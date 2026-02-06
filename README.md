@@ -14,4 +14,4 @@
 * Rare Drop Notification
   - Display rare drops from golems in title and chat.
 # WARNING!
-## This mod is under development and may be unstable. Use at your own risk.
+## This mod is under development and may be unstable, Use at your own risk.
