@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "gankura",
+	"version": "${version}",
+	"name": "GanKura",
+	"description": "A Hypixel Skyblock Mod Focused on End Stone Protector.",
+	"authors": [
+		"GanKuraDee"
+	],
+
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/gankura/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.deeply.GanKura"
+		],
+		"client": [
+			"com.deeply.gankura.GanKura"
+		]
+	},
+	"mixins": [
+		"gankura.mixins.json",
+		{
+			"config": "gankura.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

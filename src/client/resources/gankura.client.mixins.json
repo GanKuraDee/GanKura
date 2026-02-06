@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "com.deeply.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"HudRenderMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
