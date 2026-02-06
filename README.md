@@ -6,9 +6,9 @@
 * Golem Location Display
   - Display the golem spawn location on the HUD.
 * Golem Spawning Countdown
-  - Display 20s countdown on the HUD until the golem spawns. (Considering server ticks)
+  - Display 20s countdown on the HUD until the golem spawns. (Considering the server ticks)
 * DPS Calculator
-  - Shows your DPS you have dealt to the golem in the chat. (Considering server ticks)
+  - Shows your DPS you have dealt to the golem in the chat. (Considering the server ticks)
 * Loot Quality Calculator
   - Shows your golem's loot quality in the chat.
 * Rare Drop Notification
