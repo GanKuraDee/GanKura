@@ -2,11 +2,13 @@
 ## GanKura is a Hypixel Skyblock Mod focused on End Stone Protector.
 # Features
 * Golem Stage Display
-  - Display the Golem stage on the HUD.
+  - Displays the Golem stage on the HUD.
 * Golem Location Display
-  - Display the golem spawn location on the HUD.
+  - Displays the golem spawn location on the HUD.
 * Golem Spawning Countdown
-  - Display 20s countdown on the HUD until the golem spawns. (Considering the server ticks)
+  - Displays 20s countdown on the HUD until the golem spawns. (Considering the server ticks)
+* Stage 4 Duration Display
+  - Displays the time it took for the golem to reach Stage 5 on the HUD and chat.
 * DPS Calculator
   - Shows your DPS you have dealt to the golem in the chat. (Considering the server ticks)
 * Loot Quality Calculator
