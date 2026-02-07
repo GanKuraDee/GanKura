@@ -31,16 +31,14 @@ public class CombatStatsHandler {
             if (client.world != null) {
                 GameState.fightEndTime = client.world.getTime();
 
-                // ★修正: 遅延なしで即時スキャン開始
+                // Lootスキャン開始
                 GameState.isLootScanning = true;
                 GameState.hasShownDropAlert = false;
-                // LOGGER.info("Loot Scanning Started (Instant)");
             }
             return;
         }
 
-        // ... (以下、変更なし) ...
-
+        // 3. 1位ダメージ収集
         Matcher firstMatcher = ModConstants.FIRST_PLACE_PATTERN.matcher(msg);
         if (firstMatcher.find()) {
             try {
@@ -50,6 +48,7 @@ public class CombatStatsHandler {
             return;
         }
 
+        // 4. Zealot数収集
         Matcher zealotMatcher = ModConstants.ZEALOT_PATTERN.matcher(msg);
         if (zealotMatcher.find()) {
             try {
@@ -59,20 +58,25 @@ public class CombatStatsHandler {
             return;
         }
 
+        // 5. 結果表示 (Your Damage)
         Matcher dmgMatcher = ModConstants.DAMAGE_PATTERN.matcher(msg);
         if (dmgMatcher.find()) {
             processResult(dmgMatcher, client);
         }
     }
 
-    // ... (既存のメソッド群はそのまま) ...
-
     private static void processResult(Matcher matcher, MinecraftClient client) {
-        if (client.world == null || GameState.fightStartTime <= 0) return;
-        long endTime = GameState.fightEndTime;
-        if (endTime == 0) endTime = client.world.getTime();
+        if (client.world == null) return;
 
-        if (endTime <= GameState.fightStartTime) return;
+        long lastDownTime = GameState.fightEndTime;
+        long currentTime = client.world.getTime();
+
+        // ★修正: 以下の条件でのみ処理を実行する
+        // 1. Golemの討伐時刻(fightEndTime)が記録されている (Dragonの場合は記録されないので0になる)
+        // 2. その討伐が「ついさっき(20秒以内)」である (古いGolem討伐情報の誤用を防ぐ)
+        if (lastDownTime == 0 || (currentTime - lastDownTime) > 400) { // 400tick = 20秒
+            return;
+        }
 
         try {
             String rawDamage = matcher.group(1).replace(",", "");
@@ -80,22 +84,34 @@ public class CombatStatsHandler {
             String rawPos = matcher.group(2).replace(",", "");
             int myPosition = Integer.parseInt(rawPos);
 
-            long durationTicks = endTime - GameState.fightStartTime;
-            double durationSeconds = durationTicks / 20.0;
+            // DPS計算用変数
+            String formattedDps = null;
+            String durationStr = null;
 
-            if (durationSeconds > 0) {
-                double dps = myDamage / durationSeconds;
-                String formattedDps = formatDps(dps);
-                String durationStr = String.format("%.1fs", durationSeconds);
+            // Start時刻も記録されている場合のみ DPS を計算
+            if (GameState.fightStartTime > 0 && lastDownTime > GameState.fightStartTime) {
+                long durationTicks = lastDownTime - GameState.fightStartTime;
+                double durationSeconds = durationTicks / 20.0;
 
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        int lootQuality = calculateLootQuality(myDamage, myPosition);
-                        printResult(client, formattedDps, durationStr, lootQuality);
-                    }
-                }, 500);
+                if (durationSeconds > 0) {
+                    double dps = myDamage / durationSeconds;
+                    formattedDps = formatDps(dps);
+                    durationStr = String.format("%.1fs", durationSeconds);
+                }
             }
+
+            String finalDps = formattedDps;
+            String finalDuration = durationStr;
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    // Loot Quality は Golem Down さえあれば計算して表示
+                    int lootQuality = calculateLootQuality(myDamage, myPosition);
+                    printResult(client, finalDps, finalDuration, lootQuality);
+                }
+            }, 500);
+
         } catch (Exception e) {
             LOGGER.error("Failed to calculate stats", e);
         }
@@ -108,7 +124,12 @@ public class CombatStatsHandler {
 
         client.execute(() -> {
             if (client.player != null) {
-                client.player.sendMessage(Text.literal(String.format("§a[GanKura] §bYour Golem DPS: %s §7(%s)", dps, duration)), false);
+                // DPS情報がある場合のみ表示
+                if (dps != null && duration != null) {
+                    client.player.sendMessage(Text.literal(String.format("§a[GanKura] §bYour Golem DPS: %s §7(%s)", dps, duration)), false);
+                }
+
+                // Loot Quality は常に表示
                 client.player.sendMessage(Text.literal(String.format("§a[GanKura] §eGolem Loot Quality: %d", lq)), false);
                 String dropsMsg = String.format("§a[GanKura] §6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
                 client.player.sendMessage(Text.literal(dropsMsg), false);
