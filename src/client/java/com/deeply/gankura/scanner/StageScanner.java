@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 public class StageScanner {
@@ -20,9 +22,6 @@ public class StageScanner {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // ★削除: クライアント側での減算処理は廃止（サーバー時間依存に戻すため）
-
-            // 1秒(20Tick)ごとのスキャン
             if (scanTickCounter++ < 20) return;
             scanTickCounter = 0;
             scanTabList(client);
@@ -33,7 +32,6 @@ public class StageScanner {
         if (GameState.isScanning) GameState.isScanning = false;
 
         if (client.world != null) {
-            // 現在のサーバー時間 + 400Tick (20秒) をセット
             GameState.stage5TargetTime = client.world.getTime() + 400;
         }
 
@@ -64,9 +62,7 @@ public class StageScanner {
                 String rawState = matcher.group(1).trim().split("\\s+")[0];
                 String stageName = normalizeStageName(rawState);
 
-                // 初回スキャンで既にSummonedだった場合
                 if (wasScanning && ModConstants.STAGE_SUMMONED.equals(stageName)) {
-                    // ターゲット時間を「過去(1)」にして即Spawned表示にする
                     GameState.stage5TargetTime = 1;
                 }
 
@@ -99,16 +95,54 @@ public class StageScanner {
         GameState.golemStage = newStage;
         LOGGER.info("Stage updated: {} -> {}", oldStage, newStage);
 
+        // --- Stage 4 開始判定 ---
         if (ModConstants.STAGE_AWAKENING.equals(newStage)) {
+            // タイマースタート
+            GameState.stage4StartTime = System.currentTimeMillis();
+
             NotificationUtils.showAwakeningAlert(client);
             NotificationUtils.playAwakeningSound(client);
-        } else if (ModConstants.STAGE_SUMMONED.equals(newStage)) {
-            // タイマー未設定の場合のみセット
+        }
+
+        // --- Stage 5 開始判定 (Stage 4 終了) ---
+        else if (ModConstants.STAGE_SUMMONED.equals(newStage)) {
+            // 直前が Stage 4 であれば時間を計算して表示
+            if (ModConstants.STAGE_AWAKENING.equals(oldStage) && GameState.stage4StartTime > 0) {
+                long durationMillis = System.currentTimeMillis() - GameState.stage4StartTime;
+                long seconds = durationMillis / 1000;
+                long minutes = seconds / 60;
+                long remainingSeconds = seconds % 60;
+
+                // ★修正: 0.1秒 (100ms) 遅らせてチャット表示
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // Minecraftのメインスレッドでチャットを送信 (スレッドセーフ)
+                        client.execute(() -> {
+                            if (client.player != null) {
+                                client.player.sendMessage(
+                                        Text.literal(String.format("§a[GanKura] Stage 4 Duration: %dm %ds", minutes, remainingSeconds)),
+                                        false
+                                );
+                            }
+                        });
+                    }
+                }, 100);
+            }
+            // 計測終了なのでリセット
+            GameState.stage4StartTime = 0;
+
+            // Stage 5 の通常処理
             if (GameState.stage5TargetTime == 0 && client.world != null) {
                 GameState.stage5TargetTime = client.world.getTime() + 400;
             }
             NotificationUtils.showSummonedAlert(client);
             NotificationUtils.playSummonedSound(client);
+        }
+
+        // それ以外へ遷移した場合はタイマーリセット
+        else {
+            GameState.stage4StartTime = 0;
         }
     }
 }
