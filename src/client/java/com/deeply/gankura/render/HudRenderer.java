@@ -76,5 +76,17 @@ public class HudRenderer {
                 context.drawTextWithShadow(tr, locText, x, y + 24, 0xFFFFFFFF);
             }
         }
+
+        if (ModConstants.STAGE_AWAKENING.equals(stage) && GameState.stage4StartTime > 0) {
+            long durationMillis = System.currentTimeMillis() - GameState.stage4StartTime;
+            long seconds = durationMillis / 1000;
+            long minutes = seconds / 60;
+            long remainingSeconds = seconds % 60;
+
+            String timerText = String.format("Since S4: %dm %ds", minutes, remainingSeconds);
+
+            // Location (y+24) の下の行なので y+36
+            context.drawTextWithShadow(tr, timerText, x, y + 36, 0xFFFFFFFF);
+        }
     }
 }

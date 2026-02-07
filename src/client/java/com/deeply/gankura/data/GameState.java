@@ -11,6 +11,8 @@ public class GameState {
 
     public static String golemStage = ModConstants.STAGE_RESTING;
     public static long stage5TargetTime = 0;
+    // ★追加: Stage 4 開始時刻
+    public static long stage4StartTime = 0;
 
     public static boolean isScanning = false;
 
@@ -40,6 +42,8 @@ public class GameState {
     public static void resetGolemStatus() {
         golemStage = ModConstants.STAGE_RESTING;
         stage5TargetTime = 0;
+        // ★リセット
+        stage4StartTime = 0;
 
         fightStartTime = 0;
         fightEndTime = 0;
