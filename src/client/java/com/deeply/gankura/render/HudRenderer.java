@@ -1,6 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.LootStats; // ★追加
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -31,8 +32,6 @@ public class HudRenderer {
         if (GameState.isScanning) {
             displayStats = "Stage: Scanning...";
         } else if (ModConstants.STAGE_SUMMONED.equals(stage)) {
-            // ★v1.0.1仕様: 単純なサーバー時間計算に戻す (補間なし)
-            // world.getTime() はサーバーのTPSに合わせて進むため、ラグがある場合はゆっくりになります
             long currentTime = client.world.getTime();
             long remainingTicks = GameState.stage5TargetTime - currentTime;
 
@@ -57,7 +56,7 @@ public class HudRenderer {
             displayStats = "Stage: " + num;
         }
 
-        // 左揃え設定は維持
+        // 基本座標
         int x = 260;
         int y = 50;
 
@@ -77,6 +76,7 @@ public class HudRenderer {
             }
         }
 
+        // Stage 4 経過時間タイマー
         if (ModConstants.STAGE_AWAKENING.equals(stage) && GameState.stage4StartTime > 0) {
             long durationMillis = System.currentTimeMillis() - GameState.stage4StartTime;
             long seconds = durationMillis / 1000;
@@ -84,9 +84,29 @@ public class HudRenderer {
             long remainingSeconds = seconds % 60;
 
             String timerText = String.format("Since S4: %dm %ds", minutes, remainingSeconds);
-
-            // Location (y+24) の下の行なので y+36
             context.drawTextWithShadow(tr, timerText, x, y + 36, 0xFFFFFFFF);
         }
+
+        // ★追加: Golem Loot Tracker 表示
+        // 表示位置: ステータスの下 (Y=100あたりから開始)
+        int trackerX = 260;
+        int trackerY = 100;
+
+        // タイトル
+        context.drawTextWithShadow(tr, "§6Golem Loot Tracker", trackerX, trackerY, 0xFFFFFFFF);
+
+        // Epic Golem Pet (紫)
+        // §5 = Dark Purple, §7 = Gray, §f = White
+        String epicText = String.format("§5Golem §7(Pet): §f%d", LootStats.epicGolemPets);
+        context.drawTextWithShadow(tr, epicText, trackerX, trackerY + 12, 0xFFFFFFFF);
+
+        // Legendary Golem Pet (金)
+        // §6 = Gold, §7 = Gray, §f = White
+        String legText = String.format("§6Golem §7(Pet): §f%d", LootStats.legendaryGolemPets);
+        context.drawTextWithShadow(tr, legText, trackerX, trackerY + 24, 0xFFFFFFFF);
+
+        // Tier Boost Core (金)
+        String tbcText = String.format("§6Tier Boost Core: §f%d", LootStats.tierBoostCores);
+        context.drawTextWithShadow(tr, tbcText, trackerX, trackerY + 36, 0xFFFFFFFF);
     }
 }

@@ -1,6 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.LootStats; // ★追加
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -24,7 +25,6 @@ public class ItemDropScanner {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // 2 Tick (0.1秒) ごとにスキャン
             if (tickCounter++ < 2) return;
             tickCounter = 0;
             scan(client);
@@ -60,7 +60,9 @@ public class ItemDropScanner {
 
                     // 1. Tier Boost Core (金)
                     if (nameString.contains("Tier Boost Core")) {
-                        // ★修正: 太字(BOLD)を削除し、細字(通常の太さ)で作成
+                        // ★追加: カウント保存
+                        LootStats.addTierBoostCore();
+
                         MutableText tbcText = Text.literal("Tier Boost Core").formatted(Formatting.GOLD);
                         notifyDrop(client, tbcText);
                         break;
@@ -71,7 +73,9 @@ public class ItemDropScanner {
 
                         // 金色が含まれていれば Legendary
                         if (hasColor(customName, Formatting.GOLD)) {
-                            // ★修正: 太字削除
+                            // ★追加: カウント保存
+                            LootStats.addLegendaryGolemPet();
+
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.GOLD);
                             golemText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
 
@@ -80,7 +84,9 @@ public class ItemDropScanner {
                         }
                         // 紫色なら Epic
                         else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
-                            // ★修正: 太字削除
+                            // ★追加: カウント保存
+                            LootStats.addEpicGolemPet();
+
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE);
                             golemText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
 
@@ -94,10 +100,10 @@ public class ItemDropScanner {
     }
 
     private static void notifyDrop(MinecraftClient client, Text itemText) {
-        // タイトル表示 (こちらは太字になります)
+        // タイトル表示 (太字)
         NotificationUtils.showDropAlert(client, itemText);
 
-        // チャット表示 (こちらは細字になります)
+        // チャット表示 (細字)
         NotificationUtils.sendDropChatMessage(client, itemText);
 
         NotificationUtils.playDropSound(client);
