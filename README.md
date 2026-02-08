@@ -16,5 +16,7 @@
   - Shows your golem's loot quality in the chat.
 * Rare Drop Notification
   - Display rare drops from golems in title and chat.
+* Golem Loot Tracker
+  - Displays the HUD with rare drops from golems so far.
 # WARNING!
 ## This mod is under development and may be unstable, Use at your own risk.
