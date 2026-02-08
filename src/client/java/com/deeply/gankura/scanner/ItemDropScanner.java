@@ -2,6 +2,7 @@ package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.LootStats; // ★追加
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -100,13 +101,12 @@ public class ItemDropScanner {
     }
 
     private static void notifyDrop(MinecraftClient client, Text itemText) {
-        // タイトル表示 (太字)
-        NotificationUtils.showDropAlert(client, itemText);
-
-        // チャット表示 (細字)
-        NotificationUtils.sendDropChatMessage(client, itemText);
-
-        NotificationUtils.playDropSound(client);
+        // ★追加: 設定チェック// ★追加: 設定チェック
+        if (ModConfig.enableDropAlerts) {
+            NotificationUtils.showDropAlert(client, itemText);
+            NotificationUtils.sendDropChatMessage(client, itemText);
+            NotificationUtils.playDropSound(client);
+        }
         GameState.hasShownDropAlert = true;
         GameState.isLootScanning = false;
         LOGGER.info("Rare Drop Detected: " + itemText.getString());

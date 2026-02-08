@@ -1,6 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -125,14 +126,18 @@ public class CombatStatsHandler {
         client.execute(() -> {
             if (client.player != null) {
                 // DPS情報がある場合のみ表示
-                if (dps != null && duration != null) {
+                // ★追加: 設定チェック (DPS)
+                if (ModConfig.showDpsChat && dps != null && duration != null) {
                     client.player.sendMessage(Text.literal(String.format("§a[GanKura] §bYour Golem DPS: %s §7(%s)", dps, duration)), false);
                 }
 
                 // Loot Quality は常に表示
-                client.player.sendMessage(Text.literal(String.format("§a[GanKura] §eGolem Loot Quality: %d", lq)), false);
-                String dropsMsg = String.format("§a[GanKura] §6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
-                client.player.sendMessage(Text.literal(dropsMsg), false);
+                // ★追加: 設定チェック (Loot Quality)
+                if (ModConfig.showLootQualityChat) {
+                    client.player.sendMessage(Text.literal(String.format("§a[GanKura] §eGolem Loot Quality: %d", lq)), false);
+                    String dropsMsg = String.format("§a[GanKura] §6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
+                    client.player.sendMessage(Text.literal(dropsMsg), false);
+                }
             }
         });
     }

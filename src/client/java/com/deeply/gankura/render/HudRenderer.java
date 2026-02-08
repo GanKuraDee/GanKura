@@ -1,9 +1,6 @@
 package com.deeply.gankura.render;
 
-import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.HudConfig; // ★追加
-import com.deeply.gankura.data.LootStats;
-import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.data.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,8 +22,14 @@ public class HudRenderer {
         if (!isTargetMap) return;
 
         // Configの座標を使って描画
-        renderStats(context, client.textRenderer, HudConfig.statsX, HudConfig.statsY, false);
-        renderTracker(context, client.textRenderer, HudConfig.trackerX, HudConfig.trackerY);
+        if (ModConfig.showGolemStatusHud) {
+            renderStats(context, client.textRenderer, HudConfig.statsX, HudConfig.statsY, false);
+        }
+
+        // ★変更: 設定がONのときだけ描画
+        if (ModConfig.showLootTrackerHud) {
+            renderTracker(context, client.textRenderer, HudConfig.trackerX, HudConfig.trackerY);
+        }
     }
 
     // ★ Golem Status の描画メソッド (外部公開)

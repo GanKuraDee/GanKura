@@ -1,6 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -100,8 +101,10 @@ public class StageScanner {
             // タイマースタート
             GameState.stage4StartTime = System.currentTimeMillis();
 
-            NotificationUtils.showAwakeningAlert(client);
-            NotificationUtils.playAwakeningSound(client);
+            if (ModConfig.enableStageAlerts) {
+                NotificationUtils.showAwakeningAlert(client);
+                NotificationUtils.playAwakeningSound(client);
+            }
         }
 
         // --- Stage 5 開始判定 (Stage 4 終了) ---
@@ -114,20 +117,21 @@ public class StageScanner {
                 long remainingSeconds = seconds % 60;
 
                 // ★修正: 0.1秒 (100ms) 遅らせてチャット表示
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        // Minecraftのメインスレッドでチャットを送信 (スレッドセーフ)
-                        client.execute(() -> {
-                            if (client.player != null) {
-                                client.player.sendMessage(
-                                        Text.literal(String.format("§a[GanKura] Stage 4 Duration: %dm %ds", minutes, remainingSeconds)),
-                                        false
-                                );
-                            }
-                        });
-                    }
-                }, 100);
+                if (ModConfig.showStage4Duration) {
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            client.execute(() -> {
+                                if (client.player != null) {
+                                    client.player.sendMessage(
+                                            Text.literal(String.format("§a[GanKura] Stage 4 Duration: %dm %ds", minutes, remainingSeconds)),
+                                            false
+                                    );
+                                }
+                            });
+                        }
+                    }, 100);
+                }
             }
             // 計測終了なのでリセット
             GameState.stage4StartTime = 0;
@@ -136,8 +140,11 @@ public class StageScanner {
             if (GameState.stage5TargetTime == 0 && client.world != null) {
                 GameState.stage5TargetTime = client.world.getTime() + 400;
             }
-            NotificationUtils.showSummonedAlert(client);
-            NotificationUtils.playSummonedSound(client);
+// ★追加: 設定チェック (Alert)
+            if (ModConfig.enableStageAlerts) {
+                NotificationUtils.showSummonedAlert(client);
+                NotificationUtils.playSummonedSound(client);
+            }
         }
 
         // それ以外へ遷移した場合はタイマーリセット
