@@ -1,6 +1,6 @@
 # GanKura
 GanKura is a Hypixel Skyblock Mod focused on End Stone Protector.\
-(Inspired by GolemUtils https://chattriggers.com/modules/v/GolemUtils)\
+(Inspired by GolemUtils https://chattriggers.com/modules/v/GolemUtils) \
 Type /gankura to open the settings menu.
 # Features
 * Golem Stage Display
