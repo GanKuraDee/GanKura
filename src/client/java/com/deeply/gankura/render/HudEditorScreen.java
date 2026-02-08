@@ -28,7 +28,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
+        context.fill(0, 0, this.width, this.height, 0xA0000000);
 
         // --- Golem Status ---
         boolean hoverStats = isHovering(mouseX, mouseY, HudConfig.statsX, HudConfig.statsY, STATS_WIDTH, STATS_HEIGHT);
