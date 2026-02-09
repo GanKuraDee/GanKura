@@ -9,16 +9,12 @@
 	],
 
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/GanKuraDee/GanKura"
 	},
-	"license": "GPL-3.0-or-later",
+	"license": "LGPL-3.0-or-later",
 	"icon": "assets/gankura/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"com.deeply.GanKura"
-		],
 		"client": [
 			"com.deeply.gankura.GanKura"
 		]
