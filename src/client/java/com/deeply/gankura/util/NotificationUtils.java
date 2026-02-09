@@ -3,16 +3,62 @@ package com.deeply.gankura.util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class NotificationUtils {
 
+    // ★修正: [] をNetherite色、GanKuraをグラデーションにする
+    public static MutableText getGanKuraPrefix() {
+        // Netherite色 (濃い灰色/黒)
+        // ※好みに合わせて変更してください (例: 0x313335 など)
+        int netheriteColor = 0x443a3b;
+
+        // 1. 左括弧 "["
+        MutableText prefix = Text.literal("[").setStyle(Style.EMPTY.withColor(netheriteColor));
+
+        // 2. "GanKura" のグラデーション生成
+        String text = "GanKura";
+        int startColor = 0xAAAAAA; // 灰色
+        int endColor = 0xFFFFFF;   // 白
+
+        int length = text.length();
+
+        int r1 = (startColor >> 16) & 0xFF;
+        int g1 = (startColor >> 8) & 0xFF;
+        int b1 = startColor & 0xFF;
+
+        int r2 = (endColor >> 16) & 0xFF;
+        int g2 = (endColor >> 8) & 0xFF;
+        int b2 = endColor & 0xFF;
+
+        for (int i = 0; i < length; i++) {
+            float ratio = (float) i / (length - 1);
+
+            int r = (int) (r1 + (r2 - r1) * ratio);
+            int g = (int) (g1 + (g2 - g1) * ratio);
+            int b = (int) (b1 + (b2 - b1) * ratio);
+            int color = (r << 16) | (g << 8) | b;
+
+            prefix.append(Text.literal(String.valueOf(text.charAt(i)))
+                    .setStyle(Style.EMPTY.withColor(color)));
+        }
+
+        // 3. 右括弧 "]"
+        prefix.append(Text.literal("]").setStyle(Style.EMPTY.withColor(netheriteColor)));
+
+        // 4. 末尾のスペース (色はデフォルト)
+        prefix.append(Text.literal(" ").setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
+
+        return prefix;
+    }
+
     public static void showAwakeningAlert(MinecraftClient client) {
         if (client.player == null) return;
         client.inGameHud.setTitle(Text.literal("GOLEM STAGE 4").formatted(Formatting.RED, Formatting.BOLD));
         client.inGameHud.setSubtitle(Text.empty());
-        client.inGameHud.setTitleTicks(0, 70, 20);
+        client.inGameHud.setTitleTicks(2, 70, 20);
     }
 
     public static void playAwakeningSound(MinecraftClient client) {
@@ -24,7 +70,7 @@ public class NotificationUtils {
         if (client.player == null) return;
         client.inGameHud.setTitle(Text.literal("GOLEM STAGE 5").formatted(Formatting.DARK_RED, Formatting.BOLD));
         client.inGameHud.setSubtitle(Text.empty());
-        client.inGameHud.setTitleTicks(0, 70, 20);
+        client.inGameHud.setTitleTicks(2, 70, 20);
     }
 
     public static void playSummonedSound(MinecraftClient client) {
@@ -44,20 +90,15 @@ public class NotificationUtils {
         MutableText titleText = itemText.copy().formatted(Formatting.BOLD);
 
         client.inGameHud.setSubtitle(titleText);
-        client.inGameHud.setTitleTicks(0, 100, 20);
+        client.inGameHud.setTitleTicks(2, 100, 20);
     }
 
     public static void sendDropChatMessage(MinecraftClient client, Text itemText) {
         if (client.player == null) return;
 
-        // [GanKura] (緑色)
-        MutableText message = Text.literal("[GanKura] ").formatted(Formatting.GREEN);
+        MutableText message = getGanKuraPrefix();
 
-        // RARE DROP! (金色・太字)
         MutableText rareDrop = Text.literal("RARE DROP! ").formatted(Formatting.GOLD, Formatting.BOLD);
-
-        // メッセージ結合: [GanKura] RARE DROP! [アイテム名]
-        // itemText は ItemDropScanner で生成された細字の状態
         message.append(rareDrop).append(itemText);
 
         client.player.sendMessage(message, false);

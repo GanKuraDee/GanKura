@@ -3,7 +3,9 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.util.NotificationUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,15 +130,25 @@ public class CombatStatsHandler {
                 // DPS情報がある場合のみ表示
                 // ★追加: 設定チェック (DPS)
                 if (ModConfig.showDpsChat && dps != null && duration != null) {
-                    client.player.sendMessage(Text.literal(String.format("§a[GanKura] §bYour Golem DPS: %s §7(%s)", dps, duration)), false);
+                    // ★修正
+                    MutableText msg = NotificationUtils.getGanKuraPrefix();
+                    msg.append(Text.literal(String.format("§bYour Golem DPS: %s §7(%s)", dps, duration)));
+                    client.player.sendMessage(msg, false);
                 }
 
                 // Loot Quality は常に表示
                 // ★追加: 設定チェック (Loot Quality)
                 if (ModConfig.showLootQualityChat) {
-                    client.player.sendMessage(Text.literal(String.format("§a[GanKura] §eGolem Loot Quality: %d", lq)), false);
-                    String dropsMsg = String.format("§a[GanKura] §6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
-                    client.player.sendMessage(Text.literal(dropsMsg), false);
+                    // ★修正 (Quality)
+                    MutableText msg1 = NotificationUtils.getGanKuraPrefix();
+                    msg1.append(Text.literal(String.format("§eGolem Loot Quality: %d", lq)));
+                    client.player.sendMessage(msg1, false);
+
+                    // ★修正 (Drops詳細)
+                    MutableText msg2 = NotificationUtils.getGanKuraPrefix();
+                    String dropsMsg = String.format("§6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
+                    msg2.append(Text.literal(dropsMsg));
+                    client.player.sendMessage(msg2, false);
                 }
             }
         });

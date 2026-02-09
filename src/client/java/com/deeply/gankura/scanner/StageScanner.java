@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,10 +124,11 @@ public class StageScanner {
                         public void run() {
                             client.execute(() -> {
                                 if (client.player != null) {
-                                    client.player.sendMessage(
-                                            Text.literal(String.format("§a[GanKura] Stage 4 Duration: %dm %ds", minutes, remainingSeconds)),
-                                            false
-                                    );
+                                    // ★修正: グラデーションプレフィックスを使用
+                                    MutableText message = NotificationUtils.getGanKuraPrefix();
+                                    message.append(Text.literal(String.format("§aStage 4 Duration: %dm %ds", minutes, remainingSeconds)));
+
+                                    client.player.sendMessage(message, false);
                                 }
                             });
                         }
