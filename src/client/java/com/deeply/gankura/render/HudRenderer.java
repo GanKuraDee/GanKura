@@ -1,6 +1,10 @@
 package com.deeply.gankura.render;
 
-import com.deeply.gankura.data.*;
+import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.HudConfig;
+import com.deeply.gankura.data.LootStats;
+import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,26 +29,23 @@ public class HudRenderer {
         if (ModConfig.showGolemStatusHud) {
             renderStats(context, client.textRenderer, HudConfig.statsX, HudConfig.statsY, false);
         }
-
-        // ★変更: 設定がONのときだけ描画
         if (ModConfig.showLootTrackerHud) {
             renderTracker(context, client.textRenderer, HudConfig.trackerX, HudConfig.trackerY);
         }
+        if (ModConfig.showGolemHealthHud) {
+            renderHealth(context, client.textRenderer, HudConfig.healthX, HudConfig.healthY, false);
+        }
     }
 
-    // ★ Golem Status の描画メソッド (外部公開)
-    // isPreview: trueの場合、設定画面用にダミーデータを表示
     public static void renderStats(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
         String title = "§lGolem Status";
         String displayStats = "Stage: Resting";
         int color = 0xFFFFFFFF;
 
         if (isPreview) {
-            // プレビュー用データ
             displayStats = "Stage: 5 (Spawned)";
             color = 0xFFFF5555;
         } else {
-            // 通常ロジック
             String stage = GameState.golemStage;
             if (GameState.isScanning) {
                 displayStats = "Stage: Scanning...";
@@ -74,11 +75,9 @@ public class HudRenderer {
             }
         }
 
-        // タイトルとステージ描画
         context.drawTextWithShadow(tr, title, x, y, 0xFFFFAA00);
         context.drawTextWithShadow(tr, displayStats, x, y + 12, color);
 
-        // Location 描画
         String locText = null;
         if (isPreview) {
             locText = "Location: Middle Front";
@@ -95,7 +94,6 @@ public class HudRenderer {
             context.drawTextWithShadow(tr, locText, x, y + 24, 0xFFFFFFFF);
         }
 
-        // Timer 描画 (Since S4)
         if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.golemStage) && GameState.stage4StartTime > 0)) {
             String timerText;
             if (isPreview) {
@@ -105,15 +103,12 @@ public class HudRenderer {
                 long seconds = durationMillis / 1000;
                 long minutes = seconds / 60;
                 long remainingSeconds = seconds % 60;
-
-                // 添付ファイルのフォーマットに合わせました
                 timerText = String.format("Since S4: %dm %ds", minutes, remainingSeconds);
             }
             context.drawTextWithShadow(tr, timerText, x, y + 36, 0xFFFFFFFF);
         }
     }
 
-    // ★ Golem Loot Tracker の描画メソッド (外部公開)
     public static void renderTracker(DrawContext context, TextRenderer tr, int x, int y) {
         context.drawTextWithShadow(tr, "§6§lGolem Loot Tracker", x, y, 0xFFFFFFFF);
 
@@ -125,5 +120,69 @@ public class HudRenderer {
 
         String tbcText = String.format("§6Tier Boost Core: §f%d", LootStats.tierBoostCores);
         context.drawTextWithShadow(tr, tbcText, x, y + 36, 0xFFFFFFFF);
+    }
+
+    // Golem HP 描画メソッド
+    public static void renderHealth(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
+        // ★修正: プレビューでなく、かつ体力データがない場合は即終了（非表示。Waiting...も出さない）
+        if (!isPreview && GameState.golemHealth == null) return;
+
+        String title = "§c§lGolem HP";
+        String hpText; // 初期値なし
+
+        if (isPreview) {
+            hpText = "§e2.4M§f/§a5M";
+        } else {
+            // ここに来る時点で golemHealth は null ではない
+            String raw = GameState.golemHealth;
+            String[] parts = raw.split("/");
+
+            if (parts.length == 2) {
+                double current = parseHealthValue(parts[0]);
+                double max = parseHealthValue(parts[1]);
+
+                String colorCode = "§a"; // デフォルト: 緑
+
+                if (current >= 0 && max > 0) {
+                    // 優先順位1: 残り1M未満 -> 赤
+                    if (current < 1_000_000) {
+                        colorCode = "§c";
+                    }
+                    // 優先順位2: 最大体力の半分未満 -> 黄
+                    else if (current < (max / 2.0)) {
+                        colorCode = "§e";
+                    }
+                }
+
+                hpText = colorCode + parts[0] + "§f/§a" + parts[1];
+            } else {
+                hpText = "§a" + raw.replace("/", "§f/§a");
+            }
+        }
+
+        context.drawTextWithShadow(tr, title, x, y, 0xFFFFFFFF);
+        context.drawTextWithShadow(tr, hpText, x, y + 12, 0xFFFFFFFF);
+    }
+
+    private static double parseHealthValue(String s) {
+        try {
+            s = s.trim();
+            if (s.isEmpty()) return 0;
+
+            double multiplier = 1.0;
+            char last = s.charAt(s.length() - 1);
+
+            if (last == 'M' || last == 'm') {
+                multiplier = 1_000_000.0;
+                s = s.substring(0, s.length() - 1);
+            } else if (last == 'k' || last == 'K') {
+                multiplier = 1_000.0;
+                s = s.substring(0, s.length() - 1);
+            }
+
+            return Double.parseDouble(s) * multiplier;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

@@ -22,6 +22,8 @@ public class ModConfig {
     // 設定項目 (デフォルトは全て true)
     public static boolean showGolemStatusHud = true;
     public static boolean showLootTrackerHud = true;
+    // ★追加: 体力HUDの表示設定
+    public static boolean showGolemHealthHud = true;
     public static boolean enableStageAlerts = true;     // Stage 4/5 Title & Sound
     public static boolean enableDropAlerts = true;      // Drop Title & Sound
     public static boolean showStage4Duration = true;    // Chat
@@ -41,6 +43,8 @@ public class ModConfig {
             properties.load(in);
             showGolemStatusHud = parseBool("showGolemStatusHud", true);
             showLootTrackerHud = parseBool("showLootTrackerHud", true);
+            // ★追加
+            showGolemHealthHud = parseBool("showGolemHealthHud", true);
             enableStageAlerts = parseBool("enableStageAlerts", true);
             enableDropAlerts = parseBool("enableDropAlerts", true);
             showStage4Duration = parseBool("showStage4Duration", true);
@@ -57,6 +61,8 @@ public class ModConfig {
 
         properties.setProperty("showGolemStatusHud", String.valueOf(showGolemStatusHud));
         properties.setProperty("showLootTrackerHud", String.valueOf(showLootTrackerHud));
+        // ★追加
+        properties.setProperty("showGolemHealthHud", String.valueOf(showGolemHealthHud));
         properties.setProperty("enableStageAlerts", String.valueOf(enableStageAlerts));
         properties.setProperty("enableDropAlerts", String.valueOf(enableDropAlerts));
         properties.setProperty("showStage4Duration", String.valueOf(showStage4Duration));

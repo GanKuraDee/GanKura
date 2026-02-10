@@ -11,6 +11,8 @@ public class HudEditorScreen extends Screen {
     // ドラッグ状態
     private boolean draggingStats = false;
     private boolean draggingTracker = false;
+    // ★追加
+    private boolean draggingHealth = false;
 
     // ドラッグ開始時のオフセット
     private int dragOffsetX = 0;
@@ -21,6 +23,9 @@ public class HudEditorScreen extends Screen {
     private final int STATS_HEIGHT = 50;
     private final int TRACKER_WIDTH = 150;
     private final int TRACKER_HEIGHT = 50;
+    // ★追加
+    private final int HEALTH_WIDTH = 100;
+    private final int HEALTH_HEIGHT = 30;
 
     public HudEditorScreen() {
         super(Text.literal("GanKura HUD Editor"));
@@ -45,6 +50,13 @@ public class HudEditorScreen extends Screen {
 
         // 描画
         HudRenderer.renderTracker(context, textRenderer, HudConfig.trackerX, HudConfig.trackerY);
+
+        // --- ★追加: Golem Health ---
+        boolean hoverHealth = isHovering(mouseX, mouseY, HudConfig.healthX, HudConfig.healthY, HEALTH_WIDTH, HEALTH_HEIGHT);
+        int healthBoxColor = (hoverHealth || draggingHealth) ? 0x80FFFFFF : 0x40000000;
+        context.fill(HudConfig.healthX - 5, HudConfig.healthY - 5, HudConfig.healthX + HEALTH_WIDTH, HudConfig.healthY + HEALTH_HEIGHT, healthBoxColor);
+
+        HudRenderer.renderHealth(context, textRenderer, HudConfig.healthX, HudConfig.healthY, true);
 
         // 説明
         context.drawCenteredTextWithShadow(textRenderer, "Drag to move HUDs. Press ESC to save & exit.", width / 2, 20, 0xFFFFFF);
@@ -73,6 +85,13 @@ public class HudEditorScreen extends Screen {
                 dragOffsetY = (int)mouseY - HudConfig.trackerY;
                 return true;
             }
+            // ★追加
+            if (isHovering((int)mouseX, (int)mouseY, HudConfig.healthX, HudConfig.healthY, HEALTH_WIDTH, HEALTH_HEIGHT)) {
+                draggingHealth = true;
+                dragOffsetX = (int)mouseX - HudConfig.healthX;
+                dragOffsetY = (int)mouseY - HudConfig.healthY;
+                return true;
+            }
         }
         return false; // superは削除
     }
@@ -82,6 +101,7 @@ public class HudEditorScreen extends Screen {
         boolean wasDragging = draggingStats || draggingTracker;
         draggingStats = false;
         draggingTracker = false;
+        draggingHealth = false; // ★追加
         return wasDragging;
     }
 
@@ -99,6 +119,11 @@ public class HudEditorScreen extends Screen {
         if (draggingTracker) {
             HudConfig.trackerX = (int)mouseX - dragOffsetX;
             HudConfig.trackerY = (int)mouseY - dragOffsetY;
+            return true;
+        }
+        if (draggingHealth) {
+            HudConfig.healthX = (int)mouseX - dragOffsetX;
+            HudConfig.healthY = (int)mouseY - dragOffsetY;
             return true;
         }
         return false;

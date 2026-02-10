@@ -13,6 +13,8 @@ public class GameState {
     public static long stage5TargetTime = 0;
     // ★追加: Stage 4 開始時刻
     public static long stage4StartTime = 0;
+    // ★追加: Golemの体力文字列 (例: "3.2M/5M")
+    public static String golemHealth = null;
 
     public static boolean isScanning = false;
 

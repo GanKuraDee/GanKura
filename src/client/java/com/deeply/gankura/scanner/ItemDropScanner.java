@@ -1,7 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.LootStats; // ★追加
+import com.deeply.gankura.data.LootStats;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
@@ -18,16 +18,17 @@ import org.slf4j.LoggerFactory;
 
 public class ItemDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("ItemDropScanner");
-    private static int tickCounter = 0;
+    // private static int tickCounter = 0; // ★削除: 毎tick実行のため不要
 
     // スキャン継続時間カウント用
     private static int scanDurationTicks = 0;
-    private static final int MAX_SCAN_DURATION = 1200; // 60秒
+    private static final int MAX_SCAN_DURATION = 1200; // 60秒 (20 tick * 60)
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (tickCounter++ < 2) return;
-            tickCounter = 0;
+            // ★変更: カウント判定を削除し、毎tick実行する
+            // if (tickCounter++ < 2) return;
+            // tickCounter = 0;
             scan(client);
         });
     }
@@ -43,7 +44,9 @@ public class ItemDropScanner {
                 !ModConstants.MODE_COMBAT_3.equals(GameState.mode)) return;
 
         // タイムアウトチェック
-        scanDurationTicks += 2;
+        // ★変更: 毎tick実行されるため、カウントアップは +1 にする
+        scanDurationTicks++;
+
         if (scanDurationTicks > MAX_SCAN_DURATION) {
             GameState.isLootScanning = false;
             return;
@@ -61,7 +64,6 @@ public class ItemDropScanner {
 
                     // 1. Tier Boost Core (金)
                     if (nameString.contains("Tier Boost Core")) {
-                        // ★追加: カウント保存
                         LootStats.addTierBoostCore();
 
                         MutableText tbcText = Text.literal("Tier Boost Core").formatted(Formatting.GOLD);
@@ -74,7 +76,6 @@ public class ItemDropScanner {
 
                         // 金色が含まれていれば Legendary
                         if (hasColor(customName, Formatting.GOLD)) {
-                            // ★追加: カウント保存
                             LootStats.addLegendaryGolemPet();
 
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.GOLD);
@@ -85,7 +86,6 @@ public class ItemDropScanner {
                         }
                         // 紫色なら Epic
                         else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
-                            // ★追加: カウント保存
                             LootStats.addEpicGolemPet();
 
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE);
@@ -101,7 +101,7 @@ public class ItemDropScanner {
     }
 
     private static void notifyDrop(MinecraftClient client, Text itemText) {
-        // ★追加: 設定チェック// ★追加: 設定チェック
+        // 設定チェック
         if (ModConfig.enableDropAlerts) {
             NotificationUtils.showDropAlert(client, itemText);
             NotificationUtils.sendDropChatMessage(client, itemText);

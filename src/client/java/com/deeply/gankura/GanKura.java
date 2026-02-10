@@ -2,6 +2,7 @@ package com.deeply.gankura;
 
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.render.ConfigScreen; // ★追加
+import com.deeply.gankura.scanner.GolemHealthScanner; // ★追加
 import com.deeply.gankura.render.HudEditorScreen;
 import com.deeply.gankura.scanner.ItemDropScanner;
 import com.deeply.gankura.scanner.LocationScanner;
@@ -22,6 +23,8 @@ public class GanKura implements ClientModInitializer {
         StageScanner.register();
         LocationScanner.register();
         ItemDropScanner.register();
+        // ★追加
+        GolemHealthScanner.register();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")

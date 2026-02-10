@@ -35,6 +35,11 @@ public class ConfigScreen extends Screen {
                 ModConfig.showLootTrackerHud, b -> ModConfig.showLootTrackerHud = b));
         y += spacing;
 
+        // ★追加: 4. Golem Health HUD
+        this.addDrawableChild(createToggleButton(centerX, y, "Golem HP HUD",
+                ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
+        y += spacing;
+
         // 4. Stage Alerts (Title/Sound)
         this.addDrawableChild(createToggleButton(centerX, y, "Stage Alerts (Title & Sound)",
                 ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
