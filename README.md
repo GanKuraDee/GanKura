@@ -10,6 +10,8 @@ Type /gankura to open the settings menu.
   - Displays the golem spawn location on the HUD.
 * Golem Spawning Countdown
   - Displays 20s countdown on the HUD until the golem spawns. (Considering the server ticks)
+* Golem HP Display
+  - Displays the golem's HP on the HUD.
 * Stage 4 Duration Display
   - Displays the time it took for the golem to reach Stage 5 on the HUD and chat.
 * DPS Calculator
