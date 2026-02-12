@@ -20,12 +20,13 @@ import java.util.regex.Matcher;
 
 public class StageScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("StageScanner");
-    private static int scanTickCounter = 0;
+    // private static int scanTickCounter = 0; // ★削除: 毎tick実行のため不要
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (scanTickCounter++ < 20) return;
-            scanTickCounter = 0;
+            // ★変更: カウント制限を削除し、毎tick実行する
+            // if (scanTickCounter++ < 20) return;
+            // scanTickCounter = 0;
             scanTabList(client);
         });
     }
@@ -117,14 +118,14 @@ public class StageScanner {
                 long minutes = seconds / 60;
                 long remainingSeconds = seconds % 60;
 
-                // ★修正: 0.1秒 (100ms) 遅らせてチャット表示
+                // 0.1秒 (100ms) 遅らせてチャット表示
                 if (ModConfig.showStage4Duration) {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             client.execute(() -> {
                                 if (client.player != null) {
-                                    // ★修正: グラデーションプレフィックスを使用
+                                    // グラデーションプレフィックスを使用
                                     MutableText message = NotificationUtils.getGanKuraPrefix();
                                     message.append(Text.literal(String.format("§aStage 4 Duration: %dm %ds", minutes, remainingSeconds)));
 
@@ -142,7 +143,7 @@ public class StageScanner {
             if (GameState.stage5TargetTime == 0 && client.world != null) {
                 GameState.stage5TargetTime = client.world.getTime() + 400;
             }
-// ★追加: 設定チェック (Alert)
+            // 設定チェック (Alert)
             if (ModConfig.enableStageAlerts) {
                 NotificationUtils.showSummonedAlert(client);
                 NotificationUtils.playSummonedSound(client);
