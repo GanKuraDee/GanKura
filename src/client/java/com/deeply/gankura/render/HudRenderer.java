@@ -17,7 +17,6 @@ public class HudRenderer {
         if (client.player == null || client.options.hudHidden) return;
         if (client.world == null) return;
 
-        // 設定画面を開いているときは、重複防止のためオーバーレイを非表示にする
         if (client.currentScreen instanceof HudEditorScreen) return;
 
         if (!ModConstants.GAME_TYPE_SKYBLOCK.equals(GameState.gametype)) return;
@@ -25,7 +24,6 @@ public class HudRenderer {
                 || ModConstants.MODE_COMBAT_3.equals(GameState.mode);
         if (!isTargetMap) return;
 
-        // Configの座標を使って描画
         if (ModConfig.showGolemStatusHud) {
             renderStats(context, client.textRenderer, HudConfig.statsX, HudConfig.statsY, false);
         }
@@ -47,16 +45,33 @@ public class HudRenderer {
             color = 0xFFFF5555;
         } else {
             String stage = GameState.golemStage;
+
             if (GameState.isScanning) {
                 displayStats = "Stage: Scanning...";
             } else if (ModConstants.STAGE_SUMMONED.equals(stage)) {
-                long currentTime = MinecraftClient.getInstance().world.getTime();
-                long remainingTicks = GameState.stage5TargetTime - currentTime;
+
+                // --- ★Devonian式 厳密同期ロジック ---
+
+                // 1. 最後にパケットが届いてから、現実で何秒経ったか？
+                long timeSincePacket = System.currentTimeMillis() - GameState.lastServerPacketArrivalMillis;
+
+                // 2. もし1.5秒以上パケットが来ていないなら、ラグとみなして時間を止める (Clamp)
+                //    (通常は1秒ごとに来るはず)
+                if (timeSincePacket > 1000) {
+                    timeSincePacket = 1000;
+                }
+
+                // 3. 現在の推定サーバー時刻 = パケットの時刻 + 経過時間(Tick換算)
+                //    (timeSincePacket が 1500 で止まれば、この時刻も止まる)
+                double estimatedServerTime = GameState.lastServerTimePacket + (timeSincePacket / 50.0);
+
+                // 4. カウントダウン計算
+                double remainingTicks = GameState.stage5TargetTime - estimatedServerTime;
 
                 if (remainingTicks < 0) remainingTicks = 0;
 
                 if (remainingTicks > 0) {
-                    displayStats = String.format("Stage: 5 (%.1fs)", remainingTicks / 20.0f);
+                    displayStats = String.format("Stage: 5 (%.1fs)", remainingTicks / 20.0);
                     color = 0xFFFF5555;
                 } else {
                     displayStats = "Stage: 5 (Spawned)";
@@ -78,6 +93,11 @@ public class HudRenderer {
         context.drawTextWithShadow(tr, title, x, y, 0xFFFFAA00);
         context.drawTextWithShadow(tr, displayStats, x, y + 12, color);
 
+        // LocationとStage4タイマーの描画 (変更なし)
+        renderLocationAndTimer(context, tr, x, y, isPreview);
+    }
+
+    private static void renderLocationAndTimer(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
         String locText = null;
         if (isPreview) {
             locText = "Location: Middle Front";
@@ -122,18 +142,15 @@ public class HudRenderer {
         context.drawTextWithShadow(tr, tbcText, x, y + 36, 0xFFFFFFFF);
     }
 
-    // Golem HP 描画メソッド
     public static void renderHealth(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
-        // ★修正: プレビューでなく、かつ体力データがない場合は即終了（非表示。Waiting...も出さない）
         if (!isPreview && GameState.golemHealth == null) return;
 
         String title = "§c§lGolem HP";
-        String hpText; // 初期値なし
+        String hpText;
 
         if (isPreview) {
             hpText = "§e2.4M§f/§a5M";
         } else {
-            // ここに来る時点で golemHealth は null ではない
             String raw = GameState.golemHealth;
             String[] parts = raw.split("/");
 
@@ -141,25 +158,20 @@ public class HudRenderer {
                 double current = parseHealthValue(parts[0]);
                 double max = parseHealthValue(parts[1]);
 
-                String colorCode = "§a"; // デフォルト: 緑
+                String colorCode = "§a";
 
                 if (current >= 0 && max > 0) {
-                    // 優先順位1: 残り1M未満 -> 赤
                     if (current < 1_000_000) {
                         colorCode = "§c";
-                    }
-                    // 優先順位2: 最大体力の半分未満 -> 黄
-                    else if (current < (max / 2.0)) {
+                    } else if (current < (max / 2.0)) {
                         colorCode = "§e";
                     }
                 }
-
                 hpText = colorCode + parts[0] + "§f/§a" + parts[1];
             } else {
                 hpText = "§a" + raw.replace("/", "§f/§a");
             }
         }
-
         context.drawTextWithShadow(tr, title, x, y, 0xFFFFFFFF);
         context.drawTextWithShadow(tr, hpText, x, y + 12, 0xFFFFFFFF);
     }
@@ -168,10 +180,8 @@ public class HudRenderer {
         try {
             s = s.trim();
             if (s.isEmpty()) return 0;
-
             double multiplier = 1.0;
             char last = s.charAt(s.length() - 1);
-
             if (last == 'M' || last == 'm') {
                 multiplier = 1_000_000.0;
                 s = s.substring(0, s.length() - 1);
@@ -179,7 +189,6 @@ public class HudRenderer {
                 multiplier = 1_000.0;
                 s = s.substring(0, s.length() - 1);
             }
-
             return Double.parseDouble(s) * multiplier;
         } catch (NumberFormatException e) {
             return 0;

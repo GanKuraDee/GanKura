@@ -33,6 +33,10 @@ public class GameState {
     public static String locationName = "None";
     public static BlockPos locationPos = null;
 
+    // ★追加: Mixinから書き込まれる「真のサーバー時刻」情報
+    public static long lastServerTimePacket = 0;
+    public static long lastServerPacketArrivalMillis = 0;
+
     public static void reset() {
         serverId = "Unknown";
         gametype = "Unknown";

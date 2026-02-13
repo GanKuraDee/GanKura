@@ -3,7 +3,8 @@
 	"package": "com.deeply.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"HudRenderMixin"
+		"HudRenderMixin",
+		"WorldTimeMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
