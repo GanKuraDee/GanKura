@@ -1,4 +1,4 @@
-package com.deeply.mixin.client;
+package com.deeply.gankura.mixin.client;
 
 import com.deeply.gankura.data.GameState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;

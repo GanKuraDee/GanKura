@@ -20,7 +20,6 @@
 		]
 	},
 	"mixins": [
-		"gankura.mixins.json",
 		{
 			"config": "gankura.client.mixins.json",
 			"environment": "client"

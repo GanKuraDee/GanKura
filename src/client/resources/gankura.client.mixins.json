@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "com.deeply.mixin.client",
+	"package": "com.deeply.gankura.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"HudRenderMixin",
