@@ -1,5 +1,6 @@
 package com.deeply.gankura;
 
+import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.render.ConfigScreen; // ★追加
 import com.deeply.gankura.scanner.GolemHealthScanner; // ★追加
@@ -10,6 +11,7 @@ import com.deeply.gankura.scanner.StageScanner;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

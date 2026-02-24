@@ -3,7 +3,6 @@ package com.deeply.gankura.data;
 import net.minecraft.util.math.BlockPos;
 
 public class GameState {
-    // ... (既存の変数はそのまま) ...
     public static String serverId = "Unknown";
     public static String gametype = "Unknown";
     public static String mode = "Unknown";
@@ -11,12 +10,13 @@ public class GameState {
 
     public static String golemStage = ModConstants.STAGE_RESTING;
     public static long stage5TargetTime = 0;
-    // ★追加: Stage 4 開始時刻
     public static long stage4StartTime = 0;
-    // ★追加: Golemの体力文字列 (例: "3.2M/5M")
     public static String golemHealth = null;
 
     public static boolean isScanning = false;
+
+    // ★追加: ゴーレムが実際にRiseしたかどうか
+    public static boolean hasGolemRisen = false;
 
     // 戦闘統計
     public static long fightStartTime = 0;
@@ -26,14 +26,11 @@ public class GameState {
 
     // ドロップ通知関連
     public static boolean hasShownDropAlert = false;
-
-    // ★追加: ルートスキャン中かどうか
     public static boolean isLootScanning = false;
 
     public static String locationName = "None";
     public static BlockPos locationPos = null;
 
-    // ★追加: Mixinから書き込まれる「真のサーバー時刻」情報
     public static long lastServerTimePacket = 0;
     public static long lastServerPacketArrivalMillis = 0;
 
@@ -48,7 +45,6 @@ public class GameState {
     public static void resetGolemStatus() {
         golemStage = ModConstants.STAGE_RESTING;
         stage5TargetTime = 0;
-        // ★リセット
         stage4StartTime = 0;
 
         fightStartTime = 0;
@@ -58,9 +54,10 @@ public class GameState {
         lastZealotKills = 0;
 
         hasShownDropAlert = false;
-
-        // ★リセット
         isLootScanning = false;
+
+        // ★追加: リセット時にフラグを戻す
+        hasGolemRisen = false;
 
         locationName = "None";
         locationPos = null;

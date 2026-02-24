@@ -22,13 +22,15 @@ public class ModConfig {
     // 設定項目 (デフォルトは全て true)
     public static boolean showGolemStatusHud = true;
     public static boolean showLootTrackerHud = true;
-    // ★追加: 体力HUDの表示設定
     public static boolean showGolemHealthHud = true;
-    public static boolean enableStageAlerts = true;     // Stage 4/5 Title & Sound
-    public static boolean enableDropAlerts = true;      // Drop Title & Sound
-    public static boolean showStage4Duration = true;    // Chat
-    public static boolean showDpsChat = true;           // Chat
-    public static boolean showLootQualityChat = true;   // Chat
+    public static boolean enableStageAlerts = true;
+    public static boolean enableDropAlerts = true;
+    public static boolean showStage4Duration = true;
+    public static boolean showDpsChat = true;
+    public static boolean showLootQualityChat = true;
+
+    // ★追加: ワールド上のテキスト表示設定
+    public static boolean showGolemWorldText = true;
 
     static {
         load();
@@ -43,13 +45,15 @@ public class ModConfig {
             properties.load(in);
             showGolemStatusHud = parseBool("showGolemStatusHud", true);
             showLootTrackerHud = parseBool("showLootTrackerHud", true);
-            // ★追加
             showGolemHealthHud = parseBool("showGolemHealthHud", true);
             enableStageAlerts = parseBool("enableStageAlerts", true);
             enableDropAlerts = parseBool("enableDropAlerts", true);
             showStage4Duration = parseBool("showStage4Duration", true);
             showDpsChat = parseBool("showDpsChat", true);
             showLootQualityChat = parseBool("showLootQualityChat", true);
+
+            // ★追加: 読み込み処理
+            showGolemWorldText = parseBool("showGolemWorldText", true);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -61,13 +65,15 @@ public class ModConfig {
 
         properties.setProperty("showGolemStatusHud", String.valueOf(showGolemStatusHud));
         properties.setProperty("showLootTrackerHud", String.valueOf(showLootTrackerHud));
-        // ★追加
         properties.setProperty("showGolemHealthHud", String.valueOf(showGolemHealthHud));
         properties.setProperty("enableStageAlerts", String.valueOf(enableStageAlerts));
         properties.setProperty("enableDropAlerts", String.valueOf(enableDropAlerts));
         properties.setProperty("showStage4Duration", String.valueOf(showStage4Duration));
         properties.setProperty("showDpsChat", String.valueOf(showDpsChat));
         properties.setProperty("showLootQualityChat", String.valueOf(showLootQualityChat));
+
+        // ★追加: 保存処理
+        properties.setProperty("showGolemWorldText", String.valueOf(showGolemWorldText));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");

@@ -72,10 +72,16 @@ public class HudRenderer {
 
                 if (remainingTicks > 0) {
                     displayStats = String.format("Stage: 5 (%.1fs)", remainingTicks / 20.0);
-                    color = 0xFFFF5555;
+                    color = 0xFFFF5555; // カウントダウン中は赤色
                 } else {
-                    displayStats = "Stage: 5 (Spawned)";
-                    color = 0xFFFF5555;
+                    if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
+                        displayStats = "Stage: 5 (Soon)";
+                        // ★変更: (Soon) の時は黄色 (ARGB: 0xFFFFFF55)
+                        color = 0xFFFFFF55;
+                    } else {
+                        displayStats = "Stage: 5 (Spawned)";
+                        color = 0xFFFF5555; // Spawned の時は赤色
+                    }
                 }
             } else {
                 String num = switch (stage) {

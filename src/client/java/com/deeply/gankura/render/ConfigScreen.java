@@ -35,34 +35,39 @@ public class ConfigScreen extends Screen {
                 ModConfig.showLootTrackerHud, b -> ModConfig.showLootTrackerHud = b));
         y += spacing;
 
-        // ★追加: 4. Golem Health HUD
+        // 4. Golem Health HUD
         this.addDrawableChild(createToggleButton(centerX, y, "Golem HP HUD",
                 ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
         y += spacing;
 
-        // 4. Stage Alerts (Title/Sound)
+        // 5. Stage Alerts (Title/Sound)
         this.addDrawableChild(createToggleButton(centerX, y, "Stage Alerts (Title & Sound)",
                 ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
         y += spacing;
 
-        // 5. Drop Alerts (Title/Sound)
+        // 6. Drop Alerts (Title/Sound)
         this.addDrawableChild(createToggleButton(centerX, y, "Rare Drop Alerts",
                 ModConfig.enableDropAlerts, b -> ModConfig.enableDropAlerts = b));
         y += spacing;
 
-        // 6. Stage 4 Duration Chat
+        // 7. Stage 4 Duration Chat
         this.addDrawableChild(createToggleButton(centerX, y, "Stage 4 Duration Chat",
                 ModConfig.showStage4Duration, b -> ModConfig.showStage4Duration = b));
         y += spacing;
 
-        // 7. DPS Chat
+        // 8. DPS Chat
         this.addDrawableChild(createToggleButton(centerX, y, "Golem DPS Chat",
                 ModConfig.showDpsChat, b -> ModConfig.showDpsChat = b));
         y += spacing;
 
-        // 8. Loot Quality Chat
+        // 9. Loot Quality Chat
         this.addDrawableChild(createToggleButton(centerX, y, "Loot Quality Chat",
                 ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
+        y += spacing;
+
+        // ★追加: 10. Golem World Text (ワールド上のテキスト表示)
+        this.addDrawableChild(createToggleButton(centerX, y, "Golem World Text",
+                ModConfig.showGolemWorldText, b -> ModConfig.showGolemWorldText = b));
     }
 
     private ButtonWidget createToggleButton(int centerX, int y, String label, boolean currentValue, BooleanConsumer onToggle) {
@@ -96,19 +101,12 @@ public class ConfigScreen extends Screen {
         // タイトルと説明文の描画
         int centerX = this.width / 2;
 
-        // 1. "GanKura" (白・大・中央)
         context.getMatrices().pushMatrix();
-
         float scale = 2.0f;
         context.getMatrices().scale(scale, scale);
-
-        // ★修正: 色コードを 0xFFFFFF -> 0xFFFFFFFF (アルファ値FFを追加)
         context.drawCenteredTextWithShadow(textRenderer, "GanKura", (int)(centerX / scale), 10, 0xFFFFFFFF);
-
         context.getMatrices().popMatrix();
 
-        // 2. 説明文 (灰・小・中央)
-        // ★修正: 色コードを 0xAAAAAA -> 0xFFAAAAAA (アルファ値FFを追加)
         context.drawCenteredTextWithShadow(textRenderer, "A Hypixel Skyblock Mod focused on End Stone Protector.", centerX, 50, 0xFFAAAAAA);
 
         super.render(context, mouseX, mouseY, delta);

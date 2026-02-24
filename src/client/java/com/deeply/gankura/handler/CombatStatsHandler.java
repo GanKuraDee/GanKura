@@ -20,6 +20,9 @@ public class CombatStatsHandler {
     public static void handleMessage(String msg, MinecraftClient client) {
         // 1. 戦闘開始
         if (msg.contains(ModConstants.GOLEM_RISE_MSG)) {
+            // ★追加: ゴーレムが飛び出したフラグをオンにする
+            GameState.hasGolemRisen = true;
+
             if (client.world != null) {
                 GameState.fightStartTime = client.world.getTime();
                 GameState.fightEndTime = 0;
