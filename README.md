@@ -23,5 +23,5 @@ Type /gankura to open the settings menu.
   - Display rare drops from golems in title and chat.
 - Golem Loot Tracker
   - Displays the HUD with rare drops from golems so far.
-- Golem Location World Text
+- Golem World Location Display
   - Displays the golem location on the world.
