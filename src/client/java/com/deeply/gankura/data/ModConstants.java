@@ -28,7 +28,7 @@ public class ModConstants {
 
     // DPS計測用 (Fight Start / End)
     public static final String GOLEM_RISE_MSG = "BEWARE - An Endstone Protector has risen!";
-    public static final String GOLEM_DOWN_MSG = "ENDSTONE PROTECTOR DOWN!";
+    public static final String GOLEM_DOWN_MSG = "END STONE PROTECTOR DOWN!";
 
     // ダメージ取得用 ("Your Damage: 1,234,567 (Position #5)")
     public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)");
