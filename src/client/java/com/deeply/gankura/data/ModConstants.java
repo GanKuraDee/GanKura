@@ -50,4 +50,6 @@ public class ModConstants {
             new GolemSpot("Middle Behind", new BlockPos(-727, 5, -282)),
             new GolemSpot("Middle Center", new BlockPos(-689, 5, -271))
     );
+    // ★追加: ドラゴンスポーン検知用
+    public static final Pattern DRAGON_SPAWN_PATTERN = Pattern.compile("The .*?(Protector|Old|Unstable|Young|Strong|Wise|Superior) Dragon has spawned!");
 }

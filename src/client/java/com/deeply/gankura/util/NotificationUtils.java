@@ -58,7 +58,7 @@ public class NotificationUtils {
         if (client.player == null) return;
         client.inGameHud.setTitle(Text.literal("GOLEM STAGE 4").formatted(Formatting.RED, Formatting.BOLD));
         client.inGameHud.setSubtitle(Text.empty());
-        client.inGameHud.setTitleTicks(2, 70, 20);
+        client.inGameHud.setTitleTicks(5, 70, 20);
     }
 
     public static void playAwakeningSound(MinecraftClient client) {
@@ -70,7 +70,7 @@ public class NotificationUtils {
         if (client.player == null) return;
         client.inGameHud.setTitle(Text.literal("GOLEM STAGE 5").formatted(Formatting.DARK_RED, Formatting.BOLD));
         client.inGameHud.setSubtitle(Text.empty());
-        client.inGameHud.setTitleTicks(2, 70, 20);
+        client.inGameHud.setTitleTicks(5, 70, 20);
     }
 
     public static void playSummonedSound(MinecraftClient client) {
@@ -90,7 +90,7 @@ public class NotificationUtils {
         MutableText titleText = itemText.copy().formatted(Formatting.BOLD);
 
         client.inGameHud.setSubtitle(titleText);
-        client.inGameHud.setTitleTicks(2, 100, 20);
+        client.inGameHud.setTitleTicks(5, 100, 20);
     }
 
     public static void sendDropChatMessage(MinecraftClient client, Text itemText) {
@@ -107,5 +107,39 @@ public class NotificationUtils {
     public static void playDropSound(MinecraftClient client) {
         if (client.player == null) return;
         client.player.playSound(SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 0.5f);
+    }
+
+    // ★追加・修正: ドラゴンスポーンのタイトル表示
+    public static void showDragonSpawnAlert(MinecraftClient client, String dragonType) {
+        if (client.player == null) return;
+
+        // ドラゴンの種類によって色を変更
+        // ★変更: Superior を YELLOW (黄色) に変更
+        Formatting color = switch (dragonType) {
+            case "Protector" -> Formatting.DARK_GRAY;          // 濃い灰色
+            case "Old" -> Formatting.GRAY;                     // 灰色
+            case "Unstable" -> Formatting.DARK_PURPLE;         // 濃い紫
+            case "Young" -> Formatting.WHITE;                  // 白
+            case "Strong" -> Formatting.RED;                   // 赤
+            case "Wise" -> Formatting.AQUA;                    // 水色
+            case "Superior" -> Formatting.YELLOW;              // 黄色 (大当たり)
+            default -> Formatting.LIGHT_PURPLE;
+        };
+
+        // まずは色だけを適用したテキストを作成 (デフォルトは細字)
+        MutableText title = Text.literal(dragonType.toUpperCase() + " DRAGON!").formatted(color);
+
+        // ★変更: Superior の時だけ追加で太字(BOLD)にし、ウィザーの音を鳴らす
+        if ("Superior".equals(dragonType)) {
+            title.formatted(Formatting.BOLD);
+            // ズゥゥン…というウィザー召喚音で大当たりの特別感を演出
+            client.player.playSound(SoundEvents.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
+        }
+        // Superior 以外の時のサウンド処理は削除しました
+
+        // 画面にタイトルを表示
+        client.inGameHud.setTitle(title);
+        client.inGameHud.setSubtitle(Text.empty());
+        client.inGameHud.setTitleTicks(5, 70, 20);
     }
 }

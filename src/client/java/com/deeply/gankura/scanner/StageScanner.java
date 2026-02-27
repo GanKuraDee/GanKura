@@ -20,13 +20,9 @@ import java.util.regex.Matcher;
 
 public class StageScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("StageScanner");
-    // private static int scanTickCounter = 0; // ★削除: 毎tick実行のため不要
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // ★変更: カウント制限を削除し、毎tick実行する
-            // if (scanTickCounter++ < 20) return;
-            // scanTickCounter = 0;
             scanTabList(client);
         });
     }
@@ -100,7 +96,6 @@ public class StageScanner {
 
         // --- Stage 4 開始判定 ---
         if (ModConstants.STAGE_AWAKENING.equals(newStage)) {
-            // タイマースタート
             GameState.stage4StartTime = System.currentTimeMillis();
 
             if (ModConfig.enableStageAlerts) {
@@ -111,24 +106,20 @@ public class StageScanner {
 
         // --- Stage 5 開始判定 (Stage 4 終了) ---
         else if (ModConstants.STAGE_SUMMONED.equals(newStage)) {
-            // 直前が Stage 4 であれば時間を計算して表示
             if (ModConstants.STAGE_AWAKENING.equals(oldStage) && GameState.stage4StartTime > 0) {
                 long durationMillis = System.currentTimeMillis() - GameState.stage4StartTime;
                 long seconds = durationMillis / 1000;
                 long minutes = seconds / 60;
                 long remainingSeconds = seconds % 60;
 
-                // 0.1秒 (100ms) 遅らせてチャット表示
                 if (ModConfig.showStage4Duration) {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             client.execute(() -> {
                                 if (client.player != null) {
-                                    // グラデーションプレフィックスを使用
                                     MutableText message = NotificationUtils.getGanKuraPrefix();
                                     message.append(Text.literal(String.format("§aStage 4 Duration: %dm %ds", minutes, remainingSeconds)));
-
                                     client.player.sendMessage(message, false);
                                 }
                             });
@@ -136,23 +127,25 @@ public class StageScanner {
                     }, 100);
                 }
             }
-            // 計測終了なのでリセット
             GameState.stage4StartTime = 0;
 
-            // Stage 5 の通常処理
             if (GameState.stage5TargetTime == 0 && client.world != null) {
                 GameState.stage5TargetTime = client.world.getTime() + 400;
             }
-            // 設定チェック (Alert)
             if (ModConfig.enableStageAlerts) {
                 NotificationUtils.showSummonedAlert(client);
                 NotificationUtils.playSummonedSound(client);
             }
         }
 
-        // それ以外へ遷移した場合はタイマーリセット
+        // --- それ以外 (Stage 0~3) へ遷移した場合 ---
         else {
+            // タイマーリセット
             GameState.stage4StartTime = 0;
+
+            // ★追加: ゴーレムが倒されてステージがリセットされたら、Riseフラグも元に戻す！
+            // これにより、同ワールドで2回目以降のゴーレムでも正常に(Soon)が表示されます。
+            GameState.hasGolemRisen = false;
         }
     }
 }

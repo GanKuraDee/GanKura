@@ -20,7 +20,7 @@ public class CombatStatsHandler {
     public static void handleMessage(String msg, MinecraftClient client) {
         // 1. 戦闘開始
         if (msg.contains(ModConstants.GOLEM_RISE_MSG)) {
-            // ★追加: ゴーレムが飛び出したフラグをオンにする
+            // ゴーレムが飛び出したフラグをオンにする
             GameState.hasGolemRisen = true;
 
             if (client.world != null) {
@@ -77,12 +77,14 @@ public class CombatStatsHandler {
         long lastDownTime = GameState.fightEndTime;
         long currentTime = client.world.getTime();
 
-        // ★修正: 以下の条件でのみ処理を実行する
-        // 1. Golemの討伐時刻(fightEndTime)が記録されている (Dragonの場合は記録されないので0になる)
-        // 2. その討伐が「ついさっき(20秒以内)」である (古いGolem討伐情報の誤用を防ぐ)
+        // 1. Golemの討伐時刻(fightEndTime)が記録されているか、20秒以内か
         if (lastDownTime == 0 || (currentTime - lastDownTime) > 400) { // 400tick = 20秒
             return;
         }
+
+        // ★追加・変更: Golemのリザルトを1回処理したら、討伐時刻を0にリセットする！
+        // これにより、直後にドラゴンの「Your Damage」が来ても無視されるようになります。
+        GameState.fightEndTime = 0;
 
         try {
             String rawDamage = matcher.group(1).replace(",", "");
@@ -131,23 +133,18 @@ public class CombatStatsHandler {
         client.execute(() -> {
             if (client.player != null) {
                 // DPS情報がある場合のみ表示
-                // ★追加: 設定チェック (DPS)
                 if (ModConfig.showDpsChat && dps != null && duration != null) {
-                    // ★修正
                     MutableText msg = NotificationUtils.getGanKuraPrefix();
                     msg.append(Text.literal(String.format("§bYour Golem DPS: %s §7(%s)", dps, duration)));
                     client.player.sendMessage(msg, false);
                 }
 
                 // Loot Quality は常に表示
-                // ★追加: 設定チェック (Loot Quality)
                 if (ModConfig.showLootQualityChat) {
-                    // ★修正 (Quality)
                     MutableText msg1 = NotificationUtils.getGanKuraPrefix();
                     msg1.append(Text.literal(String.format("§eGolem Loot Quality: %d", lq)));
                     client.player.sendMessage(msg1, false);
 
-                    // ★修正 (Drops詳細)
                     MutableText msg2 = NotificationUtils.getGanKuraPrefix();
                     String dropsMsg = String.format("§6Tier Boost Core: %s §8| §6Golem Pet: %s §8| §5Golem Pet: %s", tbcMark, legMark, epicMark);
                     msg2.append(Text.literal(dropsMsg));

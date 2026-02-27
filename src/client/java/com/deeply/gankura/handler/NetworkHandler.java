@@ -36,6 +36,11 @@ public class NetworkHandler {
                 return false;
             }
 
+            // ★追加: 1.5. Dragon Spawn 検知 (DragonHandlerに委譲)
+            if (DragonHandler.handleMessage(msg, MinecraftClient.getInstance())) {
+                return true;
+            }
+
             // 2. Stage 5 Spawn Timer 検知 (StageScannerに委譲)
             if (msg.contains(ModConstants.GOLEM_SPAWN_MSG)) {
                 MinecraftClient client = MinecraftClient.getInstance();

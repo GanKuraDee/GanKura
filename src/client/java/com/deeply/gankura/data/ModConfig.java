@@ -28,9 +28,10 @@ public class ModConfig {
     public static boolean showStage4Duration = true;
     public static boolean showDpsChat = true;
     public static boolean showLootQualityChat = true;
-
-    // ★追加: ワールド上のテキスト表示設定
     public static boolean showGolemWorldText = true;
+
+    // ★追加: ドラゴン出現通知の設定
+    public static boolean enableDragonAlerts = true;
 
     static {
         load();
@@ -51,9 +52,10 @@ public class ModConfig {
             showStage4Duration = parseBool("showStage4Duration", true);
             showDpsChat = parseBool("showDpsChat", true);
             showLootQualityChat = parseBool("showLootQualityChat", true);
+            showGolemWorldText = parseBool("showGolemWorldText", true);
 
             // ★追加: 読み込み処理
-            showGolemWorldText = parseBool("showGolemWorldText", true);
+            enableDragonAlerts = parseBool("enableDragonAlerts", true);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -71,9 +73,10 @@ public class ModConfig {
         properties.setProperty("showStage4Duration", String.valueOf(showStage4Duration));
         properties.setProperty("showDpsChat", String.valueOf(showDpsChat));
         properties.setProperty("showLootQualityChat", String.valueOf(showLootQualityChat));
+        properties.setProperty("showGolemWorldText", String.valueOf(showGolemWorldText));
 
         // ★追加: 保存処理
-        properties.setProperty("showGolemWorldText", String.valueOf(showGolemWorldText));
+        properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");
