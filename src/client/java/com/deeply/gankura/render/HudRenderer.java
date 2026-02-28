@@ -13,37 +13,61 @@ import net.minecraft.util.Identifier;
 
 public class HudRenderer {
 
+    // ★変更: メインのrenderメソッド内でのみ拡大縮小を行うように変更
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.options.hudHidden) return;
         if (client.world == null) return;
-
         if (client.currentScreen instanceof HudEditorScreen) return;
 
-        if (!ModConstants.GAME_TYPE_SKYBLOCK.equals(GameState.gametype)) return;
+        if (!"SKYBLOCK".equals(GameState.gametype)) return;
 
-        // ★追加: The End以外のSkyblock全体で表示するHUD
+        // --- Pet HUD ---
         if (ModConfig.showPetHud) {
-            renderPetHud(context, client.textRenderer, HudConfig.petX, HudConfig.petY, false);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float) HudConfig.petX, (float) HudConfig.petY); // 先に座標へ移動
+            context.getMatrices().scale(HudConfig.petScale, HudConfig.petScale); // 拡大縮小
+            renderPetHud(context, client.textRenderer, 0, 0, false); // 0,0 を起点に描画
+            context.getMatrices().popMatrix();
         }
 
-        // ★追加: アーマースタックHUD
+        // --- Armor Stack HUD ---
         if (ModConfig.showArmorStackHud) {
-            renderArmorStackHud(context, client.textRenderer, HudConfig.armorStackX, HudConfig.armorStackY, false);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float) HudConfig.armorStackX, (float) HudConfig.armorStackY);
+            context.getMatrices().scale(HudConfig.armorStackScale, HudConfig.armorStackScale);
+            renderArmorStackHud(context, client.textRenderer, 0, 0, false);
+            context.getMatrices().popMatrix();
         }
 
-        boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.map)
-                || ModConstants.MODE_COMBAT_3.equals(GameState.mode);
+        boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
         if (!isTargetMap) return;
 
+        // --- Golem Status HUD ---
         if (ModConfig.showGolemStatusHud) {
-            renderStats(context, client.textRenderer, HudConfig.statsX, HudConfig.statsY, false);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float) HudConfig.statsX, (float) HudConfig.statsY);
+            context.getMatrices().scale(HudConfig.statsScale, HudConfig.statsScale);
+            renderStats(context, client.textRenderer, 0, 0, false);
+            context.getMatrices().popMatrix();
         }
+
+        // --- Loot Tracker HUD ---
         if (ModConfig.showLootTrackerHud) {
-            renderTracker(context, client.textRenderer, HudConfig.trackerX, HudConfig.trackerY);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float) HudConfig.trackerX, (float) HudConfig.trackerY);
+            context.getMatrices().scale(HudConfig.trackerScale, HudConfig.trackerScale);
+            renderTracker(context, client.textRenderer, 0, 0);
+            context.getMatrices().popMatrix();
         }
-        if (ModConfig.showGolemHealthHud) {
-            renderHealth(context, client.textRenderer, HudConfig.healthX, HudConfig.healthY, false);
+
+        // --- Golem HP HUD ---
+        if (ModConfig.showGolemHealthHud && GameState.golemHealth != null) {
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float) HudConfig.healthX, (float) HudConfig.healthY);
+            context.getMatrices().scale(HudConfig.healthScale, HudConfig.healthScale);
+            renderHealth(context, client.textRenderer, 0, 0, false);
+            context.getMatrices().popMatrix();
         }
     }
 
