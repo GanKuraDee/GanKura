@@ -16,6 +16,8 @@ public class HudEditorScreen extends Screen {
 
     private boolean draggingPet = false;
 
+    private boolean draggingArmorStack = false;
+
     // ドラッグ開始時のオフセット
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
@@ -31,6 +33,10 @@ public class HudEditorScreen extends Screen {
 
     private final int PET_WIDTH = 120;
     private final int PET_HEIGHT = 30;
+
+    // ★変更: 5つのアーマーが横に並ぶように幅を広げ、高さをテキスト1行分に調整
+    private final int ARMOR_STACK_WIDTH = 150;
+    private final int ARMOR_STACK_HEIGHT = 15;
 
     public HudEditorScreen() {
         super(Text.literal("GanKura HUD Editor"));
@@ -56,18 +62,26 @@ public class HudEditorScreen extends Screen {
         // 描画
         HudRenderer.renderTracker(context, textRenderer, HudConfig.trackerX, HudConfig.trackerY);
 
-        // --- ★追加: Golem Health ---
+        // --- Golem Health ---
         boolean hoverHealth = isHovering(mouseX, mouseY, HudConfig.healthX, HudConfig.healthY, HEALTH_WIDTH, HEALTH_HEIGHT);
         int healthBoxColor = (hoverHealth || draggingHealth) ? 0x80FFFFFF : 0x40000000;
         context.fill(HudConfig.healthX - 5, HudConfig.healthY - 5, HudConfig.healthX + HEALTH_WIDTH, HudConfig.healthY + HEALTH_HEIGHT, healthBoxColor);
 
         HudRenderer.renderHealth(context, textRenderer, HudConfig.healthX, HudConfig.healthY, true);
 
+        // --- Active Pet ---
         boolean hoverPet = isHovering(mouseX, mouseY, HudConfig.petX, HudConfig.petY, PET_WIDTH, PET_HEIGHT);
         int petBoxColor = (hoverPet || draggingPet) ? 0x80FFFFFF : 0x40000000;
         context.fill(HudConfig.petX - 5, HudConfig.petY - 5, HudConfig.petX + PET_WIDTH, HudConfig.petY + PET_HEIGHT, petBoxColor);
 
         HudRenderer.renderPetHud(context, textRenderer, HudConfig.petX, HudConfig.petY, true);
+
+        // --- Armor Stack ---
+        boolean hoverArmorStack = isHovering(mouseX, mouseY, HudConfig.armorStackX, HudConfig.armorStackY, ARMOR_STACK_WIDTH, ARMOR_STACK_HEIGHT);
+        int armorStackColor = (hoverArmorStack || draggingArmorStack) ? 0x80FFFFFF : 0x40000000;
+        context.fill(HudConfig.armorStackX - 5, HudConfig.armorStackY - 5, HudConfig.armorStackX + ARMOR_STACK_WIDTH, HudConfig.armorStackY + ARMOR_STACK_HEIGHT, armorStackColor);
+
+        HudRenderer.renderArmorStackHud(context, textRenderer, HudConfig.armorStackX, HudConfig.armorStackY, true);
 
         // 説明
         context.drawCenteredTextWithShadow(textRenderer, "Drag to move HUDs. Press ESC to save & exit.", width / 2, 20, 0xFFFFFF);
@@ -96,22 +110,24 @@ public class HudEditorScreen extends Screen {
                 dragOffsetY = (int)mouseY - HudConfig.trackerY;
                 return true;
             }
-            // ★追加
             if (isHovering((int)mouseX, (int)mouseY, HudConfig.healthX, HudConfig.healthY, HEALTH_WIDTH, HEALTH_HEIGHT)) {
                 draggingHealth = true;
                 dragOffsetX = (int)mouseX - HudConfig.healthX;
                 dragOffsetY = (int)mouseY - HudConfig.healthY;
                 return true;
             }
-
             if (isHovering((int)mouseX, (int)mouseY, HudConfig.petX, HudConfig.petY, PET_WIDTH, PET_HEIGHT)) {
                 draggingPet = true;
                 dragOffsetX = (int)mouseX - HudConfig.petX;
                 dragOffsetY = (int)mouseY - HudConfig.petY;
                 return true;
             }
-
-
+            if (isHovering((int)mouseX, (int)mouseY, HudConfig.armorStackX, HudConfig.armorStackY, ARMOR_STACK_WIDTH, ARMOR_STACK_HEIGHT)) {
+                draggingArmorStack = true;
+                dragOffsetX = (int)mouseX - HudConfig.armorStackX;
+                dragOffsetY = (int)mouseY - HudConfig.armorStackY;
+                return true;
+            }
         }
         return false; // superは削除
     }
@@ -123,6 +139,7 @@ public class HudEditorScreen extends Screen {
         draggingTracker = false;
         draggingHealth = false; // ★追加
         draggingPet = false; // ★追加: これがないとペットHUDが一生マウスに追従してしまいます！
+        draggingArmorStack = false;
         return wasDragging;
     }
 
@@ -150,6 +167,11 @@ public class HudEditorScreen extends Screen {
         if (draggingPet) {
             HudConfig.petX = (int)mouseX - dragOffsetX;
             HudConfig.petY = (int)mouseY - dragOffsetY;
+            return true;
+        }
+        if (draggingArmorStack) {
+            HudConfig.armorStackX = (int)mouseX - dragOffsetX;
+            HudConfig.armorStackY = (int)mouseY - dragOffsetY;
             return true;
         }
         return false;

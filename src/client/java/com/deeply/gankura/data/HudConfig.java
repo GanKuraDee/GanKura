@@ -34,6 +34,10 @@ public class HudConfig {
     public static int petX = 10;
     public static int petY = 10;
 
+    // ★追加: アーマースタックHUDの座標
+    public static int armorStackX = 10;
+    public static int armorStackY = 50;
+
     static {
         load();
     }
@@ -55,6 +59,9 @@ public class HudConfig {
 
             petX = parseInt(properties.getProperty("petX"), 10);
             petY = parseInt(properties.getProperty("petY"), 10);
+
+            armorStackX = parseInt(properties.getProperty("armorStackX"), 10);
+            armorStackY = parseInt(properties.getProperty("armorStackY"), 50);
         } catch (IOException e) {
             LOGGER.error("Failed to load HUD config", e);
         }
@@ -74,6 +81,10 @@ public class HudConfig {
 
         properties.setProperty("petX", String.valueOf(petX));
         properties.setProperty("petY", String.valueOf(petY));
+
+        properties.setProperty("armorStackX", String.valueOf(armorStackX));
+        properties.setProperty("armorStackY", String.valueOf(armorStackY));
+
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura HUD Positions");

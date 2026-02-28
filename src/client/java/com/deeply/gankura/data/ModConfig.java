@@ -36,6 +36,9 @@ public class ModConfig {
     // ★追加: Pet HUDの表示設定
     public static boolean showPetHud = true;
 
+    // ★追加: アーマースタックHUDの表示設定
+    public static boolean showArmorStackHud = true;
+
     static {
         load();
     }
@@ -61,6 +64,8 @@ public class ModConfig {
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
 
             showPetHud = parseBool("showPetHud", true);
+
+            showArmorStackHud = parseBool("showArmorStackHud", true);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -84,6 +89,8 @@ public class ModConfig {
         properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
 
         properties.setProperty("showPetHud", String.valueOf(showPetHud));
+
+        properties.setProperty("showArmorStackHud", String.valueOf(showArmorStackHud));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");

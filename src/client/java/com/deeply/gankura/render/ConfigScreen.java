@@ -103,6 +103,8 @@ public class ConfigScreen extends Screen {
 
         this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "Active Pet HUD",
                 ModConfig.showPetHud, b -> ModConfig.showPetHud = b));
+        this.addDrawableChild(createToggleButton(rightCol, y, btnWidth, "Armor Stack HUD",
+                ModConfig.showArmorStackHud, b -> ModConfig.showArmorStackHud = b));
     }
 
     private ButtonWidget createToggleButton(int x, int y, int width, String label, boolean currentValue, BooleanConsumer onToggle) {

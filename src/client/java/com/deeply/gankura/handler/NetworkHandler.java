@@ -33,6 +33,13 @@ public class NetworkHandler {
             // 処理しやすいように装飾コードを除いた文字列を作る
             String unformattedMsg = msg.replaceAll("§[0-9a-fk-or]", "");
 
+            // ★追加: アクションバーのメッセージの場合はアーマースタックを解析して終了
+            if (overlay) {
+                // ★変更: unformattedMsg ではなく、生の message(Textオブジェクト) を渡す！
+                ArmorStackHandler.handleActionBar(message);
+                return true;
+            }
+
             if (LocrawHandler.handleMessage(msg)) {
                 return false;
             }

@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.util.Identifier;
 
 public class HudRenderer {
 
@@ -25,6 +26,12 @@ public class HudRenderer {
         if (ModConfig.showPetHud) {
             renderPetHud(context, client.textRenderer, HudConfig.petX, HudConfig.petY, false);
         }
+
+        // ★追加: アーマースタックHUD
+        if (ModConfig.showArmorStackHud) {
+            renderArmorStackHud(context, client.textRenderer, HudConfig.armorStackX, HudConfig.armorStackY, false);
+        }
+
         boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.map)
                 || ModConstants.MODE_COMBAT_3.equals(GameState.mode);
         if (!isTargetMap) return;
@@ -220,5 +227,49 @@ public class HudRenderer {
 
         context.drawTextWithShadow(tr, title, x, y, 0xFFFFFFFF);
         context.drawTextWithShadow(tr, petText, x, y + 12, 0xFFFFFFFF);
+    }
+
+    // アーマースタックHUDの描画メソッド (中央揃え・プレビュー全表示)
+    public static void renderArmorStackHud(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
+        int spacing = 8; // テキスト同士の隙間
+
+        // 描画するテキストのリストを作成
+        java.util.List<String> parts = new java.util.ArrayList<>();
+
+        if (isPreview) {
+            // プレビュー時は5つすべてを様々なパターンでテスト表示
+            parts.add("§6§l10ᝐ"); // Crimson (太字)
+            parts.add("§15⁑");     // Terror (通常)
+            parts.add("§e§l8⚶");   // Hollow (太字)
+            parts.add("§23҉");     // Fervor (通常)
+            parts.add("§9§l2Ѫ");   // Aurora (太字)
+        } else {
+            // 実際のデータに基づいてリストに追加
+            if (GameState.crimsonStack > 0) parts.add((GameState.isCrimsonBold ? "§6§l" : "§6") + GameState.crimsonStack + "ᝐ");
+            if (GameState.terrorStack > 0) parts.add((GameState.isTerrorBold ? "§1§l" : "§1") + GameState.terrorStack + "⁑");
+            if (GameState.hollowStack > 0) parts.add((GameState.isHollowBold ? "§e§l" : "§e") + GameState.hollowStack + "⚶");
+            if (GameState.fervorStack > 0) parts.add((GameState.isFervorBold ? "§2§l" : "§2") + GameState.fervorStack + "҉");
+            if (GameState.auroraStack > 0) parts.add((GameState.isAuroraBold ? "§9§l" : "§9") + GameState.auroraStack + "Ѫ");
+        }
+
+        // 表示するものがなければここで終了
+        if (parts.isEmpty()) return;
+
+        // 全体の描画幅を事前に計算
+        int totalWidth = 0;
+        for (String part : parts) {
+            totalWidth += tr.getWidth(part);
+        }
+        totalWidth += (parts.size() - 1) * spacing;
+
+        // HUDエディターの当たり判定の幅(150px)を基準にして、その中央から描画を開始するロジック
+        int boxWidth = 150;
+        int currentX = x + (boxWidth / 2) - (totalWidth / 2);
+
+        // リストの順番通りに横へ並べて描画していく
+        for (String part : parts) {
+            context.drawTextWithShadow(tr, part, currentX, y, 0xFFFFFFFF);
+            currentX += tr.getWidth(part) + spacing;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.deeply.gankura;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.render.ConfigScreen; // ★追加
@@ -30,6 +31,8 @@ public class GanKura implements ClientModInitializer {
         GolemHealthScanner.register();
         // ★追加
         PetHandler.register();
+
+        ArmorStackHandler.register(); // ★追加
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")

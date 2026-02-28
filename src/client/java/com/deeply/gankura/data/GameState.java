@@ -34,6 +34,24 @@ public class GameState {
     // ★追加: 現在アクティブなペット名(カラーコード付き)
     public static String activePetName = null;
 
+    // ★追加: アーマースタック情報
+    public static int crimsonStack = 0;
+    public static boolean isCrimsonBold = false; // ★追加
+
+    public static int terrorStack = 0;
+    public static boolean isTerrorBold = false; // ★追加
+
+    public static int hollowStack = 0;
+    public static boolean isHollowBold = false; // ★追加
+
+    public static int fervorStack = 0;
+    public static boolean isFervorBold = false; // ★追加
+
+    public static int auroraStack = 0;
+    public static boolean isAuroraBold = false; // ★追加
+
+    public static long lastArmorStackUpdateTime = 0;
+
     public static long lastServerTimePacket = 0;
     public static long lastServerPacketArrivalMillis = 0;
 
