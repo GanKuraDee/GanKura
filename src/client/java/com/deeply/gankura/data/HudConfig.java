@@ -29,6 +29,11 @@ public class HudConfig {
     // ★追加: 体力HUDの座標
     public static int healthX = 260;
     public static int healthY = 150;
+
+    // ★追加: Pet HUDの座標
+    public static int petX = 10;
+    public static int petY = 10;
+
     static {
         load();
     }
@@ -47,6 +52,9 @@ public class HudConfig {
             // ★追加
             healthX = parseInt(properties.getProperty("healthX"), 260);
             healthY = parseInt(properties.getProperty("healthY"), 150);
+
+            petX = parseInt(properties.getProperty("petX"), 10);
+            petY = parseInt(properties.getProperty("petY"), 10);
         } catch (IOException e) {
             LOGGER.error("Failed to load HUD config", e);
         }
@@ -63,6 +71,9 @@ public class HudConfig {
         // ★追加
         properties.setProperty("healthX", String.valueOf(healthX));
         properties.setProperty("healthY", String.valueOf(healthY));
+
+        properties.setProperty("petX", String.valueOf(petX));
+        properties.setProperty("petY", String.valueOf(petY));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura HUD Positions");

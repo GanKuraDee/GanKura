@@ -1,7 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.ModConfig;
-import net.fabricmc.loader.api.FabricLoader; // ★追加: バージョン取得用
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,15 +13,15 @@ public class ConfigScreen extends Screen {
     // カテゴリのテキストを描画するためのY座標を保持する変数
     private int golemTextY;
     private int dragonTextY;
+    private int miscTextY;
 
-    // ★追加: サブタイトル(バージョン情報)を保持する変数
+    // サブタイトル(バージョン情報)を保持する変数
     private final String subtitleText;
 
     public ConfigScreen() {
         super(Text.literal("GanKura Configuration"));
 
-        // ★追加: FabricLoaderを使って現在のModバージョンを取得する
-        // ※ "gankura" の部分は、fabric.mod.json 内の "id" (Mod ID) と同じものを指定してください
+        // FabricLoaderを使って現在のModバージョンを取得する
         String version = FabricLoader.getInstance()
                 .getModContainer("gankura")
                 .map(container -> container.getMetadata().getVersion().getFriendlyString())
@@ -44,19 +44,19 @@ public class ConfigScreen extends Screen {
             MinecraftClient.getInstance().setScreen(new HudEditorScreen());
         }).dimensions(centerX - 100, y, 200, 20).build());
 
-        y += 28; // ボタンの高さ(20) + 少し広めの隙間(8)
+        y += 24;
 
         // ==========================================
-        // --- Golem カテゴリ ---
+        // --- End Stone Protector (Golem) カテゴリ ---
         // ==========================================
         this.golemTextY = y;
-        y += 12; // テキスト用のスペースを空ける
+        y += 12;
 
         this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "Status HUD",
                 ModConfig.showGolemStatusHud, b -> ModConfig.showGolemStatusHud = b));
         this.addDrawableChild(createToggleButton(rightCol, y, btnWidth, "Loot Tracker HUD",
                 ModConfig.showLootTrackerHud, b -> ModConfig.showLootTrackerHud = b));
-        y += 22; // ボタンの高さ(20) + 最小限の隙間(2) にして高さを節約
+        y += 22;
 
         this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "HP HUD",
                 ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
@@ -76,19 +76,33 @@ public class ConfigScreen extends Screen {
                 ModConfig.showDpsChat, b -> ModConfig.showDpsChat = b));
         y += 22;
 
+        // DPS Chatの下の行
         this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "Loot Quality Chat",
                 ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
 
-        y += 28; // 次のカテゴリとの間は少し広めに空ける
+        y += 24; // 次のカテゴリとの隙間
 
         // ==========================================
         // --- Dragon カテゴリ ---
         // ==========================================
+        // ★変更: DragonをMiscより上に移動
         this.dragonTextY = y;
         y += 12;
 
         this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "Type Alert Title",
                 ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+
+        y += 24; // 次のカテゴリとの隙間
+
+        // ==========================================
+        // --- Misc カテゴリ ---
+        // ==========================================
+        // ★変更: Miscを一番下に移動
+        this.miscTextY = y;
+        y += 12;
+
+        this.addDrawableChild(createToggleButton(leftCol, y, btnWidth, "Active Pet HUD",
+                ModConfig.showPetHud, b -> ModConfig.showPetHud = b));
     }
 
     private ButtonWidget createToggleButton(int x, int y, int width, String label, boolean currentValue, BooleanConsumer onToggle) {
@@ -120,21 +134,21 @@ public class ConfigScreen extends Screen {
 
         int centerX = this.width / 2;
 
-        // タイトルとサブタイトルも上に詰める (Y: 10->5, 45->28)
         context.getMatrices().pushMatrix();
         float scale = 2.0f;
         context.getMatrices().scale(scale, scale);
         context.drawCenteredTextWithShadow(textRenderer, "GanKura", (int)(centerX / scale), 5, 0xFFFFFFFF);
         context.getMatrices().popMatrix();
 
-        // ★変更: 固定の文章から、取得したバージョン情報(subtitleText)の描画に変更
         context.drawCenteredTextWithShadow(textRenderer, this.subtitleText, centerX, 28, 0xFFAAAAAA);
 
         // ==========================================
         // カテゴリタイトルの描画
         // ==========================================
+        // ★変更: コードの可読性のため、描画の順番も上から順に合わせています
         context.drawTextWithShadow(textRenderer, "§lEnd Stone Protector", centerX - 155, this.golemTextY, 0xFFFFAA00);
         context.drawTextWithShadow(textRenderer, "§lDragon", centerX - 155, this.dragonTextY, 0xFFFF5555);
+        context.drawTextWithShadow(textRenderer, "§lMisc", centerX - 155, this.miscTextY, 0xFF55FF55);
 
         super.render(context, mouseX, mouseY, delta);
     }

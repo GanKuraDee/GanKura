@@ -20,6 +20,11 @@ public class HudRenderer {
         if (client.currentScreen instanceof HudEditorScreen) return;
 
         if (!ModConstants.GAME_TYPE_SKYBLOCK.equals(GameState.gametype)) return;
+
+        // ★追加: The End以外のSkyblock全体で表示するHUD
+        if (ModConfig.showPetHud) {
+            renderPetHud(context, client.textRenderer, HudConfig.petX, HudConfig.petY, false);
+        }
         boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.map)
                 || ModConstants.MODE_COMBAT_3.equals(GameState.mode);
         if (!isTargetMap) return;
@@ -199,5 +204,21 @@ public class HudRenderer {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    // クラスの最後に以下のメソッドを追加
+    public static void renderPetHud(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
+        String title = "§e§lActive Pet";
+        String petText;
+
+        // ★変更: プレビュー画面かどうかにかかわらず、常に現在のペット状況をそのまま表示する
+        if (GameState.activePetName != null) {
+            petText = GameState.activePetName;
+        } else {
+            petText = "§7None";
+        }
+
+        context.drawTextWithShadow(tr, title, x, y, 0xFFFFFFFF);
+        context.drawTextWithShadow(tr, petText, x, y + 12, 0xFFFFFFFF);
     }
 }

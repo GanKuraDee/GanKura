@@ -14,6 +14,8 @@ public class HudEditorScreen extends Screen {
     // ★追加
     private boolean draggingHealth = false;
 
+    private boolean draggingPet = false;
+
     // ドラッグ開始時のオフセット
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
@@ -26,6 +28,9 @@ public class HudEditorScreen extends Screen {
     // ★追加
     private final int HEALTH_WIDTH = 100;
     private final int HEALTH_HEIGHT = 30;
+
+    private final int PET_WIDTH = 120;
+    private final int PET_HEIGHT = 30;
 
     public HudEditorScreen() {
         super(Text.literal("GanKura HUD Editor"));
@@ -57,6 +62,12 @@ public class HudEditorScreen extends Screen {
         context.fill(HudConfig.healthX - 5, HudConfig.healthY - 5, HudConfig.healthX + HEALTH_WIDTH, HudConfig.healthY + HEALTH_HEIGHT, healthBoxColor);
 
         HudRenderer.renderHealth(context, textRenderer, HudConfig.healthX, HudConfig.healthY, true);
+
+        boolean hoverPet = isHovering(mouseX, mouseY, HudConfig.petX, HudConfig.petY, PET_WIDTH, PET_HEIGHT);
+        int petBoxColor = (hoverPet || draggingPet) ? 0x80FFFFFF : 0x40000000;
+        context.fill(HudConfig.petX - 5, HudConfig.petY - 5, HudConfig.petX + PET_WIDTH, HudConfig.petY + PET_HEIGHT, petBoxColor);
+
+        HudRenderer.renderPetHud(context, textRenderer, HudConfig.petX, HudConfig.petY, true);
 
         // 説明
         context.drawCenteredTextWithShadow(textRenderer, "Drag to move HUDs. Press ESC to save & exit.", width / 2, 20, 0xFFFFFF);
@@ -92,6 +103,15 @@ public class HudEditorScreen extends Screen {
                 dragOffsetY = (int)mouseY - HudConfig.healthY;
                 return true;
             }
+
+            if (isHovering((int)mouseX, (int)mouseY, HudConfig.petX, HudConfig.petY, PET_WIDTH, PET_HEIGHT)) {
+                draggingPet = true;
+                dragOffsetX = (int)mouseX - HudConfig.petX;
+                dragOffsetY = (int)mouseY - HudConfig.petY;
+                return true;
+            }
+
+
         }
         return false; // superは削除
     }
@@ -102,6 +122,7 @@ public class HudEditorScreen extends Screen {
         draggingStats = false;
         draggingTracker = false;
         draggingHealth = false; // ★追加
+        draggingPet = false; // ★追加: これがないとペットHUDが一生マウスに追従してしまいます！
         return wasDragging;
     }
 
@@ -124,6 +145,11 @@ public class HudEditorScreen extends Screen {
         if (draggingHealth) {
             HudConfig.healthX = (int)mouseX - dragOffsetX;
             HudConfig.healthY = (int)mouseY - dragOffsetY;
+            return true;
+        }
+        if (draggingPet) {
+            HudConfig.petX = (int)mouseX - dragOffsetX;
+            HudConfig.petY = (int)mouseY - dragOffsetY;
             return true;
         }
         return false;

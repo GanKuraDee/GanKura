@@ -16,6 +16,7 @@ public class NetworkHandler {
         // サーバー参加・移動時の処理
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             GameState.reset(); // 全状態リセット
+            PetHandler.reset(); // ★追加: サーバー移動時にペットのスキャン状態をリセット
 
             if (!client.isInSingleplayer() && handler.getServerInfo() != null) {
                 String ip = handler.getServerInfo().address.toLowerCase();
@@ -29,12 +30,15 @@ public class NetworkHandler {
         // チャット受信時の処理
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             String msg = message.getString();
+            // 処理しやすいように装飾コードを除いた文字列を作る
+            String unformattedMsg = msg.replaceAll("§[0-9a-fk-or]", "");
 
-            // 1. locraw解析 (LocrawHandlerに委譲)
-            // locrawだった場合は true が返り、チャット欄には表示しない
             if (LocrawHandler.handleMessage(msg)) {
                 return false;
             }
+
+            // ★変更: 色が消える前の「message(Textオブジェクト)」を直接渡す！
+            PetHandler.handleMessage(message);
 
             // ★追加: 1.5. Dragon Spawn 検知 (DragonHandlerに委譲)
             if (DragonHandler.handleMessage(msg, MinecraftClient.getInstance())) {

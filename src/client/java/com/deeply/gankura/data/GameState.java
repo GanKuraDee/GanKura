@@ -31,6 +31,9 @@ public class GameState {
     public static String locationName = "None";
     public static BlockPos locationPos = null;
 
+    // ★追加: 現在アクティブなペット名(カラーコード付き)
+    public static String activePetName = null;
+
     public static long lastServerTimePacket = 0;
     public static long lastServerPacketArrivalMillis = 0;
 
@@ -40,6 +43,8 @@ public class GameState {
         mode = "Unknown";
         map = "Unknown";
         resetGolemStatus();
+        // ★変更: null ではなく、スキャン中の仮テキストを入れておく
+        activePetName = "§8Scanning...";
     }
 
     public static void resetGolemStatus() {
