@@ -50,6 +50,7 @@ public class ModConfig {
         }
         try (FileInputStream in = new FileInputStream(CONFIG_FILE)) {
             properties.load(in);
+            // End Stone Protector
             showGolemStatusHud = parseBool("showGolemStatusHud", true);
             showLootTrackerHud = parseBool("showLootTrackerHud", true);
             showGolemHealthHud = parseBool("showGolemHealthHud", true);
@@ -59,13 +60,11 @@ public class ModConfig {
             showDpsChat = parseBool("showDpsChat", true);
             showLootQualityChat = parseBool("showLootQualityChat", true);
             showGolemWorldText = parseBool("showGolemWorldText", true);
-
-            // ★追加: 読み込み処理
+            // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
-
-            showPetHud = parseBool("showPetHud", true);
-
-            showArmorStackHud = parseBool("showArmorStackHud", true);
+            // Misc
+            showPetHud = parseBool("showPetHud", false);
+            showArmorStackHud = parseBool("showArmorStackHud", false);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
