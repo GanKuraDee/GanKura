@@ -61,6 +61,9 @@ public class GameState {
     public static long lastServerTimePacket = 0;
     public static long lastServerPacketArrivalMillis = 0;
 
+    // ★追加: Day30到達時の警告アナウンス済みフラグ
+    public static boolean hasAnnouncedDay30 = false;
+
     public static void reset() {
         serverId = "Unknown";
         gametype = "Unknown";
@@ -74,6 +77,9 @@ public class GameState {
         // ★追加: リセット時にリブート警告も消す
         isServerClosing = false;
         serverClosingTime = null;
+
+        // ★追加: ワールド移動時にアナウンス済みフラグをリセットする
+        hasAnnouncedDay30 = false;
 
         // ★追加: ワールド移動時にアーマースタックの残像を消すために強制リセット
         crimsonStack = 0; isCrimsonBold = false;

@@ -29,6 +29,7 @@ public class ModConfig {
     public static boolean showDpsChat = true;
     public static boolean showLootQualityChat = true;
     public static boolean showGolemWorldText = true;
+    public static boolean enableDay30Alert = true;
 
     // ★追加: ドラゴン出現通知の設定
     public static boolean enableDragonAlerts = true;
@@ -41,6 +42,8 @@ public class ModConfig {
 
     // ★追加: サーバーリブート通知の設定 (デフォルトはON)
     public static boolean enableRebootAlert = true;
+
+    public static boolean showDayHud = false;
 
     static {
         load();
@@ -63,14 +66,15 @@ public class ModConfig {
             showDpsChat = parseBool("showDpsChat", true);
             showLootQualityChat = parseBool("showLootQualityChat", true);
             showGolemWorldText = parseBool("showGolemWorldText", true);
+            enableDay30Alert = parseBool("enableDay30Alert", true);
             // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
             // Misc
             showPetHud = parseBool("showPetHud", false);
             showArmorStackHud = parseBool("showArmorStackHud", false);
-
-            // ★追加: 読み込み処理
             enableRebootAlert = parseBool("enableRebootAlert", true);
+
+            showDayHud = parseBool("showDayHud", false);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -80,6 +84,7 @@ public class ModConfig {
         File parentDir = CONFIG_FILE.getParentFile();
         if (parentDir != null && !parentDir.exists()) parentDir.mkdirs();
 
+        // End Stone Protector
         properties.setProperty("showGolemStatusHud", String.valueOf(showGolemStatusHud));
         properties.setProperty("showLootTrackerHud", String.valueOf(showLootTrackerHud));
         properties.setProperty("showGolemHealthHud", String.valueOf(showGolemHealthHud));
@@ -89,16 +94,16 @@ public class ModConfig {
         properties.setProperty("showDpsChat", String.valueOf(showDpsChat));
         properties.setProperty("showLootQualityChat", String.valueOf(showLootQualityChat));
         properties.setProperty("showGolemWorldText", String.valueOf(showGolemWorldText));
+        properties.setProperty("enableDay30Alert", String.valueOf(enableDay30Alert));
 
-        // ★追加: 保存処理
+        // Dragon
         properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
 
+        // Misc
         properties.setProperty("showPetHud", String.valueOf(showPetHud));
-
         properties.setProperty("showArmorStackHud", String.valueOf(showArmorStackHud));
-
-        // ★追加: 保存処理
         properties.setProperty("enableRebootAlert", String.valueOf(enableRebootAlert));
+        properties.setProperty("showDayHud", String.valueOf(showDayHud));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");

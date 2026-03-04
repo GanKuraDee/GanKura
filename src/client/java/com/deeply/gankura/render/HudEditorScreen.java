@@ -13,6 +13,7 @@ public class HudEditorScreen extends Screen {
     private boolean draggingHealth = false;
     private boolean draggingPet = false;
     private boolean draggingArmorStack = false;
+    private boolean draggingDay = false;
 
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
@@ -28,6 +29,8 @@ public class HudEditorScreen extends Screen {
     private final int PET_HEIGHT = 30;
     private final int ARMOR_STACK_WIDTH = 150;
     private final int ARMOR_STACK_HEIGHT = 15;
+    private final int DAY_WIDTH = 60;
+    private final int DAY_HEIGHT = 15;
 
     public HudEditorScreen() {
         super(Text.literal("GanKura HUD Editor"));
@@ -104,6 +107,17 @@ public class HudEditorScreen extends Screen {
         HudRenderer.renderArmorStackHud(context, textRenderer, 0, 0, true);
         context.getMatrices().popMatrix();
 
+        // --- Day ---
+        boolean hoverDay = isHovering(mouseX, mouseY, HudConfig.dayX, HudConfig.dayY, DAY_WIDTH, DAY_HEIGHT, HudConfig.dayScale);
+        int dayBoxColor = (hoverDay || draggingDay) ? 0x80FFFFFF : 0x40000000;
+        context.fill(HudConfig.dayX - 5, HudConfig.dayY - 5, HudConfig.dayX + (int)(DAY_WIDTH * HudConfig.dayScale), HudConfig.dayY + (int)(DAY_HEIGHT * HudConfig.dayScale), dayBoxColor);
+
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate((float)HudConfig.dayX, (float)HudConfig.dayY);
+        context.getMatrices().scale(HudConfig.dayScale, HudConfig.dayScale);
+        HudRenderer.renderDayHud(context, client, textRenderer, 0, 0);
+        context.getMatrices().popMatrix();
+
         // ★修正: 説明テキストからRキーの記述を削除
         context.drawCenteredTextWithShadow(textRenderer, "Drag to move HUDs. Scroll to Resize. Press ESC to save & exit.", width / 2, 20, 0xFFFFFFFF);
 
@@ -146,6 +160,12 @@ public class HudEditorScreen extends Screen {
                 draggingArmorStack = true;
                 dragOffsetX = (int)mouseX - HudConfig.armorStackX;
                 dragOffsetY = (int)mouseY - HudConfig.armorStackY;
+                return true;
+            }
+            if (isHovering((int)mouseX, (int)mouseY, HudConfig.dayX, HudConfig.dayY, DAY_WIDTH, DAY_HEIGHT, HudConfig.dayScale)) {
+                draggingDay = true;
+                dragOffsetX = (int)mouseX - HudConfig.dayX;
+                dragOffsetY = (int)mouseY - HudConfig.dayY;
                 return true;
             }
         }
@@ -193,6 +213,11 @@ public class HudEditorScreen extends Screen {
             HudConfig.armorStackY = (int)mouseY - dragOffsetY;
             return true;
         }
+        if (draggingDay) {
+            HudConfig.dayX = (int)mouseX - dragOffsetX;
+            HudConfig.dayY = (int)mouseY - dragOffsetY;
+            return true;
+        }
         return false;
     }
 
@@ -223,7 +248,10 @@ public class HudEditorScreen extends Screen {
             HudConfig.armorStackScale = Math.max(0.5f, Math.min(3.0f, HudConfig.armorStackScale + scroll));
             return true;
         }
-
+        if (isHovering((int)mouseX, (int)mouseY, HudConfig.dayX, HudConfig.dayY, DAY_WIDTH, DAY_HEIGHT, HudConfig.dayScale)) {
+            HudConfig.dayScale = Math.max(0.5f, Math.min(3.0f, HudConfig.dayScale + scroll));
+            return true;
+        }
         return false;
     }
 

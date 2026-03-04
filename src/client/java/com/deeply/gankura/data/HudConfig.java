@@ -30,13 +30,15 @@ public class HudConfig {
     public static int petY = 10;
     public static int armorStackX = 10;
     public static int armorStackY = 50;
-
+    public static int dayX = 10;
+    public static int dayY = 90;
     // ★追加: 各HUDのスケール(倍率)
     public static float statsScale = 1.0f;
     public static float trackerScale = 1.0f;
     public static float healthScale = 1.0f;
     public static float petScale = 1.0f;
     public static float armorStackScale = 1.0f;
+    public static float dayScale = 1.0f;
 
     static {
         load();
@@ -59,6 +61,8 @@ public class HudConfig {
             petY = parseInt(properties.getProperty("petY"), 10);
             armorStackX = parseInt(properties.getProperty("armorStackX"), 10);
             armorStackY = parseInt(properties.getProperty("armorStackY"), 50);
+            dayX = parseInt(properties.getProperty("dayX"), 10);
+            dayY = parseInt(properties.getProperty("dayY"), 90);
 
             // ★追加: スケールの読み込み
             statsScale = parseFloat(properties.getProperty("statsScale"), 1.0f);
@@ -66,6 +70,7 @@ public class HudConfig {
             healthScale = parseFloat(properties.getProperty("healthScale"), 1.0f);
             petScale = parseFloat(properties.getProperty("petScale"), 1.0f);
             armorStackScale = parseFloat(properties.getProperty("armorStackScale"), 1.0f);
+            dayScale = parseFloat(properties.getProperty("dayScale"), 1.0f);
         } catch (IOException e) {
             LOGGER.error("Failed to load HUD config", e);
         }
@@ -85,13 +90,15 @@ public class HudConfig {
         properties.setProperty("petY", String.valueOf(petY));
         properties.setProperty("armorStackX", String.valueOf(armorStackX));
         properties.setProperty("armorStackY", String.valueOf(armorStackY));
-
+        properties.setProperty("dayX", String.valueOf(dayX));
+        properties.setProperty("dayY", String.valueOf(dayY));
         // ★追加: スケールの保存
         properties.setProperty("statsScale", String.valueOf(statsScale));
         properties.setProperty("trackerScale", String.valueOf(trackerScale));
         properties.setProperty("healthScale", String.valueOf(healthScale));
         properties.setProperty("petScale", String.valueOf(petScale));
         properties.setProperty("armorStackScale", String.valueOf(armorStackScale));
+        properties.setProperty("dayScale", String.valueOf(dayScale));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura HUD Positions and Scales");
@@ -130,5 +137,9 @@ public class HudConfig {
         armorStackX = 10;
         armorStackY = 50;
         armorStackScale = 1.0f;
+
+        dayX = 10;
+        dayY = 90;
+        dayScale = 1.0f;
     }
 }

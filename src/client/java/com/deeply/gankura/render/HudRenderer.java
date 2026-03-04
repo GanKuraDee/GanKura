@@ -22,6 +22,16 @@ public class HudRenderer {
 
         if (!"SKYBLOCK".equals(GameState.gametype)) return;
 
+
+        // メインの render メソッド内に追加 (SKYBLOCK判定の後など)
+        if (ModConfig.showDayHud) {
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate((float)HudConfig.dayX, (float)HudConfig.dayY);
+            context.getMatrices().scale(HudConfig.dayScale, HudConfig.dayScale);
+            renderDayHud(context, client, client.textRenderer, 0, 0);
+            context.getMatrices().popMatrix();
+        }
+
         // --- Pet HUD ---
         if (ModConfig.showPetHud) {
             context.getMatrices().pushMatrix();
@@ -322,5 +332,27 @@ public class HudRenderer {
         context.drawTextWithShadow(tr, text, -textWidth / 2, -tr.fontHeight / 2, 0xFFFF5555);
 
         context.getMatrices().popMatrix();
+    }
+
+    public static void renderDayHud(DrawContext context, MinecraftClient client, net.minecraft.client.font.TextRenderer tr, int x, int y) {
+        long day = 0;
+        if (client.world != null) {
+            day = client.world.getTimeOfDay() / 24000L;
+        }
+        String text = "Day: " + day;
+
+        // どこにいても、デフォルトのテキスト色を黄緑色(§a)にする
+        int color = 0xFFFFFFFF;
+
+        // The Endにいるかどうかの判定
+        boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
+
+        // ★修正: 定数名を STAGE_AWAKENING に変更
+        // ★修正: ModConfig.enableDay30Alert が ON の時のみ、赤色にする判定を行う
+        if (ModConfig.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.golemStage)) {
+            color = 0xFFFF5555; // 赤色
+        }
+
+        context.drawTextWithShadow(tr, text, x, y, color);
     }
 }

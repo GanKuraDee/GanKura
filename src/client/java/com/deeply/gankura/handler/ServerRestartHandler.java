@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.scoreboard.Scoreboard;
@@ -21,6 +22,26 @@ public class ServerRestartHandler {
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world == null || client.player == null) return;
+
+            // ========================================================
+            // The EndでのDay30到達 ＆ Stage4 アナウンス処理
+            // ========================================================
+            boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
+            if (isTargetMap) {
+                long currentDay = client.world.getTimeOfDay() / 24000L;
+
+                // ★修正: 定数名を STAGE_AWAKENING に変更
+                // ★修正: 設定がON、且つ条件を満たしている場合のみ実行
+                if (ModConfig.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.golemStage) && !GameState.hasAnnouncedDay30) {
+                    GameState.hasAnnouncedDay30 = true;
+
+                    net.minecraft.text.MutableText warningMsg = com.deeply.gankura.util.NotificationUtils.getGanKuraPrefix();
+                    warningMsg.append(net.minecraft.text.Text.literal("§cWarning: The current Day is " + currentDay + " during Stage 4. The server might restart soon!"));
+
+                    client.player.sendMessage(warningMsg, false);
+                }
+            }
+            // ========================================================
 
             // チャットでリブート警告を受信した状態でのみスコアボードをスキャンする
             if (!GameState.isServerClosing) return;

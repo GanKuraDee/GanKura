@@ -90,12 +90,13 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(right, y, bWidth, "DPS Chat", ModConfig.showDpsChat, b -> ModConfig.showDpsChat = b));
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Loot Quality Chat", ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Day 30 Alert", ModConfig.enableDay30Alert, b -> ModConfig.enableDay30Alert = b));
 
         // ★修正: 30 から 40 に増やして、タイトルのためのスペースを確保
         y += 40;
 
         // --- Dragon Settings ---
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Summoned Alert", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
     }
 
     // --- 3. Misc カテゴリの設定画面 ---
@@ -108,6 +109,7 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Armor Stack HUD", ModConfig.showArmorStackHud, b -> ModConfig.showArmorStackHud = b));
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Server Reboot Alert", ModConfig.enableRebootAlert, b -> ModConfig.enableRebootAlert = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Day HUD", ModConfig.showDayHud, b -> ModConfig.showDayHud = b));
     }
 
     // ★最新仕様: サブメニューからメインに戻るためのESCキー処理
