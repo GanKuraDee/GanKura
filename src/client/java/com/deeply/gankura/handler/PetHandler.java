@@ -115,11 +115,18 @@ public class PetHandler {
             }
         }
 
-        // リスト全体を探しても「[Lvl」も「No pet selected」も見つからず、
-        // かつリスト自体はちゃんと読み込まれている場合
-        // ＝ Skyblockメニュー設定で「Pet Tab Widget」がOFFになっていると判断する
-        GameState.activePetName = "§cRequired Enable Pet Tab Widget!";
-        hasScannedTabList = true;
+        // リスト全体を探しても「[Lvl」も「No pet selected」も見つからない場合
+        // ワールドに入ってから5秒(5000ms)経過したかを判定する
+        if (System.currentTimeMillis() - GameState.lastWorldJoinTime > 5000) {
+            // 5秒間何度もスキャンしても見つからなかった場合は、本当にOFFになっていると判断
+            GameState.activePetName = "§cRequired Enable Pet Tab Widget!";
+            hasScannedTabList = true; // スキャン完了(諦め)状態にする
+        } else {
+            // まだ5秒経っていない場合はラグで遅延しているだけかもしれないため、
+            // エラーは出さずに Scanning... のまま待機し、次回のTickでもう一度スキャンさせる
+            GameState.activePetName = "§8Scanning...";
+            // hasScannedTabList = true; を実行しないことで、次のTickでもう一度スキャンが走ります
+        }
     }
 
     // =========================================================================

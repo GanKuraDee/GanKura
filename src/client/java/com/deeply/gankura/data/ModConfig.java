@@ -39,6 +39,9 @@ public class ModConfig {
     // ★追加: アーマースタックHUDの表示設定
     public static boolean showArmorStackHud = true;
 
+    // ★追加: サーバーリブート通知の設定 (デフォルトはON)
+    public static boolean enableRebootAlert = true;
+
     static {
         load();
     }
@@ -65,6 +68,9 @@ public class ModConfig {
             // Misc
             showPetHud = parseBool("showPetHud", false);
             showArmorStackHud = parseBool("showArmorStackHud", false);
+
+            // ★追加: 読み込み処理
+            enableRebootAlert = parseBool("enableRebootAlert", true);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -90,6 +96,9 @@ public class ModConfig {
         properties.setProperty("showPetHud", String.valueOf(showPetHud));
 
         properties.setProperty("showArmorStackHud", String.valueOf(showArmorStackHud));
+
+        // ★追加: 保存処理
+        properties.setProperty("enableRebootAlert", String.valueOf(enableRebootAlert));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");

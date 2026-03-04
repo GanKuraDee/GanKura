@@ -33,6 +33,8 @@ public class GameState {
 
     // ★追加: 現在アクティブなペット名(カラーコード付き)
     public static String activePetName = null;
+    // 変数宣言部に追加
+    public static long lastWorldJoinTime = 0;
 
     // ★追加: アーマースタック情報
     public static int crimsonStack = 0;
@@ -52,6 +54,10 @@ public class GameState {
 
     public static long lastArmorStackUpdateTime = 0;
 
+    // ★追加: サーバーリブート情報
+    public static boolean isServerClosing = false;
+    public static String serverClosingTime = null;
+
     public static long lastServerTimePacket = 0;
     public static long lastServerPacketArrivalMillis = 0;
 
@@ -63,6 +69,19 @@ public class GameState {
         resetGolemStatus();
         // ★変更: null ではなく、スキャン中の仮テキストを入れておく
         activePetName = "§8Scanning...";
+        lastWorldJoinTime = System.currentTimeMillis(); // ワールド移動時間を記録
+
+        // ★追加: リセット時にリブート警告も消す
+        isServerClosing = false;
+        serverClosingTime = null;
+
+        // ★追加: ワールド移動時にアーマースタックの残像を消すために強制リセット
+        crimsonStack = 0; isCrimsonBold = false;
+        terrorStack = 0;  isTerrorBold = false;
+        hollowStack = 0;  isHollowBold = false;
+        fervorStack = 0;  isFervorBold = false;
+        auroraStack = 0;  isAuroraBold = false;
+        lastArmorStackUpdateTime = 0;
     }
 
     public static void resetGolemStatus() {

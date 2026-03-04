@@ -40,6 +40,11 @@ public class HudRenderer {
             context.getMatrices().popMatrix();
         }
 
+        // ★修正: 設定がON、かつ警告状態の時のみ描画する
+        if (ModConfig.enableRebootAlert && GameState.isServerClosing && GameState.serverClosingTime != null) {
+            renderServerClosingAlert(context, client, client.textRenderer);
+        }
+
         boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
         if (!isTargetMap) return;
 
@@ -295,5 +300,27 @@ public class HudRenderer {
             context.drawTextWithShadow(tr, part, currentX, y, 0xFFFFFFFF);
             currentX += tr.getWidth(part) + spacing;
         }
+    }
+
+    // ★追加: サーバーリブート警告HUDの描画メソッド
+    private static void renderServerClosingAlert(DrawContext context, MinecraftClient client, TextRenderer tr) {
+        String text = "Server closing: " + GameState.serverClosingTime;
+
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        int textWidth = tr.getWidth(text);
+
+        context.getMatrices().pushMatrix();
+
+        // 画面の「ど真ん中」へ空間を移動
+        context.getMatrices().translate(screenWidth / 2f, screenHeight / 2f);
+        // テキストを2倍のサイズに大きくする
+        context.getMatrices().scale(2.0f, 2.0f);
+
+        // 中央を原点(0,0)としたので、テキストの幅と高さの「半分」だけ左上にずらして描画することで完全な中央揃えになる
+        // 0xFFFF5555 は少し明るめの赤色(Red)です (細字＝太字の§lを付けない)
+        context.drawTextWithShadow(tr, text, -textWidth / 2, -tr.fontHeight / 2, 0xFFFF5555);
+
+        context.getMatrices().popMatrix();
     }
 }

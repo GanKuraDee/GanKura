@@ -40,6 +40,9 @@ public class NetworkHandler {
                 return true;
             }
 
+            // ★追加: サーバーリブート検知 (一番最初の方で判定する)
+            ServerRestartHandler.handleChat(unformattedMsg, MinecraftClient.getInstance());
+
             if (LocrawHandler.handleMessage(msg)) {
                 return false;
             }
