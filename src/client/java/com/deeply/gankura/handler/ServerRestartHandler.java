@@ -36,7 +36,7 @@ public class ServerRestartHandler {
                     GameState.hasAnnouncedDay30 = true;
 
                     net.minecraft.text.MutableText warningMsg = com.deeply.gankura.util.NotificationUtils.getGanKuraPrefix();
-                    warningMsg.append(net.minecraft.text.Text.literal("§cWarning: This server might restart before the golem spawns (Day " + currentDay +  ")."));
+                    warningMsg.append(net.minecraft.text.Text.literal("§cWarning: This server might restart before the golem spawns. (Day " + currentDay +  ")"));
 
                     client.player.sendMessage(warningMsg, false);
                 }
