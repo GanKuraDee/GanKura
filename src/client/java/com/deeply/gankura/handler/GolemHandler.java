@@ -5,7 +5,9 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 
-public class CombatStatsHandler {
+public class GolemHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("CombatStatsHandler");
 
     public static void handleMessage(String msg, MinecraftClient client) {
@@ -44,12 +46,25 @@ public class CombatStatsHandler {
             return;
         }
 
-        // 3. 1位ダメージ収集
-        Matcher firstMatcher = ModConstants.FIRST_PLACE_PATTERN.matcher(msg);
-        if (firstMatcher.find()) {
+        // 3. Top 3 ダメージ収集
+        Matcher topMatcher = ModConstants.TOP_DAMAGER_PATTERN.matcher(msg);
+        if (topMatcher.find()) {
             try {
-                String raw = firstMatcher.group(1).replace(",", "");
-                GameState.lastFirstPlaceDamage = Long.parseLong(raw);
+                String rank = topMatcher.group(1);
+                String name = topMatcher.group(2); // [MVP+] などを除いた純粋なプレイヤーID
+                long damage = Long.parseLong(topMatcher.group(3).replace(",", ""));
+
+                if ("1st".equals(rank)) {
+                    GameState.top1Name = name;
+                    GameState.top1Damage = damage;
+                    GameState.lastFirstPlaceDamage = damage; // Loot Quality計算用に維持
+                } else if ("2nd".equals(rank)) {
+                    GameState.top2Name = name;
+                    GameState.top2Damage = damage;
+                } else if ("3rd".equals(rank)) {
+                    GameState.top3Name = name;
+                    GameState.top3Damage = damage;
+                }
             } catch (Exception ignored) {}
             return;
         }
@@ -77,13 +92,10 @@ public class CombatStatsHandler {
         long lastDownTime = GameState.fightEndTime;
         long currentTime = client.world.getTime();
 
-        // 1. Golemの討伐時刻(fightEndTime)が記録されているか、20秒以内か
-        if (lastDownTime == 0 || (currentTime - lastDownTime) > 400) { // 400tick = 20秒
+        if (lastDownTime == 0 || (currentTime - lastDownTime) > 400) {
             return;
         }
 
-        // ★追加・変更: Golemのリザルトを1回処理したら、討伐時刻を0にリセットする！
-        // これにより、直後にドラゴンの「Your Damage」が来ても無視されるようになります。
         GameState.fightEndTime = 0;
 
         try {
@@ -92,14 +104,13 @@ public class CombatStatsHandler {
             String rawPos = matcher.group(2).replace(",", "");
             int myPosition = Integer.parseInt(rawPos);
 
-            // DPS計算用変数
             String formattedDps = null;
             String durationStr = null;
+            double durationSeconds = 0; // ★ここに追加
 
-            // Start時刻も記録されている場合のみ DPS を計算
             if (GameState.fightStartTime > 0 && lastDownTime > GameState.fightStartTime) {
                 long durationTicks = lastDownTime - GameState.fightStartTime;
-                double durationSeconds = durationTicks / 20.0;
+                durationSeconds = durationTicks / 20.0; // ★ここで代入
 
                 if (durationSeconds > 0) {
                     double dps = myDamage / durationSeconds;
@@ -110,13 +121,14 @@ public class CombatStatsHandler {
 
             String finalDps = formattedDps;
             String finalDuration = durationStr;
+            double finalDurationSec = durationSeconds; // ★これを使って計算値を固定化
 
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    // Loot Quality は Golem Down さえあれば計算して表示
                     int lootQuality = calculateLootQuality(myDamage, myPosition);
-                    printResult(client, finalDps, finalDuration, lootQuality);
+                    // ★修正: durationSeconds を printResult に渡す
+                    printResult(client, finalDps, finalDuration, finalDurationSec, lootQuality);
                 }
             }, 500);
 
@@ -125,24 +137,46 @@ public class CombatStatsHandler {
         }
     }
 
-    private static void printResult(MinecraftClient client, String dps, String duration, int lq) {
+    // ★修正: 引数に durationSeconds (double) を追加
+    private static void printResult(MinecraftClient client, String dps, String duration, double durationSeconds, int lq) {
         String tbcMark = (lq >= 250) ? "§a✔" : "§c✘";
         String legMark = (lq >= 235) ? "§a✔" : "§c✘";
         String epicMark = (lq >= 220) ? "§a✔" : "§c✘";
 
         client.execute(() -> {
             if (client.player != null) {
-                // DPS情報がある場合のみ表示
                 if (ModConfig.showDpsChat && dps != null && duration != null) {
                     MutableText msg = NotificationUtils.getGanKuraPrefix();
-                    msg.append(Text.literal(String.format("§bYour Golem DPS: %s §7(%s)", dps, duration)));
+                    msg.append(Text.literal(String.format("§bYour Golem DPS: %s §7(%s) ", dps, duration)));
+
+                    // =======================================================
+                    // ★追加: Top 3 ホバーの生成
+                    // =======================================================
+                    if (durationSeconds > 0 && GameState.top1Damage > 0) {
+                        MutableText hoverText = Text.literal("§6§lTop 3 DPS\n");
+                        hoverText.append(Text.literal(String.format("§e#1 §f%s §7- §b%s", GameState.top1Name, formatDps(GameState.top1Damage / durationSeconds))));
+
+                        if (GameState.top2Damage > 0) {
+                            hoverText.append(Text.literal(String.format("\n§6#2 §f%s §7- §b%s", GameState.top2Name, formatDps(GameState.top2Damage / durationSeconds))));
+                        }
+                        if (GameState.top3Damage > 0) {
+                            hoverText.append(Text.literal(String.format("\n§c#3 §f%s §7- §b%s", GameState.top3Name, formatDps(GameState.top3Damage / durationSeconds))));
+                        }
+
+                        // [HOVER] というテキストに、マウスを乗せた時(SHOW_TEXT)のイベントを付与
+                        MutableText hoverButton = Text.literal("§8[§e§nHOVER§r§8]")
+                                .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText)));
+
+                        msg.append(hoverButton);
+                    }
+                    // =======================================================
+
                     client.player.sendMessage(msg, false);
                 }
 
-                // Loot Quality は常に表示
                 if (ModConfig.showLootQualityChat) {
                     MutableText msg1 = NotificationUtils.getGanKuraPrefix();
-                    msg1.append(Text.literal(String.format("§eGolem Loot Quality: %d", lq)));
+                    msg1.append(Text.literal(String.format("§eYour Golem Loot Quality: %d", lq)));
                     client.player.sendMessage(msg1, false);
 
                     MutableText msg2 = NotificationUtils.getGanKuraPrefix();

@@ -16,7 +16,7 @@ import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItemDropScanner {
+public class GolemRareDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("ItemDropScanner");
     // private static int tickCounter = 0; // ★削除: 毎tick実行のため不要
 

@@ -24,6 +24,14 @@ public class GameState {
     public static long lastFirstPlaceDamage = 0;
     public static int lastZealotKills = 0;
 
+    // ★追加: トップ3のダメージ情報
+    public static String top1Name = null;
+    public static long top1Damage = 0;
+    public static String top2Name = null;
+    public static long top2Damage = 0;
+    public static String top3Name = null;
+    public static long top3Damage = 0;
+
     // ドロップ通知関連
     public static boolean hasShownDropAlert = false;
     public static boolean isLootScanning = false;
@@ -64,6 +72,12 @@ public class GameState {
     // ★追加: Day30到達時の警告アナウンス済みフラグ
     public static boolean hasAnnouncedDay30 = false;
 
+    // ★変更: Arrow Poisonの所持状態（どちらが先に消費されるか）
+    // "NONE", "TOXIC", "TWILIGHT" のいずれかが入る
+    public static String activePoison = "NONE";
+    // ★追加: 現在アクティブなPoisonの合計所持数
+    public static int activePoisonCount = 0;
+
     public static void reset() {
         serverId = "Unknown";
         gametype = "Unknown";
@@ -88,6 +102,8 @@ public class GameState {
         fervorStack = 0;  isFervorBold = false;
         auroraStack = 0;  isAuroraBold = false;
         lastArmorStackUpdateTime = 0;
+        activePoison = "NONE";
+        activePoisonCount = 0; // ★追加
     }
 
     public static void resetGolemStatus() {
@@ -100,6 +116,11 @@ public class GameState {
 
         lastFirstPlaceDamage = 0;
         lastZealotKills = 0;
+
+        // ★追加: リセット時にトップ3のデータも消去する
+        top1Name = null; top1Damage = 0;
+        top2Name = null; top2Damage = 0;
+        top3Name = null; top3Damage = 0;
 
         hasShownDropAlert = false;
         isLootScanning = false;

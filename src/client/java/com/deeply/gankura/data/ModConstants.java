@@ -33,9 +33,9 @@ public class ModConstants {
     // ダメージ取得用 ("Your Damage: 1,234,567 (Position #5)")
     public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)");
 
-    // ★追加: Loot Quality計算用
-    // "1st Damager - Name - 1,000,000"
-    public static final Pattern FIRST_PLACE_PATTERN = Pattern.compile("1st Damager - .+ - ([\\d,]+)");
+    // ★変更: 1位〜3位のDPS計算 & Loot Quality用
+    // "1st Damager - [MVP+] Name - 1,000,000" や "2nd Damager - Name - 800,000" に対応
+    public static final Pattern TOP_DAMAGER_PATTERN = Pattern.compile("(1st|2nd|3rd) Damager - (?:.*\\] )?([A-Za-z0-9_]+) - ([\\d,]+)");
 
     // "Zealots Contributed: 50/100"
     public static final Pattern ZEALOT_PATTERN = Pattern.compile("Zealots Contributed: ([\\d,]+)/100");

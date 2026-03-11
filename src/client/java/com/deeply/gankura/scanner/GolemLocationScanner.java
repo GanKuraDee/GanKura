@@ -7,7 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
-public class LocationScanner {
+public class GolemLocationScanner {
     // private static int tickCounter = 0; // 削除
 
     public static void register() {

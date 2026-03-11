@@ -1,20 +1,15 @@
 package com.deeply.gankura;
 
-import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
 import com.deeply.gankura.render.ConfigScreen; // ★追加
-import com.deeply.gankura.scanner.GolemHealthScanner; // ★追加
+import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
-import com.deeply.gankura.scanner.ItemDropScanner;
-import com.deeply.gankura.scanner.LocationScanner;
-import com.deeply.gankura.scanner.StageScanner;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +20,14 @@ public class GanKura implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         NetworkHandler.init();
-        StageScanner.register();
-        LocationScanner.register();
-        ItemDropScanner.register();
-        // ★追加
+        GolemStageScanner.register();
+        GolemLocationScanner.register();
+        GolemRareDropScanner.register();
         GolemHealthScanner.register();
-        // ★追加
         PetHandler.register();
-        ServerRestartHandler.register(); // ★これを追加
-
-        ArmorStackHandler.register(); // ★追加
+        ServerRestartHandler.register();
+        ArmorStackHandler.register();
+        ArrowPoisonScanner.register();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")

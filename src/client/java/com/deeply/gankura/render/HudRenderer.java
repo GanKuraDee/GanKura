@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 
 public class HudRenderer {
 
-    // ★変更: メインのrenderメソッド内でのみ拡大縮小を行うように変更
+    // ★変更: メインのrenderメソッドを以下で上書きしてください
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.options.hudHidden) return;
@@ -22,67 +22,20 @@ public class HudRenderer {
 
         if (!"SKYBLOCK".equals(GameState.gametype)) return;
 
-
-        // メインの render メソッド内に追加 (SKYBLOCK判定の後など)
-        if (ModConfig.showDayHud) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float)HudConfig.dayX, (float)HudConfig.dayY);
-            context.getMatrices().scale(HudConfig.dayScale, HudConfig.dayScale);
-            renderDayHud(context, client, client.textRenderer, 0, 0);
-            context.getMatrices().popMatrix();
+        // ★新システム: リスト化されたHUD要素をループで一括描画
+        for (HudElement element : com.deeply.gankura.data.HudConfig.ELEMENTS) {
+            if (element.shouldRender(false)) { // false = プレビューではない本番描画
+                context.getMatrices().pushMatrix();
+                context.getMatrices().translate((float) element.x, (float) element.y);
+                context.getMatrices().scale(element.scale, element.scale);
+                element.renderElement(context, false);
+                context.getMatrices().popMatrix();
+            }
         }
 
-        // --- Pet HUD ---
-        if (ModConfig.showPetHud) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) HudConfig.petX, (float) HudConfig.petY); // 先に座標へ移動
-            context.getMatrices().scale(HudConfig.petScale, HudConfig.petScale); // 拡大縮小
-            renderPetHud(context, client.textRenderer, 0, 0, false); // 0,0 を起点に描画
-            context.getMatrices().popMatrix();
-        }
-
-        // --- Armor Stack HUD ---
-        if (ModConfig.showArmorStackHud) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) HudConfig.armorStackX, (float) HudConfig.armorStackY);
-            context.getMatrices().scale(HudConfig.armorStackScale, HudConfig.armorStackScale);
-            renderArmorStackHud(context, client.textRenderer, 0, 0, false);
-            context.getMatrices().popMatrix();
-        }
-
-        // ★修正: 設定がON、かつ警告状態の時のみ描画する
+        // サーバーリブート警告だけは、位置固定の中央画面表示なのでそのまま残す
         if (ModConfig.enableRebootAlert && GameState.isServerClosing && GameState.serverClosingTime != null) {
             renderServerClosingAlert(context, client, client.textRenderer);
-        }
-
-        boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
-        if (!isTargetMap) return;
-
-        // --- Golem Status HUD ---
-        if (ModConfig.showGolemStatusHud) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) HudConfig.statsX, (float) HudConfig.statsY);
-            context.getMatrices().scale(HudConfig.statsScale, HudConfig.statsScale);
-            renderStats(context, client.textRenderer, 0, 0, false);
-            context.getMatrices().popMatrix();
-        }
-
-        // --- Loot Tracker HUD ---
-        if (ModConfig.showLootTrackerHud) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) HudConfig.trackerX, (float) HudConfig.trackerY);
-            context.getMatrices().scale(HudConfig.trackerScale, HudConfig.trackerScale);
-            renderTracker(context, client.textRenderer, 0, 0);
-            context.getMatrices().popMatrix();
-        }
-
-        // --- Golem HP HUD ---
-        if (ModConfig.showGolemHealthHud && GameState.golemHealth != null) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) HudConfig.healthX, (float) HudConfig.healthY);
-            context.getMatrices().scale(HudConfig.healthScale, HudConfig.healthScale);
-            renderHealth(context, client.textRenderer, 0, 0, false);
-            context.getMatrices().popMatrix();
         }
     }
 
@@ -339,7 +292,8 @@ public class HudRenderer {
         if (client.world != null) {
             day = client.world.getTimeOfDay() / 24000L;
         }
-        String text = "Day: " + day;
+        // ★修正: String.format を使って、day の数字に3桁ごとのカンマ(,)を付与する
+        String text = "Day: " + String.format("%,d", day);
 
         // どこにいても、デフォルトのテキスト色を黄緑色(§a)にする
         int color = 0xFFFFFFFF;

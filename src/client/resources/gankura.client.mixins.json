@@ -5,7 +5,8 @@
 	"client": [
 		"HudRenderMixin",
 		"WorldTimeMixin",
-		"WorldRendererMixin"
+		"WorldRendererMixin",
+		"HotbarItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

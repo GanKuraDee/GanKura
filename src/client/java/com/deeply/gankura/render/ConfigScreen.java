@@ -49,7 +49,7 @@ public class ConfigScreen extends Screen {
 
     // --- 1. カテゴリ選択画面 (MAIN) ---
     private void initMainMenu(int centerX, int y) {
-        // ★修正: HUD移動ボタンを一番上(Y=45)に配置
+        // HUD移動ボタンを一番上(Y=45)に配置
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Edit HUD Locations"), button -> {
             MinecraftClient.getInstance().setScreen(new HudEditorScreen());
         }).dimensions(centerX - 100, 45, 200, 20).build());
@@ -92,11 +92,11 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Loot Quality Chat", ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day 30 Alert", ModConfig.enableDay30Alert, b -> ModConfig.enableDay30Alert = b));
 
-        // ★修正: 30 から 40 に増やして、タイトルのためのスペースを確保
+        // タイトルのためのスペースを確保
         y += 40;
 
         // --- Dragon Settings ---
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
     }
 
     // --- 3. Misc カテゴリの設定画面 ---
@@ -110,9 +110,13 @@ public class ConfigScreen extends Screen {
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Server Reboot Alert", ModConfig.enableRebootAlert, b -> ModConfig.enableRebootAlert = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day HUD", ModConfig.showDayHud, b -> ModConfig.showDayHud = b));
+
+        // ★追加: Poison Indicator のトグルボタンを次の行の左側に追加
+        y += 22;
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Arrow Poison Indicator", ModConfig.showPoisonIndicator, b -> ModConfig.showPoisonIndicator = b));
     }
 
-    // ★最新仕様: サブメニューからメインに戻るためのESCキー処理
+    // サブメニューからメインに戻るためのESCキー処理
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
         // ESCキー(256)が押されたとき
@@ -152,7 +156,7 @@ public class ConfigScreen extends Screen {
         context.drawCenteredTextWithShadow(textRenderer, this.subtitleText, centerX, 28, 0xFFAAAAAA);
 
         if (currentMenu == MenuType.MAIN) {
-            // ★修正: HUDボタンの下に表示されるよう、Y座標を 45 から 75 に下げる
+            // HUDボタンの下に表示されるよう、Y座標を 45 から 75 に下げる
             context.drawCenteredTextWithShadow(textRenderer, "§lCategory Selection", centerX, 75, 0xFF55FFFF);
         } else if (currentMenu == MenuType.THE_END) {
             // End Stone Protector のタイトル

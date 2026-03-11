@@ -18,7 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 
-public class StageScanner {
+public class GolemStageScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("StageScanner");
 
     public static void register() {

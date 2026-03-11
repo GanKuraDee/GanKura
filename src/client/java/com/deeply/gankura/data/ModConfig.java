@@ -19,7 +19,7 @@ public class ModConfig {
             .toFile();
     private static final Properties properties = new Properties();
 
-    // 設定項目 (デフォルトは全て true)
+    // 設定項目
     public static boolean showGolemStatusHud = true;
     public static boolean showLootTrackerHud = true;
     public static boolean showGolemHealthHud = true;
@@ -30,20 +30,12 @@ public class ModConfig {
     public static boolean showLootQualityChat = true;
     public static boolean showGolemWorldText = true;
     public static boolean enableDay30Alert = true;
-
-    // ★追加: ドラゴン出現通知の設定
     public static boolean enableDragonAlerts = true;
-
-    // ★追加: Pet HUDの表示設定
-    public static boolean showPetHud = true;
-
-    // ★追加: アーマースタックHUDの表示設定
-    public static boolean showArmorStackHud = true;
-
-    // ★追加: サーバーリブート通知の設定 (デフォルトはON)
+    public static boolean showPetHud = false;
+    public static boolean showArmorStackHud = false;
     public static boolean enableRebootAlert = true;
-
     public static boolean showDayHud = false;
+    public static boolean showPoisonIndicator = false;
 
     static {
         load();
@@ -56,6 +48,7 @@ public class ModConfig {
         }
         try (FileInputStream in = new FileInputStream(CONFIG_FILE)) {
             properties.load(in);
+
             // End Stone Protector
             showGolemStatusHud = parseBool("showGolemStatusHud", true);
             showLootTrackerHud = parseBool("showLootTrackerHud", true);
@@ -67,14 +60,16 @@ public class ModConfig {
             showLootQualityChat = parseBool("showLootQualityChat", true);
             showGolemWorldText = parseBool("showGolemWorldText", true);
             enableDay30Alert = parseBool("enableDay30Alert", true);
+
             // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
+
             // Misc
             showPetHud = parseBool("showPetHud", false);
             showArmorStackHud = parseBool("showArmorStackHud", false);
             enableRebootAlert = parseBool("enableRebootAlert", true);
-
             showDayHud = parseBool("showDayHud", false);
+            showPoisonIndicator = parseBool("showPoisonIndicator", false);
         } catch (IOException e) {
             LOGGER.error("Failed to load config", e);
         }
@@ -104,6 +99,7 @@ public class ModConfig {
         properties.setProperty("showArmorStackHud", String.valueOf(showArmorStackHud));
         properties.setProperty("enableRebootAlert", String.valueOf(enableRebootAlert));
         properties.setProperty("showDayHud", String.valueOf(showDayHud));
+        properties.setProperty("showPoisonIndicator", String.valueOf(showPoisonIndicator));
 
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
             properties.store(out, "GanKura General Config");

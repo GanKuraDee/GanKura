@@ -2,7 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
-import com.deeply.gankura.scanner.StageScanner;
+import com.deeply.gankura.scanner.GolemStageScanner;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
@@ -58,13 +58,13 @@ public class NetworkHandler {
             // 2. Stage 5 Spawn Timer 検知 (StageScannerに委譲)
             if (msg.contains(ModConstants.GOLEM_SPAWN_MSG)) {
                 MinecraftClient client = MinecraftClient.getInstance();
-                client.execute(() -> StageScanner.setStageToSummoned(client));
+                client.execute(() -> GolemStageScanner.setStageToSummoned(client));
                 return true;
             }
 
             // 3. 戦闘・統計データの処理 (CombatStatsHandlerに委譲)
             // 開始、終了、データ収集、結果計算のすべてをここで判断
-            CombatStatsHandler.handleMessage(msg, MinecraftClient.getInstance());
+            GolemHandler.handleMessage(msg, MinecraftClient.getInstance());
 
             return true;
         });

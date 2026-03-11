@@ -98,8 +98,14 @@ public class NotificationUtils {
 
         MutableText message = getGanKuraPrefix();
 
-        MutableText rareDrop = Text.literal("RARE DROP! ").formatted(Formatting.GOLD, Formatting.BOLD);
-        message.append(rareDrop).append(itemText);
+        // ★変更1: 自分の名前を、ランク表記や色コードを含めた「表示名(DisplayName)」として取得
+        Text playerName = client.player.getDisplayName();
+
+        // ★変更2: RARE DROP! の代わりに、指定されたフォーマットで組み立てる
+        message.append(playerName);
+        message.append(Text.literal(" has obtained ").formatted(Formatting.YELLOW));
+        message.append(itemText);
+        message.append(Text.literal("!").formatted(Formatting.YELLOW));
 
         client.player.sendMessage(message, false);
     }
