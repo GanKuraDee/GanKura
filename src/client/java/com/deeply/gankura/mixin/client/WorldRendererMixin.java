@@ -60,8 +60,7 @@ public class WorldRendererMixin {
                 textToRender = String.format("§c§lGOLEM §c(%.1fs)", remainingTicks / 20.0);
             } else {
                 if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
-                    // ★変更: (Soon) の部分だけ黄色(§e)にする
-                    textToRender = "§c§lGOLEM §e(Soon)";
+                    textToRender = "§e§lGOLEM §e(Soon)";
                 } else {
                     textToRender = "§c§lGOLEM §c(Spawned)";
                 }

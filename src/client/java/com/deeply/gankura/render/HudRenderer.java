@@ -41,7 +41,6 @@ public class HudRenderer {
         String displayStats;
 
         if (isPreview) {
-            // ★変更: Stage 5は「Stage: 」まで含めて全体を赤色(§c)にする
             displayStats = "§cStage: 5 (Spawned)";
         } else {
             String stage = GameState.golemStage;
@@ -58,14 +57,11 @@ public class HudRenderer {
                 if (remainingTicks < 0) remainingTicks = 0;
 
                 if (remainingTicks > 0) {
-                    // ★変更: カウントダウン中は全体を赤(§c)
                     displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
                 } else {
                     if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
-                        // ★変更: Soon(間もなく)は全体を黄色(§e)
                         displayStats = "§eStage: 5 (Soon)";
                     } else {
-                        // ★変更: Spawned(出現済み)は全体を赤(§c)
                         displayStats = "§cStage: 5 (Spawned)";
                     }
                 }
@@ -121,15 +117,13 @@ public class HudRenderer {
                 long minutes = seconds / 60;
                 long remainingSeconds = seconds % 60;
 
-                // ★追加: 経過時間に応じた色の切り替えロジック
-                String colorCode = "§f"; // デフォルトは白
-                if (seconds >= 480) { // 8分(480秒)以上で赤
+                String colorCode = "§f";
+                if (seconds >= 480) {
                     colorCode = "§c";
-                } else if (seconds >= 240) { // 4分(240秒)以上で黄色
+                } else if (seconds >= 240) {
                     colorCode = "§e";
                 }
 
-                // ★変更: 算出した色コード(colorCode)を数字部分に適用する
                 timerText = String.format("Since S4: %s%dm %ds", colorCode, minutes, remainingSeconds);
             }
             context.drawTextWithShadow(tr, timerText, x, y + 36, 0xFFFFFFFF);
@@ -334,7 +328,11 @@ public class HudRenderer {
                 }
             }
 
-            if (!"Respawning".equals(state) && !"Scanning...".equals(state)) {
+            // ★変更: Respawning の時に 0/8 に取り消し線を引いて表示する処理を追加
+            if ("Respawning".equals(state)) {
+                // 色コード(§e等)の後ろに再度取り消し線(§m)を入れないと線が途切れてしまうための特殊なフォーマット
+                eyePlaced = "§mEyes placed: §e§m0§7§m/§a§m8";
+            } else if (!"Scanning...".equals(state)) {
                 if (eyes == 8) {
                     eyePlaced = "§cEyes placed: 8/8";
                 } else {
