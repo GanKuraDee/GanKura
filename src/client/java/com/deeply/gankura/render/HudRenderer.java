@@ -60,7 +60,7 @@ public class HudRenderer {
                     displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
                 } else {
                     if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
-                        displayStats = "§eStage: 5 (Soon)";
+                        displayStats = "§cStage: 5 §e(Soon)";
                     } else {
                         displayStats = "§cStage: 5 (Spawned)";
                     }
@@ -322,7 +322,7 @@ public class HudRenderer {
                 };
 
                 if ("Hatched".equals(state)) {
-                    eggState = "Egg: " + colorCode + "Hatched §c(Spawned)";
+                    eggState = "§cEgg: Hatched (Spawned)";
                 } else {
                     eggState = "Egg: " + colorCode + state;
                 }
@@ -340,7 +340,7 @@ public class HudRenderer {
                 }
 
                 if (GameState.playerDragonEyes > 0) {
-                    eyePlaced += " §a(" + GameState.playerDragonEyes + ")";
+                    eyePlaced += " §b(" + GameState.playerDragonEyes + ")";
                 }
             }
 
