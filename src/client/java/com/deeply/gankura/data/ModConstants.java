@@ -50,6 +50,15 @@ public class ModConstants {
             new GolemSpot("Middle Behind", new BlockPos(-727, 5, -282)),
             new GolemSpot("Middle Center", new BlockPos(-689, 5, -271))
     );
-    // ★追加: ドラゴンスポーン検知用
+
+    // =======================================================
+    // ドラゴン関連の正規表現
+    // =======================================================
+    public static final Pattern EYE_PLACED_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! \\((\\d)/8\\)");
+    public static final Pattern EYE_PLACED_8_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! Brace yourselves! \\(8/8\\)");
+    public static final Pattern EYE_PLACED_TAB_PATTERN = Pattern.compile("Eyes placed: (\\d)/8");
+    public static final Pattern DRAGON_TYPE_TAB_PATTERN = Pattern.compile("Dragon: \\((.+)\\)");
     public static final Pattern DRAGON_SPAWN_PATTERN = Pattern.compile("The .*?(Protector|Old|Unstable|Young|Strong|Wise|Superior) Dragon has spawned!");
+    public static final Pattern DRAGON_DOWN_PATTERN = Pattern.compile("([A-Za-z]+) DRAGON DOWN!");
+    public static final String DRAGON_EGG_SPAWNED_MSG = "The Dragon Egg has spawned!";
 }

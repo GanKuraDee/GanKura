@@ -19,7 +19,7 @@ public class ModConfig {
             .toFile();
     private static final Properties properties = new Properties();
 
-    // 設定項目
+    // 設定項目 (Golem)
     public static boolean showGolemStatusHud = true;
     public static boolean showLootTrackerHud = true;
     public static boolean showGolemHealthHud = true;
@@ -30,7 +30,16 @@ public class ModConfig {
     public static boolean showLootQualityChat = true;
     public static boolean showGolemWorldText = true;
     public static boolean enableDay30Alert = true;
+
+    // Dragon
     public static boolean enableDragonAlerts = true;
+    public static boolean enableDragonDropAlerts = true; // ★追加: ドラゴンのレアドロップ通知用
+    public static boolean showDragonStatusHud = true;
+    public static boolean showDragonDpsChat = true;
+    public static boolean showDragonLootQualityChat = true;
+    public static boolean showDragonTrackerHud = true;
+
+    // Misc
     public static boolean showPetHud = false;
     public static boolean showArmorStackHud = false;
     public static boolean enableRebootAlert = true;
@@ -63,6 +72,11 @@ public class ModConfig {
 
             // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
+            enableDragonDropAlerts = parseBool("enableDragonDropAlerts", true); // ★追加
+            showDragonStatusHud = parseBool("showDragonStatusHud", true);
+            showDragonDpsChat = parseBool("showDragonDpsChat", true);
+            showDragonLootQualityChat = parseBool("showDragonLootQualityChat", true);
+            showDragonTrackerHud = parseBool("showDragonTrackerHud", true);
 
             // Misc
             showPetHud = parseBool("showPetHud", false);
@@ -93,6 +107,11 @@ public class ModConfig {
 
         // Dragon
         properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
+        properties.setProperty("enableDragonDropAlerts", String.valueOf(enableDragonDropAlerts)); // ★追加
+        properties.setProperty("showDragonStatusHud", String.valueOf(showDragonStatusHud));
+        properties.setProperty("showDragonDpsChat", String.valueOf(showDragonDpsChat));
+        properties.setProperty("showDragonLootQualityChat", String.valueOf(showDragonLootQualityChat));
+        properties.setProperty("showDragonTrackerHud", String.valueOf(showDragonTrackerHud));
 
         // Misc
         properties.setProperty("showPetHud", String.valueOf(showPetHud));

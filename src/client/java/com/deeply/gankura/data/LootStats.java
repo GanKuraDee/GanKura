@@ -15,8 +15,8 @@ public class LootStats {
 
     private static final File CONFIG_FILE = FabricLoader.getInstance()
             .getConfigDir()
-            .resolve("gankura")               // フォルダ名
-            .resolve("loot_tracker.properties") // ★変更: ファイル名を loot_tracker.properties に変更
+            .resolve("gankura")
+            .resolve("loot_tracker.properties")
             .toFile();
 
     private static final Properties properties = new Properties();
@@ -24,6 +24,10 @@ public class LootStats {
     public static int epicGolemPets = 0;
     public static int legendaryGolemPets = 0;
     public static int tierBoostCores = 0;
+
+    // ★追加: ドラゴンペットの取得数
+    public static int epicDragonPets = 0;
+    public static int legendaryDragonPets = 0;
 
     static {
         load();
@@ -40,6 +44,10 @@ public class LootStats {
             try { epicGolemPets = Integer.parseInt(properties.getProperty("epicGolemPets", "0")); } catch (NumberFormatException e) { epicGolemPets = 0; }
             try { legendaryGolemPets = Integer.parseInt(properties.getProperty("legendaryGolemPets", "0")); } catch (NumberFormatException e) { legendaryGolemPets = 0; }
             try { tierBoostCores = Integer.parseInt(properties.getProperty("tierBoostCores", "0")); } catch (NumberFormatException e) { tierBoostCores = 0; }
+
+            // ★追加: ドラゴンペットの読み込み
+            try { epicDragonPets = Integer.parseInt(properties.getProperty("epicDragonPets", "0")); } catch (NumberFormatException e) { epicDragonPets = 0; }
+            try { legendaryDragonPets = Integer.parseInt(properties.getProperty("legendaryDragonPets", "0")); } catch (NumberFormatException e) { legendaryDragonPets = 0; }
         } catch (IOException e) {
             LOGGER.error("Failed to load loot stats", e);
         }
@@ -59,8 +67,12 @@ public class LootStats {
         properties.setProperty("legendaryGolemPets", String.valueOf(legendaryGolemPets));
         properties.setProperty("tierBoostCores", String.valueOf(tierBoostCores));
 
+        // ★追加: ドラゴンペットの保存
+        properties.setProperty("epicDragonPets", String.valueOf(epicDragonPets));
+        properties.setProperty("legendaryDragonPets", String.valueOf(legendaryDragonPets));
+
         try (FileOutputStream out = new FileOutputStream(CONFIG_FILE)) {
-            properties.store(out, "GanKura Golem Loot Tracker");
+            properties.store(out, "GanKura Golem and Dragon Loot Tracker");
         } catch (IOException e) {
             LOGGER.error("Failed to save loot stats", e);
         }
@@ -78,6 +90,17 @@ public class LootStats {
 
     public static void addTierBoostCore() {
         tierBoostCores++;
+        save();
+    }
+
+    // ★追加: ドラゴンペット追加用メソッド
+    public static void addEpicDragonPet() {
+        epicDragonPets++;
+        save();
+    }
+
+    public static void addLegendaryDragonPet() {
+        legendaryDragonPets++;
         save();
     }
 }

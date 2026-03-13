@@ -147,7 +147,7 @@ public class GolemHandler {
             if (client.player != null) {
                 if (ModConfig.showDpsChat && dps != null && duration != null) {
                     MutableText msg = NotificationUtils.getGanKuraPrefix();
-                    msg.append(Text.literal(String.format("§bYour Golem DPS: %s (%s) ", dps, duration)));
+                    msg.append(Text.literal(String.format("§bYour Golem DPS: %s §7(%s) ", dps, duration)));
 
                     // =======================================================
                     // ★追加: Top 3 ホバーの生成
@@ -164,7 +164,7 @@ public class GolemHandler {
                         }
 
                         // [HOVER] というテキストに、マウスを乗せた時(SHOW_TEXT)のイベントを付与
-                        MutableText hoverButton = Text.literal("§7[HOVER]")
+                        MutableText hoverButton = Text.literal("§8[§eHOVER§8]")
                                 .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText)));
 
                         msg.append(hoverButton);

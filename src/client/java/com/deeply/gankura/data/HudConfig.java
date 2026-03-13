@@ -25,7 +25,6 @@ public class HudConfig {
             .toFile();
     private static final Properties properties = new Properties();
 
-    // ★すべてのHUDをここで一括管理するリスト
     public static final List<HudElement> ELEMENTS = new ArrayList<>();
 
     static {
@@ -33,12 +32,10 @@ public class HudConfig {
         load();
     }
 
-    // The Endにいるかどうかの共通判定ロジック
     private static boolean isTheEnd() {
         return "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
     }
 
-    // ★今後新しいHUDを追加する時は、ここのリストに1つ追加するだけで完結します！
     private static void initElements() {
         ELEMENTS.add(new HudElement("stats", 260, 50, 1.0f, 150, 50,
                 () -> ModConfig.showGolemStatusHud, HudConfig::isTheEnd) {
@@ -79,6 +76,22 @@ public class HudConfig {
                 () -> ModConfig.showDayHud, () -> true) {
             @Override public void renderElement(DrawContext context, boolean isPreview) {
                 HudRenderer.renderDayHud(context, MinecraftClient.getInstance(), MinecraftClient.getInstance().textRenderer, 0, 0);
+            }
+        });
+
+        ELEMENTS.add(new HudElement("dragon", 10, 130, 1.0f, 150, 50,
+                () -> ModConfig.showDragonStatusHud, HudConfig::isTheEnd) {
+            @Override public void renderElement(DrawContext context, boolean isPreview) {
+                HudRenderer.renderDragonStatus(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
+            }
+        });
+
+        // ★追加: Dragon Loot Tracker
+        // ※ ModConfigに「public static boolean showDragonTrackerHud = true;」を追加してください
+        ELEMENTS.add(new HudElement("dragonTracker", 260, 190, 1.0f, 150, 40,
+                () -> ModConfig.showDragonTrackerHud, HudConfig::isTheEnd) {
+            @Override public void renderElement(DrawContext context, boolean isPreview) {
+                HudRenderer.renderDragonTracker(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
             }
         });
     }

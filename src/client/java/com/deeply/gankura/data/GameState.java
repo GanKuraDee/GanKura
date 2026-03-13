@@ -78,6 +78,24 @@ public class GameState {
     // ★追加: 現在アクティブなPoisonの合計所持数
     public static int activePoisonCount = 0;
 
+    // =======================================================
+    // ★追加: Dragon Status 関連
+    // =======================================================
+    public static String dragonEggState = "Scanning..."; // "Ready", "Hatching", "Hatched", "Respawning"
+    public static int dragonEyes = 0;
+    public static int playerDragonEyes = 0; // ★追加: 自分がはめたEyeの数
+    public static String dragonType = null;
+    public static long dragonSpawnTargetTime = 0;
+    public static long lastDragonChatTime = 0;
+    public static long dragonFightStartTime = 0;
+    public static long dragonFightEndTime = 0;
+    public static String dragonTop1Name = null;
+    public static long dragonTop1Damage = 0;
+    public static String dragonTop2Name = null;
+    public static long dragonTop2Damage = 0;
+    public static String dragonTop3Name = null;
+    public static long dragonTop3Damage = 0;
+
     public static void reset() {
         serverId = "Unknown";
         gametype = "Unknown";
@@ -104,6 +122,19 @@ public class GameState {
         lastArmorStackUpdateTime = 0;
         activePoison = "NONE";
         activePoisonCount = 0; // ★追加
+
+        // ★追加: Dragon Status リセット
+        dragonEggState = "Scanning...";
+        dragonEyes = 0;
+        playerDragonEyes = 0; // ★追加
+        dragonType = null;
+        dragonSpawnTargetTime = 0;
+        lastDragonChatTime = 0;
+        dragonFightStartTime = 0;
+        dragonFightEndTime = 0;
+        dragonTop1Name = null; dragonTop1Damage = 0;
+        dragonTop2Name = null; dragonTop2Damage = 0;
+        dragonTop3Name = null; dragonTop3Damage = 0;
     }
 
     public static void resetGolemStatus() {

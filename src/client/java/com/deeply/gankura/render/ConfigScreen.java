@@ -10,14 +10,12 @@ import net.minecraft.text.Text;
 
 public class ConfigScreen extends Screen {
 
-    // 現在どのメニューを表示しているかを管理する列挙型
     private enum MenuType {
-        MAIN,       // カテゴリ選択画面 (The End / Misc)
-        THE_END,    // End Stone Protector & Dragon の設定
-        MISC        // Pet / Armor / Reboot の設定
+        MAIN,
+        THE_END,
+        MISC
     }
 
-    // クラスを閉じても状態を保持しないよう、開くたびにMAINから始まるようにします
     private static MenuType currentMenu = MenuType.MAIN;
 
     private final String subtitleText;
@@ -33,11 +31,9 @@ public class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        // メニューが切り替わるたびにボタンをすべてクリアして再配置する
         this.clearChildren();
 
         int centerX = this.width / 2;
-        // int btnWidth = 200; // MAINメニュー用の幅はメソッド内で直接指定
         int y = 60;
 
         switch (currentMenu) {
@@ -47,30 +43,24 @@ public class ConfigScreen extends Screen {
         }
     }
 
-    // --- 1. カテゴリ選択画面 (MAIN) ---
     private void initMainMenu(int centerX, int y) {
-        // HUD移動ボタンを一番上(Y=45)に配置
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Edit HUD Locations"), button -> {
             MinecraftClient.getInstance().setScreen(new HudEditorScreen());
         }).dimensions(centerX - 100, 45, 200, 20).build());
 
-        // Category Selection のテキストが Y=75 に描画されるため、その下にボタンを配置する
         int buttonStartY = 90;
 
-        // The End カテゴリボタン
         this.addDrawableChild(ButtonWidget.builder(Text.literal("The End"), button -> {
             currentMenu = MenuType.THE_END;
             this.clearAndInit();
         }).dimensions(centerX - 100, buttonStartY, 200, 20).build());
 
-        // Misc カテゴリボタン
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Misc"), button -> {
             currentMenu = MenuType.MISC;
             this.clearAndInit();
         }).dimensions(centerX - 100, buttonStartY + 24, 200, 20).build());
     }
 
-    // --- 2. The End カテゴリの設定画面 ---
     private void initTheEndMenu(int centerX, int y) {
         int left = centerX - 155;
         int right = centerX + 5;
@@ -83,7 +73,7 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(left, y, bWidth, "HP HUD", ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "World Location Display", ModConfig.showGolemWorldText, b -> ModConfig.showGolemWorldText = b));
         y += 22;
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Alert", ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Alert Title", ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDropAlerts, b -> ModConfig.enableDropAlerts = b));
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 Duration Chat", ModConfig.showStage4Duration, b -> ModConfig.showStage4Duration = b));
@@ -92,14 +82,23 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Loot Quality Chat", ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day 30 Alert", ModConfig.enableDay30Alert, b -> ModConfig.enableDay30Alert = b));
 
-        // タイトルのためのスペースを確保
         y += 40;
 
         // --- Dragon Settings ---
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showDragonStatusHud, b -> ModConfig.showDragonStatusHud = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showDragonTrackerHud, b -> ModConfig.showDragonTrackerHud = b));
+
+        y += 22;
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+        // ★追加: Spawn Alert の右側に Rare Drop Alert を配置
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDragonDropAlerts, b -> ModConfig.enableDragonDropAlerts = b));
+
+        y += 22;
+        // ★変更: 残りの項目を下にずらして配置
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "DPS Chat", ModConfig.showDragonDpsChat, b -> ModConfig.showDragonDpsChat = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Quality Chat", ModConfig.showDragonLootQualityChat, b -> ModConfig.showDragonLootQualityChat = b));
     }
 
-    // --- 3. Misc カテゴリの設定画面 ---
     private void initMiscMenu(int centerX, int y) {
         int left = centerX - 155;
         int right = centerX + 5;
@@ -111,21 +110,17 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Server Reboot Alert", ModConfig.enableRebootAlert, b -> ModConfig.enableRebootAlert = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day HUD", ModConfig.showDayHud, b -> ModConfig.showDayHud = b));
 
-        // ★追加: Poison Indicator のトグルボタンを次の行の左側に追加
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Arrow Poison Indicator", ModConfig.showPoisonIndicator, b -> ModConfig.showPoisonIndicator = b));
     }
 
-    // サブメニューからメインに戻るためのESCキー処理
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
-        // ESCキー(256)が押されたとき
         if (input.key() == 256) {
             if (currentMenu != MenuType.MAIN) {
-                // サブメニューにいるなら、メインに戻って再描画
                 currentMenu = MenuType.MAIN;
                 this.clearAndInit();
-                return true; // 画面を閉じさせない
+                return true;
             }
         }
         return super.keyPressed(input);
@@ -146,23 +141,19 @@ public class ConfigScreen extends Screen {
         context.fill(0, 0, this.width, this.height, 0xA0000000);
         int centerX = this.width / 2;
 
-        // タイトル
         context.getMatrices().pushMatrix();
         float scale = 2.0f;
-        context.getMatrices().scale(scale, scale); // 引数エラーが出る場合は (scale, scale)
+        context.getMatrices().scale(scale, scale);
         context.drawCenteredTextWithShadow(textRenderer, "GanKura", (int)(centerX / scale), 5, 0xFFFFFFFF);
         context.getMatrices().popMatrix();
 
         context.drawCenteredTextWithShadow(textRenderer, this.subtitleText, centerX, 28, 0xFFAAAAAA);
 
         if (currentMenu == MenuType.MAIN) {
-            // HUDボタンの下に表示されるよう、Y座標を 45 から 75 に下げる
             context.drawCenteredTextWithShadow(textRenderer, "§lCategory Selection", centerX, 75, 0xFF55FFFF);
         } else if (currentMenu == MenuType.THE_END) {
-            // End Stone Protector のタイトル
             context.drawCenteredTextWithShadow(textRenderer, "§6§lEnd Stone Protector", centerX, 45, 0xFFFFFFFF);
-            // Dragon のタイトル
-            context.drawCenteredTextWithShadow(textRenderer, "§c§lDragon", centerX, 174, 0xFFFFFFFF);
+            context.drawCenteredTextWithShadow(textRenderer, "§d§lDragon", centerX, 174, 0xFFFFFFFF);
         }
 
         super.render(context, mouseX, mouseY, delta);
@@ -170,7 +161,6 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void close() {
-        // 画面を完全に閉じるときは、次開いた時のために状態をリセットしておく
         currentMenu = MenuType.MAIN;
         super.close();
     }

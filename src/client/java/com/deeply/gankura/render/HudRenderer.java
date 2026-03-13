@@ -13,7 +13,6 @@ import net.minecraft.util.Identifier;
 
 public class HudRenderer {
 
-    // ★変更: メインのrenderメソッドを以下で上書きしてください
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.options.hudHidden) return;
@@ -22,9 +21,8 @@ public class HudRenderer {
 
         if (!"SKYBLOCK".equals(GameState.gametype)) return;
 
-        // ★新システム: リスト化されたHUD要素をループで一括描画
         for (HudElement element : com.deeply.gankura.data.HudConfig.ELEMENTS) {
-            if (element.shouldRender(false)) { // false = プレビューではない本番描画
+            if (element.shouldRender(false)) {
                 context.getMatrices().pushMatrix();
                 context.getMatrices().translate((float) element.x, (float) element.y);
                 context.getMatrices().scale(element.scale, element.scale);
@@ -33,7 +31,6 @@ public class HudRenderer {
             }
         }
 
-        // サーバーリブート警告だけは、位置固定の中央画面表示なのでそのまま残す
         if (ModConfig.enableRebootAlert && GameState.isServerClosing && GameState.serverClosingTime != null) {
             renderServerClosingAlert(context, client, client.textRenderer);
         }
@@ -41,50 +38,35 @@ public class HudRenderer {
 
     public static void renderStats(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
         String title = "§lGolem Status";
-        String displayStats = "Stage: Resting";
-        int color = 0xFFFFFFFF;
+        String displayStats;
 
         if (isPreview) {
-            displayStats = "Stage: 5 (Spawned)";
-            color = 0xFFFF5555;
+            // ★変更: Stage 5は「Stage: 」まで含めて全体を赤色(§c)にする
+            displayStats = "§cStage: 5 (Spawned)";
         } else {
             String stage = GameState.golemStage;
 
             if (GameState.isScanning) {
-                displayStats = "Stage: Scanning...";
+                displayStats = "Stage: §8Scanning...";
             } else if (ModConstants.STAGE_SUMMONED.equals(stage)) {
-
-                // --- ★Devonian式 厳密同期ロジック ---
-
-                // 1. 最後にパケットが届いてから、現実で何秒経ったか？
                 long timeSincePacket = System.currentTimeMillis() - GameState.lastServerPacketArrivalMillis;
+                if (timeSincePacket > 1000) timeSincePacket = 1000;
 
-                // 2. もし1.5秒以上パケットが来ていないなら、ラグとみなして時間を止める (Clamp)
-                //    (通常は1秒ごとに来るはず)
-                if (timeSincePacket > 1000) {
-                    timeSincePacket = 1000;
-                }
-
-                // 3. 現在の推定サーバー時刻 = パケットの時刻 + 経過時間(Tick換算)
-                //    (timeSincePacket が 1500 で止まれば、この時刻も止まる)
                 double estimatedServerTime = GameState.lastServerTimePacket + (timeSincePacket / 50.0);
-
-                // 4. カウントダウン計算
                 double remainingTicks = GameState.stage5TargetTime - estimatedServerTime;
 
                 if (remainingTicks < 0) remainingTicks = 0;
 
                 if (remainingTicks > 0) {
-                    displayStats = String.format("Stage: 5 (%.1fs)", remainingTicks / 20.0);
-                    color = 0xFFFF5555; // カウントダウン中は赤色
+                    // ★変更: カウントダウン中は全体を赤(§c)
+                    displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
                 } else {
                     if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
-                        displayStats = "Stage: 5 (Soon)";
-                        // ★変更: (Soon) の時は黄色 (ARGB: 0xFFFFFF55)
-                        color = 0xFFFFFF55;
+                        // ★変更: Soon(間もなく)は全体を黄色(§e)
+                        displayStats = "§eStage: 5 (Soon)";
                     } else {
-                        displayStats = "Stage: 5 (Spawned)";
-                        color = 0xFFFF5555; // Spawned の時は赤色
+                        // ★変更: Spawned(出現済み)は全体を赤(§c)
+                        displayStats = "§cStage: 5 (Spawned)";
                     }
                 }
             } else {
@@ -96,30 +78,35 @@ public class HudRenderer {
                     case ModConstants.STAGE_AWAKENING -> "4";
                     default -> "?";
                 };
-                displayStats = "Stage: " + num;
+                displayStats = "Stage: §f" + num;
             }
         }
 
         context.drawTextWithShadow(tr, title, x, y, 0xFFFFAA00);
-        context.drawTextWithShadow(tr, displayStats, x, y + 12, color);
+        context.drawTextWithShadow(tr, displayStats, x, y + 12, 0xFFFFFFFF);
 
-        // LocationとStage4タイマーの描画 (変更なし)
         renderLocationAndTimer(context, tr, x, y, isPreview);
     }
 
     private static void renderLocationAndTimer(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
         String locText = null;
+
         if (isPreview) {
-            locText = "Location: Middle Front";
+            locText = "Location: §fMiddle Front";
         } else {
             boolean showLoc = ModConstants.STAGE_AWAKENING.equals(GameState.golemStage)
                     || ModConstants.STAGE_SUMMONED.equals(GameState.golemStage);
             if (showLoc) {
-                locText = "None".equals(GameState.locationName)
-                        ? (ModConstants.STAGE_AWAKENING.equals(GameState.golemStage) ? "Location: Scanning..." : null)
-                        : "Location: " + GameState.locationName;
+                if ("None".equals(GameState.locationName)) {
+                    if (ModConstants.STAGE_AWAKENING.equals(GameState.golemStage)) {
+                        locText = "Location: §8Scanning...";
+                    }
+                } else {
+                    locText = "Location: §f" + GameState.locationName;
+                }
             }
         }
+
         if (locText != null) {
             context.drawTextWithShadow(tr, locText, x, y + 24, 0xFFFFFFFF);
         }
@@ -127,13 +114,23 @@ public class HudRenderer {
         if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.golemStage) && GameState.stage4StartTime > 0)) {
             String timerText;
             if (isPreview) {
-                timerText = "Since S4: 0m 45s";
+                timerText = "Since S4: §f0m 45s";
             } else {
                 long durationMillis = System.currentTimeMillis() - GameState.stage4StartTime;
                 long seconds = durationMillis / 1000;
                 long minutes = seconds / 60;
                 long remainingSeconds = seconds % 60;
-                timerText = String.format("Since S4: %dm %ds", minutes, remainingSeconds);
+
+                // ★追加: 経過時間に応じた色の切り替えロジック
+                String colorCode = "§f"; // デフォルトは白
+                if (seconds >= 480) { // 8分(480秒)以上で赤
+                    colorCode = "§c";
+                } else if (seconds >= 240) { // 4分(240秒)以上で黄色
+                    colorCode = "§e";
+                }
+
+                // ★変更: 算出した色コード(colorCode)を数字部分に適用する
+                timerText = String.format("Since S4: %s%dm %ds", colorCode, minutes, remainingSeconds);
             }
             context.drawTextWithShadow(tr, timerText, x, y + 36, 0xFFFFFFFF);
         }
@@ -205,12 +202,10 @@ public class HudRenderer {
         }
     }
 
-    // クラスの最後に以下のメソッドを追加
     public static void renderPetHud(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
         String title = "§e§lActive Pet";
         String petText;
 
-        // ★変更: プレビュー画面かどうかにかかわらず、常に現在のペット状況をそのまま表示する
         if (GameState.activePetName != null) {
             petText = GameState.activePetName;
         } else {
@@ -221,22 +216,18 @@ public class HudRenderer {
         context.drawTextWithShadow(tr, petText, x, y + 12, 0xFFFFFFFF);
     }
 
-    // アーマースタックHUDの描画メソッド (中央揃え・プレビュー全表示)
     public static void renderArmorStackHud(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
-        int spacing = 8; // テキスト同士の隙間
+        int spacing = 8;
 
-        // 描画するテキストのリストを作成
         java.util.List<String> parts = new java.util.ArrayList<>();
 
         if (isPreview) {
-            // プレビュー時は5つすべてを様々なパターンでテスト表示
-            parts.add("§6§l10ᝐ"); // Crimson (太字)
-            parts.add("§15⁑");     // Terror (通常)
-            parts.add("§e§l8⚶");   // Hollow (太字)
-            parts.add("§23҉");     // Fervor (通常)
-            parts.add("§9§l2Ѫ");   // Aurora (太字)
+            parts.add("§6§l10ᝐ");
+            parts.add("§15⁑");
+            parts.add("§e§l8⚶");
+            parts.add("§23҉");
+            parts.add("§9§l2Ѫ");
         } else {
-            // 実際のデータに基づいてリストに追加
             if (GameState.crimsonStack > 0) parts.add((GameState.isCrimsonBold ? "§6§l" : "§6") + GameState.crimsonStack + "ᝐ");
             if (GameState.terrorStack > 0) parts.add((GameState.isTerrorBold ? "§1§l" : "§1") + GameState.terrorStack + "⁑");
             if (GameState.hollowStack > 0) parts.add((GameState.isHollowBold ? "§e§l" : "§e") + GameState.hollowStack + "⚶");
@@ -244,28 +235,23 @@ public class HudRenderer {
             if (GameState.auroraStack > 0) parts.add((GameState.isAuroraBold ? "§9§l" : "§9") + GameState.auroraStack + "Ѫ");
         }
 
-        // 表示するものがなければここで終了
         if (parts.isEmpty()) return;
 
-        // 全体の描画幅を事前に計算
         int totalWidth = 0;
         for (String part : parts) {
             totalWidth += tr.getWidth(part);
         }
         totalWidth += (parts.size() - 1) * spacing;
 
-        // HUDエディターの当たり判定の幅(150px)を基準にして、その中央から描画を開始するロジック
         int boxWidth = 150;
         int currentX = x + (boxWidth / 2) - (totalWidth / 2);
 
-        // リストの順番通りに横へ並べて描画していく
         for (String part : parts) {
             context.drawTextWithShadow(tr, part, currentX, y, 0xFFFFFFFF);
             currentX += tr.getWidth(part) + spacing;
         }
     }
 
-    // ★追加: サーバーリブート警告HUDの描画メソッド
     private static void renderServerClosingAlert(DrawContext context, MinecraftClient client, TextRenderer tr) {
         String text = "Server closing: " + GameState.serverClosingTime;
 
@@ -275,13 +261,9 @@ public class HudRenderer {
 
         context.getMatrices().pushMatrix();
 
-        // 画面の「ど真ん中」へ空間を移動
         context.getMatrices().translate(screenWidth / 2f, screenHeight / 2f);
-        // テキストを2倍のサイズに大きくする
         context.getMatrices().scale(2.0f, 2.0f);
 
-        // 中央を原点(0,0)としたので、テキストの幅と高さの「半分」だけ左上にずらして描画することで完全な中央揃えになる
-        // 0xFFFF5555 は少し明るめの赤色(Red)です (細字＝太字の§lを付けない)
         context.drawTextWithShadow(tr, text, -textWidth / 2, -tr.fontHeight / 2, 0xFFFF5555);
 
         context.getMatrices().popMatrix();
@@ -292,21 +274,118 @@ public class HudRenderer {
         if (client.world != null) {
             day = client.world.getTimeOfDay() / 24000L;
         }
-        // ★修正: String.format を使って、day の数字に3桁ごとのカンマ(,)を付与する
         String text = "Day: " + String.format("%,d", day);
 
-        // どこにいても、デフォルトのテキスト色を黄緑色(§a)にする
         int color = 0xFFFFFFFF;
 
-        // The Endにいるかどうかの判定
         boolean isTargetMap = "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
 
-        // ★修正: 定数名を STAGE_AWAKENING に変更
-        // ★修正: ModConfig.enableDay30Alert が ON の時のみ、赤色にする判定を行う
         if (ModConfig.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.golemStage)) {
-            color = 0xFFFF5555; // 赤色
+            color = 0xFFFF5555;
         }
 
         context.drawTextWithShadow(tr, text, x, y, color);
+    }
+
+    public static void renderDragonStatus(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
+        String title = "§d§lDragon Status";
+        String eggState;
+        String eyePlaced = null;
+        String dragonType = null;
+
+        if (isPreview) {
+            eggState = "Egg: §cHatched §c(Spawned)";
+            eyePlaced = "§cEyes placed: 8/8 §a(2)";
+            dragonType = "Type: §eSuperior";
+        } else {
+            String state = GameState.dragonEggState;
+            int eyes = GameState.dragonEyes;
+
+            if ("Hatching".equals(state)) {
+                long timeSincePacket = System.currentTimeMillis() - GameState.lastServerPacketArrivalMillis;
+                if (timeSincePacket > 1000) timeSincePacket = 1000;
+
+                double estimatedServerTime = GameState.lastServerTimePacket + (timeSincePacket / 50.0);
+                double remainingTicks = GameState.dragonSpawnTargetTime - estimatedServerTime;
+
+                if (GameState.dragonSpawnTargetTime == 0) {
+                    remainingTicks = 0;
+                }
+                if (remainingTicks < 0) remainingTicks = 0;
+
+                if (remainingTicks > 0) {
+                    eggState = String.format("Egg: §eHatching §c(%.1fs)", remainingTicks / 20.0);
+                } else {
+                    eggState = "Egg: §eHatching §e(Soon)";
+                }
+            } else {
+                String colorCode = switch (state) {
+                    case "Ready" -> "§a";
+                    case "Hatched" -> "§c";
+                    case "Respawning" -> "§7";
+                    case "Scanning..." -> "§8";
+                    default -> "§f";
+                };
+
+                if ("Hatched".equals(state)) {
+                    eggState = "Egg: " + colorCode + "Hatched §c(Spawned)";
+                } else {
+                    eggState = "Egg: " + colorCode + state;
+                }
+            }
+
+            if (!"Respawning".equals(state) && !"Scanning...".equals(state)) {
+                if (eyes == 8) {
+                    eyePlaced = "§cEyes placed: 8/8";
+                } else {
+                    eyePlaced = "Eyes placed: §e" + eyes + "§7/§a8";
+                }
+
+                if (GameState.playerDragonEyes > 0) {
+                    eyePlaced += " §a(" + GameState.playerDragonEyes + ")";
+                }
+            }
+
+            if (GameState.dragonType != null) {
+                String typeColorCode = switch (GameState.dragonType) {
+                    case "Protector" -> "§8";
+                    case "Old" -> "§7";
+                    case "Unstable" -> "§5";
+                    case "Young" -> "§f";
+                    case "Strong" -> "§c";
+                    case "Wise" -> "§b";
+                    case "Superior" -> "§e";
+                    default -> "§d";
+                };
+                dragonType = "Type: " + typeColorCode + GameState.dragonType;
+            }
+        }
+
+        context.drawTextWithShadow(tr, title, x, y, 0xFFFF55FF);
+
+        context.drawTextWithShadow(tr, eggState, x, y + 12, 0xFFFFFFFF);
+
+        int nextY = y + 24;
+        if (eyePlaced != null) {
+            context.drawTextWithShadow(tr, eyePlaced, x, nextY, 0xFFFFFFFF);
+            nextY += 12;
+        }
+
+        if (dragonType != null) {
+            context.drawTextWithShadow(tr, dragonType, x, nextY, 0xFFFFFFFF);
+        }
+    }
+
+    public static void renderDragonTracker(DrawContext context, TextRenderer tr, int x, int y, boolean isPreview) {
+        context.drawTextWithShadow(tr, "§d§lDragon Loot Tracker", x, y, 0xFFFFFFFF);
+
+        int epicCount = isPreview ? 1 : LootStats.epicDragonPets;
+        int legCount = isPreview ? 2 : LootStats.legendaryDragonPets;
+
+        String epicText = String.format("§5Ender Dragon §7(Pet): §f%d", epicCount);
+        context.drawTextWithShadow(tr, epicText, x, y + 12, 0xFFFFFFFF);
+
+        String legText = String.format("§6Ender Dragon §7(Pet): §f%d", legCount);
+        context.drawTextWithShadow(tr, legText, x, y + 24, 0xFFFFFFFF);
     }
 }

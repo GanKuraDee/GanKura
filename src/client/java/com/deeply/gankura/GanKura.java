@@ -22,12 +22,13 @@ public class GanKura implements ClientModInitializer {
         NetworkHandler.init();
         GolemStageScanner.register();
         GolemLocationScanner.register();
-        GolemRareDropScanner.register();
+        RareDropScanner.register();
         GolemHealthScanner.register();
         PetHandler.register();
         ServerRestartHandler.register();
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
+        DragonStatusScanner.register();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")

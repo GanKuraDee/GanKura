@@ -16,9 +16,8 @@ import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GolemRareDropScanner {
+public class RareDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("ItemDropScanner");
-    // private static int tickCounter = 0; // ★削除: 毎tick実行のため不要
 
     // スキャン継続時間カウント用
     private static int scanDurationTicks = 0;
@@ -26,9 +25,6 @@ public class GolemRareDropScanner {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // ★変更: カウント判定を削除し、毎tick実行する
-            // if (tickCounter++ < 2) return;
-            // tickCounter = 0;
             scan(client);
         });
     }
@@ -43,8 +39,6 @@ public class GolemRareDropScanner {
         if (!ModConstants.MAP_THE_END.equals(GameState.map) &&
                 !ModConstants.MODE_COMBAT_3.equals(GameState.mode)) return;
 
-        // タイムアウトチェック
-        // ★変更: 毎tick実行されるため、カウントアップは +1 にする
         scanDurationTicks++;
 
         if (scanDurationTicks > MAX_SCAN_DURATION) {
@@ -65,33 +59,48 @@ public class GolemRareDropScanner {
                     // 1. Tier Boost Core (金)
                     if (nameString.contains("Tier Boost Core")) {
                         LootStats.addTierBoostCore();
-
                         MutableText tbcText = Text.literal("Tier Boost Core").formatted(Formatting.GOLD);
-                        notifyDrop(client, tbcText);
+                        // ★変更: Golemの設定(enableDropAlerts)を渡す
+                        notifyDrop(client, tbcText, ModConfig.enableDropAlerts);
                         break;
                     }
 
                     // 2. [Lvl 1] Golem
                     else if (nameString.contains("[Lvl 1] Golem")) {
-
-                        // 金色が含まれていれば Legendary
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryGolemPet();
-
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.GOLD);
                             golemText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-
-                            notifyDrop(client, golemText);
+                            // ★変更: Golemの設定を渡す
+                            notifyDrop(client, golemText, ModConfig.enableDropAlerts);
                             break;
                         }
-                        // 紫色なら Epic
                         else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
                             LootStats.addEpicGolemPet();
-
                             MutableText golemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE);
                             golemText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            // ★変更: Golemの設定を渡す
+                            notifyDrop(client, golemText, ModConfig.enableDropAlerts);
+                            break;
+                        }
+                    }
 
-                            notifyDrop(client, golemText);
+                    // 3. [Lvl 1] Ender Dragon
+                    else if (nameString.contains("[Lvl 1] Ender Dragon")) {
+                        if (hasColor(customName, Formatting.GOLD)) {
+                            LootStats.addLegendaryDragonPet();
+                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD);
+                            dragonText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            // ★変更: Dragon専用の設定(enableDragonDropAlerts)を渡す
+                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                            break;
+                        }
+                        else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
+                            LootStats.addEpicDragonPet();
+                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE);
+                            dragonText.append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            // ★変更: Dragon専用の設定を渡す
+                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
                             break;
                         }
                     }
@@ -100,9 +109,9 @@ public class GolemRareDropScanner {
         }
     }
 
-    private static void notifyDrop(MinecraftClient client, Text itemText) {
-        // 設定チェック
-        if (ModConfig.enableDropAlerts) {
+    // ★変更: isAlertEnabled という引数を増やし、呼び出し元でON/OFFを決定させる
+    private static void notifyDrop(MinecraftClient client, Text itemText, boolean isAlertEnabled) {
+        if (isAlertEnabled) {
             NotificationUtils.showDropAlert(client, itemText);
             NotificationUtils.sendDropChatMessage(client, itemText);
             NotificationUtils.playDropSound(client);
