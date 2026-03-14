@@ -87,12 +87,21 @@ public class RareDropScanner {
 
     private static void notifyDrop(MinecraftClient client, Text itemText, boolean isAlertEnabled) {
         if (isAlertEnabled) {
-            MutableText title = Text.literal("RARE DROP!").formatted(Formatting.GOLD, Formatting.BOLD);
-            NotificationUtils.showTitle(client, title, itemText);
+            // 1. タイトル表示
+            MutableText title = Text.literal("DROP!").formatted(Formatting.RED, Formatting.BOLD);
+            NotificationUtils.showTitle(client, title, itemText, 5 ,100, 20);
 
-            MutableText chatMsg = Text.literal("RARE DROP! ").formatted(Formatting.GOLD, Formatting.BOLD).append(itemText);
+            // 2. チャット表示 (ここで組み立てて、汎用のsendSystemChatへ渡す)
+            Text playerName = client.player.getDisplayName();
+            MutableText chatMsg = Text.empty()
+                    .append(playerName)
+                    .append(Text.literal(" has obtained ").formatted(Formatting.YELLOW))
+                    .append(itemText)
+                    .append(Text.literal("!").formatted(Formatting.YELLOW));
+
             NotificationUtils.sendSystemChat(client, chatMsg);
 
+            // 3. サウンド
             NotificationUtils.playSound(client, SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         }
         GameState.Player.hasShownDropAlert = true;
