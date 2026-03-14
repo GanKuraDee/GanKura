@@ -5,14 +5,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.MinecraftClient;
 
+// ★復活: Timerを使うためのインポート
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class LocrawHandler {
 
-    // サーバー接続時に即座にlocrawを送信する
+    // サーバー接続時にlocrawを送信するスケジュール
     public static void scheduleLocraw(MinecraftClient client) {
-        if (client.player != null) {
-            // ★修正: Timerを撤廃し、接続後即座にコマンドを送信する
-            client.execute(() -> client.player.networkHandler.sendChatCommand("locraw"));
-        }
+        // ★修正: 0秒だと早すぎてFabricがエラーを吐くため、0.5秒(500ms)だけ待機させる
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                client.execute(() -> {
+                    if (client.player != null) {
+                        client.player.networkHandler.sendChatCommand("locraw");
+                    }
+                });
+            }
+        }, 500); // ここが 500 になっています
     }
 
     // チャットメッセージがlocrawのJSONか判定し、処理する
