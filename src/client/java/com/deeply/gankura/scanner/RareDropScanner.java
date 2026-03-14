@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -18,18 +19,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RareDropScanner {
-    private static final Logger LOGGER = LoggerFactory.getLogger("ItemDropScanner");
+    private static final Logger LOGGER = LoggerFactory.getLogger("RareDropScanner");
 
     private static int scanDurationTicks = 0;
-    private static final int MAX_SCAN_DURATION = 1200;
+    private static final int MAX_SCAN_DURATION = 1200; // 60秒間スキャン
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
     }
 
     private static void scan(MinecraftClient client) {
+        // Handler側で "DOWN!" を検知した時に isLootScanning が true になることを前提とします
         if (!GameState.Player.isLootScanning) {
-            scanDurationTicks = 0; return;
+            scanDurationTicks = 0;
+            return;
         }
 
         if (!ModConstants.MAP_THE_END.equals(GameState.Server.map) &&
@@ -40,7 +43,8 @@ public class RareDropScanner {
         scanDurationTicks++;
         if (scanDurationTicks > MAX_SCAN_DURATION) {
             GameState.Player.isLootScanning = false;
-            scanDurationTicks = 0; return;
+            scanDurationTicks = 0;
+            return;
         }
 
         if (GameState.Player.hasShownDropAlert) return;
@@ -49,31 +53,34 @@ public class RareDropScanner {
             if (entity instanceof ArmorStandEntity armorStand) {
                 Text customName = armorStand.getCustomName();
                 if (customName != null) {
-                    String nameStr = customName.getString().replaceAll("§[0-9a-fk-or]", "");
+                    // ★修正: Hypixelの仕様に合わせ、確実に色情報(§)を保持した文字列を生成する
+                    String legacyName = toLegacyString(customName);
+                    String plainName = legacyName.replaceAll("§[0-9a-fk-or]", "");
 
-                    if (nameStr.contains("Tier Boost Core")) {
+                    if (plainName.contains("Tier Boost Core")) {
                         LootStats.addTierBoostCore();
                         notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
                         break;
-                    } else if (nameStr.contains("Golem")) {
-                        if (hasColor(customName, Formatting.GOLD)) {
+                    } else if (plainName.contains("Golem")) {
+                        // ★修正: legacyName の中に直接 §6(金) や §5(紫) が含まれているかで判定する
+                        if (legacyName.contains("§6")) {
                             LootStats.addLegendaryGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                             break;
-                        } else if (hasColor(customName, Formatting.DARK_PURPLE)) {
+                        } else if (legacyName.contains("§5")) {
                             LootStats.addEpicGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                             break;
                         }
-                    } else if (nameStr.contains("Ender Dragon")) {
-                        if (hasColor(customName, Formatting.GOLD)) {
+                    } else if (plainName.contains("Ender Dragon")) {
+                        if (legacyName.contains("§6")) {
                             LootStats.addLegendaryDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
                             break;
-                        } else if (hasColor(customName, Formatting.DARK_PURPLE)) {
+                        } else if (legacyName.contains("§5")) {
                             LootStats.addEpicDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
@@ -89,9 +96,9 @@ public class RareDropScanner {
         if (isAlertEnabled) {
             // 1. タイトル表示
             MutableText title = Text.literal("DROP!").formatted(Formatting.RED, Formatting.BOLD);
-            NotificationUtils.showTitle(client, title, itemText, 5 ,100, 20);
+            NotificationUtils.showTitle(client, title, itemText, 5, 100, 20);
 
-            // 2. チャット表示 (ここで組み立てて、汎用のsendSystemChatへ渡す)
+            // 2. チャット表示
             Text playerName = client.player.getDisplayName();
             MutableText chatMsg = Text.empty()
                     .append(playerName)
@@ -109,14 +116,29 @@ public class RareDropScanner {
         LOGGER.info("Rare Drop Detected: " + itemText.getString());
     }
 
-    private static boolean hasColor(Text text, Formatting targetFormatting) {
-        TextColor targetColor = TextColor.fromFormatting(targetFormatting);
-        if (targetColor == null) return false;
-        TextColor selfColor = text.getStyle().getColor();
-        if (selfColor != null && selfColor.equals(targetColor)) return true;
-        for (Text sibling : text.getSiblings()) {
-            if (hasColor(sibling, targetFormatting)) return true;
-        }
-        return false;
+    // ★追加: Hypixelから送られてくるあらゆる形式の色付きテキストを、確実にレガシー文字列(§付き)に変換するメソッド
+    private static String toLegacyString(Text text) {
+        StringBuilder sb = new StringBuilder();
+        text.visit((style, part) -> {
+            TextColor color = style.getColor();
+            if (color != null) {
+                Integer rgb = color.getRgb();
+                for (Formatting f : Formatting.values()) {
+                    if (f.isColor() && f.getColorValue() != null && f.getColorValue().equals(rgb)) {
+                        sb.append("§").append(f.getCode());
+                        break;
+                    }
+                }
+            }
+            if (style.isObfuscated()) sb.append("§k");
+            if (style.isBold()) sb.append("§l");
+            if (style.isStrikethrough()) sb.append("§m");
+            if (style.isUnderlined()) sb.append("§n");
+            if (style.isItalic()) sb.append("§o");
+
+            sb.append(part);
+            return java.util.Optional.empty();
+        }, Style.EMPTY);
+        return sb.toString();
     }
 }
