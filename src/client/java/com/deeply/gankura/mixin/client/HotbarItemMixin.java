@@ -27,9 +27,9 @@ public class HotbarItemMixin {
         if (stack.isOf(Items.BOW)) {
             ItemStack dyeStack = null;
 
-            if ("TWILIGHT".equals(GameState.activePoison)) {
+            if ("TWILIGHT".equals(GameState.Player.activePoison)) {
                 dyeStack = new ItemStack(Items.PURPLE_DYE);
-            } else if ("TOXIC".equals(GameState.activePoison)) {
+            } else if ("TOXIC".equals(GameState.Player.activePoison)) {
                 dyeStack = new ItemStack(Items.LIME_DYE);
             }
 
@@ -44,8 +44,8 @@ public class HotbarItemMixin {
                 // =======================================================
                 // ★修正: 2. 残り個数の描画 (最新バージョンの仕様に対応)
                 // =======================================================
-                if (GameState.activePoisonCount > 0) {
-                    String countText = String.valueOf(GameState.activePoisonCount);
+                if (GameState.Player.activePoisonCount > 0) {
+                    String countText = String.valueOf(GameState.Player.activePoisonCount);
                     net.minecraft.client.font.TextRenderer tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
 
                     // バニラ標準の「アイテムの右下に個数を描画する機能」を使うことで、

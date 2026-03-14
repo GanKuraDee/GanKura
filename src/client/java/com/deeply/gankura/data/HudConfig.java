@@ -1,10 +1,8 @@
 package com.deeply.gankura.data;
 
 import com.deeply.gankura.render.HudElement;
-import com.deeply.gankura.render.HudRenderer;
+import com.deeply.gankura.render.hud.*;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,68 +30,17 @@ public class HudConfig {
         load();
     }
 
-    private static boolean isTheEnd() {
-        return "The End".equals(GameState.map) || "Combat 3".equals(GameState.mode);
-    }
-
+    // ★神クラスの解体により、追加がたったの1行で可能に！
     private static void initElements() {
-        ELEMENTS.add(new HudElement("stats", 260, 50, 1.0f, 150, 50,
-                () -> ModConfig.showGolemStatusHud, HudConfig::isTheEnd) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderStats(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("tracker", 260, 100, 1.0f, 150, 50,
-                () -> ModConfig.showLootTrackerHud, HudConfig::isTheEnd) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderTracker(context, MinecraftClient.getInstance().textRenderer, 0, 0);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("health", 260, 150, 1.0f, 100, 30,
-                () -> ModConfig.showGolemHealthHud, () -> isTheEnd() && GameState.golemHealth != null) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderHealth(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("pet", 10, 10, 1.0f, 120, 30,
-                () -> ModConfig.showPetHud, () -> true) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderPetHud(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("armorStack", 10, 50, 1.0f, 150, 15,
-                () -> ModConfig.showArmorStackHud, () -> true) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderArmorStackHud(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("day", 10, 90, 1.0f, 60, 15,
-                () -> ModConfig.showDayHud, () -> true) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderDayHud(context, MinecraftClient.getInstance(), MinecraftClient.getInstance().textRenderer, 0, 0);
-            }
-        });
-
-        ELEMENTS.add(new HudElement("dragon", 10, 130, 1.0f, 150, 50,
-                () -> ModConfig.showDragonStatusHud, HudConfig::isTheEnd) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderDragonStatus(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
-
-        // ★追加: Dragon Loot Tracker
-        // ※ ModConfigに「public static boolean showDragonTrackerHud = true;」を追加してください
-        ELEMENTS.add(new HudElement("dragonTracker", 260, 190, 1.0f, 150, 40,
-                () -> ModConfig.showDragonTrackerHud, HudConfig::isTheEnd) {
-            @Override public void renderElement(DrawContext context, boolean isPreview) {
-                HudRenderer.renderDragonTracker(context, MinecraftClient.getInstance().textRenderer, 0, 0, isPreview);
-            }
-        });
+        ELEMENTS.add(new GolemStatusHud());
+        ELEMENTS.add(new GolemLootTrackerHud());
+        ELEMENTS.add(new GolemHealthHud());
+        ELEMENTS.add(new DragonStatusHud());
+        ELEMENTS.add(new DragonLootTrackerHud()); // ここでバグも修正！
+        ELEMENTS.add(new BroodmotherStatusHud());
+        ELEMENTS.add(new PetHud());
+        ELEMENTS.add(new ArmorStackHud());
+        ELEMENTS.add(new DayHud());
     }
 
     public static void load() {

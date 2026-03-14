@@ -20,12 +20,12 @@ public class ArmorStackHandler {
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (System.currentTimeMillis() - GameState.lastArmorStackUpdateTime > 2000) {
-                GameState.crimsonStack = 0; GameState.isCrimsonBold = false;
-                GameState.terrorStack = 0;  GameState.isTerrorBold = false;
-                GameState.hollowStack = 0;  GameState.isHollowBold = false;
-                GameState.fervorStack = 0;  GameState.isFervorBold = false;
-                GameState.auroraStack = 0;  GameState.isAuroraBold = false;
+            if (System.currentTimeMillis() - GameState.Player.lastArmorStackUpdateTime > 2000) {
+                GameState.Player.crimsonStack = 0; GameState.Player.isCrimsonBold = false;
+                GameState.Player.terrorStack = 0;  GameState.Player.isTerrorBold = false;
+                GameState.Player.hollowStack = 0;  GameState.Player.isHollowBold = false;
+                GameState.Player.fervorStack = 0;  GameState.Player.isFervorBold = false;
+                GameState.Player.auroraStack = 0;  GameState.Player.isAuroraBold = false;
             }
         });
     }
@@ -41,43 +41,43 @@ public class ArmorStackHandler {
         }
 
         if (hasArmorInfo) {
-            GameState.crimsonStack = 0; GameState.isCrimsonBold = false;
-            GameState.terrorStack = 0;  GameState.isTerrorBold = false;
-            GameState.hollowStack = 0;  GameState.isHollowBold = false;
-            GameState.fervorStack = 0;  GameState.isFervorBold = false;
-            GameState.auroraStack = 0;  GameState.isAuroraBold = false;
+            GameState.Player.crimsonStack = 0; GameState.Player.isCrimsonBold = false;
+            GameState.Player.terrorStack = 0;  GameState.Player.isTerrorBold = false;
+            GameState.Player.hollowStack = 0;  GameState.Player.isHollowBold = false;
+            GameState.Player.fervorStack = 0;  GameState.Player.isFervorBold = false;
+            GameState.Player.auroraStack = 0;  GameState.Player.isAuroraBold = false;
 
             Matcher m1 = CRIMSON_PATTERN.matcher(unformattedMsg);
             if (m1.find()) {
-                GameState.crimsonStack = Integer.parseInt(m1.group(1));
-                GameState.isCrimsonBold = isBoldAt(formattedMsg, m1.group(0));
+                GameState.Player.crimsonStack = Integer.parseInt(m1.group(1));
+                GameState.Player.isCrimsonBold = isBoldAt(formattedMsg, m1.group(0));
             }
 
             Matcher m2 = TERROR_PATTERN.matcher(unformattedMsg);
             if (m2.find()) {
-                GameState.terrorStack = Integer.parseInt(m2.group(1));
-                GameState.isTerrorBold = isBoldAt(formattedMsg, m2.group(0));
+                GameState.Player.terrorStack = Integer.parseInt(m2.group(1));
+                GameState.Player.isTerrorBold = isBoldAt(formattedMsg, m2.group(0));
             }
 
             Matcher m3 = HOLLOW_PATTERN.matcher(unformattedMsg);
             if (m3.find()) {
-                GameState.hollowStack = Integer.parseInt(m3.group(1));
-                GameState.isHollowBold = isBoldAt(formattedMsg, m3.group(0));
+                GameState.Player.hollowStack = Integer.parseInt(m3.group(1));
+                GameState.Player.isHollowBold = isBoldAt(formattedMsg, m3.group(0));
             }
 
             Matcher m4 = FERVOR_PATTERN.matcher(unformattedMsg);
             if (m4.find()) {
-                GameState.fervorStack = Integer.parseInt(m4.group(1));
-                GameState.isFervorBold = isBoldAt(formattedMsg, m4.group(0));
+                GameState.Player.fervorStack = Integer.parseInt(m4.group(1));
+                GameState.Player.isFervorBold = isBoldAt(formattedMsg, m4.group(0));
             }
 
             Matcher m5 = AURORA_PATTERN.matcher(unformattedMsg);
             if (m5.find()) {
-                GameState.auroraStack = Integer.parseInt(m5.group(1));
-                GameState.isAuroraBold = isBoldAt(formattedMsg, m5.group(0));
+                GameState.Player.auroraStack = Integer.parseInt(m5.group(1));
+                GameState.Player.isAuroraBold = isBoldAt(formattedMsg, m5.group(0));
             }
 
-            GameState.lastArmorStackUpdateTime = System.currentTimeMillis();
+            GameState.Player.lastArmorStackUpdateTime = System.currentTimeMillis();
         }
     }
 

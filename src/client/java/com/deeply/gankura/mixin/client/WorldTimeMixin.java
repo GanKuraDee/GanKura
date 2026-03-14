@@ -13,7 +13,7 @@ public class WorldTimeMixin {
     @Inject(method = "onWorldTimeUpdate", at = @At("RETURN"))
     private void onWorldTimeUpdate(WorldTimeUpdateS2CPacket packet, CallbackInfo ci) {
         // time() を使用する
-        GameState.lastServerTimePacket = packet.time();
-        GameState.lastServerPacketArrivalMillis = System.currentTimeMillis();
+        GameState.Server.lastTimePacket = packet.time();
+        GameState.Server.lastPacketArrivalMillis = System.currentTimeMillis();
     }
 }

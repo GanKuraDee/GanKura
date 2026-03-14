@@ -33,11 +33,14 @@ public class ModConfig {
 
     // Dragon
     public static boolean enableDragonAlerts = true;
-    public static boolean enableDragonDropAlerts = true; // ★追加: ドラゴンのレアドロップ通知用
+    public static boolean enableDragonDropAlerts = true;
     public static boolean showDragonStatusHud = true;
     public static boolean showDragonDpsChat = true;
     public static boolean showDragonLootQualityChat = true;
     public static boolean showDragonTrackerHud = true;
+
+    // ★追加: Spider's Den
+    public static boolean showBroodmotherStatusHud = true;
 
     // Misc
     public static boolean showPetHud = false;
@@ -72,11 +75,14 @@ public class ModConfig {
 
             // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
-            enableDragonDropAlerts = parseBool("enableDragonDropAlerts", true); // ★追加
+            enableDragonDropAlerts = parseBool("enableDragonDropAlerts", true);
             showDragonStatusHud = parseBool("showDragonStatusHud", true);
             showDragonDpsChat = parseBool("showDragonDpsChat", true);
             showDragonLootQualityChat = parseBool("showDragonLootQualityChat", true);
             showDragonTrackerHud = parseBool("showDragonTrackerHud", true);
+
+            // ★追加: Spider's Den
+            showBroodmotherStatusHud = parseBool("showBroodmotherStatusHud", true);
 
             // Misc
             showPetHud = parseBool("showPetHud", false);
@@ -107,11 +113,14 @@ public class ModConfig {
 
         // Dragon
         properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
-        properties.setProperty("enableDragonDropAlerts", String.valueOf(enableDragonDropAlerts)); // ★追加
+        properties.setProperty("enableDragonDropAlerts", String.valueOf(enableDragonDropAlerts));
         properties.setProperty("showDragonStatusHud", String.valueOf(showDragonStatusHud));
         properties.setProperty("showDragonDpsChat", String.valueOf(showDragonDpsChat));
         properties.setProperty("showDragonLootQualityChat", String.valueOf(showDragonLootQualityChat));
         properties.setProperty("showDragonTrackerHud", String.valueOf(showDragonTrackerHud));
+
+        // ★追加: Spider's Den
+        properties.setProperty("showBroodmotherStatusHud", String.valueOf(showBroodmotherStatusHud));
 
         // Misc
         properties.setProperty("showPetHud", String.valueOf(showPetHud));

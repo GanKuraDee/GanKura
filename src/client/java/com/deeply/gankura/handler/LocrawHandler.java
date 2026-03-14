@@ -31,15 +31,15 @@ public class LocrawHandler {
                     String newId = json.get("server").getAsString();
 
                     // サーバーが変わっていたらリセット
-                    if (!newId.equals(GameState.serverId)) {
-                        GameState.serverId = newId;
-                        GameState.resetGolemStatus();
+                    if (!newId.equals(GameState.Server.id)) {
+                        GameState.Server.id = newId;
+                        GameState.Golem.reset();
                     }
 
                     // 情報を更新
-                    if (json.has("gametype")) GameState.gametype = json.get("gametype").getAsString();
-                    if (json.has("mode")) GameState.mode = json.get("mode").getAsString();
-                    if (json.has("map")) GameState.map = json.get("map").getAsString();
+                    if (json.has("gametype")) GameState.Server.gametype = json.get("gametype").getAsString();
+                    if (json.has("mode")) GameState.Server.mode = json.get("mode").getAsString();
+                    if (json.has("map")) GameState.Server.map = json.get("map").getAsString();
 
                     return true; // 処理したのでtrue（チャット欄には表示しない）
                 }

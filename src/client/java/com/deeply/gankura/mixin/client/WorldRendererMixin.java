@@ -26,15 +26,15 @@ public class WorldRendererMixin {
         PlayerEntity player = client.player;
         if (player == null) return;
 
-        if (GameState.locationPos == null || "None".equals(GameState.locationName)) return;
+        if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
 
-        String stage = GameState.golemStage;
+        String stage = GameState.Golem.stage;
         boolean isStage4 = ModConstants.STAGE_AWAKENING.equals(stage);
         boolean isStage5 = ModConstants.STAGE_SUMMONED.equals(stage);
 
         if (!isStage4 && !isStage5) return;
 
-        BlockPos basePos = GameState.locationPos;
+        BlockPos basePos = GameState.Player.locationPos;
         BlockPos renderPos;
         int textColor;
         String textToRender;
@@ -47,19 +47,19 @@ public class WorldRendererMixin {
             renderPos = basePos.add(0, 0, -2);
             textColor = 0xFFFF5555;
 
-            long timeSincePacket = System.currentTimeMillis() - GameState.lastServerPacketArrivalMillis;
+            long timeSincePacket = System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis;
             if (timeSincePacket > 1000) {
                 timeSincePacket = 1000;
             }
-            double estimatedServerTime = GameState.lastServerTimePacket + (timeSincePacket / 50.0);
-            double remainingTicks = GameState.stage5TargetTime - estimatedServerTime;
+            double estimatedServerTime = GameState.Server.lastTimePacket + (timeSincePacket / 50.0);
+            double remainingTicks = GameState.Golem.stage5TargetTime - estimatedServerTime;
 
             if (remainingTicks < 0) remainingTicks = 0;
 
             if (remainingTicks > 0) {
                 textToRender = String.format("§c§lGOLEM §c(%.1fs)", remainingTicks / 20.0);
             } else {
-                if (!GameState.hasGolemRisen && !"None".equals(GameState.locationName)) {
+                if (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) {
                     textToRender = "§e§lGOLEM §e(Soon)";
                 } else {
                     textToRender = "§c§lGOLEM §c(Spawned)";

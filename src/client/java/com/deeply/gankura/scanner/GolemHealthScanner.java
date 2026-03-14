@@ -18,8 +18,8 @@ public class GolemHealthScanner {
             if (client.world == null) return;
 
             // ★追加: Stage 5 (Summoned) 以外はスキャンせず、データもクリアする
-            if (!ModConstants.STAGE_SUMMONED.equals(GameState.golemStage)) {
-                GameState.golemHealth = null;
+            if (!ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
+                GameState.Golem.health = null;
                 return;
             }
 
@@ -41,7 +41,7 @@ public class GolemHealthScanner {
                 }
             }
 
-            GameState.golemHealth = foundHealth;
+            GameState.Golem.health = foundHealth;
         });
     }
 }
