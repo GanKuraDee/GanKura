@@ -46,7 +46,7 @@ public class BroodmotherStatusHud extends HudElement {
                 if ("Imminent".equals(stage) && GameState.Broodmother.stage4StartTime > 0) {
                     long seconds = (System.currentTimeMillis() - GameState.Broodmother.stage4StartTime) / 1000;
                     String colorCode = seconds >= 45 ? "§c" : (seconds >= 30 ? "§e" : "§f");
-                    timerText = String.format("Since Imminent: %s%dm %ds §7(Max 1m)", colorCode, seconds / 60, seconds % 60);
+                    timerText = String.format("Since S4: %s%dm %ds §7(Max 1m)", colorCode, seconds / 60, seconds % 60);
                 }
             }
         }

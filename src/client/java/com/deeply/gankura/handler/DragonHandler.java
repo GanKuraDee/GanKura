@@ -153,8 +153,6 @@ public class DragonHandler {
         if ("Superior".equals(dragonType)) {
             title.formatted(Formatting.BOLD);
             NotificationUtils.playSound(client, SoundEvents.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
-        } else {
-            NotificationUtils.playSound(client, SoundEvents.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 1.0f);
         }
         NotificationUtils.showTitle(client, title, null);
     }

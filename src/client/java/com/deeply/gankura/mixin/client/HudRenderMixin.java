@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InGameHud.class)
 public class HudRenderMixin {
+
     @Inject(method = "render", at = @At("HEAD"))
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         // ★変更: tickCounter (部分的な時間経過) を渡す

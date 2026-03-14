@@ -102,7 +102,7 @@ public class RareDropScanner {
             NotificationUtils.sendSystemChat(client, chatMsg);
 
             // 3. サウンド
-            NotificationUtils.playSound(client, SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            NotificationUtils.playSound(client, SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 0.5f);
         }
         GameState.Player.hasShownDropAlert = true;
         GameState.Player.isLootScanning = false;

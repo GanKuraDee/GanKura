@@ -8,18 +8,20 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-public class GolemHealthHud extends HudElement {
-    public GolemHealthHud() {
-        super("health", 260, 150, 1.0f, 100, 30,
-                () -> ModConfig.showGolemHealthHud,
-                () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) && GameState.Golem.health != null);
+public class BroodmotherHealthHud extends HudElement {
+    public BroodmotherHealthHud() {
+        super("broodmother_health", 260, 180, 1.0f, 120, 30,
+                () -> ModConfig.showBroodmotherHealthHud,
+                () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map) && GameState.Broodmother.health != null);
     }
 
     @Override
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        String hpText = isPreview ? "§e2.4M§f/§a5M" : parseHealthString(GameState.Golem.health);
-        context.drawTextWithShadow(tr, "§c§lGolem HP", 0, 0, 0xFFFFFFFF);
+
+        String hpText = isPreview ? "§e3,000§f/§a6,000" : parseHealthString(GameState.Broodmother.health);
+
+        context.drawTextWithShadow(tr, "§4§lBroodmother HP", 0, 0, 0xFFFFFFFF);
         context.drawTextWithShadow(tr, hpText, 0, 12, 0xFFFFFFFF);
     }
 
@@ -29,14 +31,13 @@ public class GolemHealthHud extends HudElement {
         if (parts.length == 2) {
             double current = parseHealthValue(parts[0]);
             double max = parseHealthValue(parts[1]);
-            String colorCode = "§a"; // デフォルトは緑(§a)
+            String colorCode = "§a";
 
             if (current >= 0 && max > 0) {
-                // ★修正: 固定値(1M)ではなく、Broodmotherと同じ割合(20%・50%)の判定に変更
                 if (current < (max * 0.2)) {
-                    colorCode = "§c"; // 20%未満で赤色(§c)
+                    colorCode = "§c";
                 } else if (current < (max * 0.5)) {
-                    colorCode = "§e"; // 50%未満で黄色(§e)
+                    colorCode = "§e";
                 }
             }
             return colorCode + parts[0] + "§f/§a" + parts[1];
@@ -46,7 +47,8 @@ public class GolemHealthHud extends HudElement {
 
     private double parseHealthValue(String s) {
         try {
-            s = s.trim().replace(",", "");;
+            // ★修正: 計算する前にカンマ(,)を削除してエラーを防ぐ
+            s = s.trim().replace(",", "");
             if (s.isEmpty()) return 0;
             double multiplier = 1.0;
             char last = s.charAt(s.length() - 1);

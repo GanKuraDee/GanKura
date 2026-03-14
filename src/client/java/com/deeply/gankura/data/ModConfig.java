@@ -41,6 +41,9 @@ public class ModConfig {
 
     // ★追加: Spider's Den
     public static boolean showBroodmotherStatusHud = true;
+    public static boolean showBroodmotherHealthHud = true; // ★追加: HP HUD用
+    public static boolean enableBroodmotherAlerts = true;
+    public static boolean showBroodmotherStage4Duration = true;
 
     // Misc
     public static boolean showPetHud = false;
@@ -83,6 +86,9 @@ public class ModConfig {
 
             // ★追加: Spider's Den
             showBroodmotherStatusHud = parseBool("showBroodmotherStatusHud", true);
+            showBroodmotherHealthHud = parseBool("showBroodmotherHealthHud", true); // ★追加
+            enableBroodmotherAlerts = parseBool("enableBroodmotherAlerts", true);
+            showBroodmotherStage4Duration = parseBool("showBroodmotherStage4Duration", true);
 
             // Misc
             showPetHud = parseBool("showPetHud", false);
@@ -121,6 +127,9 @@ public class ModConfig {
 
         // ★追加: Spider's Den
         properties.setProperty("showBroodmotherStatusHud", String.valueOf(showBroodmotherStatusHud));
+        properties.setProperty("showBroodmotherHealthHud", String.valueOf(showBroodmotherHealthHud)); // ★追加
+        properties.setProperty("enableBroodmotherAlerts", String.valueOf(enableBroodmotherAlerts));
+        properties.setProperty("showBroodmotherStage4Duration", String.valueOf(showBroodmotherStage4Duration));
 
         // Misc
         properties.setProperty("showPetHud", String.valueOf(showPetHud));

@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class WorldTimeMixin {
+
     @Inject(method = "onWorldTimeUpdate", at = @At("RETURN"))
     private void onWorldTimeUpdate(WorldTimeUpdateS2CPacket packet, CallbackInfo ci) {
         // time() を使用する

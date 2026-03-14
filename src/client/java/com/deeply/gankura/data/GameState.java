@@ -100,10 +100,12 @@ public class GameState {
     public static class Broodmother {
         public static String stage = "Scanning...";
         public static long stage4StartTime = 0;
+        public static String health = null;
 
         public static void reset() {
             stage = "Scanning...";
             stage4StartTime = 0;
+            health = null;
         }
     }
 

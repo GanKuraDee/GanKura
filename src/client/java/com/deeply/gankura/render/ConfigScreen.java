@@ -13,7 +13,7 @@ public class ConfigScreen extends Screen {
     private enum MenuType {
         MAIN,
         THE_END,
-        SPIDERS_DEN, // ★追加
+        SPIDERS_DEN,
         MISC
     }
 
@@ -40,7 +40,7 @@ public class ConfigScreen extends Screen {
         switch (currentMenu) {
             case MAIN -> initMainMenu(centerX, y);
             case THE_END -> initTheEndMenu(centerX, y);
-            case SPIDERS_DEN -> initSpidersDenMenu(centerX, y); // ★追加
+            case SPIDERS_DEN -> initSpidersDenMenu(centerX, y);
             case MISC -> initMiscMenu(centerX, y);
         }
     }
@@ -57,7 +57,6 @@ public class ConfigScreen extends Screen {
             this.clearAndInit();
         }).dimensions(centerX - 100, buttonStartY, 200, 20).build());
 
-        // ★追加: Spider's Den メニューへのボタン
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Spider's Den"), button -> {
             currentMenu = MenuType.SPIDERS_DEN;
             this.clearAndInit();
@@ -103,12 +102,20 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Quality Chat", ModConfig.showDragonLootQualityChat, b -> ModConfig.showDragonLootQualityChat = b));
     }
 
-    // ★追加: Spider's Den メニューの構築
+    // ★修正: Spider's Den メニューにHP HUDボタンを追加し、2列に綺麗に並べる
     private void initSpidersDenMenu(int centerX, int y) {
         int left = centerX - 155;
+        int right = centerX + 5;
         int bWidth = 150;
 
+        // 1段目: 左(Status HUD) / 右(HP HUD)
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showBroodmotherStatusHud, b -> ModConfig.showBroodmotherStatusHud = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "HP HUD", ModConfig.showBroodmotherHealthHud, b -> ModConfig.showBroodmotherHealthHud = b));
+
+        y += 22;
+        // 2段目: 左(Stage Alerts) / 右(Duration Chat)
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Alert Title", ModConfig.enableBroodmotherAlerts, b -> ModConfig.enableBroodmotherAlerts = b));
+        this.addDrawableChild(createToggleButton(right, y, bWidth, "Stage 4 Duration Chat", ModConfig.showBroodmotherStage4Duration, b -> ModConfig.showBroodmotherStage4Duration = b));
     }
 
     private void initMiscMenu(int centerX, int y) {
@@ -166,7 +173,7 @@ public class ConfigScreen extends Screen {
         } else if (currentMenu == MenuType.THE_END) {
             context.drawCenteredTextWithShadow(textRenderer, "§6§lEnd Stone Protector", centerX, 45, 0xFFFFFFFF);
             context.drawCenteredTextWithShadow(textRenderer, "§d§lDragon", centerX, 174, 0xFFFFFFFF);
-        } else if (currentMenu == MenuType.SPIDERS_DEN) { // ★追加
+        } else if (currentMenu == MenuType.SPIDERS_DEN) {
             context.drawCenteredTextWithShadow(textRenderer, "§4§lBroodmother", centerX, 45, 0xFFFFFFFF);
         }
 

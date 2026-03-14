@@ -23,7 +23,7 @@ public class GanKura implements ClientModInitializer {
         TabListScanner.register();
         GolemLocationScanner.register();
         RareDropScanner.register();
-        GolemHealthScanner.register();
+        EntityHealthScanner.register();
         PetHandler.register();
         ServerRestartHandler.register();
         ArmorStackHandler.register();

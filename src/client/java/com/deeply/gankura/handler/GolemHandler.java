@@ -20,9 +20,14 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 public class GolemHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger("CombatStatsHandler");
+    private static final Logger LOGGER = LoggerFactory.getLogger("GolemHandler");
 
     public static void handleMessage(String msg, MinecraftClient client) {
+        if (msg.contains(ModConstants.GOLEM_SPAWN_MSG)) {
+            client.execute(() -> setStageToSummoned(client));
+            return;
+        }
+
         if (msg.contains(ModConstants.GOLEM_RISE_MSG)) {
             GameState.Golem.hasRisen = true;
             if (client.world != null) {
@@ -161,7 +166,7 @@ public class GolemHandler {
                 MutableText title = Text.literal("GOLEM STAGE 4").formatted(Formatting.RED, Formatting.BOLD);
                 // ★修正: サブタイトルを削除 (nullを渡す)
                 NotificationUtils.showTitle(client, title, null);
-                NotificationUtils.playSound(client, SoundEvents.ENTITY_IRON_GOLEM_HURT, 1.0f, 0.8f);
+                NotificationUtils.playSound(client, SoundEvents.ENTITY_IRON_GOLEM_HURT, 1.0f, 1.0f);
             }
         }
         else if (ModConstants.STAGE_SUMMONED.equals(newStage)) {
@@ -170,7 +175,7 @@ public class GolemHandler {
                 if (ModConfig.showStage4Duration) {
                     new Timer().schedule(new TimerTask() {
                         @Override public void run() {
-                            client.execute(() -> NotificationUtils.sendSystemChat(client, Text.literal(String.format("§aStage 4 Duration: %dm %ds", seconds / 60, seconds % 60))));
+                            client.execute(() -> NotificationUtils.sendSystemChat(client, Text.literal(String.format("§aGolem Stage 4 Duration: %dm %ds", seconds / 60, seconds % 60))));
                         }
                     }, 100);
                 }

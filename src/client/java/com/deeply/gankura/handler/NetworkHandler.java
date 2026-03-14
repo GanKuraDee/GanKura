@@ -1,7 +1,6 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
@@ -14,56 +13,45 @@ public class NetworkHandler {
     public static void init() {
         // サーバー参加・移動時の処理
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            GameState.resetAll(); // 全状態リセット
-            PetHandler.reset(); // サーバー移動時にペットのスキャン状態をリセット
+            GameState.resetAll();
+            PetHandler.reset();
 
             if (!client.isInSingleplayer() && handler.getServerInfo() != null) {
                 String ip = handler.getServerInfo().address.toLowerCase();
                 if (ip.contains("hypixel.net")) {
-                    // LocrawHandlerに処理を委譲
                     LocrawHandler.scheduleLocraw(client);
                 }
             }
         });
 
-        // チャット受信時の処理
+        // チャット受信時の処理 (純粋なルーター/ディスパッチャー)
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            String msg = message.getString();
-            // 処理しやすいように装飾コードを除いた文字列を作る
-            String unformattedMsg = msg.replaceAll("§[0-9a-fk-or]", "");
-
-            // アクションバーのメッセージの場合はアーマースタックを解析して終了
+            // 1. アクションバーのメッセージは専用ハンドラーへ
             if (overlay) {
                 ArmorStackHandler.handleActionBar(message);
                 return true;
             }
 
-            // サーバーリブート検知 (一番最初の方で判定する)
-            ServerRestartHandler.handleChat(unformattedMsg, MinecraftClient.getInstance());
+            String msg = message.getString();
+            String unformattedMsg = msg.replaceAll("§[0-9a-fk-or]", "");
+            MinecraftClient client = MinecraftClient.getInstance();
 
+            // 2. システム・インフラ系 (チャットを非表示にする可能性があるもの)
             if (LocrawHandler.handleMessage(msg)) {
-                return false;
+                return false; // locrawのJSONデータは画面に出さず隠す
             }
 
-            // ペットの処理
+            // 3. 各ドメイン(機能)への純粋な委譲
+            // NetworkHandler自身は、メッセージの中身が何なのか一切気にせず担当者に投げるだけ！
+            ServerRestartHandler.handleChat(unformattedMsg, client);
             PetHandler.handleMessage(message);
 
-            // 1.5. Dragon Spawn 検知 (DragonHandlerに委譲)
-            if (DragonHandler.handleMessage(msg, MinecraftClient.getInstance())) {
+            if (DragonHandler.handleMessage(msg, client)) {
                 return true;
             }
 
-            // 2. Stage 5 Spawn Timer 検知
-            // ★修正: TabListScanner から GolemHandler に呼び出し先を変更！
-            if (msg.contains(ModConstants.GOLEM_SPAWN_MSG)) {
-                MinecraftClient client = MinecraftClient.getInstance();
-                client.execute(() -> GolemHandler.setStageToSummoned(client));
-                return true;
-            }
-
-            // 3. 戦闘・統計データの処理 (GolemHandlerに委譲)
-            // 開始、終了、データ収集、結果計算のすべてをここで判断
-            GolemHandler.handleMessage(msg, MinecraftClient.getInstance());
+            // Golemに関する全てのチャット処理を委譲
+            GolemHandler.handleMessage(msg, client);
 
             return true;
         });

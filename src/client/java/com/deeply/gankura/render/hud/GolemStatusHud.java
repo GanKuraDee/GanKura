@@ -31,7 +31,7 @@ public class GolemStatusHud extends HudElement {
                 double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
 
                 if (remainingTicks > 0) displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
-                else displayStats = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) ? "§eStage: 5 (Soon)" : "§cStage: 5 (Spawned)";
+                else displayStats = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) ? "§cStage: 5 §e(Soon)" : "§cStage: 5 (Spawned)";
             } else {
                 String num = switch (stage) { case ModConstants.STAGE_RESTING -> "0"; case ModConstants.STAGE_DORMANT -> "1"; case ModConstants.STAGE_AGITATED -> "2"; case ModConstants.STAGE_DISTURBED -> "3"; case ModConstants.STAGE_AWAKENING -> "4"; default -> "?"; };
                 displayStats = "Stage: §f" + num;
@@ -41,7 +41,7 @@ public class GolemStatusHud extends HudElement {
         context.drawTextWithShadow(tr, "§lGolem Status", 0, 0, 0xFFFFAA00);
         context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
 
-        String locText = isPreview ? "Location: §eMiddle Front" : ((ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) ? ("None".equals(GameState.Player.locationName) ? "Location: §8Scanning..." : "Location: §e" + GameState.Player.locationName) : null);
+        String locText = isPreview ? "Location: §fMiddle Front" : ((ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) ? ("None".equals(GameState.Player.locationName) ? "Location: §8Scanning..." : "Location: §f" + GameState.Player.locationName) : null);
         if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
 
         if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
