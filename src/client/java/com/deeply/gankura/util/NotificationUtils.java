@@ -35,23 +35,11 @@ public class NotificationUtils {
     // 汎用ユーティリティメソッド群
     // =======================================================
 
-    /**
-     * 画面中央にタイトルとサブタイトルを表示する (デフォルトの時間設定)
-     * バニラのデフォルトは フェードイン: 10Tick(0.5秒), 表示: 70Tick(3.5秒), フェードアウト: 20Tick(1.0秒) です。
-     */
     public static void showTitle(MinecraftClient client, Text title, Text subtitle) {
         // 既存のコードが壊れないように、引数が3つの場合はデフォルト時間を指定して下のメソッドを呼ぶ
-        showTitle(client, title, subtitle, 10, 70, 20);
+        showTitle(client, title, subtitle, 5, 70, 20);
     }
 
-    /**
-     * ★追加: 画面中央にタイトルとサブタイトルを表示する (時間を指定可能)
-     * 時間の単位は「Tick」です。(20Tick = 1秒)
-     *
-     * @param fadeIn  フェードインにかかる時間 (Tick)
-     * @param stay    画面に完全に表示され続ける時間 (Tick)
-     * @param fadeOut フェードアウトにかかる時間 (Tick)
-     */
     public static void showTitle(MinecraftClient client, Text title, Text subtitle, int fadeIn, int stay, int fadeOut) {
         if (client.player == null) return;
 
