@@ -79,7 +79,7 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(left, y, bWidth, "HP HUD", ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "World Location Display", ModConfig.showGolemWorldText, b -> ModConfig.showGolemWorldText = b));
         y += 22;
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Alert Title", ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Title", ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDropAlerts, b -> ModConfig.enableDropAlerts = b));
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 Duration Chat", ModConfig.showStage4Duration, b -> ModConfig.showStage4Duration = b));
@@ -94,7 +94,7 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showDragonTrackerHud, b -> ModConfig.showDragonTrackerHud = b));
 
         y += 22;
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDragonDropAlerts, b -> ModConfig.enableDragonDropAlerts = b));
 
         y += 22;
@@ -114,7 +114,7 @@ public class ConfigScreen extends Screen {
 
         y += 22;
         // 2段目: 左(Stage Alerts) / 右(Duration Chat)
-        this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Alert Title", ModConfig.enableBroodmotherAlerts, b -> ModConfig.enableBroodmotherAlerts = b));
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Soon & Spawned Title", ModConfig.enableBroodmotherAlerts, b -> ModConfig.enableBroodmotherAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Stage 4 Duration Chat", ModConfig.showBroodmotherStage4Duration, b -> ModConfig.showBroodmotherStage4Duration = b));
     }
 
