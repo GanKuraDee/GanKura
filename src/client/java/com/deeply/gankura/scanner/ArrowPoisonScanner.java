@@ -12,9 +12,9 @@ public class ArrowPoisonScanner {
             if (client.player == null || client.world == null) return;
 
             // SKYBLOCK内でのみスキャン
-            if (!"SKYBLOCK".equals(GameState.gametype)) {
-                GameState.activePoison = "NONE";
-                GameState.activePoisonCount = 0;
+            if (!"SKYBLOCK".equals(GameState.Server.gametype)) {
+                GameState.Player.activePoison = "NONE";
+                GameState.Player.activePoisonCount = 0;
                 return;
             }
 
@@ -47,13 +47,13 @@ public class ArrowPoisonScanner {
             }
 
             // 結果をGameStateに反映
-            GameState.activePoison = firstFound;
+            GameState.Player.activePoison = firstFound;
             if ("TOXIC".equals(firstFound)) {
-                GameState.activePoisonCount = toxicTotal;
+                GameState.Player.activePoisonCount = toxicTotal;
             } else if ("TWILIGHT".equals(firstFound)) {
-                GameState.activePoisonCount = twilightTotal;
+                GameState.Player.activePoisonCount = twilightTotal;
             } else {
-                GameState.activePoisonCount = 0;
+                GameState.Player.activePoisonCount = 0;
             }
         });
     }

@@ -12,6 +12,10 @@ public class ModConstants {
     public static final String MODE_COMBAT_3 = "combat_3"; // The End
     public static final String MAP_THE_END = "The End";
 
+    // ★追加: Spider's Den 判定用
+    public static final String MODE_COMBAT_1 = "combat_1";
+    public static final String MAP_SPIDERS_DEN = "Spider's Den";
+
     // ステージ名
     public static final String STAGE_RESTING = "Resting";
     public static final String STAGE_DORMANT = "Dormant";
@@ -23,6 +27,9 @@ public class ModConstants {
     // 正規表現・メッセージ
     public static final Pattern PROTECTOR_PATTERN = Pattern.compile("Protector:\\s*(.+)");
 
+    // ★追加: Broodmother のタブリストスキャン用パターン
+    public static final Pattern BROODMOTHER_PATTERN = Pattern.compile("Broodmother:\\s+(.+)");
+
     // Stage 5 (Spawn Timer Start)
     public static final String GOLEM_SPAWN_MSG = "The ground begins to shake as an End Stone Protector rises from below!";
 
@@ -33,7 +40,7 @@ public class ModConstants {
     // ダメージ取得用 ("Your Damage: 1,234,567 (Position #5)")
     public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)");
 
-    // ★変更: 1位〜3位のDPS計算 & Loot Quality用
+    // 1位〜3位のDPS計算 & Loot Quality用
     // "1st Damager - [MVP+] Name - 1,000,000" や "2nd Damager - Name - 800,000" に対応
     public static final Pattern TOP_DAMAGER_PATTERN = Pattern.compile("(1st|2nd|3rd) Damager - (?:.*\\] )?([A-Za-z0-9_]+) - ([\\d,]+)");
 

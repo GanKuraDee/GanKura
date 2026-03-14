@@ -20,7 +20,7 @@ public class GanKura implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         NetworkHandler.init();
-        GolemStageScanner.register();
+        TabListScanner.register();
         GolemLocationScanner.register();
         RareDropScanner.register();
         GolemHealthScanner.register();
@@ -28,7 +28,6 @@ public class GanKura implements ClientModInitializer {
         ServerRestartHandler.register();
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
-        DragonStatusScanner.register();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")

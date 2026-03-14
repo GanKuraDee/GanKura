@@ -13,6 +13,7 @@ public class ConfigScreen extends Screen {
     private enum MenuType {
         MAIN,
         THE_END,
+        SPIDERS_DEN, // ★追加
         MISC
     }
 
@@ -39,6 +40,7 @@ public class ConfigScreen extends Screen {
         switch (currentMenu) {
             case MAIN -> initMainMenu(centerX, y);
             case THE_END -> initTheEndMenu(centerX, y);
+            case SPIDERS_DEN -> initSpidersDenMenu(centerX, y); // ★追加
             case MISC -> initMiscMenu(centerX, y);
         }
     }
@@ -55,10 +57,16 @@ public class ConfigScreen extends Screen {
             this.clearAndInit();
         }).dimensions(centerX - 100, buttonStartY, 200, 20).build());
 
+        // ★追加: Spider's Den メニューへのボタン
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Spider's Den"), button -> {
+            currentMenu = MenuType.SPIDERS_DEN;
+            this.clearAndInit();
+        }).dimensions(centerX - 100, buttonStartY + 24, 200, 20).build());
+
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Misc"), button -> {
             currentMenu = MenuType.MISC;
             this.clearAndInit();
-        }).dimensions(centerX - 100, buttonStartY + 24, 200, 20).build());
+        }).dimensions(centerX - 100, buttonStartY + 48, 200, 20).build());
     }
 
     private void initTheEndMenu(int centerX, int y) {
@@ -66,7 +74,6 @@ public class ConfigScreen extends Screen {
         int right = centerX + 5;
         int bWidth = 150;
 
-        // --- Golem Settings ---
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showGolemStatusHud, b -> ModConfig.showGolemStatusHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showLootTrackerHud, b -> ModConfig.showLootTrackerHud = b));
         y += 22;
@@ -84,19 +91,24 @@ public class ConfigScreen extends Screen {
 
         y += 40;
 
-        // --- Dragon Settings ---
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showDragonStatusHud, b -> ModConfig.showDragonStatusHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showDragonTrackerHud, b -> ModConfig.showDragonTrackerHud = b));
 
         y += 22;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Alert Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
-        // ★追加: Spawn Alert の右側に Rare Drop Alert を配置
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDragonDropAlerts, b -> ModConfig.enableDragonDropAlerts = b));
 
         y += 22;
-        // ★変更: 残りの項目を下にずらして配置
         this.addDrawableChild(createToggleButton(left, y, bWidth, "DPS Chat", ModConfig.showDragonDpsChat, b -> ModConfig.showDragonDpsChat = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Quality Chat", ModConfig.showDragonLootQualityChat, b -> ModConfig.showDragonLootQualityChat = b));
+    }
+
+    // ★追加: Spider's Den メニューの構築
+    private void initSpidersDenMenu(int centerX, int y) {
+        int left = centerX - 155;
+        int bWidth = 150;
+
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showBroodmotherStatusHud, b -> ModConfig.showBroodmotherStatusHud = b));
     }
 
     private void initMiscMenu(int centerX, int y) {
@@ -154,6 +166,8 @@ public class ConfigScreen extends Screen {
         } else if (currentMenu == MenuType.THE_END) {
             context.drawCenteredTextWithShadow(textRenderer, "§6§lEnd Stone Protector", centerX, 45, 0xFFFFFFFF);
             context.drawCenteredTextWithShadow(textRenderer, "§d§lDragon", centerX, 174, 0xFFFFFFFF);
+        } else if (currentMenu == MenuType.SPIDERS_DEN) { // ★追加
+            context.drawCenteredTextWithShadow(textRenderer, "§4§lBroodmother", centerX, 45, 0xFFFFFFFF);
         }
 
         super.render(context, mouseX, mouseY, delta);
