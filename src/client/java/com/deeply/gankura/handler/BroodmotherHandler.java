@@ -63,7 +63,7 @@ public class BroodmotherHandler {
                         @Override
                         public void run() {
                             client.execute(() -> {
-                                Text durationText = Text.literal(String.format("§aBrood Mother Stage 4 Duration: %dm %ds", seconds / 60, seconds % 60));
+                                Text durationText = Text.literal(String.format("§aBroodmother Stage 4 Duration: %dm %ds", seconds / 60, seconds % 60));
                                 NotificationUtils.sendSystemChat(client, durationText);
                             });
                         }
