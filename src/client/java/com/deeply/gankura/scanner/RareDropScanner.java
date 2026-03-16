@@ -22,7 +22,7 @@ public class RareDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("RareDropScanner");
 
     private static int scanDurationTicks = 0;
-    private static final int MAX_SCAN_DURATION = 1200; // 60秒間スキャン
+    private static final int MAX_SCAN_DURATION = 600; // 30秒間スキャン
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
@@ -59,43 +59,53 @@ public class RareDropScanner {
                 if (customName != null) {
                     // 色情報(§)を含んだ完全な文字列を復元
                     String legacyName = toLegacyString(customName);
+                    // 色情報を抜いた純粋な文字列
+                    String plainName = legacyName.replaceAll("§[0-9a-fk-or]", "");
 
                     // =======================================================
-                    // ★究極の最適化: 色とレベルを含めた「完全一致」でのみ判定
-                    // 除外フィルターを廃止し、本物のドロップアイテムの文字列そのものを検索します。
+                    // ★修正: 柔軟かつ強固な判定ロジック
+                    // "[Lvl 1] " (最後にスペースあり) で検索することで、[Lvl 100]などを
+                    // 確実に弾きつつ、見えないカラーコードのズレによる検知漏れを防ぎます。
                     // =======================================================
 
                     // --- ゴーレム専用ドロップ ---
                     if (scanGolemPool) {
-                        if (legacyName.contains("§6Tier Boost Core")) {
+                        if (plainName.contains("Tier Boost Core") && legacyName.contains("§6")) {
                             LootStats.addTierBoostCore();
                             notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
                             break;
-                        } else if (legacyName.contains("§7[Lvl 1] §6Golem")) {
-                            LootStats.addLegendaryGolemPet();
-                            MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
-                            break;
-                        } else if (legacyName.contains("§7[Lvl 1] §5Golem")) {
-                            LootStats.addEpicGolemPet();
-                            MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
-                            break;
+                        }
+                        // "[Lvl 1] " と "Golem" が両方含まれているか
+                        else if (plainName.contains("[Lvl 1] ") && plainName.contains("Golem")) {
+                            if (legacyName.contains("§6")) {
+                                LootStats.addLegendaryGolemPet();
+                                MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                                notifyDrop(client, itemText, ModConfig.enableDropAlerts);
+                                break;
+                            } else if (legacyName.contains("§5")) {
+                                LootStats.addEpicGolemPet();
+                                MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                                notifyDrop(client, itemText, ModConfig.enableDropAlerts);
+                                break;
+                            }
                         }
                     }
 
                     // --- ドラゴン専用ドロップ ---
                     if (scanDragonPool) {
-                        if (legacyName.contains("§7[Lvl 1] §6Ender Dragon")) {
-                            LootStats.addLegendaryDragonPet();
-                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
-                            break;
-                        } else if (legacyName.contains("§7[Lvl 1] §5Ender Dragon")) {
-                            LootStats.addEpicDragonPet();
-                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
-                            break;
+                        // "[Lvl 1] " と "Ender Dragon" が両方含まれているか
+                        if (plainName.contains("[Lvl 1] ") && plainName.contains("Ender Dragon")) {
+                            if (legacyName.contains("§6")) {
+                                LootStats.addLegendaryDragonPet();
+                                MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                                notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                                break;
+                            } else if (legacyName.contains("§5")) {
+                                LootStats.addEpicDragonPet();
+                                MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                                notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                                break;
+                            }
                         }
                     }
                 }
