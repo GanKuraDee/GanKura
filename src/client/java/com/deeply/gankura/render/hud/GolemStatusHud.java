@@ -33,15 +33,37 @@ public class GolemStatusHud extends HudElement {
                 if (remainingTicks > 0) displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
                 else displayStats = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) ? "§cStage: 5 §e(Soon)" : "§cStage: 5 (Spawned)";
             } else {
-                String num = switch (stage) { case ModConstants.STAGE_RESTING -> "0"; case ModConstants.STAGE_DORMANT -> "1"; case ModConstants.STAGE_AGITATED -> "2"; case ModConstants.STAGE_DISTURBED -> "3"; case ModConstants.STAGE_AWAKENING -> "4"; default -> "?"; };
-                displayStats = "Stage: §f" + num;
+                // ★修正1: Stage 4の「4」を黄色(§e)にするように色分けを追加
+                String num = switch (stage) {
+                    case ModConstants.STAGE_RESTING -> "§f0";
+                    case ModConstants.STAGE_DORMANT -> "§f1";
+                    case ModConstants.STAGE_AGITATED -> "§f2";
+                    case ModConstants.STAGE_DISTURBED -> "§f3";
+                    case ModConstants.STAGE_AWAKENING -> "§e4"; // 黄色
+                    default -> "§f?";
+                };
+                displayStats = "Stage: " + num;
             }
         }
 
         context.drawTextWithShadow(tr, "§lGolem Status", 0, 0, 0xFFFFAA00);
         context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
 
-        String locText = isPreview ? "Location: §fMiddle Front" : ((ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) ? ("None".equals(GameState.Player.locationName) ? "Location: §8Scanning..." : "Location: §f" + GameState.Player.locationName) : null);
+        // ★修正2: Locationテキストの生成。可読性向上のためif文に整理し、Stage 5の時は全体を赤色(§c)に。
+        String locText = null;
+        if (isPreview) {
+            // プレビューもStage 5想定なので、全体のテーマに合わせて赤色で表示
+            locText = "§cLocation: Middle Front";
+        } else if (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
+            if ("None".equals(GameState.Player.locationName)) {
+                locText = "Location: §8Scanning...";
+            } else if (ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
+                locText = "§cLocation: " + GameState.Player.locationName; // Stage 5: 全体が赤色
+            } else {
+                locText = "Location: §f" + GameState.Player.locationName; // Stage 4: 通常色
+            }
+        }
+
         if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
 
         if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {

@@ -21,27 +21,28 @@ public class BroodmotherStatusHud extends HudElement {
         String displayStats; String timerText = null;
 
         if (isPreview) {
-            displayStats = "Stage: §f4"; timerText = "Since Imminent: §e0m 45s §7(Max 1m)";
+            // ★修正: プレビュー表示も実際の動作に合わせて「4」を黄色(§e)にしました
+            displayStats = "Stage: §e4"; timerText = "Since S4: §e0m 45s §7(Max 1m)";
         } else {
             String stage = GameState.Broodmother.stage;
 
             if ("Alive!".equals(stage)) {
                 displayStats = "§cStage: 5 (Spawned)";
             }
-            // ★修正: GameState.Golem.isScanning の条件を削除し、純粋にBroodmotherのステージ名だけで判定！
             else if ("Scanning...".equals(stage)) {
                 displayStats = "Stage: §8Scanning...";
             }
             else {
+                // ★修正: Stage 4 (Imminent) の「4」を黄色(§e)にするように色分けを追加
                 String num = switch (stage) {
-                    case "Slain" -> "0";
-                    case "Dormant" -> "1";
-                    case "Soon" -> "2";
-                    case "Awakening" -> "3";
-                    case "Imminent" -> "4";
-                    default -> "?";
+                    case "Slain" -> "§f0";
+                    case "Dormant" -> "§f1";
+                    case "Soon" -> "§f2";
+                    case "Awakening" -> "§f3";
+                    case "Imminent" -> "§e4"; // 黄色
+                    default -> "§f?";
                 };
-                displayStats = "Stage: §f" + num;
+                displayStats = "Stage: " + num;
 
                 if ("Imminent".equals(stage) && GameState.Broodmother.stage4StartTime > 0) {
                     long seconds = (System.currentTimeMillis() - GameState.Broodmother.stage4StartTime) / 1000;
