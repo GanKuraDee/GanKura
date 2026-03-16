@@ -159,7 +159,7 @@ public class DragonHandler {
                         hoverText.append(Text.literal(String.format("§e#1 §f%s §7- §b%s", GameState.Dragon.top1Name, formatDps(GameState.Dragon.top1Damage / durationSeconds))));
                         if (GameState.Dragon.top2Damage > 0) hoverText.append(Text.literal(String.format("\n§6#2 §f%s §7- §b%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
                         if (GameState.Dragon.top3Damage > 0) hoverText.append(Text.literal(String.format("\n§c#3 §f%s §7- §b%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
-                        msg.append(Text.literal("§8[§eDetails§8]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
+                        msg.append(Text.literal("§8§l[§e§lTOP 3§8§l]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
