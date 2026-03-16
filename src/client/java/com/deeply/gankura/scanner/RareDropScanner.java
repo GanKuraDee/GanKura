@@ -29,7 +29,6 @@ public class RareDropScanner {
     }
 
     private static void scan(MinecraftClient client) {
-        // Handler側で "DOWN!" を検知した時に isLootScanning が true になることを前提とします
         if (!GameState.Player.isLootScanning) {
             scanDurationTicks = 0;
             return;
@@ -49,38 +48,50 @@ public class RareDropScanner {
 
         if (GameState.Player.hasShownDropAlert) return;
 
+        // ボスごとのルートプールの分離
+        long currentTime = client.world.getTime();
+        boolean scanGolemPool = GameState.Golem.fightEndTime > 0 && (currentTime - GameState.Golem.fightEndTime) <= MAX_SCAN_DURATION;
+        boolean scanDragonPool = GameState.Dragon.fightEndTime > 0 && (currentTime - GameState.Dragon.fightEndTime) <= MAX_SCAN_DURATION;
+
         for (Entity entity : client.world.getEntities()) {
             if (entity instanceof ArmorStandEntity armorStand) {
                 Text customName = armorStand.getCustomName();
                 if (customName != null) {
-                    // ★修正: Hypixelの仕様に合わせ、確実に色情報(§)を保持した文字列を生成する
+                    // 色情報(§)を含んだ完全な文字列を復元
                     String legacyName = toLegacyString(customName);
-                    String plainName = legacyName.replaceAll("§[0-9a-fk-or]", "");
 
-                    if (plainName.contains("Tier Boost Core")) {
-                        LootStats.addTierBoostCore();
-                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
-                        break;
-                    } else if (plainName.contains("Golem")) {
-                        // ★修正: legacyName の中に直接 §6(金) や §5(紫) が含まれているかで判定する
-                        if (legacyName.contains("§6")) {
+                    // =======================================================
+                    // ★究極の最適化: 色とレベルを含めた「完全一致」でのみ判定
+                    // 除外フィルターを廃止し、本物のドロップアイテムの文字列そのものを検索します。
+                    // =======================================================
+
+                    // --- ゴーレム専用ドロップ ---
+                    if (scanGolemPool) {
+                        if (legacyName.contains("§6Tier Boost Core")) {
+                            LootStats.addTierBoostCore();
+                            notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
+                            break;
+                        } else if (legacyName.contains("§7[Lvl 1] §6Golem")) {
                             LootStats.addLegendaryGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                             break;
-                        } else if (legacyName.contains("§5")) {
+                        } else if (legacyName.contains("§7[Lvl 1] §5Golem")) {
                             LootStats.addEpicGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                             break;
                         }
-                    } else if (plainName.contains("Ender Dragon")) {
-                        if (legacyName.contains("§6")) {
+                    }
+
+                    // --- ドラゴン専用ドロップ ---
+                    if (scanDragonPool) {
+                        if (legacyName.contains("§7[Lvl 1] §6Ender Dragon")) {
                             LootStats.addLegendaryDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
                             break;
-                        } else if (legacyName.contains("§5")) {
+                        } else if (legacyName.contains("§7[Lvl 1] §5Ender Dragon")) {
                             LootStats.addEpicDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                             notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
@@ -94,11 +105,9 @@ public class RareDropScanner {
 
     private static void notifyDrop(MinecraftClient client, Text itemText, boolean isAlertEnabled) {
         if (isAlertEnabled) {
-            // 1. タイトル表示
             MutableText title = Text.literal("DROP!").formatted(Formatting.RED, Formatting.BOLD);
             NotificationUtils.showTitle(client, title, itemText, 5, 100, 20);
 
-            // 2. チャット表示
             Text playerName = client.player.getDisplayName();
             MutableText chatMsg = Text.empty()
                     .append(playerName)
@@ -107,8 +116,6 @@ public class RareDropScanner {
                     .append(Text.literal("!").formatted(Formatting.YELLOW));
 
             NotificationUtils.sendSystemChat(client, chatMsg);
-
-            // 3. サウンド
             NotificationUtils.playSound(client, SoundEvents.ENTITY_PLAYER_LEVELUP, 1.0f, 0.5f);
         }
         GameState.Player.hasShownDropAlert = true;
@@ -116,7 +123,6 @@ public class RareDropScanner {
         LOGGER.info("Rare Drop Detected: " + itemText.getString());
     }
 
-    // ★追加: Hypixelから送られてくるあらゆる形式の色付きテキストを、確実にレガシー文字列(§付き)に変換するメソッド
     private static String toLegacyString(Text text) {
         StringBuilder sb = new StringBuilder();
         text.visit((style, part) -> {

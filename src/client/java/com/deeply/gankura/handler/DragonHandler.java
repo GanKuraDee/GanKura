@@ -106,17 +106,47 @@ public class DragonHandler {
 
             new Timer().schedule(new TimerTask() {
                 @Override public void run() {
-                    int lootQuality = calculateDragonLootQuality(myPosition);
+                    // ★修正: myDamage(自分のダメージ)も引数として渡す
+                    int lootQuality = calculateDragonLootQuality(myPosition, myDamage);
                     printDragonResult(client, finalDps, finalDurationStr, finalDurationSec, lootQuality);
                 }
             }, 500);
         } catch (Exception ignored) {}
     }
 
-    private static int calculateDragonLootQuality(int myPosition) {
-        int weight = 0; int placedEyes = GameState.Dragon.playerEyes;
-        if (myPosition == 1) weight = 300; else if (myPosition == 2) weight = 250; else if (myPosition == 3) weight = 200; else if (myPosition <= 5) weight = 150; else if (myPosition <= 10) weight = 100; else if (myPosition <= 15) weight = 75; else weight = 50;
-        return weight + (placedEyes * 100);
+    // ★修正: 指定された公式に完全準拠したLoot Qualityの計算ロジック
+    private static int calculateDragonLootQuality(int myPosition, long myDamage) {
+        int placementQuality = 10; // ダメージ1未満のデフォルト値
+
+        if (myDamage >= 1) {
+            if (myPosition == 1) placementQuality = 200;
+            else if (myPosition == 2) placementQuality = 175;
+            else if (myPosition == 3) placementQuality = 150;
+            else if (myPosition == 4) placementQuality = 125;
+            else if (myPosition == 5) placementQuality = 110;
+            else if (myPosition >= 6 && myPosition <= 8) placementQuality = 100;
+            else if (myPosition >= 9 && myPosition <= 10) placementQuality = 90;
+            else if (myPosition >= 11 && myPosition <= 12) placementQuality = 80;
+            else placementQuality = 70; // 13位以降でダメージ1以上
+        }
+
+        // ダメージスコアの計算: (100 * DamageDealt) / FirstPlaceDamageDealt
+        double damageRatio = 0;
+        long firstDamage = GameState.Dragon.top1Damage;
+
+        // もし自分が1位で、Top Damagerメッセージの取得が遅れた場合のフェイルセーフ
+        if (firstDamage == 0 && myPosition == 1) {
+            firstDamage = myDamage;
+        }
+
+        if (firstDamage > 0) {
+            damageRatio = (100.0 * myDamage) / firstDamage;
+        }
+
+        int placedEyes = GameState.Dragon.playerEyes;
+
+        // LootQuality = PlacementQuality + (100 * SummoningEyePlaced) + DamageRatio
+        return (int) (placementQuality + (100 * placedEyes) + damageRatio);
     }
 
     private static void printDragonResult(MinecraftClient client, String dps, String duration, double durationSeconds, int lq) {
@@ -129,7 +159,7 @@ public class DragonHandler {
                         hoverText.append(Text.literal(String.format("§e#1 §f%s §7- §b%s", GameState.Dragon.top1Name, formatDps(GameState.Dragon.top1Damage / durationSeconds))));
                         if (GameState.Dragon.top2Damage > 0) hoverText.append(Text.literal(String.format("\n§6#2 §f%s §7- §b%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
                         if (GameState.Dragon.top3Damage > 0) hoverText.append(Text.literal(String.format("\n§c#3 §f%s §7- §b%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
-                        msg.append(Text.literal("§8[§eHOVER§8]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
+                        msg.append(Text.literal("§8[§eDetails§8]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
