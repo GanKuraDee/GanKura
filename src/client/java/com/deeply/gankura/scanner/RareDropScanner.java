@@ -21,7 +21,7 @@ public class RareDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("RareDropScanner");
 
     private static int scanDurationTicks = 0;
-    private static final int MAX_SCAN_DURATION = 100; // 5秒間スキャン
+    private static final int MAX_SCAN_DURATION = 1200; // 60秒間スキャン
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
