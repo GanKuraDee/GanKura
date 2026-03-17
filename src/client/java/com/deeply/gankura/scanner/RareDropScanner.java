@@ -47,59 +47,50 @@ public class RareDropScanner {
 
         if (GameState.Player.hasShownDropAlert) return;
 
-        // ボスごとのルートプールの分離
-        long currentTime = client.world.getTime();
-        boolean scanGolemPool = GameState.Golem.fightEndTime > 0 && (currentTime - GameState.Golem.fightEndTime) <= MAX_SCAN_DURATION;
-        boolean scanDragonPool = GameState.Dragon.fightEndTime > 0 && (currentTime - GameState.Dragon.fightEndTime) <= MAX_SCAN_DURATION;
-
         for (Entity entity : client.world.getEntities()) {
             if (entity instanceof ArmorStandEntity armorStand) {
                 if (armorStand.hasCustomName()) {
                     Text customName = armorStand.getCustomName();
                     if (customName == null) continue;
 
-                    // 以前完全に機能していた、正確なプレーンテキストの取得に戻す
                     String nameString = customName.getString();
 
-                    // --- ゴーレム専用ドロップ ---
-                    if (scanGolemPool) {
-                        if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
-                            LootStats.addTierBoostCore();
-                            notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
+                    // 1. Tier Boost Core (金)
+                    if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
+                        LootStats.addTierBoostCore();
+                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
+                        break;
+                    }
+
+                    // 2. [Lvl 1] Golem (Legendary / Epic)
+                    else if (nameString.contains("[Lvl 1] Golem")) {
+                        if (hasColor(customName, Formatting.GOLD)) {
+                            LootStats.addLegendaryGolemPet();
+                            MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                             break;
                         }
-                        // 空白ありの "[Lvl 1] Golem" で検索することで、召喚ペット([Lvl1])を自動で弾く
-                        else if (nameString.contains("[Lvl 1] Golem")) {
-                            if (hasColor(customName, Formatting.GOLD)) {
-                                LootStats.addLegendaryGolemPet();
-                                MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                                notifyDrop(client, itemText, ModConfig.enableDropAlerts);
-                                break;
-                            }
-                            // 以前機能していた、2種類の紫色(DARK/LIGHT)を両方判定するロジックを復活
-                            else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
-                                LootStats.addEpicGolemPet();
-                                MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                                notifyDrop(client, itemText, ModConfig.enableDropAlerts);
-                                break;
-                            }
+                        else if (hasColor(customName, Formatting.DARK_PURPLE)) {
+                            LootStats.addEpicGolemPet();
+                            MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
+                            break;
                         }
                     }
 
-                    // --- ドラゴン専用ドロップ ---
-                    if (scanDragonPool) {
-                        if (nameString.contains("[Lvl 1] Ender Dragon")) {
-                            if (hasColor(customName, Formatting.GOLD)) {
-                                LootStats.addLegendaryDragonPet();
-                                MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                                notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
-                                break;
-                            } else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
-                                LootStats.addEpicDragonPet();
-                                MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                                notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
-                                break;
-                            }
+                    // 3. [Lvl 1] Ender Dragon (Legendary / Epic)
+                    else if (nameString.contains("[Lvl 1] Ender Dragon")) {
+                        if (hasColor(customName, Formatting.GOLD)) {
+                            LootStats.addLegendaryDragonPet();
+                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                            break;
+                        }
+                        else if (hasColor(customName, Formatting.DARK_PURPLE)) {
+                            LootStats.addEpicDragonPet();
+                            MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
+                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                            break;
                         }
                     }
                 }
@@ -127,7 +118,6 @@ public class RareDropScanner {
         LOGGER.info("Rare Drop Detected: " + itemText.getString());
     }
 
-    // 以前、色判定を100%確実にこなしていたメソッドを完全復活
     private static boolean hasColor(Text text, Formatting targetFormatting) {
         TextColor targetColor = TextColor.fromFormatting(targetFormatting);
         if (targetColor == null) return false;
