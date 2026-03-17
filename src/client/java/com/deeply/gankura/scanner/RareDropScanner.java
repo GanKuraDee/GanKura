@@ -11,7 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -22,7 +21,7 @@ public class RareDropScanner {
     private static final Logger LOGGER = LoggerFactory.getLogger("RareDropScanner");
 
     private static int scanDurationTicks = 0;
-    private static final int MAX_SCAN_DURATION = 600; // 30秒間スキャン
+    private static final int MAX_SCAN_DURATION = 100; // 5秒間スキャン
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
@@ -55,34 +54,30 @@ public class RareDropScanner {
 
         for (Entity entity : client.world.getEntities()) {
             if (entity instanceof ArmorStandEntity armorStand) {
-                Text customName = armorStand.getCustomName();
-                if (customName != null) {
-                    // 色情報(§)を含んだ完全な文字列を復元
-                    String legacyName = toLegacyString(customName);
-                    // 色情報を抜いた純粋な文字列
-                    String plainName = legacyName.replaceAll("§[0-9a-fk-or]", "");
+                if (armorStand.hasCustomName()) {
+                    Text customName = armorStand.getCustomName();
+                    if (customName == null) continue;
 
-                    // =======================================================
-                    // ★修正: 柔軟かつ強固な判定ロジック
-                    // "[Lvl 1] " (最後にスペースあり) で検索することで、[Lvl 100]などを
-                    // 確実に弾きつつ、見えないカラーコードのズレによる検知漏れを防ぎます。
-                    // =======================================================
+                    // 以前完全に機能していた、正確なプレーンテキストの取得に戻す
+                    String nameString = customName.getString();
 
                     // --- ゴーレム専用ドロップ ---
                     if (scanGolemPool) {
-                        if (plainName.contains("Tier Boost Core") && legacyName.contains("§6")) {
+                        if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
                             LootStats.addTierBoostCore();
                             notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
                             break;
                         }
-                        // "[Lvl 1] " と "Golem" が両方含まれているか
-                        else if (plainName.contains("[Lvl 1] ") && plainName.contains("Golem")) {
-                            if (legacyName.contains("§6")) {
+                        // 空白ありの "[Lvl 1] Golem" で検索することで、召喚ペット([Lvl1])を自動で弾く
+                        else if (nameString.contains("[Lvl 1] Golem")) {
+                            if (hasColor(customName, Formatting.GOLD)) {
                                 LootStats.addLegendaryGolemPet();
                                 MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                                 notifyDrop(client, itemText, ModConfig.enableDropAlerts);
                                 break;
-                            } else if (legacyName.contains("§5")) {
+                            }
+                            // 以前機能していた、2種類の紫色(DARK/LIGHT)を両方判定するロジックを復活
+                            else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
                                 LootStats.addEpicGolemPet();
                                 MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                                 notifyDrop(client, itemText, ModConfig.enableDropAlerts);
@@ -93,14 +88,13 @@ public class RareDropScanner {
 
                     // --- ドラゴン専用ドロップ ---
                     if (scanDragonPool) {
-                        // "[Lvl 1] " と "Ender Dragon" が両方含まれているか
-                        if (plainName.contains("[Lvl 1] ") && plainName.contains("Ender Dragon")) {
-                            if (legacyName.contains("§6")) {
+                        if (nameString.contains("[Lvl 1] Ender Dragon")) {
+                            if (hasColor(customName, Formatting.GOLD)) {
                                 LootStats.addLegendaryDragonPet();
                                 MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                                 notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
                                 break;
-                            } else if (legacyName.contains("§5")) {
+                            } else if (hasColor(customName, Formatting.DARK_PURPLE) || hasColor(customName, Formatting.LIGHT_PURPLE)) {
                                 LootStats.addEpicDragonPet();
                                 MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
                                 notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
@@ -133,28 +127,22 @@ public class RareDropScanner {
         LOGGER.info("Rare Drop Detected: " + itemText.getString());
     }
 
-    private static String toLegacyString(Text text) {
-        StringBuilder sb = new StringBuilder();
-        text.visit((style, part) -> {
-            TextColor color = style.getColor();
-            if (color != null) {
-                Integer rgb = color.getRgb();
-                for (Formatting f : Formatting.values()) {
-                    if (f.isColor() && f.getColorValue() != null && f.getColorValue().equals(rgb)) {
-                        sb.append("§").append(f.getCode());
-                        break;
-                    }
-                }
-            }
-            if (style.isObfuscated()) sb.append("§k");
-            if (style.isBold()) sb.append("§l");
-            if (style.isStrikethrough()) sb.append("§m");
-            if (style.isUnderlined()) sb.append("§n");
-            if (style.isItalic()) sb.append("§o");
+    // 以前、色判定を100%確実にこなしていたメソッドを完全復活
+    private static boolean hasColor(Text text, Formatting targetFormatting) {
+        TextColor targetColor = TextColor.fromFormatting(targetFormatting);
+        if (targetColor == null) return false;
 
-            sb.append(part);
-            return java.util.Optional.empty();
-        }, Style.EMPTY);
-        return sb.toString();
+        TextColor selfColor = text.getStyle().getColor();
+        if (selfColor != null && selfColor.equals(targetColor)) {
+            return true;
+        }
+
+        for (Text sibling : text.getSiblings()) {
+            if (hasColor(sibling, targetFormatting)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
