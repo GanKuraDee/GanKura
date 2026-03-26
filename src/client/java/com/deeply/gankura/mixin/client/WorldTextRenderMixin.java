@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DebugRenderer.class)
-public class WorldRendererMixin {
+public class WorldTextRenderMixin {
 
     @Inject(at = @At("TAIL"), method = "render")
     private void onRender(Frustum frustum, double cameraX, double cameraY, double cameraZ, float tickProgress, CallbackInfo ci) {

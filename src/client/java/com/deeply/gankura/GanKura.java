@@ -4,6 +4,7 @@ import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
+import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.render.ConfigScreen; // ★追加
 import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
@@ -28,6 +29,7 @@ public class GanKura implements ClientModInitializer {
         ServerRestartHandler.register();
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
+        EntityHighlightManager.register();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("gankura")
