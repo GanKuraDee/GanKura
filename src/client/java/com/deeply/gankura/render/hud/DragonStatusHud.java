@@ -21,7 +21,7 @@ public class DragonStatusHud extends HudElement {
         String eggState; String eyePlaced = null; String dragonType = null;
 
         if (isPreview) {
-            eggState = "§cEgg: Hatched (Spawned)"; eyePlaced = "§cEyes placed: 8/8 §a(2)"; dragonType = "Type: §eSuperior";
+            eggState = "§cEgg: Hatched (Spawned)"; eyePlaced = "§cEyes placed: 8/8 §b(2)"; dragonType = "Type: §eSuperior";
         } else {
             String state = GameState.Dragon.eggState;
             int eyes = GameState.Dragon.eyes;
