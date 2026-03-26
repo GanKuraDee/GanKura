@@ -12,12 +12,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(WorldRenderer.class)
 public class WorldBeaconRenderMixin {
 
-    // 1.21.11の最新仕様に完全対応
-    // ブロックエンティティのステートを収集する "fillBlockEntityRenderStates" メソッドの終わりに割り込む
-    @Inject(method = "fillBlockEntityRenderStates", at = @At("RETURN"))
-    private void injectCustomRenderStates(Camera camera, float tickProgress, WorldRenderState renderStates, CallbackInfo ci) {
+    // ★修正: Sodiumに上書きされてしまうメソッドから、絶対に上書きされない「アウトライン収集メソッド」にお引越し！
+    @Inject(method = "fillEntityOutlineRenderStates", at = @At("RETURN"))
+    private void injectCustomRenderStates(Camera camera, WorldRenderState renderStates, CallbackInfo ci) {
 
-        // マイクラ標準の収集が終わった直後に、私たちの「偽ビーコン」のデータを追加する
+        // マイクラ(またはSodium)の標準収集が終わった直後に、私たちの「偽ビーコン」のデータを追加する
         GolemBeaconRenderer.submitBeaconState(renderStates, camera);
 
     }
