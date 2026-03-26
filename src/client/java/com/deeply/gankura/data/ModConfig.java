@@ -30,6 +30,7 @@ public class ModConfig {
     public static boolean showLootQualityChat = true;
     public static boolean showGolemWorldText = true;
     public static boolean enableDay30Alert = true;
+    public static boolean enableGolemHighlight = true; // ★追加: ゴーレムハイライト
 
     // Dragon
     public static boolean enableDragonAlerts = true;
@@ -39,11 +40,12 @@ public class ModConfig {
     public static boolean showDragonLootQualityChat = true;
     public static boolean showDragonTrackerHud = true;
 
-    // ★追加: Spider's Den
+    // Spider's Den
     public static boolean showBroodmotherStatusHud = true;
-    public static boolean showBroodmotherHealthHud = true; // ★追加: HP HUD用
+    public static boolean showBroodmotherHealthHud = true;
     public static boolean enableBroodmotherAlerts = true;
     public static boolean showBroodmotherStage4Duration = true;
+    public static boolean enableBroodmotherHighlight = true; // ★追加: ブルードマザーハイライト
 
     // Misc
     public static boolean showPetHud = false;
@@ -75,6 +77,7 @@ public class ModConfig {
             showLootQualityChat = parseBool("showLootQualityChat", true);
             showGolemWorldText = parseBool("showGolemWorldText", true);
             enableDay30Alert = parseBool("enableDay30Alert", true);
+            enableGolemHighlight = parseBool("enableGolemHighlight", true); // ★追加
 
             // Dragon
             enableDragonAlerts = parseBool("enableDragonAlerts", true);
@@ -84,11 +87,12 @@ public class ModConfig {
             showDragonLootQualityChat = parseBool("showDragonLootQualityChat", true);
             showDragonTrackerHud = parseBool("showDragonTrackerHud", true);
 
-            // ★追加: Spider's Den
+            // Spider's Den
             showBroodmotherStatusHud = parseBool("showBroodmotherStatusHud", true);
-            showBroodmotherHealthHud = parseBool("showBroodmotherHealthHud", true); // ★追加
+            showBroodmotherHealthHud = parseBool("showBroodmotherHealthHud", true);
             enableBroodmotherAlerts = parseBool("enableBroodmotherAlerts", true);
             showBroodmotherStage4Duration = parseBool("showBroodmotherStage4Duration", true);
+            enableBroodmotherHighlight = parseBool("enableBroodmotherHighlight", true); // ★追加
 
             // Misc
             showPetHud = parseBool("showPetHud", false);
@@ -116,6 +120,7 @@ public class ModConfig {
         properties.setProperty("showLootQualityChat", String.valueOf(showLootQualityChat));
         properties.setProperty("showGolemWorldText", String.valueOf(showGolemWorldText));
         properties.setProperty("enableDay30Alert", String.valueOf(enableDay30Alert));
+        properties.setProperty("enableGolemHighlight", String.valueOf(enableGolemHighlight)); // ★追加
 
         // Dragon
         properties.setProperty("enableDragonAlerts", String.valueOf(enableDragonAlerts));
@@ -125,11 +130,12 @@ public class ModConfig {
         properties.setProperty("showDragonLootQualityChat", String.valueOf(showDragonLootQualityChat));
         properties.setProperty("showDragonTrackerHud", String.valueOf(showDragonTrackerHud));
 
-        // ★追加: Spider's Den
+        // Spider's Den
         properties.setProperty("showBroodmotherStatusHud", String.valueOf(showBroodmotherStatusHud));
-        properties.setProperty("showBroodmotherHealthHud", String.valueOf(showBroodmotherHealthHud)); // ★追加
+        properties.setProperty("showBroodmotherHealthHud", String.valueOf(showBroodmotherHealthHud));
         properties.setProperty("enableBroodmotherAlerts", String.valueOf(enableBroodmotherAlerts));
         properties.setProperty("showBroodmotherStage4Duration", String.valueOf(showBroodmotherStage4Duration));
+        properties.setProperty("enableBroodmotherHighlight", String.valueOf(enableBroodmotherHighlight)); // ★追加
 
         // Misc
         properties.setProperty("showPetHud", String.valueOf(showPetHud));

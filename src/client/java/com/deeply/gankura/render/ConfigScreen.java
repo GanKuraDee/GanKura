@@ -75,47 +75,53 @@ public class ConfigScreen extends Screen {
 
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showGolemStatusHud, b -> ModConfig.showGolemStatusHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showLootTrackerHud, b -> ModConfig.showLootTrackerHud = b));
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "HP HUD", ModConfig.showGolemHealthHud, b -> ModConfig.showGolemHealthHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "World Location Display", ModConfig.showGolemWorldText, b -> ModConfig.showGolemWorldText = b));
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 & 5 Title", ModConfig.enableStageAlerts, b -> ModConfig.enableStageAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDropAlerts, b -> ModConfig.enableDropAlerts = b));
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Stage 4 Duration Chat", ModConfig.showStage4Duration, b -> ModConfig.showStage4Duration = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "DPS Chat", ModConfig.showDpsChat, b -> ModConfig.showDpsChat = b));
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Loot Quality Chat", ModConfig.showLootQualityChat, b -> ModConfig.showLootQualityChat = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day 30 Alert", ModConfig.enableDay30Alert, b -> ModConfig.enableDay30Alert = b));
 
+        y += 20;
+        // ★追加: ゴーレムハイライト用のボタン
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Highlight", ModConfig.enableGolemHighlight, b -> ModConfig.enableGolemHighlight = b));
+
+        // ★ドラゴンのセクションが被らないように下にずらします
         y += 40;
 
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showDragonStatusHud, b -> ModConfig.showDragonStatusHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Tracker HUD", ModConfig.showDragonTrackerHud, b -> ModConfig.showDragonTrackerHud = b));
 
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Spawn Title", ModConfig.enableDragonAlerts, b -> ModConfig.enableDragonAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Rare Drop Notification", ModConfig.enableDragonDropAlerts, b -> ModConfig.enableDragonDropAlerts = b));
 
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "DPS Chat", ModConfig.showDragonDpsChat, b -> ModConfig.showDragonDpsChat = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Loot Quality Chat", ModConfig.showDragonLootQualityChat, b -> ModConfig.showDragonLootQualityChat = b));
     }
 
-    // ★修正: Spider's Den メニューにHP HUDボタンを追加し、2列に綺麗に並べる
     private void initSpidersDenMenu(int centerX, int y) {
         int left = centerX - 155;
         int right = centerX + 5;
         int bWidth = 150;
 
-        // 1段目: 左(Status HUD) / 右(HP HUD)
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Status HUD", ModConfig.showBroodmotherStatusHud, b -> ModConfig.showBroodmotherStatusHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "HP HUD", ModConfig.showBroodmotherHealthHud, b -> ModConfig.showBroodmotherHealthHud = b));
 
-        y += 22;
-        // 2段目: 左(Stage Alerts) / 右(Duration Chat)
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Soon & Spawned Title", ModConfig.enableBroodmotherAlerts, b -> ModConfig.enableBroodmotherAlerts = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Stage 4 Duration Chat", ModConfig.showBroodmotherStage4Duration, b -> ModConfig.showBroodmotherStage4Duration = b));
+
+        y += 20;
+        // ★追加: ブルードマザーハイライト用のボタン
+        this.addDrawableChild(createToggleButton(left, y, bWidth, "Highlight", ModConfig.enableBroodmotherHighlight, b -> ModConfig.enableBroodmotherHighlight = b));
     }
 
     private void initMiscMenu(int centerX, int y) {
@@ -125,11 +131,11 @@ public class ConfigScreen extends Screen {
 
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Active Pet HUD", ModConfig.showPetHud, b -> ModConfig.showPetHud = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Armor Stack HUD", ModConfig.showArmorStackHud, b -> ModConfig.showArmorStackHud = b));
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Server Reboot Alert", ModConfig.enableRebootAlert, b -> ModConfig.enableRebootAlert = b));
         this.addDrawableChild(createToggleButton(right, y, bWidth, "Day HUD", ModConfig.showDayHud, b -> ModConfig.showDayHud = b));
 
-        y += 22;
+        y += 20;
         this.addDrawableChild(createToggleButton(left, y, bWidth, "Arrow Poison Indicator", ModConfig.showPoisonIndicator, b -> ModConfig.showPoisonIndicator = b));
     }
 
@@ -172,7 +178,8 @@ public class ConfigScreen extends Screen {
             context.drawCenteredTextWithShadow(textRenderer, "§lCategory Selection", centerX, 75, 0xFF55FFFF);
         } else if (currentMenu == MenuType.THE_END) {
             context.drawCenteredTextWithShadow(textRenderer, "§6§lEnd Stone Protector", centerX, 45, 0xFFFFFFFF);
-            context.drawCenteredTextWithShadow(textRenderer, "§d§lDragon", centerX, 174, 0xFFFFFFFF);
+            // ★ドラゴンのタイトル位置もボタン配置に合わせて下にずらします (174 -> 190)
+            context.drawCenteredTextWithShadow(textRenderer, "§d§lDragon", centerX, 185, 0xFFFFFFFF);
         } else if (currentMenu == MenuType.SPIDERS_DEN) {
             context.drawCenteredTextWithShadow(textRenderer, "§4§lBroodmother", centerX, 45, 0xFFFFFFFF);
         }
