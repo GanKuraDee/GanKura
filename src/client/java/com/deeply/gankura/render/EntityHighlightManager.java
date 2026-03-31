@@ -2,7 +2,6 @@ package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
-import com.deeply.gankura.data.ModConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -30,10 +29,10 @@ public class EntityHighlightManager {
 
         // ★修正: 設定がOFFの場合はそもそもスキャン対象外にする
         boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
-        boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage) && ModConfig.enableGolemHighlight;
+        boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage) && ModConfig.INSTANCE.golem.enableGolemHighlight;
 
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
-        boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.enableBroodmotherHighlight;
+        boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.broodmother.enableBroodmotherHighlight;
 
         if (!scanGolem && !scanBroodmother) return;
 

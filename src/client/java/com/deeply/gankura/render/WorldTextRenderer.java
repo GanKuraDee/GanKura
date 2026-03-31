@@ -2,7 +2,6 @@ package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
-import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +20,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGolemWaypoint(MinecraftClient client, PlayerEntity player) {
-        if (!ModConfig.showGolemWorldText) return;
+        if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Text) return;
 
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
 

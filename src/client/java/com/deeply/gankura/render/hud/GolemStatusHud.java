@@ -1,7 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
         super("stats", 260, 50, 1.0f, 150, 50,
-                () -> ModConfig.showGolemStatusHud,
+                () -> ModConfig.INSTANCE.golem.showGolemStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
 
@@ -66,15 +66,18 @@ public class GolemStatusHud extends HudElement {
 
         if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
 
-        if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
-            String timerText;
-            if (isPreview) timerText = "Since S4: §f0m 45s";
-            else {
-                long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
-                String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
-                timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
+        // ★修正: 新しく作成した設定スイッチがONの時だけタイマーの処理を行う
+        if (ModConfig.INSTANCE.golem.showGolemStatusHud_SinceS4) {
+            if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
+                String timerText;
+                if (isPreview) timerText = "Since S4: §f0m 45s";
+                else {
+                    long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
+                    String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
+                    timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
+                }
+                context.drawTextWithShadow(tr, timerText, 0, 36, 0xFFFFFFFF);
             }
-            context.drawTextWithShadow(tr, timerText, 0, 36, 0xFFFFFFFF);
         }
     }
 }

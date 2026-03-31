@@ -2,7 +2,7 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.LootStats;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
@@ -12,7 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 public class GolemLootTrackerHud extends HudElement {
     public GolemLootTrackerHud() {
         super("tracker", 260, 100, 1.0f, 150, 50,
-                () -> ModConfig.showLootTrackerHud,
+                () -> ModConfig.INSTANCE.golem.showLootTrackerHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
 

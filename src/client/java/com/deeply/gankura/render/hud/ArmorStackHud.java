@@ -1,7 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ArmorStackHud extends HudElement {
     public ArmorStackHud() {
-        super("armorStack", 10, 50, 1.0f, 150, 15, () -> ModConfig.showArmorStackHud, () -> true);
+        super("armorStack", 10, 50, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
     }
 
     @Override

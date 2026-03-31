@@ -2,7 +2,7 @@ package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.LootStats;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -58,7 +58,7 @@ public class RareDropScanner {
                     // 1. Tier Boost Core (金)
                     if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
                         LootStats.addTierBoostCore();
-                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.enableDropAlerts);
+                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.INSTANCE.golem.enableDropAlerts);
                         break;
                     }
 
@@ -67,13 +67,13 @@ public class RareDropScanner {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
+                            notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
                             break;
                         }
                         else if (hasColor(customName, Formatting.DARK_PURPLE)) {
                             LootStats.addEpicGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.enableDropAlerts);
+                            notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
                             break;
                         }
                     }
@@ -83,13 +83,13 @@ public class RareDropScanner {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                            notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
                             break;
                         }
                         else if (hasColor(customName, Formatting.DARK_PURPLE)) {
                             LootStats.addEpicDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.enableDragonDropAlerts);
+                            notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
                             break;
                         }
                     }

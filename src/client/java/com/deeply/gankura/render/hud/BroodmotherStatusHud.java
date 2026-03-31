@@ -1,7 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 public class BroodmotherStatusHud extends HudElement {
     public BroodmotherStatusHud() {
         super("broodmother", 10, 50, 1.0f, 150, 50,
-                () -> ModConfig.showBroodmotherStatusHud,
+                () -> ModConfig.INSTANCE.broodmother.showBroodmotherStatusHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
     }
 
@@ -54,6 +54,9 @@ public class BroodmotherStatusHud extends HudElement {
 
         context.drawTextWithShadow(tr, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF);
         context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
-        if (timerText != null) context.drawTextWithShadow(tr, timerText, 0, 24, 0xFFFFFFFF);
+        // ★修正: タイマーテキストが存在し、かつ設定スイッチがONの時だけ描画する
+        if (timerText != null && ModConfig.INSTANCE.broodmother.showBroodmotherStatusHud_SinceS4) {
+            context.drawTextWithShadow(tr, timerText, 0, 24, 0xFFFFFFFF);
+        }
     }
 }

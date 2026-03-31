@@ -1,7 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,7 +32,7 @@ public class ServerRestartHandler {
                 long currentDay = client.world.getTimeOfDay() / 24000L;
 
                 // 設定がON、且つ条件を満たしている場合のみ実行
-                if (ModConfig.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
+                if (ModConfig.INSTANCE.golem.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
                     GameState.Golem.hasAnnouncedDay30 = true;
 
                     client.execute(() -> {
@@ -78,7 +78,7 @@ public class ServerRestartHandler {
 
     public static void handleChat(String unformattedMsg, MinecraftClient client) {
         // 設定がOFFなら何もしない
-        if (!ModConfig.enableRebootAlert) return;
+        if (!ModConfig.INSTANCE.misc.enableRebootAlert) return;
 
         if (unformattedMsg.startsWith("[Important] This server will restart soon:")) {
             GameState.Server.isClosing = true;

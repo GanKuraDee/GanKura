@@ -11,6 +11,7 @@ base {
 }
 
 repositories {
+	maven { url "https://maven.notenoughupdates.org/releases/" }
 }
 
 loom {
@@ -33,6 +34,12 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	modImplementation("org.notenoughupdates.moulconfig:modern-1.21.11:4.5.0")
+	include("org.notenoughupdates.moulconfig:modern-1.21.11:4.5.0")
+
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+	include("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
 }
 
 processResources {

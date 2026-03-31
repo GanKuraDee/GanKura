@@ -1,7 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.minecraft.client.MinecraftClient;
@@ -51,7 +51,8 @@ public class DragonHandler {
                 GameState.Dragon.fightStartTime = client.world.getTime(); GameState.Dragon.fightEndTime = 0;
                 GameState.Dragon.top1Name = null; GameState.Dragon.top1Damage = 0; GameState.Dragon.top2Name = null; GameState.Dragon.top2Damage = 0; GameState.Dragon.top3Name = null; GameState.Dragon.top3Damage = 0;
             }
-            if (ModConfig.enableDragonAlerts) {
+            // ★変更: 古い判定を削除し、新しい isAlertEnabledFor メソッドで判定
+            if (isAlertEnabledFor(dragonType)) {
                 client.execute(() -> showDragonSpawnAlert(client, dragonType));
             }
             GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
@@ -152,7 +153,7 @@ public class DragonHandler {
     private static void printDragonResult(MinecraftClient client, String dps, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
-                if (ModConfig.showDragonDpsChat && dps != null && duration != null) {
+                if (ModConfig.INSTANCE.dragon.showDragonDpsChat && dps != null && duration != null) {
                     MutableText msg = Text.literal(String.format("§dYour Dragon DPS: %s §7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Dragon.top1Damage > 0) {
                         MutableText hoverText = Text.literal("§6§lTop 3 DPS\n");
@@ -163,7 +164,7 @@ public class DragonHandler {
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
-                if (ModConfig.showDragonLootQualityChat) {
+                if (ModConfig.INSTANCE.dragon.showDragonLootQualityChat) {
                     NotificationUtils.sendSystemChat(client, Text.literal(String.format("§eYour Dragon Loot Quality: %d", lq)));
                     String dropsMsg = String.format("§6Ender Dragon §7(Pet): %s §8| §5Ender Dragon §7(Pet): %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Text.literal(dropsMsg));
@@ -173,6 +174,21 @@ public class DragonHandler {
     }
 
     private static String formatDps(double dps) { return dps >= 1000 ? String.format("%,.1fk", dps / 1000.0) : String.format("%,.1f", dps); }
+
+    // ★追加: ドラゴンの種類に応じてアラート設定がONになっているか確認するメソッド
+    private static boolean isAlertEnabledFor(String dragonType) {
+        if (dragonType == null) return false;
+        return switch (dragonType) {
+            case "Protector" -> ModConfig.INSTANCE.dragon.enableDragonAlert_Protector;
+            case "Old"       -> ModConfig.INSTANCE.dragon.enableDragonAlert_Old;
+            case "Unstable"  -> ModConfig.INSTANCE.dragon.enableDragonAlert_Unstable;
+            case "Young"     -> ModConfig.INSTANCE.dragon.enableDragonAlert_Young;
+            case "Strong"    -> ModConfig.INSTANCE.dragon.enableDragonAlert_Strong;
+            case "Wise"      -> ModConfig.INSTANCE.dragon.enableDragonAlert_Wise;
+            case "Superior"  -> ModConfig.INSTANCE.dragon.enableDragonAlert_Superior;
+            default          -> false; // 万が一未知のドラゴンが出た場合は表示しない
+        };
+    }
 
     // ★Utilsから引き継いだドラゴンスポーンの表示処理
     private static void showDragonSpawnAlert(MinecraftClient client, String dragonType) {
@@ -209,7 +225,8 @@ public class DragonHandler {
             } else if (foundDragonSpawned) {
                 if (scannedType != null) {
                     GameState.Dragon.eggState = "Hatched"; GameState.Dragon.type = scannedType; GameState.Dragon.eyes = 8;
-                    if (ModConfig.enableDragonAlerts) {
+                    // ★変更: 古い判定を削除し、新しい isAlertEnabledFor メソッドで判定
+                    if (isAlertEnabledFor(scannedType)) {
                         final String finalType = scannedType;
                         client.execute(() -> showDragonSpawnAlert(client, finalType));
                     }

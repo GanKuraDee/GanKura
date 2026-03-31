@@ -1,7 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 public class DragonStatusHud extends HudElement {
     public DragonStatusHud() {
         super("dragon", 10, 130, 1.0f, 150, 50,
-                () -> ModConfig.showDragonStatusHud,
+                () -> ModConfig.INSTANCE.dragon.showDragonStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
 

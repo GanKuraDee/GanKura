@@ -1,7 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.ModConfig;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class PetHud extends HudElement {
     public PetHud() {
-        super("pet", 10, 10, 1.0f, 120, 30, () -> ModConfig.showPetHud, () -> true);
+        super("pet", 10, 10, 1.0f, 120, 30, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
     }
 
     @Override

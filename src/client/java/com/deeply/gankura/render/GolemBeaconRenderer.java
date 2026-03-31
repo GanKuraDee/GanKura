@@ -2,7 +2,6 @@ package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
-import com.deeply.gankura.data.ModConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +17,7 @@ public class GolemBeaconRenderer {
 
     public static void submitBeaconState(WorldRenderState worldState, Camera camera) {
         // ★追加: World Location DisplayがOFFならビーコンも描画しない
-        if (!ModConfig.showGolemWorldText) return;
+        if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Beacon) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null) return;

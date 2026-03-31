@@ -1,7 +1,6 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,7 +13,7 @@ public class HotbarOverlayRenderer {
         if (stack.isEmpty()) return;
 
         // 設定でPoison IndicatorがOFFになっている場合は何もせずに終了する
-        if (!ModConfig.showPoisonIndicator) return;
+        if (!ModConfig.INSTANCE.misc.showPoisonIndicator) return;
 
         // =======================================================
         // 弓(Juju/Terminator) への Poison Indicator 描画
