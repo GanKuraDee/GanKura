@@ -1,7 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.render.ModConfig;
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

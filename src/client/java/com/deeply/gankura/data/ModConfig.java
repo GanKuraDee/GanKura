@@ -1,6 +1,7 @@
-package com.deeply.gankura.render;
+package com.deeply.gankura.data;
 
 
+import com.deeply.gankura.render.HudEditorScreen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;

@@ -2,6 +2,7 @@ package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.HudConfig;
+import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;

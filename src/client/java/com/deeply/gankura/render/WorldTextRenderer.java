@@ -1,6 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;

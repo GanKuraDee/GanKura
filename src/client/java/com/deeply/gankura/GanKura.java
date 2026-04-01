@@ -7,7 +7,7 @@ import com.deeply.gankura.handler.ServerRestartHandler;
 import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
-import com.deeply.gankura.render.ModConfig;
+import com.deeply.gankura.data.ModConfig;
 
 import io.github.notenoughupdates.moulconfig.gui.GuiContext;
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent;
