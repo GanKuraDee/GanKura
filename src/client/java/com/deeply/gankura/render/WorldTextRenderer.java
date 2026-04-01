@@ -66,8 +66,8 @@ public class WorldTextRenderer {
 
         Vec3d eyePos = player.getEyePos();
         double distance = eyePos.distanceTo(Vec3d.ofCenter(renderPos));
-        float scale = (float) (distance * 0.005);
-        float textScale = Math.max(0.02f, Math.min(scale, 0.5f));
+        float textScale = (float) (distance * 0.005);
+        textScale = Math.max(0.02f, Math.min(textScale, 0.5f));
 
         GizmoDrawing.blockLabel(textToRender, renderPos, 0, textColor, textScale * 20);
     }

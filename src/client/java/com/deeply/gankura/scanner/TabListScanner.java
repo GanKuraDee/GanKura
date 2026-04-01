@@ -21,6 +21,9 @@ import java.util.List;
 
 public class TabListScanner {
 
+    private static List<String> previousUnformattedLines = null;
+    private static List<String> previousFormattedLines = null;
+
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scanTabList(client));
     }
@@ -50,6 +53,16 @@ public class TabListScanner {
             formattedLines.add(legacyStr);
             unformattedLines.add(legacyStr.replaceAll("(?i)§[0-9A-FK-OR]", "").trim());
         }
+
+        // キャッシュと比較して変更がない場合は処理をスキップ
+        if (previousUnformattedLines != null && previousFormattedLines != null &&
+            previousUnformattedLines.equals(unformattedLines) && previousFormattedLines.equals(formattedLines)) {
+            return;
+        }
+
+        // 更新
+        previousUnformattedLines = new ArrayList<>(unformattedLines);
+        previousFormattedLines = new ArrayList<>(formattedLines);
 
         // ★各専門のハンドラー(担当者)にリストを渡して処理を任せる (単一責任の原則)
         GolemHandler.processTabList(unformattedLines, client);

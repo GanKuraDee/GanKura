@@ -14,6 +14,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,9 @@ public class RareDropScanner {
 
         if (GameState.Player.hasShownDropAlert) return;
 
-        for (Entity entity : client.world.getEntities()) {
+        // プレイヤー周囲30ブロック以内のArmorStandのみスキャン
+        Box scanBox = client.player.getBoundingBox().expand(30.0);
+        for (Entity entity : client.world.getEntitiesByClass(ArmorStandEntity.class, scanBox, e -> true)) {
             if (entity instanceof ArmorStandEntity armorStand) {
                 if (armorStand.hasCustomName()) {
                     Text customName = armorStand.getCustomName();

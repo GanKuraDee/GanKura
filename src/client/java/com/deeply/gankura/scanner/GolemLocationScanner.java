@@ -8,13 +8,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public class GolemLocationScanner {
-    // private static int tickCounter = 0; // 削除
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // ★変更: 制限を撤廃し、毎Tick実行して最速検知を目指す
-            // if (tickCounter++ < 10) return;
-            // tickCounter = 0;
             scan(client);
         });
     }

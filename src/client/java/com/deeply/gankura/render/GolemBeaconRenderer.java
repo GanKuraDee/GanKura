@@ -16,6 +16,10 @@ public class GolemBeaconRenderer {
 
     private static final int MAX_BUILD_HEIGHT = 319;
 
+    private static BlockPos lastRenderPos = null;
+    private static String lastStage = null;
+    private static BeaconBlockEntityRenderState cachedState = null;
+
     public static void submitBeaconState(WorldRenderState worldState, Camera camera) {
         // ★追加: World Location DisplayがOFFならビーコンも描画しない
         if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Beacon) return;
@@ -43,21 +47,29 @@ public class GolemBeaconRenderer {
             renderPos = basePos.add(0, 0, -2);
         }
 
-        int color = isStage4 ? 0xFFFFFFFF : 0xFFFF5555;
+        // 位置やステージが変わった場合のみ再計算
+        if (!renderPos.equals(lastRenderPos) || !stage.equals(lastStage) || cachedState == null) {
+            lastRenderPos = renderPos;
+            lastStage = stage;
 
-        BeaconBlockEntityRenderState state = new BeaconBlockEntityRenderState();
-        state.pos = renderPos;
-        state.blockState = Blocks.BEACON.getDefaultState();
-        state.type = BlockEntityType.BEACON;
-        state.lightmapCoordinates = LightmapTextureManager.MAX_LIGHT_COORDINATE;
-        state.crumblingOverlay = null;
+            int color = isStage4 ? 0xFFFFFFFF : 0xFFFF5555;
 
-        state.beamRotationDegrees = client.world != null ? Math.floorMod(client.world.getTime(), 40) + client.getRenderTickCounter().getTickProgress(true) : 0f;
-        state.beamSegments.add(new BeaconBlockEntityRenderState.BeamSegment(color, MAX_BUILD_HEIGHT));
+            cachedState = new BeaconBlockEntityRenderState();
+            cachedState.pos = renderPos;
+            cachedState.blockState = Blocks.BEACON.getDefaultState();
+            cachedState.type = BlockEntityType.BEACON;
+            cachedState.lightmapCoordinates = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+            cachedState.crumblingOverlay = null;
+
+            cachedState.beamSegments.add(new BeaconBlockEntityRenderState.BeamSegment(color, MAX_BUILD_HEIGHT));
+        }
+
+        // 動的な部分のみ更新
+        cachedState.beamRotationDegrees = client.world != null ? Math.floorMod(client.world.getTime(), 40) + client.getRenderTickCounter().getTickProgress(true) : 0f;
 
         float length = (float) camera.getCameraPos().subtract(renderPos.toCenterPos()).horizontalLength();
-        state.beamScale = client.player != null && client.player.isUsingSpyglass() ? 1.0F : Math.max(1.0F, length / 96.0F);
+        cachedState.beamScale = client.player != null && client.player.isUsingSpyglass() ? 1.0F : Math.max(1.0F, length / 96.0F);
 
-        worldState.blockEntityRenderStates.add(state);
+        worldState.blockEntityRenderStates.add(cachedState);
     }
 }
