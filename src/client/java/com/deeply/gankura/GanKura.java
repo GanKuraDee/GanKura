@@ -19,6 +19,7 @@ import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -34,6 +35,7 @@ public class GanKura implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModConfig.load();
         NetworkHandler.init();
         TabListScanner.register();
         GolemLocationScanner.register();
@@ -55,6 +57,12 @@ public class GanKura implements ClientModInitializer {
                 openHudNextTick = false;
                 client.setScreen(new HudEditorScreen());
             }
+        });
+
+        // ★追加: ゲーム終了時に、確実に最新の設定をファイルに保存（セーブ）する！
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            ModConfig.INSTANCE.saveNow();
+            LOGGER.info("GanKura config saved successfully on exit.");
         });
 
         // コマンドの登録

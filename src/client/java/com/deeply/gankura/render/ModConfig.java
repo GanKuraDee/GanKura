@@ -1,6 +1,8 @@
 package com.deeply.gankura.render;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.annotations.*;
@@ -9,12 +11,63 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.Optional;
 
 public class ModConfig extends Config {
 
-    // MoulConfigは「インスタンス（実体）」として扱うのがルールです
-    public static final ModConfig INSTANCE = new ModConfig();
+    // ★修正1: final を外して、ファイルから読み込んだデータで上書きできるようにします
+    public static ModConfig INSTANCE = new ModConfig();
+
+    // ★修正2: セーブ＆ロード用のGsonを準備 (@Expose が付いた変数だけを処理する設定)
+    private static final Gson GSON = new GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation()
+            .setPrettyPrinting()
+            .create();
+
+    // ★修正3: 保存先を config/gankura/gankura_config.properties に変更
+    private static File getConfigFile() {
+        // "config/gankura" というフォルダへのパスを作成
+        File dir = new File(FabricLoader.getInstance().getConfigDir().toFile(), "gankura");
+
+        // もし "gankura" フォルダが存在しなければ、新しく作成する
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // そのフォルダの中の "gankura_config.properties" を指定
+        return new File(dir, "gankura_config.properties");
+    }
+    // ★修正4: 起動時にファイルを読み込むメソッドを強化
+    public static void load() {
+        File file = getConfigFile();
+        if (file.exists()) {
+            try (FileReader reader = new FileReader(file)) {
+                ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
+                if (loaded != null) {
+                    INSTANCE = loaded;
+                }
+            } catch (Exception e) {
+                System.err.println("[GanKura] Old config format detected or file corrupted. Overwriting with JSON...");
+                // 古いproperties形式のテキストが残っていてエラーになった場合は、無視して新しいJSON形式で上書きさせます
+            }
+        }
+
+        // ★超重要: Gsonでデータを読み込むと、transient（保存除外）にしていた「ボタンの処理」が消滅してしまうため、ここで再セットする！
+        if (INSTANCE.gui == null) {
+            INSTANCE.gui = new GuiCategory();
+        }
+        INSTANCE.gui.openHudEditor = () -> {
+            MinecraftClient.getInstance().send(() -> {
+                MinecraftClient.getInstance().setScreen(new HudEditorScreen());
+            });
+        };
+
+        // 起動時やエラー発生時に、確実に現在の設定をJSON形式でファイルに書き込んでおく
+        INSTANCE.saveNow();
+    }
 
     @Override
     public StructuredText getTitle() {
@@ -32,10 +85,19 @@ public class ModConfig extends Config {
         }
         return "Unknown"; // 取得に失敗した場合の保険
     }
+
+    // ==========================================
+    // ★追加: 消えてしまっていた「セーブ処理」の本体を復活！
+    // ==========================================
     @Override
     public void saveNow() {
-        // ※MoulConfigのバージョンによっては自動保存されますが、
-        // 必要であればここにGsonなどを使ったファイル保存処理を書きます。
+        try (FileWriter writer = new FileWriter(getConfigFile())) {
+            // Gsonを使って、現在の設定をJSON形式でファイルに書き込む
+            GSON.toJson(this, writer);
+        } catch (Exception e) {
+            System.err.println("Failed to save GanKura config!");
+            e.printStackTrace();
+        }
     }
 
     // ==========================================
