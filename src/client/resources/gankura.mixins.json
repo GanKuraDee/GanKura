@@ -1,0 +1,19 @@
+{
+	"required": true,
+	"package": "com.deeply.gankura.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+      	"EntityGlowingMixin",
+		"HotbarItemMixin",
+		"HudRenderMixin",
+		"WorldBeaconRenderMixin",
+		"WorldTimeMixin",
+		"WorldTextRenderMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
