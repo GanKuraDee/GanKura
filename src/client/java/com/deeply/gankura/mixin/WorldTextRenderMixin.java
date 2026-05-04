@@ -12,9 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DebugRenderer.class)
 public class WorldTextRenderMixin {
 
-    @Inject(at = @At("TAIL"), method = "render")
-    private void onRender(Frustum frustum, double cameraX, double cameraY, double cameraZ, float tickProgress, CallbackInfo ci) {
-        // 実際のワールド描画処理は、専用のレンダラークラスに丸投げする
+    /**
+     * Minecraft 26.1.2 仕様:
+     * DebugRenderer クラスでは render メソッドが廃止され、emitGizmos に統合されました。
+     *
+     * メソッドシグネチャ (引数):
+     * Frustum frustum, double camX, double camY, double camZ, float partialTicks
+     */
+    @Inject(at = @At("TAIL"), method = "emitGizmos")
+    private void onEmitGizmos(Frustum frustum, double camX, double camY, double camZ, float partialTicks, CallbackInfo ci) {
+        // ギズモの収集タイミングで、私たちのテキストレンダラーを呼び出す
         WorldTextRenderer.render(Minecraft.getInstance());
     }
 }

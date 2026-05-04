@@ -6,7 +6,7 @@ import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class DayHud extends HudElement {
     public DayHud() {
@@ -18,17 +18,24 @@ public class DayHud extends HudElement {
         Minecraft client = Minecraft.getInstance();
         Font font = client.font;
 
-        // ワールド時刻から日数を計算 (1日 = 24,000 ticks)
-        long day = client.level != null ? client.level.getDayTime() / 24000L : 0;
+        long day = 0;
+        /*
+         * ClientLevel.class の L178 および L517 (内部クラス ClientLevelData) を参照
+         * getLevelData() は ClientLevelData 型を返し、
+         * その中の getGameTime() がワールドの累積ティック数を保持しています。
+         */
+        if (client.level != null) {
+            // getDayTime() ではなく getGameTime() を使用します
+            day = client.level.getLevelData().getGameTime() / 24000L;
+        }
+
         int color = 0xFFFFFFFF;
         boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
 
-        // 特定条件下でのアラート色（赤）の判定
         if (ModConfig.INSTANCE.golem.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             color = 0xFFFF5555;
         }
 
-        // GuiGraphicsExtractor のメソッド: text(Font, String, x, y, color, shadow)
         graphics.text(font, "Day: " + String.format("%,d", day), 0, 0, color, true);
     }
 }

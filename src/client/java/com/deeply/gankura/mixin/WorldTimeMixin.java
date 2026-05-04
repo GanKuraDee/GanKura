@@ -11,13 +11,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPacketListener.class)
 public class WorldTimeMixin {
 
-    // ★変更: onWorldTimeUpdate -> handleSetTime
+    /**
+     * Minecraft 26.1.2 における時間同期パケットの処理
+     * method: handleSetTime (ClientboundSetTimePacket を受け取るメソッド)
+     */
     @Inject(method = "handleSetTime", at = @At("RETURN"))
     private void onWorldTimeUpdate(ClientboundSetTimePacket packet, CallbackInfo ci) {
 
-        // ★変更: time() -> getGameTime()
-        // ※もしマイクラ内の「1日の時刻（0〜24000）」が必要な場合は getDayTime() を使用してください。
-        GameState.Server.lastTimePacket = packet.getGameTime();
+        // ★修正: getGameTime() -> gameTime()
+        // Record 型のため、Getter ではなくフィールド名そのままのメソッドを呼びます
+        GameState.Server.lastTimePacket = packet.gameTime();
         GameState.Server.lastPacketArrivalMillis = System.currentTimeMillis();
 
     }
