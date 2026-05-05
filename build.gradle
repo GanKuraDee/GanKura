@@ -12,6 +12,7 @@ base {
 
 repositories {
 	maven { url "https://maven.notenoughupdates.org/releases/" }
+	maven { url = "https://maven.terraformersmc.com/releases" }
 }
 
 loom {
@@ -37,6 +38,8 @@ dependencies {
 
 	modImplementation("org.notenoughupdates.moulconfig:modern-1.21.11:4.5.0")
 	include("org.notenoughupdates.moulconfig:modern-1.21.11:4.5.0")
+
+	modImplementation("com.terraformersmc:modmenu:17.0.0")
 
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
 	include("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")

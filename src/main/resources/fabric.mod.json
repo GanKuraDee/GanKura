@@ -3,7 +3,7 @@
 	"id": "gankura",
 	"version": "${version}",
 	"name": "GanKura",
-	"description": "A Hypixel Skyblock Mod focused on End Stone Protector.",
+	"description": "A Hypixel Skyblock Mod focused on Area Mini-bosses.",
 	"authors": [
 		"GanKuraDee"
 	],
@@ -17,11 +17,14 @@
 	"entrypoints": {
 		"client": [
 			"com.deeply.gankura.GanKura"
+		],
+		"modmenu": [
+			"com.deeply.gankura.compat.ModMenuIntegration"
 		]
 	},
 	"mixins": [
 		{
-			"config": "gankura.client.mixins.json",
+			"config": "gankura.mixins.json",
 			"environment": "client"
 		}
 	],
