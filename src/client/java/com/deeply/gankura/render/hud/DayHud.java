@@ -18,16 +18,8 @@ public class DayHud extends HudElement {
         Minecraft client = Minecraft.getInstance();
         Font font = client.font;
 
-        long day = 0;
-        /*
-         * ClientLevel.class の L178 および L517 (内部クラス ClientLevelData) を参照
-         * getLevelData() は ClientLevelData 型を返し、
-         * その中の getGameTime() がワールドの累積ティック数を保持しています。
-         */
-        if (client.level != null) {
-            // getDayTime() ではなく getGameTime() を使用します
-            day = client.level.getLevelData().getGameTime() / 24000L;
-        }
+        // ★変更: ClientLevel からではなく、Mixin で傍受したサーバーの正確な dayTime を使用する
+        long day = GameState.Server.dayTime / 24000L;
 
         int color = 0xFFFFFFFF;
         boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);

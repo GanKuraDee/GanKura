@@ -16,6 +16,7 @@ public class GameState {
         public static boolean isClosing = false;
         public static String closingTime = null;
         public static long lastWorldJoinTime = 0;
+        public static long dayTime = 0;
 
         public static void reset() {
             id = "Unknown"; gametype = "Unknown"; mode = "Unknown"; map = "Unknown";

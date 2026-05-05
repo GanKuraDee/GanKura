@@ -7,16 +7,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.blockentity.state.BeaconRenderState;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
 
 public class GolemBeaconRenderer {
 
     private static final int MAX_BUILD_HEIGHT = 319;
 
+    // ★修正1: static の cachedState はマルチスレッド描画でバグるため廃止しました
     private static BlockPos lastRenderPos = null;
     private static String lastStage = null;
-    private static BeaconRenderState cachedState = null;
 
     public static void submitBeaconState(LevelRenderState worldState, Camera camera) {
         if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Beacon) return;
@@ -37,41 +36,31 @@ public class GolemBeaconRenderer {
 
         BlockPos basePos = GameState.Player.locationPos;
         BlockPos renderPos = isStage4 ? basePos.offset(0, 1, -2) : basePos.offset(0, 0, -2);
+        int color = isStage4 ? 0xFFFFFFFF : 0xFFFF5555;
 
-        if (!renderPos.equals(lastRenderPos) || !stage.equals(lastStage) || cachedState == null) {
-            lastRenderPos = renderPos;
-            lastStage = stage;
+        // ★修正2: 毎フレーム新しい State を作成し、スレッド間のデータ競合を防ぐ
+        BeaconRenderState state = new BeaconRenderState();
+        state.blockPos = renderPos;
+        state.blockEntityType = net.minecraft.world.level.block.entity.BlockEntityType.BEACON;
 
-            int color = isStage4 ? 0xFFFFFFFF : 0xFFFF5555;
+        state.sections.clear();
+        state.sections.add(new BeaconRenderState.Section(color, MAX_BUILD_HEIGHT));
 
-            cachedState = new BeaconRenderState();
-
-            // ★修正1: 継承元のフィールドへのアクセス
-            // もし直接代入でエラーが出る場合は cachedState.setBlockPos(renderPos) 等を試してください
-            cachedState.blockPos = renderPos;
-            // privateアクセスエラー対策:
-            // 本来はコンストラクタや内部メソッドで設定されますが、手動生成の場合は一旦これで試します
-            // エラーが出る場合は「cachedState.blockState = ...」の代わりに適切なSetterを探してください
-            // (提示されたソースにはありませんでしたが、継承元にあるはずです)
-
-            // ★修正2: sections (List) と Section レコード (2引数: color, height)
-            cachedState.sections.clear();
-            cachedState.sections.add(new BeaconRenderState.Section(color, MAX_BUILD_HEIGHT));
-        }
-
-        // ★修正3: フィールド名を提示されたソースに合わせる
-        // animationTime (回転) と beamRadiusScale (太さ/スケール)
+        // ★修正3: floatの桁落ち（精度低下によるカクつき）対策
         float partialTicks = client.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-        cachedState.animationTime = client.level != null ? (client.level.getGameTime() + partialTicks) : 0f;
+        long gameTime = client.level.getLevelData().getGameTime();
 
-        // 距離計算 (Camera.position() を使用)
+        // Math.floorMod を使って巨大な時間を 24000 の余りに変換し、
+        // 小数点以下(partialTicks)が切り捨てられずに滑らかにアニメーションするようにします
+        state.animationTime = (Math.floorMod(gameTime, 24000) + partialTicks);
+
         double dx = camera.position().x - renderPos.getCenter().x;
         double dz = camera.position().z - renderPos.getCenter().z;
         float length = (float) Math.sqrt(dx * dx + dz * dz);
 
-        // スコープ使用時は等倍、それ以外は距離に応じてスケールアップ
-        cachedState.beamRadiusScale = client.player != null && client.player.isScoping() ? 1.0F : Math.max(1.0F, length / 96.0F);
+        state.beamRadiusScale = client.player != null && client.player.isScoping() ? 1.0F : Math.max(1.0F, length / 96.0F);
 
-        worldState.blockEntityRenderStates.add(cachedState);
+        // 描画キューに追加
+        worldState.blockEntityRenderStates.add(state);
     }
 }
