@@ -43,7 +43,7 @@ public class EntityGlowingMixin {
             }
             else if (entity instanceof EnderDragonEntity) {
                 // ドラゴン: ライトパープル
-                cir.setReturnValue(0xAA55FF);
+                cir.setReturnValue(0xFF55FF);
             }
             else {
                 // それ以外（予備）: 白色

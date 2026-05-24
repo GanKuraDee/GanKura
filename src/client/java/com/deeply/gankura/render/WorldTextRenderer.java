@@ -96,7 +96,7 @@ public class WorldTextRenderer {
                 color = 0xFFFF5555;
             } else if (entity instanceof EnderDragonEntity) {
                 if (!ModConfig.INSTANCE.dragon.enableDragonTracer) continue;
-                color = 0xFFAA55FF;
+                color = 0xFFFF55FF;
             } else {
                 continue;
             }
