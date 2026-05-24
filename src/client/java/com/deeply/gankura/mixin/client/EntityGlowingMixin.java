@@ -2,6 +2,7 @@ package com.deeply.gankura.mixin.client;
 
 import com.deeply.gankura.render.EntityHighlightManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,12 +34,16 @@ public class EntityGlowingMixin {
 
             // --- ボスごとに色を変更 ---
             if (entity instanceof IronGolemEntity) {
-                // ゴーレム: 金色 (Hexコード: FFAA00)
+                // ゴーレム: 金色
                 cir.setReturnValue(0xFFAA00);
             }
             else if (entity instanceof SpiderEntity) {
-                // ブルードマザー: 赤色 (Hexコード: FF5555)
+                // ブルードマザー: 赤色
                 cir.setReturnValue(0xFF5555);
+            }
+            else if (entity instanceof EnderDragonEntity) {
+                // ドラゴン: ライトパープル
+                cir.setReturnValue(0xAA55FF);
             }
             else {
                 // それ以外（予備）: 白色
@@ -46,4 +51,5 @@ public class EntityGlowingMixin {
             }
         }
     }
+
 }

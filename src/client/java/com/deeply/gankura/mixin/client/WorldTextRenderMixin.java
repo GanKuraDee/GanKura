@@ -14,7 +14,6 @@ public class WorldTextRenderMixin {
 
     @Inject(at = @At("TAIL"), method = "render")
     private void onRender(Frustum frustum, double cameraX, double cameraY, double cameraZ, float tickProgress, CallbackInfo ci) {
-        // 実際のワールド描画処理は、専用のレンダラークラスに丸投げする
-        WorldTextRenderer.render(MinecraftClient.getInstance());
+        WorldTextRenderer.render(MinecraftClient.getInstance(), tickProgress);
     }
 }

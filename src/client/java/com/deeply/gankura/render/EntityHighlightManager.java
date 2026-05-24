@@ -6,6 +6,7 @@ import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.text.Text;
@@ -35,7 +36,9 @@ public class EntityHighlightManager {
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.broodmother.enableBroodmotherHighlight;
 
-        if (!scanGolem && !scanBroodmother) return;
+        boolean scanDragon = isTheEnd && "Hatched".equals(GameState.Dragon.eggState) && ModConfig.INSTANCE.dragon.enableDragonHighlight;
+
+        if (!scanGolem && !scanBroodmother && !scanDragon) return;
 
         for (Entity entity : client.world.getEntities()) {
             Text customName = entity.getCustomName();
@@ -61,6 +64,23 @@ public class EntityHighlightManager {
                     if (closestSpider != null) {
                         highlightedEntities.add(closestSpider);
                     }
+                }
+
+                if (scanDragon && nameStr.contains("Dragon")) {
+                    Box searchBox = entity.getBoundingBox().expand(20.0);
+                    List<EnderDragonEntity> dragons = client.world.getEntitiesByClass(EnderDragonEntity.class, searchBox, e -> true);
+                    Entity closestDragon = getClosestEntity(dragons, entity);
+                    if (closestDragon != null) {
+                        highlightedEntities.add(closestDragon);
+                    }
+                }
+            }
+        }
+
+        if (scanDragon && highlightedEntities.stream().noneMatch(e -> e instanceof EnderDragonEntity)) {
+            for (Entity entity : client.world.getEntities()) {
+                if (entity instanceof EnderDragonEntity) {
+                    highlightedEntities.add(entity);
                 }
             }
         }

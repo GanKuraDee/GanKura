@@ -100,18 +100,18 @@ public class GolemHandler {
         client.execute(() -> {
             if (client.player != null) {
                 if (ModConfig.INSTANCE.golem.showDpsChat && dps != null && duration != null) {
-                    MutableText msg = Text.literal(String.format("§bYour Golem DPS: %s §7(%s) ", dps, duration));
+                    MutableText msg = Text.literal(String.format("§6Your Golem DPS: §l§o%s §r§7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Golem.top1Damage > 0) {
                         MutableText hoverText = Text.literal("§6§lTop 3 DPS\n");
-                        hoverText.append(Text.literal(String.format("§e#1 §f%s §7- §b%s", GameState.Golem.top1Name, formatDps(GameState.Golem.top1Damage / durationSeconds))));
-                        if (GameState.Golem.top2Damage > 0) hoverText.append(Text.literal(String.format("\n§6#2 §f%s §7- §b%s", GameState.Golem.top2Name, formatDps(GameState.Golem.top2Damage / durationSeconds))));
-                        if (GameState.Golem.top3Damage > 0) hoverText.append(Text.literal(String.format("\n§c#3 §f%s §7- §b%s", GameState.Golem.top3Name, formatDps(GameState.Golem.top3Damage / durationSeconds))));
-                        msg.append(Text.literal("§8§l[§e§lHOVER§8§l]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
+                        hoverText.append(Text.literal(String.format("§e#1 §f%s §7- §6§l§o%s", GameState.Golem.top1Name, formatDps(GameState.Golem.top1Damage / durationSeconds))));
+                        if (GameState.Golem.top2Damage > 0) hoverText.append(Text.literal(String.format("\n§6#2 §f%s §7- §6§l§o%s", GameState.Golem.top2Name, formatDps(GameState.Golem.top2Damage / durationSeconds))));
+                        if (GameState.Golem.top3Damage > 0) hoverText.append(Text.literal(String.format("\n§c#3 §f%s §7- §6§l§o%s", GameState.Golem.top3Name, formatDps(GameState.Golem.top3Damage / durationSeconds))));
+                        msg.append(Text.literal("§6§l§o[HOVER]").setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
                 if (ModConfig.INSTANCE.golem.showLootQualityChat) {
-                    NotificationUtils.sendSystemChat(client, Text.literal(String.format("§eYour Golem Loot Quality: %d", lq)));
+                    NotificationUtils.sendSystemChat(client, Text.literal(String.format("§6Your Golem Loot Quality: §l§o%d", lq)));
                     String dropsMsg = String.format("§6Tier Boost Core: %s §8| §6Golem §7(Pet): %s §8| §5Golem §7(Pet): %s", (lq >= 250) ? "§a✔" : "§c✘", (lq >= 235) ? "§a✔" : "§c✘", (lq >= 220) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Text.literal(dropsMsg));
                 }

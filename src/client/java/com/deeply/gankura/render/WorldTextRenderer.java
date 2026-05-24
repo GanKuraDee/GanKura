@@ -4,6 +4,10 @@ import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.mob.SpiderEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -11,13 +15,11 @@ import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
 public class WorldTextRenderer {
 
-    // Mixinからはこのメソッドだけが呼ばれる
-    public static void render(MinecraftClient client) {
+    public static void render(MinecraftClient client, float tickProgress) {
         if (client.player == null) return;
 
-        // 今後、描画要素が増えたらここに足していくだけ！
-        // 例: renderBroodmotherWaypoint(client, client.player);
         renderGolemWaypoint(client, client.player);
+        renderBossTracers(client, tickProgress);
     }
 
     private static void renderGolemWaypoint(MinecraftClient client, PlayerEntity player) {
@@ -70,5 +72,38 @@ public class WorldTextRenderer {
         textScale = Math.max(0.02f, Math.min(textScale, 0.5f));
 
         GizmoDrawing.blockLabel(textToRender, renderPos, 0, textColor, textScale * 20);
+    }
+
+    private static void renderBossTracers(MinecraftClient client, float tickProgress) {
+        if (EntityHighlightManager.highlightedEntities.isEmpty()) return;
+
+        PlayerEntity player = client.player;
+        if (player == null) return;
+
+        // 目線から視線方向へ0.5ブロック前方にオフセット
+        // → 一人称時にカメラ原点と始点が重ならず画面中央から線が見える
+        Vec3d eyePos = player.getLerpedPos(tickProgress)
+                .add(0, player.getEyeHeight(player.getPose()), 0);
+        Vec3d from = eyePos.add(player.getRotationVec(tickProgress).multiply(0.5));
+
+        for (Entity entity : EntityHighlightManager.highlightedEntities) {
+            int color;
+            if (entity instanceof IronGolemEntity) {
+                if (!ModConfig.INSTANCE.golem.enableGolemTracer) continue;
+                color = 0xFFFFAA00;
+            } else if (entity instanceof SpiderEntity) {
+                if (!ModConfig.INSTANCE.broodmother.enableBroodmotherTracer) continue;
+                color = 0xFFFF5555;
+            } else if (entity instanceof EnderDragonEntity) {
+                if (!ModConfig.INSTANCE.dragon.enableDragonTracer) continue;
+                color = 0xFFAA55FF;
+            } else {
+                continue;
+            }
+
+            // エンティティの補間済み中心位置
+            Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
+            GizmoDrawing.line(from, to, color, 4.0f).ignoreOcclusion();
+        }
     }
 }
