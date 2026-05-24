@@ -1,7 +1,14 @@
 # GanKura
-GanKura is a Hypixel Skyblock Mod focused on End Stone Protector etc, inspired by GolemUtils https://chattriggers.com/modules/v/GolemUtils
+GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
 
-Type /gankura to open the settings menu.
+#### Currently supported:
+- End Stone Protector
+- Dragon
+- Broodmother
+
+#### Commands:
+- /gankura - Open the main settings screen
+- /gankura hud - Open the HUD movement and scaling settings screen
 
 # Features
 <details><summary>End Stone Protector</summary><ul><li><strong>Stage Display</strong></li><ul><li>Displays the golem's stage on the HUD.</li></ul></ul><ul><li><strong>Location Display</strong></li><ul><li>Displays the golem's spawn location on the HUD.</li></ul></ul><ul><li><strong>Spawning Countdown</strong></li><ul><li>Displays 20s countdown on the HUD until the golem spawns. (Considering the server ticks)</li></ul></ul><ul><li><strong>HP Display</strong></li><ul><li>Displays the golem's HP on the HUD.</li></ul></ul><ul><li><strong>Stage 4 Duration Display</strong></li><ul><li>Displays the time it took for the golem to reach Stage 5 on the HUD and chat.</li></ul></ul><ul><li><strong>Stage 4 & 5 Title</strong></li><ul><li>Displays the title and plays a sound when golem's stage is 4 or 5.</li></ul></ul><ul><li><strong>DPS Calculator</strong></li><ul><li>Shows the DPS you and the top 3 players have dealt to the golem in the chat. (Considering the server ticks)</li></ul></ul><ul><li><strong>Loot Quality Calculator</strong></li><ul><li>Shows your golem's loot quality in the chat.</li></ul></ul><ul><li><strong>Rare Drop Notification</strong></li><ul><li>Display rare drops from golems in title and chat.</li></ul></ul><ul><li><strong>Loot Tracker</strong></li><ul><li>Displays the HUD with rare drops from golems so far.</li></ul></ul><ul><li><strong>World Location Display</strong></li><ul><li>Displays the golem's spawn location on the world.</li></ul></ul><ul><li><strong>Day 30 Alert</strong></li><ul><li>Announces if the Golem's Stage is 4 and the server's Day is 30 or higher.</li></ul></ul><ul><li><strong>Highlight</strong></li><ul><li>Highlight End Stone Protector in the world.</li></ul></ul></details>
