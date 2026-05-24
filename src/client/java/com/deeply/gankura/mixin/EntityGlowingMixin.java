@@ -4,6 +4,7 @@ import com.deeply.gankura.render.EntityHighlightManager;
 import net.minecraft.world.entity.Entity;
 
 import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.spider.Spider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,6 +43,10 @@ public class EntityGlowingMixin {
             else if (entity instanceof Spider) {
                 // ブルードマザー: 赤色 (Hexコード: FF5555)
                 cir.setReturnValue(0xFF5555);
+            }
+            else if (entity instanceof EnderDragon) {
+                // ドラゴン: ライトパープル (Hexコード: FF55FF)
+                cir.setReturnValue(0xFF55FF);
             }
             else {
                 // それ以外（予備）: 白色

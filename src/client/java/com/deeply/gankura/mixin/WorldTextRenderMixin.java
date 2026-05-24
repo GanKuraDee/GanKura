@@ -21,7 +21,6 @@ public class WorldTextRenderMixin {
      */
     @Inject(at = @At("TAIL"), method = "emitGizmos")
     private void onEmitGizmos(Frustum frustum, double camX, double camY, double camZ, float partialTicks, CallbackInfo ci) {
-        // ギズモの収集タイミングで、私たちのテキストレンダラーを呼び出す
         WorldTextRenderer.render(Minecraft.getInstance());
     }
 }

@@ -154,20 +154,20 @@ public class DragonHandler {
         client.execute(() -> {
             if (client.player != null) {
                 if (ModConfig.INSTANCE.dragon.showDragonDpsChat && dps != null && duration != null) {
-                    MutableComponent msg = Component.literal(String.format("§dYour Dragon DPS: %s §7(%s) ", dps, duration));
+                    MutableComponent msg = Component.literal(String.format("§dYour Dragon DPS: §l§o%s §r§7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Dragon.top1Damage > 0) {
-                        MutableComponent hoverText = Component.literal("§6§lTop 3 DPS\n");
-                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- §b%s", GameState.Dragon.top1Name, formatDps(GameState.Dragon.top1Damage / durationSeconds))));
-                        if (GameState.Dragon.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §b%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
-                        if (GameState.Dragon.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §b%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
+                        MutableComponent hoverText = Component.literal("§d§lTop 3 DPS\n");
+                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- §d§l§o%s", GameState.Dragon.top1Name, formatDps(GameState.Dragon.top1Damage / durationSeconds))));
+                        if (GameState.Dragon.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §d§l§o%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
+                        if (GameState.Dragon.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §d§l§o%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
                         // Yarnの HoverEvent.ShowText は HoverEvent.Action.SHOW_TEXT になります。また、.setStyle は .withStyle になります。
-                        msg.append(Component.literal("§8§l[§e§lHOVER§8§l]")
+                        msg.append(Component.literal("§d§l[HOVER]")
                                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
                 if (ModConfig.INSTANCE.dragon.showDragonLootQualityChat) {
-                    NotificationUtils.sendSystemChat(client, Component.literal(String.format("§eYour Dragon Loot Quality: %d", lq)));
+                    NotificationUtils.sendSystemChat(client, Component.literal(String.format("§dYour Dragon Loot Quality: §l§o%d", lq)));
                     String dropsMsg = String.format("§6Ender Dragon §7(Pet): %s §8| §5Ender Dragon §7(Pet): %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Component.literal(dropsMsg));
                 }

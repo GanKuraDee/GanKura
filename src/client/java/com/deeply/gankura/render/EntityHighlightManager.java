@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.phys.AABB;
 
@@ -25,47 +26,54 @@ public class EntityHighlightManager {
     }
 
     private static void updateHighlights(Minecraft client) {
-        highlightedEntities.clear();
+        if (client.level == null || client.player == null) {
+            highlightedEntities.clear();
+            return;
+        }
 
-        if (client.level == null || client.player == null) return;
-
-        // ★修正: 設定がOFFの場合はそもそもスキャン対象外にする
         boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage) && ModConfig.INSTANCE.golem.enableGolemHighlight;
 
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.broodmother.enableBroodmotherHighlight;
 
-        if (!scanGolem && !scanBroodmother) return;
+        boolean scanDragon = isTheEnd && GameState.Dragon.type != null && ModConfig.INSTANCE.dragon.enableDragonHighlight;
 
-        // Yarn: client.world.getEntities() -> Mojang: client.level.entitiesForRendering()
+        // 条件が無効になったカテゴリのエンティティを削除
+        if (!scanGolem)       highlightedEntities.removeIf(e -> e instanceof IronGolem);
+        if (!scanBroodmother) highlightedEntities.removeIf(e -> e instanceof Spider);
+        if (!scanDragon)      highlightedEntities.removeIf(e -> e instanceof EnderDragon);
+
+        // ワールドから削除済みのエンティティを削除
+        highlightedEntities.removeIf(Entity::isRemoved);
+
+        if (!scanGolem && !scanBroodmother && !scanDragon) return;
+
+        // フラスタム内のエンティティから新たに追加（既存エンティティはそのまま維持）
         for (Entity entity : client.level.entitiesForRendering()) {
             Component customName = entity.getCustomName();
-            if (customName != null) {
-                String nameStr = customName.getString();
+            if (customName == null) continue;
+            String nameStr = customName.getString();
 
-                if (scanGolem && nameStr.contains("End Stone Protector")) {
-                    // Yarn: expand(8.0) -> Mojang: inflate(8.0)
-                    AABB searchBox = entity.getBoundingBox().inflate(8.0);
-                    // Yarn: getEntitiesByClass -> Mojang: getEntitiesOfClass
-                    List<IronGolem> golems = client.level.getEntitiesOfClass(IronGolem.class, searchBox, e -> true);
+            if (scanGolem && nameStr.contains("End Stone Protector")) {
+                AABB searchBox = entity.getBoundingBox().inflate(8.0);
+                List<IronGolem> golems = client.level.getEntitiesOfClass(IronGolem.class, searchBox, e -> true);
+                Entity closest = getClosestEntity(golems, entity);
+                if (closest != null) highlightedEntities.add(closest);
+            }
 
-                    Entity closestGolem = getClosestEntity(golems, entity);
-                    if (closestGolem != null) {
-                        highlightedEntities.add(closestGolem);
-                    }
-                }
+            if (scanBroodmother && nameStr.contains("Broodmother")) {
+                AABB searchBox = entity.getBoundingBox().inflate(8.0);
+                List<Spider> spiders = client.level.getEntitiesOfClass(Spider.class, searchBox, e -> true);
+                Entity closest = getClosestEntity(spiders, entity);
+                if (closest != null) highlightedEntities.add(closest);
+            }
 
-                if (scanBroodmother && nameStr.contains("Broodmother")) {
-                    AABB searchBox = entity.getBoundingBox().inflate(8.0);
-
-                    List<Spider> spiders = client.level.getEntitiesOfClass(Spider.class, searchBox, e -> true);
-
-                    Entity closestSpider = getClosestEntity(spiders, entity);
-                    if (closestSpider != null) {
-                        highlightedEntities.add(closestSpider);
-                    }
-                }
+            if (scanDragon && nameStr.contains("Dragon")) {
+                AABB searchBox = entity.getBoundingBox().inflate(32.0);
+                List<EnderDragon> dragons = client.level.getEntitiesOfClass(EnderDragon.class, searchBox, e -> true);
+                Entity closest = getClosestEntity(dragons, entity);
+                if (closest != null) highlightedEntities.add(closest);
             }
         }
     }

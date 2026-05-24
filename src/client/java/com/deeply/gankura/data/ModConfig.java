@@ -280,9 +280,22 @@ public class ModConfig extends Config {
         public boolean enableDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Highlights the Golem through walls.")
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
+        @ConfigEditorAccordion(id = 5)
         @ConfigEditorBoolean
+        public boolean bossHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights the Golem through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
         public boolean enableGolemHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Golem.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean enableGolemTracer = true;
     }
 
     public static class DragonCategory {
@@ -379,6 +392,24 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Rare Drop Notification", desc = "Toggles the notification for rare drops from the Dragon in title and chat.")
         @ConfigEditorBoolean
         public boolean enableDragonDropAlerts = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
+        @ConfigEditorAccordion(id = 3)
+        @ConfigEditorBoolean
+        public boolean bossHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights the Dragon through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 3)
+        public boolean enableDragonHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Dragon.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 3)
+        public boolean enableDragonTracer = true;
     }
 
     public static class BroodmotherCategory {
@@ -456,9 +487,22 @@ public class ModConfig extends Config {
         public boolean showBroodmotherStage4Duration = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Highlights the Broodmother through walls.")
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
+        @ConfigEditorAccordion(id = 3)
         @ConfigEditorBoolean
+        public boolean bossHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights the Broodmother through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 3)
         public boolean enableBroodmotherHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Broodmother.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 3)
+        public boolean enableBroodmotherTracer = true;
     }
 
     public static class MiscCategory {

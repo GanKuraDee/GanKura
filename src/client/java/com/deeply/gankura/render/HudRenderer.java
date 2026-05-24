@@ -41,10 +41,14 @@ public class HudRenderer {
             }
         }
 
+        // --- エンティティトレーサー（画面中央から対象エンティティへの線） ---
+        EntityTracerRenderer.render(graphics, client);
+
         // --- サーバーリブート警告（画面中央固定） ---
         if (ModConfig.INSTANCE.misc.enableRebootAlert && GameState.Server.isClosing && GameState.Server.closingTime != null) {
             renderServerClosingAlert(graphics, client, client.font);
         }
+
     }
 
     private static void renderServerClosingAlert(GuiGraphicsExtractor graphics, Minecraft client, Font font) {

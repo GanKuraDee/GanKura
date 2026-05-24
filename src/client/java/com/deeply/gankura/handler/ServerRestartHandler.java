@@ -29,7 +29,7 @@ public class ServerRestartHandler {
             // ========================================================
             boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
             if (isTargetMap) {
-                long currentDay = client.level.getGameTime() / 24000L;
+                long currentDay = GameState.Server.dayTime / 24000L;
 
                 // 設定がON、且つ条件を満たしている場合のみ実行
                 if (ModConfig.INSTANCE.golem.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
