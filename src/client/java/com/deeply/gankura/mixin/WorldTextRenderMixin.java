@@ -1,5 +1,6 @@
 package com.deeply.gankura.mixin;
 
+import com.deeply.gankura.render.EntityTracerRenderer;
 import com.deeply.gankura.render.WorldTextRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -21,6 +22,8 @@ public class WorldTextRenderMixin {
      */
     @Inject(at = @At("TAIL"), method = "emitGizmos")
     private void onEmitGizmos(Frustum frustum, double camX, double camY, double camZ, float partialTicks, CallbackInfo ci) {
-        WorldTextRenderer.render(Minecraft.getInstance());
+        Minecraft client = Minecraft.getInstance();
+        WorldTextRenderer.render(client);
+        EntityTracerRenderer.emitGizmos(client);
     }
 }
