@@ -161,7 +161,7 @@ public class DragonHandler {
                         if (GameState.Dragon.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §d§l§o%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
                         if (GameState.Dragon.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §d§l§o%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
                         // Yarnの HoverEvent.ShowText は HoverEvent.Action.SHOW_TEXT になります。また、.setStyle は .withStyle になります。
-                        msg.append(Component.literal("§d§l[HOVER]")
+                        msg.append(Component.literal("§d§l§o[HOVER]")
                                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);

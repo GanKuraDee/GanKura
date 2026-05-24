@@ -107,7 +107,7 @@ public class GolemHandler {
                         if (GameState.Golem.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §6§l§o%s", GameState.Golem.top2Name, formatDps(GameState.Golem.top2Damage / durationSeconds))));
                         if (GameState.Golem.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §6§l§o%s", GameState.Golem.top3Name, formatDps(GameState.Golem.top3Damage / durationSeconds))));
                         // Yarnの HoverEvent.ShowText は HoverEvent.Action.SHOW_TEXT に、setStyleはwithStyleに変更
-                        msg.append(Component.literal("§6§l[HOVER]")
+                        msg.append(Component.literal("§6§l§o[HOVER]")
                                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
