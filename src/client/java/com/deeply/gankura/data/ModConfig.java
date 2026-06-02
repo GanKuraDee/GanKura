@@ -692,7 +692,7 @@ public class ModConfig extends Config {
         public boolean showMagmaBossHealthHud = true;
 
         @Expose
-        @ConfigOption(name = "Spawn Status Title", desc = "Shows a title when the Magma Boss spawn status changes (75%, Kill the Magmas, etc.).")
+        @ConfigOption(name = "Stage Status Title", desc = "Shows a title when the Magma Boss stage status changes (75%, Kill the Magmas, etc.).")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossTitle = true;
