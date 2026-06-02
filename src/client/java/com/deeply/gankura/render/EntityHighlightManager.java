@@ -27,6 +27,34 @@ public class EntityHighlightManager {
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
 
+    // Ashfang のフォロワー3種（ハイライト・トレーサーの個別設定付き）
+    public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
+        new CrimsonBossEntry("Ashfang Follower",
+            0x555555, 0xFF555555,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerTracer,
+            () -> GameState.AshfangFollower.isDetected,
+            d -> GameState.AshfangFollower.isDetected = d,
+            () -> null,
+            h -> {}),
+        new CrimsonBossEntry("Ashfang Acolyte",
+            0x5555FF, 0xFF5555FF,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteTracer,
+            () -> GameState.AshfangAcolyte.isDetected,
+            d -> GameState.AshfangAcolyte.isDetected = d,
+            () -> null,
+            h -> {}),
+        new CrimsonBossEntry("Ashfang Underling",
+            0xFF5555, 0xFFFF5555,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingTracer,
+            () -> GameState.AshfangUnderling.isDetected,
+            d -> GameState.AshfangUnderling.isDetected = d,
+            () -> null,
+            h -> {})
+    );
+
     public static final List<CrimsonBossEntry> CRIMSON_BOSSES = List.of(
         new CrimsonBossEntry("Bladesoul",
             0x555555, 0xFF555555,
@@ -98,6 +126,8 @@ public class EntityHighlightManager {
         boolean scanMagmaGlare = isCrimsonIsle
                 && "Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)
                 && ModConfig.INSTANCE.crimsonIsle.enableMagmaBossHighlight;
+        boolean scanAshfangFollowers = isCrimsonIsle
+                && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get());
 
         // 条件が無効になったカテゴリのエンティティを削除
         if (!scanGolem)       highlightedEntities.removeIf(e -> e instanceof IronGolem);
@@ -112,9 +142,10 @@ public class EntityHighlightManager {
             for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
         }
 
-        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare) return;
+        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
+        boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
 
         for (Entity entity : client.level.entitiesForRendering()) {
             Component customName = entity.getCustomName();
@@ -155,7 +186,7 @@ public class EntityHighlightManager {
                     // "Kill the Magmas" フェーズ中は Magma Boss 本体をスキップし Magma Glare のみ対象にする
                     if (scanMagmaGlare && "Magma Boss".equals(boss.nameTag())) continue;
                     if (nameStr.contains(boss.nameTag())) {
-                        Entity visualTarget = findVisualEntity(client, entity);
+                        Entity visualTarget = findVisualEntity(client, entity, boss.nameTag());
                         if (visualTarget != null) {
                             highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, boss);
@@ -174,6 +205,21 @@ public class EntityHighlightManager {
                     }
                 }
             }
+
+            if (scanAshfangFollowers) {
+                for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
+                    CrimsonBossEntry follower = ASHFANG_FOLLOWERS.get(i);
+                    if (!follower.enableHighlight().get() && !follower.enableTracer().get()) continue;
+                    if (nameStr.contains(follower.nameTag())) {
+                        Entity visualTarget = findVisualEntity(client, entity, follower.nameTag());
+                        if (visualTarget != null) {
+                            if (follower.enableHighlight().get()) highlightedEntities.add(visualTarget);
+                            crimsonBossEntities.put(visualTarget, follower);
+                            followerFound[i] = true;
+                        }
+                    }
+                }
+            }
         }
 
         if (scanDragon && highlightedEntities.stream().noneMatch(e -> e instanceof EnderDragon)) {
@@ -187,21 +233,31 @@ public class EntityHighlightManager {
             for (int i = 0; i < CRIMSON_BOSSES.size(); i++) {
                 CRIMSON_BOSSES.get(i).setIsDetected().accept(bossFound[i]);
             }
+            for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
+                ASHFANG_FOLLOWERS.get(i).setIsDetected().accept(followerFound[i]);
+            }
         }
     }
 
-    private static Entity findVisualEntity(Minecraft client, Entity namedEntity) {
+    private static Entity findVisualEntity(Minecraft client, Entity namedEntity, String bossName) {
         if (!(namedEntity instanceof ArmorStand)) return namedEntity;
         AABB box = namedEntity.getBoundingBox().inflate(8.0);
 
-        // Skeleton 系はボスの視覚エンティティとして扱わない
-        // （Bladesoul の Wither Skeleton は別途明示的に追加されるため影響なし）
-        Entity closest = getClosestEntity(
-                client.level.getEntitiesOfClass(Mob.class, box, e -> !(e instanceof AbstractSkeleton)),
-                namedEntity);
-        if (closest != null) return closest;
+        // Barbarian Duke X と Mage Outlaw は Player エンティティ型のボス。
+        // Mob 検索をスキップして直接 Player を探す（近傍 Mob に誤ってマッチするのを防ぐ）
+        boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
+        if (!isPlayerTypeBoss) {
+            // Skeleton 系はボスの視覚エンティティとして扱わない
+            // （Bladesoul の Wither Skeleton は別途明示的に追加されるため影響なし）
+            Entity closest = getClosestEntity(
+                    client.level.getEntitiesOfClass(Mob.class, box, e -> !(e instanceof AbstractSkeleton)),
+                    namedEntity);
+            if (closest != null) return closest;
+        }
 
-        closest = getClosestEntity(client.level.getEntitiesOfClass(Player.class, box, e -> e != client.player), namedEntity);
+        Entity closest = getClosestEntity(
+                client.level.getEntitiesOfClass(Player.class, box, e -> e != client.player),
+                namedEntity);
         if (closest != null) return closest;
 
         return getClosestEntity(client.level.getEntitiesOfClass(ArmorStand.class, box,

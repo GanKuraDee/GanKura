@@ -1,7 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.HudConfig;
-import net.minecraft.client.DeltaTracker;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -25,6 +25,17 @@ public class HudEditorScreen extends Screen {
                 Component.literal("Reset to Default"),
                 button -> HudConfig.resetToDefault()
         ).bounds(this.width / 2 - 75, this.height - 30, 150, 20).build());
+
+        // Minecraft 26.1.x では Screen に mouseScrolled がないため Fabric API で登録する
+        ScreenMouseEvents.beforeMouseScroll(this).register((screen, mouseX, mouseY, h, v) -> {
+            float scroll = (float) v * 0.1f;
+            for (HudElement element : HudConfig.ELEMENTS) {
+                if (element.isEnabled() && element.isHovering(mouseX, mouseY)) {
+                    element.scale = Math.max(0.5f, Math.min(3.0f, element.scale + scroll));
+                    break;
+                }
+            }
+        });
     }
 
     /**

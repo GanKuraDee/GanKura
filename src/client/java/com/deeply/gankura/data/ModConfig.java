@@ -695,6 +695,49 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 32)
         public boolean enableAshfangTracer = true;
 
+        @Expose
+        @ConfigOption(name = "Follower Highlight", desc = "Expand to configure Ashfang follower highlight settings.")
+        @ConfigEditorAccordion(id = 33)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 30)
+        public boolean ashfangFollowerHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Follower Glowing", desc = "Highlights Ashfang Followers through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangFollowerHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Follower Tracer", desc = "Draws a tracer line from your position to Ashfang Followers.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangFollowerTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Acolyte Glowing", desc = "Highlights Ashfang Acolytes through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangAcolyteHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Acolyte Tracer", desc = "Draws a tracer line from your position to Ashfang Acolytes.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangAcolyteTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Underling Glowing", desc = "Highlights Ashfang Underlings through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangUnderlingHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Underling Tracer", desc = "Draws a tracer line from your position to Ashfang Underlings.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 33)
+        public boolean enableAshfangUnderlingTracer = true;
+
         // ---- Magma Boss (id: 40, 41, 42) ----
         @Expose
         @ConfigOption(name = "Magma Boss", desc = "Expand to configure Magma Boss settings.")
