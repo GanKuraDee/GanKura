@@ -1,5 +1,6 @@
 package com.deeply.gankura.mixin;
 
+import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.render.EntityHighlightManager;
 import net.minecraft.world.entity.Entity;
 
@@ -14,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityGlowingMixin {
 
-    // 1. 強制的に発光(Glowing)をONにする
-    // ★変更: Yarnの "isGlowing" は Mojangでは "isCurrentlyGlowing" となります
     @Inject(method = "isCurrentlyGlowing", at = @At("HEAD"), cancellable = true)
     private void forceBossGlowing(CallbackInfoReturnable<Boolean> cir) {
         if (EntityHighlightManager.highlightedEntities.contains((Entity) (Object) this)) {
@@ -23,33 +22,31 @@ public class EntityGlowingMixin {
         }
     }
 
-    // =======================================================
-    // ★追加: 発光色（アウトラインの色）を強制的に上書きする
-    // マイクラが色を取得しようとした瞬間に割り込み、好きな色を渡します。
-    // =======================================================
-    // ★変更: Yarnの "getTeamColorValue" は Mojangでは "getTeamColor" となります
     @Inject(method = "getTeamColor", at = @At("HEAD"), cancellable = true)
     private void overrideGlowingColor(CallbackInfoReturnable<Integer> cir) {
         Entity entity = (Entity) (Object) this;
 
-        // 私たちのハイライトリストに入っているエンティティなら...
         if (EntityHighlightManager.highlightedEntities.contains(entity)) {
+            // Crimson Isle ボス（Wither Skeleton 等を含む）
+            CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
+            if (boss != null) {
+                cir.setReturnValue(boss.glowColorRGB());
+                return;
+            }
 
-            // --- ボスごとに色を変更 ---
-            if (entity instanceof IronGolem) {
-                // ゴーレム: 金色 (Hexコード: FFAA00)
-                cir.setReturnValue(0xFFAA00);
-            }
-            else if (entity instanceof Spider) {
-                // ブルードマザー: 赤色 (Hexコード: FF5555)
+            // Magma Glare (Magma Boss 配下の MagmaCube): 赤
+            if (EntityHighlightManager.magmaGlareEntities.contains(entity)) {
                 cir.setReturnValue(0xFF5555);
+                return;
             }
-            else if (entity instanceof EnderDragon) {
-                // ドラゴン: ライトパープル (Hexコード: FF55FF)
-                cir.setReturnValue(0xFF55FF);
-            }
-            else {
-                // それ以外（予備）: 白色
+
+            if (entity instanceof IronGolem) {
+                cir.setReturnValue(0xFFAA00); // ゴーレム: 金色
+            } else if (entity instanceof Spider) {
+                cir.setReturnValue(0xFF5555); // ブルードマザー: 赤色
+            } else if (entity instanceof EnderDragon) {
+                cir.setReturnValue(0xFF55FF); // ドラゴン: ライトパープル
+            } else {
                 cir.setReturnValue(0xFFFFFF);
             }
         }

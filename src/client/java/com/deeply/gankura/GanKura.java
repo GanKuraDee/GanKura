@@ -1,6 +1,7 @@
 package com.deeply.gankura;
 
 import com.deeply.gankura.handler.ArmorStackHandler;
+import com.deeply.gankura.handler.CrimsonDropHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
@@ -46,6 +47,7 @@ public class GanKura implements ClientModInitializer {
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
         EntityHighlightManager.register();
+        CrimsonDropHandler.register();
 
         // ★追加: 毎ティック（1/20秒）ごとに予約チケットをチェックする
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

@@ -43,11 +43,11 @@ public class BroodmotherHandler {
 
             // ★変更: TitleとSoundを独立して判定
             client.execute(() -> {
-                if (ModConfig.INSTANCE.broodmother.enableStage4Title) {
+                if (ModConfig.INSTANCE.spidersDen.enableStage4Title) {
                     MutableComponent title = Component.literal("BROODMOTHER SOON").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
                     NotificationUtils.showTitle(client, title, null);
                 }
-                if (ModConfig.INSTANCE.broodmother.enableStage4Sound) {
+                if (ModConfig.INSTANCE.spidersDen.enableStage4Sound) {
                     NotificationUtils.playSound(client, SoundEvents.CREEPER_HURT, 1.0f, 1.0f);
                 }
             });
@@ -59,7 +59,7 @@ public class BroodmotherHandler {
             if ("Imminent".equals(oldStage) && GameState.Broodmother.stage4StartTime > 0) {
                 long seconds = (System.currentTimeMillis() - GameState.Broodmother.stage4StartTime) / 1000;
 
-                if (ModConfig.INSTANCE.broodmother.showBroodmotherStage4Duration) {
+                if (ModConfig.INSTANCE.spidersDen.showBroodmotherStage4Duration) {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -75,11 +75,11 @@ public class BroodmotherHandler {
 
             // ★変更: TitleとSoundを独立して判定
             client.execute(() -> {
-                if (ModConfig.INSTANCE.broodmother.enableStage5Title) {
+                if (ModConfig.INSTANCE.spidersDen.enableStage5Title) {
                     MutableComponent title = Component.literal("BROODMOTHER SPAWNED").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
                     NotificationUtils.showTitle(client, title, null);
                 }
-                if (ModConfig.INSTANCE.broodmother.enableStage5Sound) {
+                if (ModConfig.INSTANCE.spidersDen.enableStage5Sound) {
                     NotificationUtils.playSound(client, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, 1.0f, 1.0f);
                 }
             });

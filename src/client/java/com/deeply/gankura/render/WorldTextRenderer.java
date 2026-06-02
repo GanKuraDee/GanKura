@@ -19,7 +19,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGolemWaypoint(Minecraft client, Player player) {
-        if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Text) return;
+        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
 
         String stage = GameState.Golem.stage;

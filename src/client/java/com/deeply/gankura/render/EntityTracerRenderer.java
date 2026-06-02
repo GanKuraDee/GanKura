@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.gizmos.LineGizmo;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
 import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.phys.Vec3;
 
@@ -20,27 +22,43 @@ public class EntityTracerRenderer {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
 
         Vec3 eyePos = client.gameRenderer.getMainCamera().position();
-        // カメラ位置をそのまま使うと射影後の w_clip=0 になり GPU がラインを破棄する。
-        // プレイヤーの視線方向へ 0.2 ブロックずらして近平面より手前を確保する。
         Vec3 startPos = eyePos.add(client.player.getLookAngle().scale(0.2));
 
         for (Entity entity : EntityHighlightManager.highlightedEntities) {
-            if (entity instanceof IronGolem   && !ModConfig.INSTANCE.golem.enableGolemTracer)             continue;
-            if (entity instanceof Spider       && !ModConfig.INSTANCE.broodmother.enableBroodmotherTracer) continue;
-            if (entity instanceof EnderDragon  && !ModConfig.INSTANCE.dragon.enableDragonTracer)           continue;
+            int color;
+
+            // Crimson Isle ボス（Wither Skeleton を含む）
+            CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
+            if (boss != null) {
+                if (!boss.enableTracer().get()) continue;
+                // Bladesoul は Blaze + Wither Skeleton の合体構成。Tracer は Wither Skeleton のみ
+                if ("Bladesoul".equals(boss.nameTag()) && !(entity instanceof WitherSkeleton)) continue;
+                color = boss.tracerColorARGB();
+            }
+            // Magma Glare (Magma Boss 配下の MagmaCube)
+            else if (EntityHighlightManager.magmaGlareEntities.contains(entity)) {
+                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
+                color = 0xFFFF5555; // 赤
+            }
+            // Golem / Broodmother / Dragon
+            else if (entity instanceof IronGolem) {
+                if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;
+                color = 0xFFFFAA00;
+            } else if (entity instanceof Spider) {
+                if (!ModConfig.INSTANCE.spidersDen.enableBroodmotherTracer) continue;
+                color = 0xFFFF5555;
+            } else if (entity instanceof EnderDragon) {
+                if (!ModConfig.INSTANCE.theEnd.enableDragonTracer) continue;
+                color = 0xFFFF55FF;
+            } else {
+                continue; // 該当なし
+            }
 
             Vec3 entityCenter = entity.position().add(0, entity.getBbHeight() / 2.0, 0);
             GizmoProperties props = Gizmos.addGizmo(
-                new LineGizmo(startPos, entityCenter, getTracerColor(entity), LineGizmo.DEFAULT_WIDTH)
+                new LineGizmo(startPos, entityCenter, color, 4.0f)
             );
             props.setAlwaysOnTop();
         }
-    }
-
-    private static int getTracerColor(Entity entity) {
-        if (entity instanceof IronGolem)   return 0xFFFFAA00;
-        if (entity instanceof Spider)      return 0xFFFF5555;
-        if (entity instanceof EnderDragon) return 0xFFFF55FF;
-        return 0xFFFFFFFF;
     }
 }

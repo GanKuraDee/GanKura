@@ -61,7 +61,7 @@ public class RareDropScanner {
                 // 1. Tier Boost Core (金)
                 if (nameString.contains("Tier Boost Core") && hasColor(customName, ChatFormatting.GOLD)) {
                     LootStats.addTierBoostCore();
-                    notifyDrop(client, Component.literal("Tier Boost Core").withStyle(ChatFormatting.GOLD), ModConfig.INSTANCE.golem.enableDropAlerts);
+                    notifyDrop(client, Component.literal("Tier Boost Core").withStyle(ChatFormatting.GOLD), ModConfig.INSTANCE.theEnd.enableDropAlerts);
                     break;
                 }
 
@@ -70,13 +70,13 @@ public class RareDropScanner {
                     if (hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryGolemPet();
                         MutableComponent itemText = Component.literal("Golem").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                        notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
+                        notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
                         break;
                     }
                     else if (hasColor(customName, ChatFormatting.DARK_PURPLE)) {
                         LootStats.addEpicGolemPet();
                         MutableComponent itemText = Component.literal("Golem").withStyle(ChatFormatting.DARK_PURPLE).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                        notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
+                        notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
                         break;
                     }
                 }
@@ -86,13 +86,13 @@ public class RareDropScanner {
                     if (hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryDragonPet();
                         MutableComponent dragonText = Component.literal("Ender Dragon").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                        notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
+                        notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
                         break;
                     }
                     else if (hasColor(customName, ChatFormatting.DARK_PURPLE)) {
                         LootStats.addEpicDragonPet();
                         MutableComponent dragonText = Component.literal("Ender Dragon").withStyle(ChatFormatting.DARK_PURPLE).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                        notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
+                        notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
                         break;
                     }
                 }

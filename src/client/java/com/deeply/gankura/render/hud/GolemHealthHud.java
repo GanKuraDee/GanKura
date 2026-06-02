@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class GolemHealthHud extends HudElement {
     public GolemHealthHud() {
         super("health", 260, 150, 1.0f, 100, 30,
-                () -> ModConfig.INSTANCE.golem.showGolemHealthHud,
+                () -> ModConfig.INSTANCE.theEnd.showGolemHealthHud,
                 () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) && GameState.Golem.health != null);
     }
 

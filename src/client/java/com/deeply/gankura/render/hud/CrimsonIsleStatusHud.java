@@ -1,0 +1,82 @@
+package com.deeply.gankura.render.hud;
+
+import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.render.EntityHighlightManager;
+import com.deeply.gankura.render.HudElement;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
+public class CrimsonIsleStatusHud extends HudElement {
+    public CrimsonIsleStatusHud() {
+        super("crimson_isle_status", 10, 200, 1.0f, 180, 76,
+                () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleStatusHud,
+                () -> ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
+                        || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode));
+    }
+
+    @Override
+    public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
+        Font font = Minecraft.getInstance().font;
+        graphics.text(font, "§c§lNether Boss Status", 0, 0, 0xFFFFFFFF, true);
+        int y = 14;
+        for (var boss : EntityHighlightManager.CRIMSON_BOSSES) {
+            String status;
+            if (isPreview) {
+                status = "§aSpawned";
+            } else if ("Magma Boss".equals(boss.nameTag())) {
+                // Magma Boss はスコアボードのみで判定
+                String sp = GameState.MagmaBoss.spawnStatus;
+                if (sp != null) {
+                    status = "§aSpawned §7(" + sp + ")";
+                } else {
+                    long remaining = GameState.MagmaBoss.respawnEndTime - System.currentTimeMillis();
+                    if (remaining > 0) {
+                        long secs = remaining / 1000;
+                        status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
+                    } else {
+                        status = "§7Ready? §8(may be down)";
+                    }
+                }
+            } else {
+                long respawnEnd = getRespawnEndTime(boss.nameTag());
+                long remaining = respawnEnd - System.currentTimeMillis();
+                if (remaining > 0) {
+                    long secs = remaining / 1000;
+                    status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
+                } else if (boss.getIsDetected().get()) {
+                    status = "§aSpawned";
+                } else {
+                    status = "§7Ready? §8(may be down)";
+                }
+            }
+            String nameColor = colorCode(boss.glowColorRGB());
+            graphics.text(font, nameColor + boss.nameTag() + "§f: " + status, 0, y, 0xFFFFFFFF, true);
+            y += 12;
+        }
+    }
+
+    private static long getRespawnEndTime(String nameTag) {
+        return switch (nameTag) {
+            case "Barbarian Duke X" -> GameState.BarbarianDukeX.respawnEndTime;
+            case "Bladesoul"        -> GameState.Bladesoul.respawnEndTime;
+            case "Mage Outlaw"      -> GameState.MageOutlaw.respawnEndTime;
+            case "Ashfang"          -> GameState.Ashfang.respawnEndTime;
+            case "Magma Boss"       -> GameState.MagmaBoss.respawnEndTime;
+            default                 -> 0L;
+        };
+    }
+
+    private static String colorCode(int rgb) {
+        return switch (rgb) {
+            case 0xFF5555 -> "§c"; // Barbarian Duke X
+            case 0x555555 -> "§8"; // Bladesoul
+            case 0xAA00AA -> "§5"; // Mage Outlaw
+            case 0xAAAAAA -> "§7"; // Ashfang
+            case 0xFFAA00 -> "§6"; // Magma Boss
+            default -> "§f";
+        };
+    }
+}

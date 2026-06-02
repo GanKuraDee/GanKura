@@ -110,11 +110,60 @@ public class GameState {
         }
     }
 
+    public static class BarbarianDukeX {
+        public static boolean isDetected = false;
+        public static String health = null;
+        public static long respawnEndTime = 0;
+        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; }
+    }
+
+    public static class Bladesoul {
+        public static boolean isDetected = false;
+        public static String health = null;
+        public static long respawnEndTime = 0;
+        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; }
+    }
+
+    public static class MageOutlaw {
+        public static boolean isDetected = false;
+        public static String health = null;
+        public static long respawnEndTime = 0;
+        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; }
+    }
+
+    public static class Ashfang {
+        public static boolean isDetected = false;
+        public static String health = null;
+        public static long respawnEndTime = 0;
+        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; }
+    }
+
+    public static class MagmaBoss {
+        public static boolean isDetected = false;
+        public static String health = null;
+        public static long respawnEndTime = 0;
+        public static String spawnStatus = null;
+        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; spawnStatus = null; }
+    }
+
+    public static class CrimsonDrop {
+        public static boolean isScanning = false;
+        public static String killedBoss = null;
+        public static boolean hasShownAlert = false;
+        public static void reset() { isScanning = false; killedBoss = null; hasShownAlert = false; }
+    }
+
     public static void resetAll() {
         Server.reset();
         Player.reset();
         Golem.reset();
         Dragon.reset();
         Broodmother.reset();
+        BarbarianDukeX.reset();
+        Bladesoul.reset();
+        MageOutlaw.reset();
+        Ashfang.reset();
+        MagmaBoss.reset();
+        CrimsonDrop.reset();
     }
 }

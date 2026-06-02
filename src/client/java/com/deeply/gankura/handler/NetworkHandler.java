@@ -47,6 +47,7 @@ public class NetworkHandler {
             // NetworkHandler自身は、メッセージの中身が何なのか一切気にせず担当者に投げるだけ！
             ServerRestartHandler.handleChat(unformattedMsg, client);
             PetHandler.handleMessage(message);
+            CrimsonDropHandler.handleMessage(unformattedMsg);
 
             if (DragonHandler.handleMessage(msg, client)) {
                 return true;

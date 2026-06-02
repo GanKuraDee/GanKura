@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class BroodmotherStatusHud extends HudElement {
     public BroodmotherStatusHud() {
         super("broodmother", 10, 50, 1.0f, 150, 50,
-                () -> ModConfig.INSTANCE.broodmother.showBroodmotherStatusHud,
+                () -> ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
     }
 
@@ -55,7 +55,7 @@ public class BroodmotherStatusHud extends HudElement {
         graphics.text(font, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF, true);
         graphics.text(font, displayStats, 0, 12, 0xFFFFFFFF, true);
 
-        if (timerText != null && ModConfig.INSTANCE.broodmother.showBroodmotherStatusHud_SinceS4) {
+        if (timerText != null && ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud_SinceS4) {
             graphics.text(font, timerText, 0, 24, 0xFFFFFFFF, true);
         }
     }

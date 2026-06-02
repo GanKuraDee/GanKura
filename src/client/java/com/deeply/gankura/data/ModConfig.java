@@ -57,9 +57,10 @@ public class ModConfig extends Config {
         }
 
         // ★超重要: Gsonでデータを読み込むと、transient（保存除外）にしていた「ボタンの処理」が消滅してしまうため、ここで再セットする！
-        if (INSTANCE.gui == null) {
-            INSTANCE.gui = new GuiCategory();
-        }
+        if (INSTANCE.gui == null)         INSTANCE.gui         = new GuiCategory();
+        if (INSTANCE.theEnd == null)      INSTANCE.theEnd      = new TheEndCategory();
+        if (INSTANCE.spidersDen == null)  INSTANCE.spidersDen  = new SpidersDenCategory();
+        if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
         INSTANCE.gui.openHudEditor = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().setScreen(new HudEditorScreen());
@@ -110,16 +111,16 @@ public class ModConfig extends Config {
     public GuiCategory gui = new GuiCategory();
 
     @Expose
-    @Category(name = "End Stone Protector", desc = "Settings for End Stone Protector features.")
-    public GolemCategory golem = new GolemCategory();
+    @Category(name = "The End", desc = "Settings for End Stone Protector and Dragon features.")
+    public TheEndCategory theEnd = new TheEndCategory();
 
     @Expose
-    @Category(name = "Dragon", desc = "Settings for Dragon features.")
-    public DragonCategory dragon = new DragonCategory();
+    @Category(name = "Spider's Den", desc = "Settings for Broodmother features.")
+    public SpidersDenCategory spidersDen = new SpidersDenCategory();
 
     @Expose
-    @Category(name = "Broodmother", desc = "Settings for Broodmother features.")
-    public BroodmotherCategory broodmother = new BroodmotherCategory();
+    @Category(name = "Crimson Isle", desc = "Settings for Crimson Isle bosses.")
+    public CrimsonIsleCategory crimsonIsle = new CrimsonIsleCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Settings for Miscellaneous features.")
@@ -142,367 +143,602 @@ public class ModConfig extends Config {
         };
     }
 
-    public static class GolemCategory {
+    // ==========================================
+    // The End: End Stone Protector + Dragon
+    // ==========================================
+    public static class TheEndCategory {
+
+        // ========== End Stone Protector section ==========
+        @Expose
+        @ConfigOption(name = "End Stone Protector", desc = "Expand to configure End Stone Protector settings.")
+        @ConfigEditorAccordion(id = 0)
+        @ConfigEditorBoolean
+        public boolean golemSection = false;
+
         @Expose
         @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 0) // ★ 新しいグループなので ID を 1 にします
+        @ConfigEditorAccordion(id = 1)
         @ConfigEditorBoolean
-        public boolean hudFolder = false; // ★ 機能を持たないダミー変数
-
-        // ▼ これ以降は「HUD Settings」の中に収納される子要素 ▼
+        @ConfigAccordionId(id = 0)
+        public boolean golemHudFolder = false;
 
         @Expose
         @ConfigOption(name = "Status HUD", desc = "Toggles the Golem Status HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0) // ★ 親と同じ ID 1 で紐付け！
+        @ConfigAccordionId(id = 1)
         public boolean showGolemStatusHud = true;
 
-        // ★追加: GolemのSince S4タイマー用スイッチ
         @Expose
         @ConfigOption(name = "Show Since S4", desc = "Toggles the Since S4 timer in the Status HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0) // 同じHUDアコーディオン(id=0)に収納
+        @ConfigAccordionId(id = 1)
         public boolean showGolemStatusHud_SinceS4 = true;
 
         @Expose
         @ConfigOption(name = "Loot Tracker HUD", desc = "Toggles the Golem Loot Tracker HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0) // ★ 親と同じ ID 1 で紐付け！
+        @ConfigAccordionId(id = 1)
         public boolean showLootTrackerHud = true;
 
         @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Golem Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0) // ★ 親と同じ ID 1 で紐付け！
+        @ConfigAccordionId(id = 1)
         public boolean showGolemHealthHud = true;
 
-        // ==========================================
-        // ★ アコーディオン（折り畳み）の「親」
-        // ==========================================
         @Expose
         @ConfigOption(name = "World Location Display", desc = "Expand to configure Text and Beacon settings.")
-        @ConfigEditorAccordion(id = 1) // ★ 親のIDを「0」とする
+        @ConfigEditorAccordion(id = 2)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
         public boolean worldLocationFolder = false;
 
-        // ==========================================
-        // ★ アコーディオンの中に収納される「子」
-        // ==========================================
         @Expose
         @ConfigOption(name = "Show Text", desc = "Toggles the 3D floating text (e.g. GOLEM (Spawned)).")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1) // ★ 親と同じID「0」を指定して紐付ける！
+        @ConfigAccordionId(id = 2)
         public boolean showGolemWorldLocation_Text = true;
 
         @Expose
         @ConfigOption(name = "Show Beacon Beam", desc = "Toggles the beacon beam light.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1) // ★ 親と同じID「0」を指定して紐付ける！
+        @ConfigAccordionId(id = 2)
         public boolean showGolemWorldLocation_Beacon = true;
 
-        // ==========================================
-        // ★ 新設：Stage 4 Alert の折り畳み
-        // ==========================================
         @Expose
         @ConfigOption(name = "Stage 4 Alert", desc = "Expand to configure Stage 4 alerts.")
-        @ConfigEditorAccordion(id = 2) // ★ 新しいID「2」
+        @ConfigEditorAccordion(id = 3)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
         public boolean stage4Folder = false;
 
         @Expose
         @ConfigOption(name = "Show Title", desc = "Shows a title on screen when the Golem's stage is 4.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 3)
         public boolean enableStage4Title = true;
 
         @Expose
         @ConfigOption(name = "Play Sound", desc = "Plays an Iron Golem hurt sound when the Golem's stage is 4.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 3)
         public boolean enableStage4Sound = true;
 
-        // ==========================================
-        // ★ 新設：Stage 5 Alert の折り畳み
-        // ==========================================
         @Expose
         @ConfigOption(name = "Stage 5 Alert", desc = "Expand to configure Stage 5 alerts.")
-        @ConfigEditorAccordion(id = 3) // ★ 新しいID「3」
+        @ConfigEditorAccordion(id = 4)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
         public boolean stage5Folder = false;
 
         @Expose
         @ConfigOption(name = "Show Title", desc = "Shows a title on screen when the Golem's stage is 5.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 4)
         public boolean enableStage5Title = true;
 
         @Expose
         @ConfigOption(name = "Play Sound", desc = "Plays an anvil land sound when the Golem's stage is 5.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 4)
         public boolean enableStage5Sound = true;
 
-        // ==========================================
-        // ★ 新設：Chat 関連の折り畳み
-        // ==========================================
         @Expose
         @ConfigOption(name = "Chat Settings", desc = "Expand to configure chat messages and alerts.")
-        @ConfigEditorAccordion(id = 4) // ★ 新しいID「4」を割り当て
+        @ConfigEditorAccordion(id = 5)
         @ConfigEditorBoolean
-        public boolean chatFolder = false;
+        @ConfigAccordionId(id = 0)
+        public boolean golemChatFolder = false;
 
         @Expose
         @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows the time it took for the Golem to reach stage 5 in the chat.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4) // ★ 子要素をID 4に紐付け
+        @ConfigAccordionId(id = 5)
         public boolean showStage4Duration = true;
 
         @Expose
         @ConfigOption(name = "DPS Chat", desc = "Shows the DPS you and the top 3 players have dealt to the Golem after the fight.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4) // ★ 子要素をID 4に紐付け
+        @ConfigAccordionId(id = 5)
         public boolean showDpsChat = true;
 
         @Expose
         @ConfigOption(name = "Loot Quality Chat", desc = "Shows your Golem's loot quality after the fight.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4) // ★ 子要素をID 4に紐付け
+        @ConfigAccordionId(id = 5)
         public boolean showLootQualityChat = true;
 
         @Expose
         @ConfigOption(name = "Day 30+ Alert Chat", desc = "Alerts if the Golem's stage is 4 and the lobby's day is 30 or higher.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4) // ★ 子要素をID 4に紐付け
+        @ConfigAccordionId(id = 5)
         public boolean enableDay30Alert = true;
 
         @Expose
         @ConfigOption(name = "Rare Drop Notification", desc = "Toggles the notification for rare drops from the Golem in title and chat.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
         public boolean enableDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
-        @ConfigEditorAccordion(id = 5)
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 6)
         @ConfigEditorBoolean
-        public boolean bossHighlightFolder = false;
+        @ConfigAccordionId(id = 0)
+        public boolean golemHighlightFolder = false;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights the Golem through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
+        @ConfigAccordionId(id = 6)
         public boolean enableGolemHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Golem.")
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to the Golem.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
+        @ConfigAccordionId(id = 6)
         public boolean enableGolemTracer = true;
-    }
 
-    public static class DragonCategory {
-        // ★ HUD アコーディオン
+        // ========== Dragon section ==========
+        @Expose
+        @ConfigOption(name = "Dragon", desc = "Expand to configure Dragon settings.")
+        @ConfigEditorAccordion(id = 10)
+        @ConfigEditorBoolean
+        public boolean dragonSection = false;
+
         @Expose
         @ConfigOption(name = "HUD Settings", desc = "Expand to configure Dragon HUD elements.")
-        @ConfigEditorAccordion(id = 0)
+        @ConfigEditorAccordion(id = 11)
         @ConfigEditorBoolean
-        public boolean hudFolder = false;
+        @ConfigAccordionId(id = 10)
+        public boolean dragonHudFolder = false;
 
         @Expose
         @ConfigOption(name = "Status HUD", desc = "Toggles the Dragon Status HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
+        @ConfigAccordionId(id = 11)
         public boolean showDragonStatusHud = true;
 
         @Expose
         @ConfigOption(name = "Loot Tracker HUD", desc = "Toggles the Dragon Loot Tracker HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
+        @ConfigAccordionId(id = 11)
         public boolean showDragonTrackerHud = true;
 
-        // ==========================================
-        // ★ 新設：Spawn Title Alerts の折り畳み
-        // ==========================================
         @Expose
-        @ConfigOption(name = "Spawn Alert Title ", desc = "Expand to configure spawn alerts per dragon type.")
-        @ConfigEditorAccordion(id = 1) // ★ 新しいID「2」
+        @ConfigOption(name = "Spawn Alert Title", desc = "Expand to configure spawn alerts per dragon type.")
+        @ConfigEditorAccordion(id = 12)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 10)
         public boolean spawnTitleFolder = false;
 
         @Expose
         @ConfigOption(name = "Protector", desc = "Toggles title alert for Protector Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Protector = true;
 
         @Expose
         @ConfigOption(name = "Old", desc = "Toggles title alert for Old Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Old = true;
 
         @Expose
         @ConfigOption(name = "Unstable", desc = "Toggles title alert for Unstable Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Unstable = true;
 
         @Expose
         @ConfigOption(name = "Young", desc = "Toggles title alert for Young Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Young = true;
 
         @Expose
         @ConfigOption(name = "Strong", desc = "Toggles title alert for Strong Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Strong = true;
 
         @Expose
         @ConfigOption(name = "Wise", desc = "Toggles title alert for Wise Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Wise = true;
 
         @Expose
         @ConfigOption(name = "Superior", desc = "Toggles title alert for Superior Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 12)
         public boolean enableDragonAlert_Superior = true;
 
-        // ★ Chat アコーディオン
         @Expose
         @ConfigOption(name = "Chat Settings", desc = "Expand to configure Dragon chat messages.")
-        @ConfigEditorAccordion(id = 2)
+        @ConfigEditorAccordion(id = 13)
         @ConfigEditorBoolean
-        public boolean chatFolder = false;
+        @ConfigAccordionId(id = 10)
+        public boolean dragonChatFolder = false;
 
         @Expose
         @ConfigOption(name = "DPS Chat", desc = "Shows the DPS you and the top 3 players have dealt to the Dragon after the fight.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 13)
         public boolean showDragonDpsChat = true;
 
         @Expose
         @ConfigOption(name = "Loot Quality Chat", desc = "Shows your Dragon's Loot Quality after the fight.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 13)
         public boolean showDragonLootQualityChat = true;
 
         @Expose
         @ConfigOption(name = "Rare Drop Notification", desc = "Toggles the notification for rare drops from the Dragon in title and chat.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 10)
         public boolean enableDragonDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
-        @ConfigEditorAccordion(id = 3)
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 14)
         @ConfigEditorBoolean
-        public boolean bossHighlightFolder = false;
+        @ConfigAccordionId(id = 10)
+        public boolean dragonHighlightFolder = false;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights the Dragon through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 14)
         public boolean enableDragonHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Dragon.")
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to the Dragon.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 14)
         public boolean enableDragonTracer = true;
     }
 
-    public static class BroodmotherCategory {
-        // ★ HUD アコーディオン
+    // ==========================================
+    // Spider's Den: Broodmother
+    // ==========================================
+    public static class SpidersDenCategory {
+
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure Broodmother HUD elements.")
+        @ConfigOption(name = "Broodmother", desc = "Expand to configure Broodmother settings.")
         @ConfigEditorAccordion(id = 0)
         @ConfigEditorBoolean
-        public boolean hudFolder = false;
+        public boolean broodmotherSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure Broodmother HUD elements.")
+        @ConfigEditorAccordion(id = 1)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
+        public boolean broodmotherHudFolder = false;
 
         @Expose
         @ConfigOption(name = "Status HUD", desc = "Toggles the Broodmother Status HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
+        @ConfigAccordionId(id = 1)
         public boolean showBroodmotherStatusHud = true;
 
-        // ★追加: BroodmotherのSince S4タイマー用スイッチ
         @Expose
         @ConfigOption(name = "Show Since S4", desc = "Toggles the Since S4 timer in the Status HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0) // 同じHUDアコーディオン(id=0)に収納
+        @ConfigAccordionId(id = 1)
         public boolean showBroodmotherStatusHud_SinceS4 = true;
 
         @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Broodmother Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
+        @ConfigAccordionId(id = 1)
         public boolean showBroodmotherHealthHud = true;
 
-        // ==========================================
-        // ★ 新設：Stage 4 Alert の折り畳み
-        // ==========================================
         @Expose
         @ConfigOption(name = "Stage 4 Alert", desc = "Expand to configure Stage 4 (Soon) alerts.")
-        @ConfigEditorAccordion(id = 1) // ★ 新しいID「1」
+        @ConfigEditorAccordion(id = 2)
         @ConfigEditorBoolean
-        public boolean stage4Folder = false;
+        @ConfigAccordionId(id = 0)
+        public boolean broodmotherStage4Folder = false;
 
         @Expose
         @ConfigOption(name = "Show Title", desc = "Shows a title on screen when the Broodmother's stage is 4.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 2)
         public boolean enableStage4Title = true;
 
         @Expose
         @ConfigOption(name = "Play Sound", desc = "Plays a Creeper hurt sound when the Broodmother's stage is 4.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
+        @ConfigAccordionId(id = 2)
         public boolean enableStage4Sound = true;
 
-        // ==========================================
-        // ★ 新設：Stage 5 Alert の折り畳み
-        // ==========================================
         @Expose
         @ConfigOption(name = "Stage 5 Alert", desc = "Expand to configure Stage 5 (Spawned) alerts.")
-        @ConfigEditorAccordion(id = 2) // ★ 新しいID「2」
+        @ConfigEditorAccordion(id = 3)
         @ConfigEditorBoolean
-        public boolean stage5Folder = false;
+        @ConfigAccordionId(id = 0)
+        public boolean broodmotherStage5Folder = false;
 
         @Expose
         @ConfigOption(name = "Show Title", desc = "Shows a title on screen when the Broodmother's stage is 5.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 3)
         public boolean enableStage5Title = true;
 
         @Expose
         @ConfigOption(name = "Play Sound", desc = "Plays a Zombie breaks door sound when the Broodmother's stage is 5.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 3)
         public boolean enableStage5Sound = true;
 
         @Expose
         @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows the time it took for the Broodmother to reach stage 5 in the chat.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
         public boolean showBroodmotherStage4Duration = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss visibility features.")
-        @ConfigEditorAccordion(id = 3)
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 4)
         @ConfigEditorBoolean
-        public boolean bossHighlightFolder = false;
+        @ConfigAccordionId(id = 0)
+        public boolean broodmotherHighlightFolder = false;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights the Broodmother through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 4)
         public boolean enableBroodmotherHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line from the screen center to the Broodmother.")
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to the Broodmother.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 3)
+        @ConfigAccordionId(id = 4)
         public boolean enableBroodmotherTracer = true;
+    }
+
+    // ==========================================
+    // Crimson Isle: Status HUD + 5 bosses
+    // ==========================================
+    public static class CrimsonIsleCategory {
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Shows Spawned/Unknown status for all Crimson Isle bosses.")
+        @ConfigEditorBoolean
+        public boolean showCrimsonIsleStatusHud = true;
+
+        @Expose
+        @ConfigOption(name = "Rare Drop Notification", desc = "Toggles the notification for rare drops from Crimson Isle bosses in title and chat.")
+        @ConfigEditorBoolean
+        public boolean enableCrimsonDropAlerts = true;
+
+        @Expose
+        @ConfigOption(name = "Loot Tracker HUD", desc = "Toggles the Crimson Isle Loot Tracker HUD.")
+        @ConfigEditorBoolean
+        public boolean showCrimsonLootTrackerHud = true;
+
+        // ---- Barbarian Duke X (id: 0, 1, 2) ----
+        @Expose
+        @ConfigOption(name = "Barbarian Duke X", desc = "Expand to configure Barbarian Duke X settings.")
+        @ConfigEditorAccordion(id = 0)
+        @ConfigEditorBoolean
+        public boolean barbarianSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 1)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
+        public boolean barbarianHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Barbarian Duke X Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 1)
+        public boolean showBarbarianHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 2)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 0)
+        public boolean barbarianHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Barbarian Duke X through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
+        public boolean enableBarbarianHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Barbarian Duke X.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
+        public boolean enableBarbarianTracer = true;
+
+        // ---- Bladesoul (id: 10, 11, 12) ----
+        @Expose
+        @ConfigOption(name = "Bladesoul", desc = "Expand to configure Bladesoul settings.")
+        @ConfigEditorAccordion(id = 10)
+        @ConfigEditorBoolean
+        public boolean bladesoulSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 11)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 10)
+        public boolean bladesoulHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Bladesoul Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 11)
+        public boolean showBladesoulHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 12)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 10)
+        public boolean bladesoulHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Bladesoul through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 12)
+        public boolean enableBladesoulHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Bladesoul.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 12)
+        public boolean enableBladesoulTracer = true;
+
+        // ---- Mage Outlaw (id: 20, 21, 22) ----
+        @Expose
+        @ConfigOption(name = "Mage Outlaw", desc = "Expand to configure Mage Outlaw settings.")
+        @ConfigEditorAccordion(id = 20)
+        @ConfigEditorBoolean
+        public boolean mageOutlawSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 21)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 20)
+        public boolean mageOutlawHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Mage Outlaw Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 21)
+        public boolean showMageOutlawHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 22)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 20)
+        public boolean mageOutlawHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Mage Outlaw through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 22)
+        public boolean enableMageOutlawHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Mage Outlaw.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 22)
+        public boolean enableMageOutlawTracer = true;
+
+        // ---- Ashfang (id: 30, 31, 32) ----
+        @Expose
+        @ConfigOption(name = "Ashfang", desc = "Expand to configure Ashfang settings.")
+        @ConfigEditorAccordion(id = 30)
+        @ConfigEditorBoolean
+        public boolean ashfangSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 31)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 30)
+        public boolean ashfangHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Ashfang Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 31)
+        public boolean showAshfangHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 32)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 30)
+        public boolean ashfangHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Ashfang through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 32)
+        public boolean enableAshfangHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Ashfang.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 32)
+        public boolean enableAshfangTracer = true;
+
+        // ---- Magma Boss (id: 40, 41, 42) ----
+        @Expose
+        @ConfigOption(name = "Magma Boss", desc = "Expand to configure Magma Boss settings.")
+        @ConfigEditorAccordion(id = 40)
+        @ConfigEditorBoolean
+        public boolean magmaBossSection = false;
+
+        @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 41)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 40)
+        public boolean magmaBossHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Magma Boss Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 41)
+        public boolean showMagmaBossHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Spawn Status Title", desc = "Shows a title when the Magma Boss spawn status changes (75%, Kill the Magmas, etc.).")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 40)
+        public boolean enableMagmaBossSpawnTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
+        @ConfigEditorAccordion(id = 42)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 40)
+        public boolean magmaBossHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Magma Boss through walls.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 42)
+        public boolean enableMagmaBossHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Magma Boss.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 42)
+        public boolean enableMagmaBossTracer = true;
     }
 
     public static class MiscCategory {
