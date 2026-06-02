@@ -1,10 +1,7 @@
 package com.deeply.gankura.data;
 
-import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.render.HudElement;
 import com.deeply.gankura.render.hud.*;
-import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,31 +42,7 @@ public class HudConfig {
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
 
-        // Crimson Isle bosses (generic HUD)
-        boolean[] ci = {true}; // isCrimsonIsle supplier helper
-        for (com.deeply.gankura.data.CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
-            int idx = EntityHighlightManager.CRIMSON_BOSSES.indexOf(boss);
-            int defY = 210 + idx * 30;
-            String label = "§c§l" + boss.nameTag() + " HP";
-            ELEMENTS.add(new CrimsonBossHealthHud(
-                    boss.nameTag().toLowerCase().replace(" ", "_") + "_health",
-                    260, defY,
-                    label, "§e30M§f/§a60M",
-                    () -> {
-                        switch (boss.nameTag()) {
-                            case "Barbarian Duke X": return ModConfig.INSTANCE.crimsonIsle.showBarbarianHealthHud;
-                            case "Bladesoul": return ModConfig.INSTANCE.crimsonIsle.showBladesoulHealthHud;
-                            case "Mage Outlaw": return ModConfig.INSTANCE.crimsonIsle.showMageOutlawHealthHud;
-                            case "Ashfang": return ModConfig.INSTANCE.crimsonIsle.showAshfangHealthHud;
-                            case "Magma Boss": return ModConfig.INSTANCE.crimsonIsle.showMagmaBossHealthHud;
-                            default: return false;
-                        }
-                    },
-                    () -> (ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                            || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode))
-                            && boss.getHealth().get() != null,
-                    boss.getHealth()));
-        }
+        ELEMENTS.add(new CrimsonBossesHealthHud());
 
         ELEMENTS.add(new PetHud());
         ELEMENTS.add(new ArmorStackHud());

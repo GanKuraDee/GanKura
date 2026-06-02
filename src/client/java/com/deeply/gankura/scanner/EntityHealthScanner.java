@@ -2,6 +2,7 @@ package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
@@ -125,7 +126,8 @@ public class EntityHealthScanner {
             if (line.contains("The boss is reforming!")) { found = "Reforming...";    break; }
         }
         // Final Stage 以外で値が変化した場合にタイトル表示
-        if (found != null && !"Final Stage".equals(found) && !found.equals(previousMagmaSpawnStatus)) {
+        if (found != null && !"Final Stage".equals(found) && !found.equals(previousMagmaSpawnStatus)
+                && ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTitle) {
             MutableText title = Text.literal(found).formatted(Formatting.RED, Formatting.BOLD);
             NotificationUtils.showTitle(client, title, null);
         }
