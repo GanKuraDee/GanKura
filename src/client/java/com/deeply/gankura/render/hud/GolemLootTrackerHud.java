@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class GolemLootTrackerHud extends HudElement {
     public GolemLootTrackerHud() {
-        super("tracker", 260, 100, 1.0f, 150, 50,
+        super("tracker", 10, 60, 1.0f, 150, 50,
                 () -> ModConfig.INSTANCE.theEnd.showLootTrackerHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }

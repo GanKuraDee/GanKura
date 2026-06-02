@@ -1,9 +1,5 @@
 package com.deeply.gankura.data;
 
-import com.deeply.gankura.data.CrimsonBossEntry;
-import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.ModConstants;
-import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.render.HudElement;
 import com.deeply.gankura.render.hud.*;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,29 +41,7 @@ public class HudConfig {
         ELEMENTS.add(new BroodmotherHealthHud());
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
-
-        // Crimson Isle ボス HP HUD (汎用クラスをボスごとにインスタンス化)
-        for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
-            int idx = EntityHighlightManager.CRIMSON_BOSSES.indexOf(boss);
-            int defY = 210 + idx * 30;
-            String label = "§c§l" + boss.nameTag() + " HP";
-            ELEMENTS.add(new CrimsonBossHealthHud(
-                    boss.nameTag().toLowerCase().replace(" ", "_") + "_health",
-                    260, defY,
-                    label, "§e30M§f/§a60M",
-                    () -> switch (boss.nameTag()) {
-                        case "Barbarian Duke X" -> ModConfig.INSTANCE.crimsonIsle.showBarbarianHealthHud;
-                        case "Bladesoul"        -> ModConfig.INSTANCE.crimsonIsle.showBladesoulHealthHud;
-                        case "Mage Outlaw"      -> ModConfig.INSTANCE.crimsonIsle.showMageOutlawHealthHud;
-                        case "Ashfang"          -> ModConfig.INSTANCE.crimsonIsle.showAshfangHealthHud;
-                        case "Magma Boss"       -> ModConfig.INSTANCE.crimsonIsle.showMagmaBossHealthHud;
-                        default -> false;
-                    },
-                    () -> (ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                            || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode))
-                            && boss.getHealth().get() != null,
-                    boss.getHealth()));
-        }
+        ELEMENTS.add(new CrimsonBossesHealthHud());
 
         ELEMENTS.add(new PetHud());
         ELEMENTS.add(new ArmorStackHud());
