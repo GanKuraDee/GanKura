@@ -137,6 +137,21 @@ public class GameState {
         public static void reset() { isDetected = false; health = null; respawnEndTime = 0; }
     }
 
+    public static class AshfangFollower {
+        public static boolean isDetected = false;
+        public static void reset() { isDetected = false; }
+    }
+
+    public static class AshfangAcolyte {
+        public static boolean isDetected = false;
+        public static void reset() { isDetected = false; }
+    }
+
+    public static class AshfangUnderling {
+        public static boolean isDetected = false;
+        public static void reset() { isDetected = false; }
+    }
+
     public static class MagmaBoss {
         public static boolean isDetected = false;
         public static String health = null;
@@ -163,6 +178,9 @@ public class GameState {
         Bladesoul.reset();
         MageOutlaw.reset();
         Ashfang.reset();
+        AshfangFollower.reset();
+        AshfangAcolyte.reset();
+        AshfangUnderling.reset();
         MagmaBoss.reset();
         CrimsonDrop.reset();
     }

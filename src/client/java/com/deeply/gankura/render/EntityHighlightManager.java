@@ -26,6 +26,33 @@ public class EntityHighlightManager {
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
 
+    public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
+        new CrimsonBossEntry("Ashfang Follower",
+            0x555555, 0xFF555555,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerTracer,
+            () -> GameState.AshfangFollower.isDetected,
+            d -> GameState.AshfangFollower.isDetected = d,
+            () -> null,
+            h -> {}),
+        new CrimsonBossEntry("Ashfang Acolyte",
+            0x5555FF, 0xFF5555FF,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteTracer,
+            () -> GameState.AshfangAcolyte.isDetected,
+            d -> GameState.AshfangAcolyte.isDetected = d,
+            () -> null,
+            h -> {}),
+        new CrimsonBossEntry("Ashfang Underling",
+            0xFF5555, 0xFFFF5555,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingHighlight,
+            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingTracer,
+            () -> GameState.AshfangUnderling.isDetected,
+            d -> GameState.AshfangUnderling.isDetected = d,
+            () -> null,
+            h -> {})
+    );
+
     public static final List<CrimsonBossEntry> CRIMSON_BOSSES = List.of(
         new CrimsonBossEntry("Bladesoul",
             0x555555, 0xFF555555,
@@ -90,8 +117,9 @@ public class EntityHighlightManager {
         boolean scanMagmaGlare = isCrimsonIsle
                 && "Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)
                 && ModConfig.INSTANCE.crimsonIsle.enableMagmaBossHighlight;
+        boolean scanAshfangFollowers = isCrimsonIsle && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get());
 
-        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare) {
+        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) {
             if (!isCrimsonIsle) {
                 for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
             }
@@ -99,6 +127,7 @@ public class EntityHighlightManager {
         }
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
+        boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
 
         for (Entity entity : client.world.getEntities()) {
             Text customName = entity.getCustomName();
@@ -134,7 +163,7 @@ public class EntityHighlightManager {
                     CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
                     if (!boss.enableHighlight().get()) continue;
                     if (nameStr.contains(boss.nameTag())) {
-                        Entity visualTarget = findVisualEntity(client, entity);
+                        Entity visualTarget = findVisualEntity(client, entity, boss.nameTag());
                         if (visualTarget != null) {
                             highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, boss);
@@ -154,6 +183,21 @@ public class EntityHighlightManager {
                     }
                 }
             }
+
+            if (scanAshfangFollowers) {
+                for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
+                    CrimsonBossEntry follower = ASHFANG_FOLLOWERS.get(i);
+                    if (!follower.enableHighlight().get() && !follower.enableTracer().get()) continue;
+                    if (nameStr.contains(follower.nameTag())) {
+                        Entity visualTarget = findVisualEntity(client, entity, follower.nameTag());
+                        if (visualTarget != null) {
+                            if (follower.enableHighlight().get()) highlightedEntities.add(visualTarget);
+                            crimsonBossEntities.put(visualTarget, follower);
+                            followerFound[i] = true;
+                        }
+                    }
+                }
+            }
         }
 
         if (scanDragon && highlightedEntities.stream().noneMatch(e -> e instanceof EnderDragonEntity)) {
@@ -167,17 +211,24 @@ public class EntityHighlightManager {
             for (int i = 0; i < CRIMSON_BOSSES.size(); i++) {
                 CRIMSON_BOSSES.get(i).setIsDetected().accept(bossFound[i]);
             }
+            for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
+                ASHFANG_FOLLOWERS.get(i).setIsDetected().accept(followerFound[i]);
+            }
         }
     }
 
-    private static Entity findVisualEntity(MinecraftClient client, Entity namedEntity) {
+    private static Entity findVisualEntity(MinecraftClient client, Entity namedEntity, String bossName) {
         if (!(namedEntity instanceof ArmorStandEntity)) return namedEntity;
         Box box = namedEntity.getBoundingBox().expand(8.0);
 
-        Entity closest = getClosestEntity(client.world.getEntitiesByClass(MobEntity.class, box, e -> true), namedEntity);
-        if (closest != null) return closest;
+        // PlayerEntity型ボスは周辺MobによるマッチングをスキップしPlayerEntityを直接検索する
+        boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
+        if (!isPlayerTypeBoss) {
+            Entity closest = getClosestEntity(client.world.getEntitiesByClass(MobEntity.class, box, e -> true), namedEntity);
+            if (closest != null) return closest;
+        }
 
-        closest = getClosestEntity(client.world.getEntitiesByClass(PlayerEntity.class, box, e -> e != client.player), namedEntity);
+        Entity closest = getClosestEntity(client.world.getEntitiesByClass(PlayerEntity.class, box, e -> e != client.player), namedEntity);
         if (closest != null) return closest;
 
         return getClosestEntity(client.world.getEntitiesByClass(ArmorStandEntity.class, box,
