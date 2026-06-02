@@ -22,7 +22,7 @@ public class GolemBeaconRenderer {
 
     public static void submitBeaconState(WorldRenderState worldState, Camera camera) {
         // ★追加: World Location DisplayがOFFならビーコンも描画しない
-        if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Beacon) return;
+        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Beacon) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null) return;

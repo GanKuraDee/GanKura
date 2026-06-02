@@ -61,7 +61,7 @@ public class RareDropScanner {
                     // 1. Tier Boost Core (金)
                     if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
                         LootStats.addTierBoostCore();
-                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.INSTANCE.golem.enableDropAlerts);
+                        notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.INSTANCE.theEnd.enableDropAlerts);
                         break;
                     }
 
@@ -70,13 +70,13 @@ public class RareDropScanner {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
+                            notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
                             break;
                         }
                         else if (hasColor(customName, Formatting.DARK_PURPLE)) {
                             LootStats.addEpicGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, itemText, ModConfig.INSTANCE.golem.enableDropAlerts);
+                            notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
                             break;
                         }
                     }
@@ -86,13 +86,13 @@ public class RareDropScanner {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
+                            notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
                             break;
                         }
                         else if (hasColor(customName, Formatting.DARK_PURPLE)) {
                             LootStats.addEpicDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.DARK_PURPLE).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
-                            notifyDrop(client, dragonText, ModConfig.INSTANCE.dragon.enableDragonDropAlerts);
+                            notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
                             break;
                         }
                     }

@@ -8,6 +8,7 @@
 		"WorldTextRenderMixin",
 		"HotbarItemMixin",
 		"EntityGlowingMixin",
+		"PlayerGlowingMixin",
 		"WorldBeaconRenderMixin"
 	],
 	"injectors": {

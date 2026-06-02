@@ -16,6 +16,10 @@ public class ModConstants {
     public static final String MODE_COMBAT_1 = "combat_1";
     public static final String MAP_SPIDERS_DEN = "Spider's Den";
 
+    // ★追加: Crimson Isle 判定用
+    public static final String MODE_CRIMSON_ISLE = "crimson_isle";
+    public static final String MAP_CRIMSON_ISLE = "Crimson Isle";
+
     // ステージ名
     public static final String STAGE_RESTING = "Resting";
     public static final String STAGE_DORMANT = "Dormant";

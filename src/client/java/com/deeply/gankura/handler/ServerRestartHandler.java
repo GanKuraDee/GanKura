@@ -32,7 +32,7 @@ public class ServerRestartHandler {
                 long currentDay = client.world.getTimeOfDay() / 24000L;
 
                 // 設定がON、且つ条件を満たしている場合のみ実行
-                if (ModConfig.INSTANCE.golem.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
+                if (ModConfig.INSTANCE.theEnd.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
                     GameState.Golem.hasAnnouncedDay30 = true;
 
                     client.execute(() -> {

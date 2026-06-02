@@ -99,7 +99,7 @@ public class GolemHandler {
     private static void printResult(MinecraftClient client, String dps, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
-                if (ModConfig.INSTANCE.golem.showDpsChat && dps != null && duration != null) {
+                if (ModConfig.INSTANCE.theEnd.showDpsChat && dps != null && duration != null) {
                     MutableText msg = Text.literal(String.format("§6Your Golem DPS: §l§o%s §r§7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Golem.top1Damage > 0) {
                         MutableText hoverText = Text.literal("§6§lTop 3 DPS\n");
@@ -110,7 +110,7 @@ public class GolemHandler {
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
-                if (ModConfig.INSTANCE.golem.showLootQualityChat) {
+                if (ModConfig.INSTANCE.theEnd.showLootQualityChat) {
                     NotificationUtils.sendSystemChat(client, Text.literal(String.format("§6Your Golem Loot Quality: §l§o%d", lq)));
                     String dropsMsg = String.format("§6Tier Boost Core: %s §8| §6Golem §7(Pet): %s §8| §5Golem §7(Pet): %s", (lq >= 250) ? "§a✔" : "§c✘", (lq >= 235) ? "§a✔" : "§c✘", (lq >= 220) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Text.literal(dropsMsg));
@@ -164,18 +164,18 @@ public class GolemHandler {
             GameState.Golem.stage4StartTime = System.currentTimeMillis();
 
             // ★修正: Stage 4のTitleとSoundを独立して判定
-            if (ModConfig.INSTANCE.golem.enableStage4Title) {
+            if (ModConfig.INSTANCE.theEnd.enableStage4Title) {
                 MutableText title = Text.literal("GOLEM STAGE 4").formatted(Formatting.RED, Formatting.BOLD);
                 NotificationUtils.showTitle(client, title, null);
             }
-            if (ModConfig.INSTANCE.golem.enableStage4Sound) {
+            if (ModConfig.INSTANCE.theEnd.enableStage4Sound) {
                 NotificationUtils.playSound(client, SoundEvents.ENTITY_IRON_GOLEM_HURT, 1.0f, 1.0f);
             }
         }
         else if (ModConstants.STAGE_SUMMONED.equals(newStage)) {
             if (ModConstants.STAGE_AWAKENING.equals(oldStage) && GameState.Golem.stage4StartTime > 0) {
                 long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
-                if (ModConfig.INSTANCE.golem.showStage4Duration) {
+                if (ModConfig.INSTANCE.theEnd.showStage4Duration) {
                     new Timer().schedule(new TimerTask() {
                         @Override public void run() {
                             client.execute(() -> NotificationUtils.sendSystemChat(client, Text.literal(String.format("§aGolem Stage 4 Duration: %dm %ds", seconds / 60, seconds % 60))));
@@ -187,11 +187,11 @@ public class GolemHandler {
             if (GameState.Golem.stage5TargetTime == 0 && client.world != null) GameState.Golem.stage5TargetTime = client.world.getTime() + 400;
 
             // ★修正: Stage 5のTitleとSoundを独立して判定
-            if (ModConfig.INSTANCE.golem.enableStage5Title) {
+            if (ModConfig.INSTANCE.theEnd.enableStage5Title) {
                 MutableText title = Text.literal("GOLEM STAGE 5").formatted(Formatting.DARK_RED, Formatting.BOLD);
                 NotificationUtils.showTitle(client, title, null);
             }
-            if (ModConfig.INSTANCE.golem.enableStage5Sound) {
+            if (ModConfig.INSTANCE.theEnd.enableStage5Sound) {
                 NotificationUtils.playSound(client, SoundEvents.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
             }
         }

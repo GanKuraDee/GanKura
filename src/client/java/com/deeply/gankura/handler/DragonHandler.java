@@ -153,7 +153,7 @@ public class DragonHandler {
     private static void printDragonResult(MinecraftClient client, String dps, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
-                if (ModConfig.INSTANCE.dragon.showDragonDpsChat && dps != null && duration != null) {
+                if (ModConfig.INSTANCE.theEnd.showDragonDpsChat && dps != null && duration != null) {
                     MutableText msg = Text.literal(String.format("§dYour Dragon DPS: §l§o%s §r§7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Dragon.top1Damage > 0) {
                         MutableText hoverText = Text.literal("§d§lTop 3 DPS\n");
@@ -164,7 +164,7 @@ public class DragonHandler {
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
-                if (ModConfig.INSTANCE.dragon.showDragonLootQualityChat) {
+                if (ModConfig.INSTANCE.theEnd.showDragonLootQualityChat) {
                     NotificationUtils.sendSystemChat(client, Text.literal(String.format("§dYour Dragon Loot Quality: §l§o%d", lq)));
                     String dropsMsg = String.format("§6Ender Dragon §7(Pet): %s §8| §5Ender Dragon §7(Pet): %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Text.literal(dropsMsg));
@@ -179,13 +179,13 @@ public class DragonHandler {
     private static boolean isAlertEnabledFor(String dragonType) {
         if (dragonType == null) return false;
         return switch (dragonType) {
-            case "Protector" -> ModConfig.INSTANCE.dragon.enableDragonAlert_Protector;
-            case "Old"       -> ModConfig.INSTANCE.dragon.enableDragonAlert_Old;
-            case "Unstable"  -> ModConfig.INSTANCE.dragon.enableDragonAlert_Unstable;
-            case "Young"     -> ModConfig.INSTANCE.dragon.enableDragonAlert_Young;
-            case "Strong"    -> ModConfig.INSTANCE.dragon.enableDragonAlert_Strong;
-            case "Wise"      -> ModConfig.INSTANCE.dragon.enableDragonAlert_Wise;
-            case "Superior"  -> ModConfig.INSTANCE.dragon.enableDragonAlert_Superior;
+            case "Protector" -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Protector;
+            case "Old"       -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Old;
+            case "Unstable"  -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Unstable;
+            case "Young"     -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Young;
+            case "Strong"    -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Strong;
+            case "Wise"      -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Wise;
+            case "Superior"  -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Superior;
             default          -> false; // 万が一未知のドラゴンが出た場合は表示しない
         };
     }

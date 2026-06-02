@@ -1,6 +1,8 @@
 package com.deeply.gankura.mixin.client;
 
+import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.render.EntityHighlightManager;
+import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
@@ -45,9 +47,14 @@ public class EntityGlowingMixin {
                 // ドラゴン: ライトパープル
                 cir.setReturnValue(0xFF55FF);
             }
+            else if (entity instanceof MagmaCubeEntity
+                    && EntityHighlightManager.magmaGlareEntities.contains(entity)) {
+                // Magma Glare: 赤
+                cir.setReturnValue(0xFF5555);
+            }
             else {
-                // それ以外（予備）: 白色
-                cir.setReturnValue(0xFFFFFF);
+                CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
+                cir.setReturnValue(boss != null ? boss.glowColorRGB() : 0xFFFFFF);
             }
         }
     }

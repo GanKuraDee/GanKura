@@ -38,6 +38,11 @@ public class LocrawHandler {
                     if (!newId.equals(GameState.Server.id)) {
                         GameState.Server.id = newId;
                         GameState.Golem.reset();
+                        GameState.BarbarianDukeX.reset();
+                        GameState.Bladesoul.reset();
+                        GameState.MageOutlaw.reset();
+                        GameState.Ashfang.reset();
+                        GameState.MagmaBoss.reset();
                     }
 
                     // 情報を更新

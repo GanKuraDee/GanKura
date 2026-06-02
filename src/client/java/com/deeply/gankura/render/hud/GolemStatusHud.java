@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
         super("stats", 260, 50, 1.0f, 150, 50,
-                () -> ModConfig.INSTANCE.golem.showGolemStatusHud,
+                () -> ModConfig.INSTANCE.theEnd.showGolemStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
 
@@ -67,7 +67,7 @@ public class GolemStatusHud extends HudElement {
         if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
 
         // ★修正: 新しく作成した設定スイッチがONの時だけタイマーの処理を行う
-        if (ModConfig.INSTANCE.golem.showGolemStatusHud_SinceS4) {
+        if (ModConfig.INSTANCE.theEnd.showGolemStatusHud_SinceS4) {
             if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
                 String timerText;
                 if (isPreview) timerText = "Since S4: §f0m 45s";

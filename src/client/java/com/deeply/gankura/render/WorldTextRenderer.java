@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
@@ -8,6 +9,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.mob.MagmaCubeEntity;
+import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -23,7 +26,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGolemWaypoint(MinecraftClient client, PlayerEntity player) {
-        if (!ModConfig.INSTANCE.golem.showGolemWorldLocation_Text) return;
+        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
 
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
 
@@ -89,16 +92,24 @@ public class WorldTextRenderer {
         for (Entity entity : EntityHighlightManager.highlightedEntities) {
             int color;
             if (entity instanceof IronGolemEntity) {
-                if (!ModConfig.INSTANCE.golem.enableGolemTracer) continue;
+                if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;
                 color = 0xFFFFAA00;
             } else if (entity instanceof SpiderEntity) {
-                if (!ModConfig.INSTANCE.broodmother.enableBroodmotherTracer) continue;
+                if (!ModConfig.INSTANCE.spidersDen.enableBroodmotherTracer) continue;
                 color = 0xFFFF5555;
             } else if (entity instanceof EnderDragonEntity) {
-                if (!ModConfig.INSTANCE.dragon.enableDragonTracer) continue;
+                if (!ModConfig.INSTANCE.theEnd.enableDragonTracer) continue;
                 color = 0xFFFF55FF;
+            } else if (entity instanceof MagmaCubeEntity
+                    && EntityHighlightManager.magmaGlareEntities.contains(entity)) {
+                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
+                color = 0xFFFF5555;
             } else {
-                continue;
+                CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
+                if (boss == null || !boss.enableTracer().get()) continue;
+                // Bladesoul は Wither Skeleton のみにトレーサーを表示（本体は Glow のみ）
+                if ("Bladesoul".equals(boss.nameTag()) && !(entity instanceof WitherSkeletonEntity)) continue;
+                color = boss.tracerColorARGB();
             }
 
             // エンティティの補間済み中心位置

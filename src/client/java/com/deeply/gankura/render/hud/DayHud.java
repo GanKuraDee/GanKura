@@ -21,7 +21,7 @@ public class DayHud extends HudElement {
         int color = 0xFFFFFFFF;
         boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
 
-        if (ModConfig.INSTANCE.golem.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
+        if (ModConfig.INSTANCE.theEnd.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             color = 0xFFFF5555;
         }
         context.drawTextWithShadow(tr, "Day: " + String.format("%,d", day), 0, 0, color);
