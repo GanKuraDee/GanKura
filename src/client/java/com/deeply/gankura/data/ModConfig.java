@@ -144,12 +144,6 @@ public class ModConfig extends Config {
         public boolean showGolemStatusHud = true;
 
         @Expose
-        @ConfigOption(name = "Show Since S4", desc = "Toggles the Since S4 timer in the Status HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
-        public boolean showGolemStatusHud_SinceS4 = true;
-
-        @Expose
         @ConfigOption(name = "Loot Tracker HUD", desc = "Toggles the Golem Loot Tracker HUD.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 1)
@@ -420,12 +414,6 @@ public class ModConfig extends Config {
         public boolean showBroodmotherStatusHud = true;
 
         @Expose
-        @ConfigOption(name = "Show Since S4", desc = "Toggles the Since S4 timer in the Status HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
-        public boolean showBroodmotherStatusHud_SinceS4 = true;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Broodmother Health HUD.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 1)
@@ -504,6 +492,11 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Status HUD", desc = "Shows Spawned/Unknown status for all Crimson Isle bosses.")
         @ConfigEditorBoolean
         public boolean showCrimsonIsleStatusHud = true;
+
+        @Expose
+        @ConfigOption(name = "World Location Display", desc = "Shows boss name and status as floating text above each boss spawn location.")
+        @ConfigEditorBoolean
+        public boolean showCrimsonIsleWorldText = true;
 
         @Expose
         @ConfigOption(name = "Rare Drop Notification", desc = "Toggles the notification for rare drops from Crimson Isle bosses in title and chat.")

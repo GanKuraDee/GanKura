@@ -83,7 +83,6 @@ public class GameState {
         public static String type = null;
         public static long spawnTargetTime = 0;
         public static long lastChatTime = 0;
-
         public static long fightStartTime = 0; public static long fightEndTime = 0;
 
         public static String top1Name = null; public static long top1Damage = 0;

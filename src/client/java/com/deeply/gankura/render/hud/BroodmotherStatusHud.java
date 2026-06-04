@@ -54,8 +54,7 @@ public class BroodmotherStatusHud extends HudElement {
 
         context.drawTextWithShadow(tr, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF);
         context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
-        // ★修正: タイマーテキストが存在し、かつ設定スイッチがONの時だけ描画する
-        if (timerText != null && ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud_SinceS4) {
+        if (timerText != null) {
             context.drawTextWithShadow(tr, timerText, 0, 24, 0xFFFFFFFF);
         }
     }

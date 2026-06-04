@@ -221,6 +221,14 @@ public class EntityHighlightManager {
         if (!(namedEntity instanceof ArmorStandEntity)) return namedEntity;
         Box box = namedEntity.getBoundingBox().expand(8.0);
 
+        // Magma Boss: MagmaCubeEntity のみを対象とし、ジャンプ中の位置ずれに対応するため広めに探索
+        // Kill the Magmas フェーズ中は単体エンティティが存在せず Magma Glare と誤マッチするためスキップ
+        if ("Magma Boss".equals(bossName)) {
+            if ("Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)) return null;
+            Box wideBox = namedEntity.getBoundingBox().expand(20.0);
+            return getClosestEntity(client.world.getEntitiesByClass(MagmaCubeEntity.class, wideBox, e -> true), namedEntity);
+        }
+
         // PlayerEntity型ボスは周辺MobによるマッチングをスキップしPlayerEntityを直接検索する
         boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
         if (!isPlayerTypeBoss) {

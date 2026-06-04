@@ -51,6 +51,13 @@ public class ModConstants {
     // "Zealots Contributed: 50/100"
     public static final Pattern ZEALOT_PATTERN = Pattern.compile("Zealots Contributed: ([\\d,]+)/100");
 
+    // Crimson Isle ボスの固定スポーン座標
+    public static final BlockPos BLADESOUL_POS        = new BlockPos(-295, 83,  -518);
+    public static final BlockPos ASHFANG_POS           = new BlockPos(-485, 137, -1016);
+    public static final BlockPos MAGMA_BOSS_POS        = new BlockPos(-369, 66,  -805);
+    public static final BlockPos MAGE_OUTLAW_POS       = new BlockPos(-181, 106, -860);
+    public static final BlockPos BARBARIAN_DUKE_X_POS  = new BlockPos(-537, 117, -905);
+
     // ゴーレムの祭壇の座標リスト
     public record GolemSpot(String name, BlockPos pos) {}
     public static final List<GolemSpot> GOLEM_SPOTS = List.of(

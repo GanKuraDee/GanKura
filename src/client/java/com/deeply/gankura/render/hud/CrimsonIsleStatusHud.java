@@ -32,12 +32,15 @@ public class CrimsonIsleStatusHud extends HudElement {
                 if (sp != null) {
                     status = "§aSpawned §7(" + sp + ")";
                 } else {
-                    long remaining = GameState.MagmaBoss.respawnEndTime - System.currentTimeMillis();
+                    long respawnEnd = GameState.MagmaBoss.respawnEndTime;
+                    long remaining = respawnEnd - System.currentTimeMillis();
                     if (remaining > 0) {
                         long secs = remaining / 1000;
                         status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
+                    } else if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) {
+                        status = "§aReady";
                     } else {
-                        status = "§7Ready? §8(may be down)";
+                        status = "§7Unknown §8(spawns within 2m)";
                     }
                 }
             } else {
@@ -48,8 +51,10 @@ public class CrimsonIsleStatusHud extends HudElement {
                     status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
                 } else if (boss.getIsDetected().get()) {
                     status = "§aSpawned";
+                } else if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) {
+                    status = "§aReady";
                 } else {
-                    status = "§7Ready? §8(may be down)";
+                    status = "§7Unknown §8(spawns within 2m)";
                 }
             }
             String nameColor = colorCode(boss.glowColorRGB());
