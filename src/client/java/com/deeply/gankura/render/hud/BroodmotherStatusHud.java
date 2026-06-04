@@ -19,20 +19,18 @@ public class BroodmotherStatusHud extends HudElement {
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
         // Minecraft.getInstance().font を使用
         Font font = Minecraft.getInstance().font;
-        String displayStats; String timerText = null;
+        String displayStats;
 
         if (isPreview) {
-            displayStats = "Stage: §e4"; timerText = "Since S4: §e0m 45s §7(Max 1m)";
+            displayStats = "Stage: §e4 §f(0m 45s)";
         } else {
             String stage = GameState.Broodmother.stage;
 
             if ("Alive!".equals(stage)) {
                 displayStats = "§cStage: 5 (Spawned)";
-            }
-            else if ("Scanning...".equals(stage)) {
+            } else if ("Scanning...".equals(stage)) {
                 displayStats = "Stage: §8Scanning...";
-            }
-            else {
+            } else {
                 String num = switch (stage) {
                     case "Slain" -> "§f0";
                     case "Dormant" -> "§f1";
@@ -45,18 +43,13 @@ public class BroodmotherStatusHud extends HudElement {
 
                 if ("Imminent".equals(stage) && GameState.Broodmother.stage4StartTime > 0) {
                     long seconds = (System.currentTimeMillis() - GameState.Broodmother.stage4StartTime) / 1000;
-                    String colorCode = seconds >= 45 ? "§c" : (seconds >= 30 ? "§e" : "§f");
-                    timerText = String.format("Since S4: %s%dm %ds §7(Max 1m)", colorCode, seconds / 60, seconds % 60);
+                    String col = seconds >= 45 ? "§c" : (seconds >= 30 ? "§e" : "§f");
+                    displayStats += String.format(" %s(%dm %ds)", col, seconds / 60, seconds % 60);
                 }
             }
         }
 
-        // GuiGraphicsExtractor のメソッド: text(Font, String, x, y, color, shadow)
         graphics.text(font, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF, true);
         graphics.text(font, displayStats, 0, 12, 0xFFFFFFFF, true);
-
-        if (timerText != null) {
-            graphics.text(font, timerText, 0, 24, 0xFFFFFFFF, true);
-        }
     }
 }

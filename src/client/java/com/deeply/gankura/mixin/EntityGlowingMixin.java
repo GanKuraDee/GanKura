@@ -1,6 +1,7 @@
 package com.deeply.gankura.mixin;
 
 import com.deeply.gankura.data.CrimsonBossEntry;
+import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.render.EntityHighlightManager;
 import net.minecraft.world.entity.Entity;
 
@@ -45,10 +46,24 @@ public class EntityGlowingMixin {
             } else if (entity instanceof Spider) {
                 cir.setReturnValue(0xFF5555); // ブルードマザー: 赤色
             } else if (entity instanceof EnderDragon) {
-                cir.setReturnValue(0xFF55FF); // ドラゴン: ライトパープル
+                cir.setReturnValue(dragonColor(GameState.Dragon.type));
             } else {
                 cir.setReturnValue(0xFFFFFF);
             }
         }
+    }
+
+    private static int dragonColor(String type) {
+        if (type == null) return 0xFF55FF;
+        return switch (type) {
+            case "Protector" -> 0x555555; // §8 DARK_GRAY
+            case "Old"       -> 0xAAAAAA; // §7 GRAY
+            case "Unstable"  -> 0xAA00AA; // §5 DARK_PURPLE
+            case "Young"     -> 0xFFFFFF; // §f WHITE
+            case "Strong"    -> 0xFF5555; // §c RED
+            case "Wise"      -> 0x55FFFF; // §b AQUA
+            case "Superior"  -> 0xFFFF55; // §e YELLOW
+            default          -> 0xFF55FF; // §d LIGHT_PURPLE
+        };
     }
 }

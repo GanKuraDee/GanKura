@@ -21,7 +21,7 @@ public class GolemStatusHud extends HudElement {
         String displayStats;
 
         if (isPreview) {
-            displayStats = "§cStage: 5 (Spawned)";
+            displayStats = "Stage: §e4 §f(2m 30s)";
         } else {
             String stage = GameState.Golem.stage;
             if (GameState.Golem.isScanning) {
@@ -45,6 +45,11 @@ public class GolemStatusHud extends HudElement {
                     default -> "§f?";
                 };
                 displayStats = "Stage: " + num;
+                if (ModConstants.STAGE_AWAKENING.equals(stage) && GameState.Golem.stage4StartTime > 0) {
+                    long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
+                    String col = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
+                    displayStats += String.format(" %s(%dm %ds)", col, seconds / 60, seconds % 60);
+                }
             }
         }
 
@@ -54,7 +59,7 @@ public class GolemStatusHud extends HudElement {
 
         String locText = null;
         if (isPreview) {
-            locText = "§cLocation: Middle Front";
+            locText = "Location: §fMiddle Front";
         } else if (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
             if ("None".equals(GameState.Player.locationName)) {
                 locText = "Location: §8Scanning...";
@@ -67,18 +72,6 @@ public class GolemStatusHud extends HudElement {
 
         if (locText != null) {
             graphics.text(font, locText, 0, 24, 0xFFFFFFFF, true);
-        }
-
-        if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
-            String timerText;
-            if (isPreview) {
-                timerText = "Since S4: §f0m 45s";
-            } else {
-                long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
-                String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
-                timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
-            }
-            graphics.text(font, timerText, 0, 36, 0xFFFFFFFF, true);
         }
     }
 }
