@@ -49,7 +49,7 @@ public class EntityTracerRenderer {
                 color = 0xFFFF5555;
             } else if (entity instanceof EnderDragon) {
                 if (!ModConfig.INSTANCE.theEnd.enableDragonTracer) continue;
-                color = 0xFFFF55FF;
+                color = 0xFF000000 | dragonColor(GameState.Dragon.type);
             } else {
                 continue; // 該当なし
             }
@@ -60,5 +60,19 @@ public class EntityTracerRenderer {
             );
             props.setAlwaysOnTop();
         }
+    }
+
+    private static int dragonColor(String type) {
+        if (type == null) return 0xFF55FF;
+        return switch (type) {
+            case "Protector" -> 0x555555;
+            case "Old"       -> 0xAAAAAA;
+            case "Unstable"  -> 0xAA00AA;
+            case "Young"     -> 0xFFFFFF;
+            case "Strong"    -> 0xFF5555;
+            case "Wise"      -> 0x55FFFF;
+            case "Superior"  -> 0xFFFF55;
+            default          -> 0xFF55FF;
+        };
     }
 }
