@@ -21,7 +21,7 @@ public class GolemStatusHud extends HudElement {
         String displayStats;
 
         if (isPreview) {
-            displayStats = "§cStage: 5 (Spawned)";
+            displayStats = "Stage: §e4 §f(2m 30s)";
         } else {
             String stage = GameState.Golem.stage;
             if (GameState.Golem.isScanning) {
@@ -33,48 +33,39 @@ public class GolemStatusHud extends HudElement {
                 if (remainingTicks > 0) displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);
                 else displayStats = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) ? "§cStage: 5 §e(Soon)" : "§cStage: 5 (Spawned)";
             } else {
-                // ★修正1: Stage 4の「4」を黄色(§e)にするように色分けを追加
                 String num = switch (stage) {
                     case ModConstants.STAGE_RESTING -> "§f0";
                     case ModConstants.STAGE_DORMANT -> "§f1";
                     case ModConstants.STAGE_AGITATED -> "§f2";
                     case ModConstants.STAGE_DISTURBED -> "§f3";
-                    case ModConstants.STAGE_AWAKENING -> "§e4"; // 黄色
+                    case ModConstants.STAGE_AWAKENING -> "§e4";
                     default -> "§f?";
                 };
                 displayStats = "Stage: " + num;
+                if (ModConstants.STAGE_AWAKENING.equals(stage) && GameState.Golem.stage4StartTime > 0) {
+                    long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
+                    String col = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
+                    displayStats += String.format(" %s(%dm %ds)", col, seconds / 60, seconds % 60);
+                }
             }
         }
 
         context.drawTextWithShadow(tr, "§lGolem Status", 0, 0, 0xFFFFAA00);
         context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
 
-        // ★修正2: Locationテキストの生成。可読性向上のためif文に整理し、Stage 5の時は全体を赤色(§c)に。
         String locText = null;
         if (isPreview) {
-            // プレビューもStage 5想定なので、全体のテーマに合わせて赤色で表示
-            locText = "§cLocation: Middle Front";
+            locText = "Location: §fMiddle Front";
         } else if (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) || ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
             if ("None".equals(GameState.Player.locationName)) {
                 locText = "Location: §8Scanning...";
             } else if (ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage)) {
-                locText = "§cLocation: " + GameState.Player.locationName; // Stage 5: 全体が赤色
+                locText = "§cLocation: " + GameState.Player.locationName;
             } else {
-                locText = "Location: §f" + GameState.Player.locationName; // Stage 4: 通常色
+                locText = "Location: §f" + GameState.Player.locationName;
             }
         }
 
         if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
-
-        if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
-            String timerText;
-            if (isPreview) timerText = "Since S4: §f0m 45s";
-            else {
-                long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
-                String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
-                timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
-            }
-            context.drawTextWithShadow(tr, timerText, 0, 36, 0xFFFFFFFF);
-        }
     }
 }
