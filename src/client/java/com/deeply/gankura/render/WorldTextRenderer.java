@@ -153,7 +153,7 @@ public class WorldTextRenderer {
                 color = 0xFFFF5555;
             } else if (entity instanceof EnderDragonEntity) {
                 if (!ModConfig.INSTANCE.theEnd.enableDragonTracer) continue;
-                color = 0xFFFF55FF;
+                color = 0xFF000000 | dragonTracerColor(GameState.Dragon.type);
             } else if (entity instanceof MagmaCubeEntity
                     && EntityHighlightManager.magmaGlareEntities.contains(entity)) {
                 if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
@@ -170,5 +170,19 @@ public class WorldTextRenderer {
             Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
             GizmoDrawing.line(from, to, color, 4.0f).ignoreOcclusion();
         }
+    }
+
+    private static int dragonTracerColor(String type) {
+        if (type == null) return 0xFF55FF;
+        return switch (type) {
+            case "Protector" -> 0x555555;
+            case "Old"       -> 0xAAAAAA;
+            case "Unstable"  -> 0xAA00AA;
+            case "Young"     -> 0xFFFFFF;
+            case "Strong"    -> 0xFF5555;
+            case "Wise"      -> 0x55FFFF;
+            case "Superior"  -> 0xFFFF55;
+            default          -> 0xFF55FF;
+        };
     }
 }
