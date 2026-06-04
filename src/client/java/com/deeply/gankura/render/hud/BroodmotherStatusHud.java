@@ -55,7 +55,7 @@ public class BroodmotherStatusHud extends HudElement {
         graphics.text(font, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF, true);
         graphics.text(font, displayStats, 0, 12, 0xFFFFFFFF, true);
 
-        if (timerText != null && ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud_SinceS4) {
+        if (timerText != null) {
             graphics.text(font, timerText, 0, 24, 0xFFFFFFFF, true);
         }
     }

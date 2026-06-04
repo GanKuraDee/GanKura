@@ -69,18 +69,16 @@ public class GolemStatusHud extends HudElement {
             graphics.text(font, locText, 0, 24, 0xFFFFFFFF, true);
         }
 
-        if (ModConfig.INSTANCE.theEnd.showGolemStatusHud_SinceS4) {
-            if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
-                String timerText;
-                if (isPreview) {
-                    timerText = "Since S4: §f0m 45s";
-                } else {
-                    long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
-                    String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
-                    timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
-                }
-                graphics.text(font, timerText, 0, 36, 0xFFFFFFFF, true);
+        if (isPreview || (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && GameState.Golem.stage4StartTime > 0)) {
+            String timerText;
+            if (isPreview) {
+                timerText = "Since S4: §f0m 45s";
+            } else {
+                long seconds = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
+                String colorCode = seconds >= 480 ? "§c" : (seconds >= 240 ? "§e" : "§f");
+                timerText = String.format("Since S4: %s%dm %ds", colorCode, seconds / 60, seconds % 60);
             }
+            graphics.text(font, timerText, 0, 36, 0xFFFFFFFF, true);
         }
     }
 }

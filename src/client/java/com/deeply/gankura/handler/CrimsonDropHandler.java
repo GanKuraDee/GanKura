@@ -47,8 +47,8 @@ public class CrimsonDropHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
     }
 
-    // Magma Boss は 5 分、その他は 2 分のリスポーンタイマー
-    private static final long RESPAWN_MAGMA_BOSS_MS = 5 * 60 * 1000L;
+    // Magma Boss は 2 分、その他は 2 分のリスポーンタイマー
+    private static final long RESPAWN_MAGMA_BOSS_MS = 2 * 60 * 1000L;
     private static final long RESPAWN_DEFAULT_MS    = 2 * 60 * 1000L;
 
     // NetworkHandler から呼ばれる。"{BOSS} DOWN!" を検知してスキャン開始 & タイマーセット

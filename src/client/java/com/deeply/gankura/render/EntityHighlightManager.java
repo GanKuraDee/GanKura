@@ -243,6 +243,14 @@ public class EntityHighlightManager {
         if (!(namedEntity instanceof ArmorStand)) return namedEntity;
         AABB box = namedEntity.getBoundingBox().inflate(8.0);
 
+        // Magma Boss: MagmaCube のみを対象とし、ジャンプ中の位置ずれに対応するため広めに探索
+        // Kill the Magmas フェーズ中は単体エンティティが存在せず Magma Glare と誤マッチするためスキップ
+        if ("Magma Boss".equals(bossName)) {
+            if ("Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)) return null;
+            AABB wideBox = namedEntity.getBoundingBox().inflate(20.0);
+            return getClosestEntity(client.level.getEntitiesOfClass(MagmaCube.class, wideBox, e -> true), namedEntity);
+        }
+
         // Barbarian Duke X と Mage Outlaw は Player エンティティ型のボス。
         // Mob 検索をスキップして直接 Player を探す（近傍 Mob に誤ってマッチするのを防ぐ）
         boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
