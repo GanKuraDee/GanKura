@@ -9,7 +9,8 @@
 		"HudRenderMixin",
 		"WorldBeaconRenderMixin",
 		"WorldTimeMixin",
-		"WorldTextRenderMixin"
+		"WorldTextRenderMixin",
+		"GizmoTextFogMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
