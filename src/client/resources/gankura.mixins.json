@@ -9,7 +9,8 @@
 		"HotbarItemMixin",
 		"EntityGlowingMixin",
 		"PlayerGlowingMixin",
-		"WorldBeaconRenderMixin"
+		"WorldBeaconRenderMixin",
+		"GizmoTextFogMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
