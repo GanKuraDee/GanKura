@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "gankura",
+	"version": "${version}",
+	"name": "GanKura",
+	"description": "A Hypixel Skyblock Mod focused on Area Mini-bosses.",
+	"authors": [
+		"GanKuraDee"
+	],
+	"contact": {
+		"sources": "https://github.com/GanKuraDee/GanKura"
+	},
+	"license": "LGPL-3.0-or-later",
+	"icon": "assets/gankura/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"com.deeply.gankura.GanKura"
+		],
+		"modmenu": [
+			"com.deeply.gankura.compat.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		{
+			"config": "gankura.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
