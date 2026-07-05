@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class DragonLootTrackerHud extends HudElement {
     public DragonLootTrackerHud() {
-        super("dragonTracker", 10, 220, 1.0f, 150, 36,
+        super("dragonTracker", 10, 200, 1.0f, 150, 36,
                 () -> ModConfig.INSTANCE.theEnd.showDragonTrackerHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
