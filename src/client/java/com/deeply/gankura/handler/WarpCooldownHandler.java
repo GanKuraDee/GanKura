@@ -18,13 +18,22 @@ public class WarpCooldownHandler {
         if (!ModConfig.INSTANCE.misc.enableWarpQueue || !isWarpCommand(command)) return true;
 
         long now = System.currentTimeMillis();
-        if (now < GameState.Warp.cooldownEndAt) {
+        if (GameState.Warp.awaitingConfirmation || now < GameState.Warp.cooldownEndAt) {
             GameState.Warp.queuedCommand = command;
             return false;
         }
 
-        GameState.Warp.cooldownEndAt = now + COOLDOWN_MS;
+        // 実際のクールダウンはチャットに「Warping...」が表示されてから開始する
+        GameState.Warp.awaitingConfirmation = true;
         return true;
+    }
+
+    // NetworkHandler のチャットディスパッチャーから呼ばれる
+    public static void handleMessage(String unformattedMsg) {
+        if (GameState.Warp.awaitingConfirmation && unformattedMsg.contains("Warping...")) {
+            GameState.Warp.awaitingConfirmation = false;
+            GameState.Warp.cooldownEndAt = System.currentTimeMillis() + COOLDOWN_MS;
+        }
     }
 
     private static void onTick(Minecraft client) {
@@ -33,7 +42,7 @@ public class WarpCooldownHandler {
         GameState.Warp.cooldownEndAt = 0;
         String queued = GameState.Warp.queuedCommand;
         GameState.Warp.queuedCommand = null;
-        // 再送信は onCommand() を再度通過するため、そちら側で次のクールダウンが開始される
+        // 再送信は onCommand() を再度通過するため、そちら側で awaitingConfirmation が再度立てられる
         if (queued != null && client.player != null) {
             client.player.connection.sendCommand(queued);
         }
