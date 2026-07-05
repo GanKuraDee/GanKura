@@ -168,6 +168,12 @@ public class GameState {
         public static void reset() { isScanning = false; killedBoss = null; hasShownAlert = false; }
     }
 
+    public static class Warp {
+        public static long cooldownEndAt = 0;
+        public static String queuedCommand = null;
+        public static void reset() { cooldownEndAt = 0; queuedCommand = null; }
+    }
+
     public static void resetAll() {
         Server.reset();
         Player.reset();
@@ -183,5 +189,6 @@ public class GameState {
         AshfangUnderling.reset();
         MagmaBoss.reset();
         CrimsonDrop.reset();
+        Warp.reset();
     }
 }
