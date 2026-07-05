@@ -770,7 +770,7 @@ public class ModConfig extends Config {
         public boolean hudFolder = false;
 
         @Expose
-        @ConfigOption(name = "Active Pet HUD", desc = "Shows your currently active pet.")
+        @ConfigOption(name = "Pet HUD", desc = "Shows your currently active pet.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showPetHud = false;
