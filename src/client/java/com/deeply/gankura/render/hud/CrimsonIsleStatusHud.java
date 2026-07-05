@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class CrimsonIsleStatusHud extends HudElement {
     public CrimsonIsleStatusHud() {
-        super("crimson_isle_status", 200, 110, 1.0f, 180, 76,
+        super("crimson_isle_status", 200, 78, 1.0f, 180, 76,
                 () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleStatusHud,
                 () -> ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
                         || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode));

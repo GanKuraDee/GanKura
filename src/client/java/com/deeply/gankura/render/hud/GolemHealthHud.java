@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class GolemHealthHud extends HudElement {
     public GolemHealthHud() {
-        super("health", 10, 120, 1.0f, 100, 24,
+        super("health", 10, 106, 1.0f, 100, 24,
                 () -> ModConfig.INSTANCE.theEnd.showGolemHealthHud,
                 () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) && GameState.Golem.health != null);
     }

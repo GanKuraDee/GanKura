@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class WarpCooldownHud extends HudElement {
     public WarpCooldownHud() {
-        super("warp_cooldown", 400, 85, 1.0f, 100, 15,
+        super("warp_cooldown", 400, 79, 1.0f, 100, 15,
                 () -> ModConfig.INSTANCE.misc.enableWarpQueue,
                 () -> GameState.Warp.cooldownEndAt > System.currentTimeMillis());
     }
