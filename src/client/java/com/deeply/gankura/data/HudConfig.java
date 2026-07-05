@@ -50,6 +50,7 @@ public class HudConfig {
         ELEMENTS.add(new WarpCooldownHud());
         ELEMENTS.add(new TpsHud());
         ELEMENTS.add(new EquipmentHud());
+        ELEMENTS.add(new GearHud());
     }
 
     public static void load() {

@@ -1,0 +1,43 @@
+package com.deeply.gankura.render.hud;
+
+import com.deeply.gankura.data.EquipmentState;
+import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConfig.HudOrientation;
+import com.deeply.gankura.render.HudElement;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+
+import java.util.List;
+
+public class GearHud extends HudElement {
+    private static final List<ItemStack> PREVIEW_STACKS = List.of(
+            new ItemStack(Items.TOTEM_OF_UNDYING), new ItemStack(Items.PLAYER_HEAD),
+            new ItemStack(Items.LEATHER_LEGGINGS), new ItemStack(Items.NETHER_STAR)
+    );
+    private static final int SLOT_SIZE = 18;
+    private static final int DEFAULT_SLOTS = 4;
+
+    public GearHud() {
+        super("gear", 10, 190, 1.0f, SLOT_SIZE * DEFAULT_SLOTS, SLOT_SIZE,
+                () -> ModConfig.INSTANCE.misc.showGearHud, () -> true);
+    }
+
+    @Override
+    public void renderElement(DrawContext context, boolean isPreview) {
+        boolean vertical = ModConfig.INSTANCE.misc.gearHudOrientation == HudOrientation.VERTICAL;
+        List<ItemStack> stacks = isPreview ? PREVIEW_STACKS : EquipmentState.items;
+        int count = Math.max(1, stacks.size());
+
+        this.width = vertical ? SLOT_SIZE : SLOT_SIZE * count;
+        this.height = vertical ? SLOT_SIZE * count : SLOT_SIZE;
+
+        for (int i = 0; i < stacks.size(); i++) {
+            ItemStack stack = stacks.get(i);
+            if (stack.isEmpty()) continue;
+            int x = vertical ? 1 : i * SLOT_SIZE + 1;
+            int y = vertical ? i * SLOT_SIZE + 1 : 1;
+            context.drawItem(stack, x, y);
+        }
+    }
+}
