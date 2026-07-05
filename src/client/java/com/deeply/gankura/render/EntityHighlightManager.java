@@ -152,7 +152,7 @@ public class EntityHighlightManager {
             if (customName == null) continue;
             String nameStr = customName.getString();
 
-            if (scanGolem && nameStr.contains("End Stone Protector")) {
+            if (scanGolem && ModConstants.PROTECTOR_ENTITY_NAME_PATTERN.matcher(nameStr).find()) {
                 AABB searchBox = entity.getBoundingBox().inflate(8.0);
                 List<IronGolem> golems = client.level.getEntitiesOfClass(IronGolem.class, searchBox, e -> true);
                 Entity closest = getClosestEntity(golems, entity);
