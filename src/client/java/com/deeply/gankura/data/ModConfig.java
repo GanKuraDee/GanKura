@@ -794,27 +794,27 @@ public class ModConfig extends Config {
         public boolean enableWarpQueue = true;
 
         @Expose
-        @ConfigOption(name = "Server TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
+        @ConfigOption(name = "TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
         @ConfigEditorBoolean
         public boolean showTpsHud = false;
 
         @Expose
-        @ConfigOption(name = "Equipped Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
+        @ConfigOption(name = "Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
         @ConfigEditorBoolean
         public boolean showEquipmentHud = false;
 
         @Expose
-        @ConfigOption(name = "Equipped Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
+        @ConfigOption(name = "Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
         @ConfigEditorDropdown
         public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
-        @ConfigOption(name = "Skyblock Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
+        @ConfigOption(name = "Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
         @ConfigEditorBoolean
         public boolean showGearHud = false;
 
         @Expose
-        @ConfigOption(name = "Skyblock Equipment HUD Orientation", desc = "Lays the Skyblock Equipment HUD out horizontally or vertically.")
+        @ConfigOption(name = "Equipment HUD Orientation", desc = "Lays the Equipment HUD out horizontally or vertically.")
         @ConfigEditorDropdown
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
     }
