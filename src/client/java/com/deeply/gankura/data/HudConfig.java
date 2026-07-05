@@ -48,6 +48,7 @@ public class HudConfig {
         ELEMENTS.add(new DayHud());
         ELEMENTS.add(new WarpCooldownHud());
         ELEMENTS.add(new TpsHud());
+        ELEMENTS.add(new EquipmentHud());
     }
 
     public static void load() {
