@@ -789,6 +789,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
+        @ConfigEditorAccordion(id = 51)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showEquipmentHud = false;
@@ -796,11 +797,12 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
         @ConfigEditorDropdown
-        @ConfigAccordionId(id = 50)
+        @ConfigAccordionId(id = 51)
         public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
         @ConfigOption(name = "Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
+        @ConfigEditorAccordion(id = 52)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showGearHud = false;
@@ -808,7 +810,7 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Equipment HUD Orientation", desc = "Lays the Equipment HUD out horizontally or vertically.")
         @ConfigEditorDropdown
-        @ConfigAccordionId(id = 50)
+        @ConfigAccordionId(id = 52)
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
