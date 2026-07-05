@@ -517,7 +517,7 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         public boolean showCrimsonLootTrackerHud = true;
 
-        // ---- Barbarian Duke X (id: 0, 1, 2) ----
+        // ---- Barbarian Duke X (id: 0) ----
         @Expose
         @ConfigOption(name = "Barbarian Duke X", desc = "Expand to configure Barbarian Duke X settings.")
         @ConfigEditorAccordion(id = 0)
@@ -525,38 +525,24 @@ public class ModConfig extends Config {
         public boolean barbarianSection = false;
 
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 1)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean barbarianHudFolder = false;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Barbarian Duke X Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
-        public boolean showBarbarianHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
-        @ConfigEditorAccordion(id = 2)
-        @ConfigEditorBoolean
         @ConfigAccordionId(id = 0)
-        public boolean barbarianHighlightFolder = false;
+        public boolean showBarbarianHealthHud = true;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Barbarian Duke X through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 0)
         public boolean enableBarbarianHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Barbarian Duke X.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
+        @ConfigAccordionId(id = 0)
         public boolean enableBarbarianTracer = true;
 
-        // ---- Bladesoul (id: 10, 11, 12) ----
+        // ---- Bladesoul (id: 10) ----
         @Expose
         @ConfigOption(name = "Bladesoul", desc = "Expand to configure Bladesoul settings.")
         @ConfigEditorAccordion(id = 10)
@@ -564,38 +550,24 @@ public class ModConfig extends Config {
         public boolean bladesoulSection = false;
 
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 11)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean bladesoulHudFolder = false;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Bladesoul Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 11)
-        public boolean showBladesoulHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
-        @ConfigEditorAccordion(id = 12)
-        @ConfigEditorBoolean
         @ConfigAccordionId(id = 10)
-        public boolean bladesoulHighlightFolder = false;
+        public boolean showBladesoulHealthHud = true;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Bladesoul through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 12)
+        @ConfigAccordionId(id = 10)
         public boolean enableBladesoulHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Bladesoul.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 12)
+        @ConfigAccordionId(id = 10)
         public boolean enableBladesoulTracer = true;
 
-        // ---- Mage Outlaw (id: 20, 21, 22) ----
+        // ---- Mage Outlaw (id: 20) ----
         @Expose
         @ConfigOption(name = "Mage Outlaw", desc = "Expand to configure Mage Outlaw settings.")
         @ConfigEditorAccordion(id = 20)
@@ -603,38 +575,24 @@ public class ModConfig extends Config {
         public boolean mageOutlawSection = false;
 
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 21)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 20)
-        public boolean mageOutlawHudFolder = false;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Mage Outlaw Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 21)
-        public boolean showMageOutlawHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
-        @ConfigEditorAccordion(id = 22)
-        @ConfigEditorBoolean
         @ConfigAccordionId(id = 20)
-        public boolean mageOutlawHighlightFolder = false;
+        public boolean showMageOutlawHealthHud = true;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Mage Outlaw through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 22)
+        @ConfigAccordionId(id = 20)
         public boolean enableMageOutlawHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Mage Outlaw.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 22)
+        @ConfigAccordionId(id = 20)
         public boolean enableMageOutlawTracer = true;
 
-        // ---- Ashfang (id: 30, 31, 32) ----
+        // ---- Ashfang (id: 30, 33) ----
         @Expose
         @ConfigOption(name = "Ashfang", desc = "Expand to configure Ashfang settings.")
         @ConfigEditorAccordion(id = 30)
@@ -642,35 +600,21 @@ public class ModConfig extends Config {
         public boolean ashfangSection = false;
 
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 31)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 30)
-        public boolean ashfangHudFolder = false;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Ashfang Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 31)
-        public boolean showAshfangHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
-        @ConfigEditorAccordion(id = 32)
-        @ConfigEditorBoolean
         @ConfigAccordionId(id = 30)
-        public boolean ashfangHighlightFolder = false;
+        public boolean showAshfangHealthHud = true;
 
         @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Ashfang through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 32)
+        @ConfigAccordionId(id = 30)
         public boolean enableAshfangHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Ashfang.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 32)
+        @ConfigAccordionId(id = 30)
         public boolean enableAshfangTracer = true;
 
         @Expose
@@ -716,7 +660,7 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 33)
         public boolean enableAshfangUnderlingTracer = true;
 
-        // ---- Magma Boss (id: 40, 41, 42) ----
+        // ---- Magma Boss (id: 40) ----
         @Expose
         @ConfigOption(name = "Magma Boss", desc = "Expand to configure Magma Boss settings.")
         @ConfigEditorAccordion(id = 40)
@@ -724,16 +668,9 @@ public class ModConfig extends Config {
         public boolean magmaBossSection = false;
 
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
-        @ConfigEditorAccordion(id = 41)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean magmaBossHudFolder = false;
-
-        @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Magma Boss Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 41)
+        @ConfigAccordionId(id = 40)
         public boolean showMagmaBossHealthHud = true;
 
         @Expose
@@ -743,22 +680,15 @@ public class ModConfig extends Config {
         public boolean enableMagmaBossTitle = true;
 
         @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure boss highlight settings.")
-        @ConfigEditorAccordion(id = 42)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean magmaBossHighlightFolder = false;
-
-        @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Magma Boss through walls.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 42)
+        @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Magma Boss.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 42)
+        @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossTracer = true;
     }
 
