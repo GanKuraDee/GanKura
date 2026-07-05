@@ -24,12 +24,18 @@ public class EquipmentHud extends HudElement {
 
     @Override
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
+        boolean vertical = ModConfig.INSTANCE.misc.equipmentHudOrientation == ModConfig.HudOrientation.VERTICAL;
+        this.width = vertical ? SLOT_SIZE : SLOT_SIZE * SLOTS.length;
+        this.height = vertical ? SLOT_SIZE * SLOTS.length : SLOT_SIZE;
+
         Player player = Minecraft.getInstance().player;
 
         for (int i = 0; i < SLOTS.length; i++) {
             ItemStack stack = isPreview ? PREVIEW_STACKS[i] : (player != null ? player.getItemBySlot(SLOTS[i]) : ItemStack.EMPTY);
             if (stack.isEmpty()) continue;
-            graphics.item(stack, i * SLOT_SIZE + 1, 1);
+            int x = vertical ? 1 : i * SLOT_SIZE + 1;
+            int y = vertical ? i * SLOT_SIZE + 1 : 1;
+            graphics.item(stack, x, y);
         }
     }
 }

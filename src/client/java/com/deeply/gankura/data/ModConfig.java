@@ -18,6 +18,15 @@ import java.util.Optional;
 
 public class ModConfig extends Config {
 
+    public enum HudOrientation {
+        HORIZONTAL, VERTICAL;
+
+        @Override
+        public String toString() {
+            return this == HORIZONTAL ? "Horizontal" : "Vertical";
+        }
+    }
+
     // ★修正1: final を外して、ファイルから読み込んだデータで上書きできるようにします
     public static ModConfig INSTANCE = new ModConfig();
 
@@ -817,5 +826,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Equipped Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
         @ConfigEditorBoolean
         public boolean showEquipmentHud = false;
+
+        @Expose
+        @ConfigOption(name = "Equipped Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
+        @ConfigEditorDropdown
+        public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
     }
 }
