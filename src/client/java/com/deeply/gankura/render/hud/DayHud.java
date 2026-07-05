@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class DayHud extends HudElement {
     public DayHud() {
-        super("day", 10, 90, 1.0f, 60, 15, () -> ModConfig.INSTANCE.misc.showDayHud, () -> true);
+        super("day", 400, 65, 1.0f, 60, 15, () -> ModConfig.INSTANCE.misc.showDayHud, () -> true);
     }
 
     @Override
