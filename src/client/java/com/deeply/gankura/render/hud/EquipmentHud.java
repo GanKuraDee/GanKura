@@ -1,6 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConfig.HudOrientation;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -24,12 +25,18 @@ public class EquipmentHud extends HudElement {
 
     @Override
     public void renderElement(DrawContext context, boolean isPreview) {
+        boolean vertical = ModConfig.INSTANCE.misc.equipmentHudOrientation == HudOrientation.VERTICAL;
+        this.width = vertical ? SLOT_SIZE : SLOT_SIZE * SLOTS.length;
+        this.height = vertical ? SLOT_SIZE * SLOTS.length : SLOT_SIZE;
+
         PlayerEntity player = MinecraftClient.getInstance().player;
 
         for (int i = 0; i < SLOTS.length; i++) {
             ItemStack stack = isPreview ? PREVIEW_STACKS[i] : (player != null ? player.getEquippedStack(SLOTS[i]) : ItemStack.EMPTY);
             if (stack.isEmpty()) continue;
-            context.drawItem(stack, i * SLOT_SIZE + 1, 1);
+            int x = vertical ? 1 : i * SLOT_SIZE + 1;
+            int y = vertical ? i * SLOT_SIZE + 1 : 1;
+            context.drawItem(stack, x, y);
         }
     }
 }
