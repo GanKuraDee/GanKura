@@ -778,5 +778,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Server Reboot Alert", desc = "Warning with sound and title when the current lobby restarts.")
         @ConfigEditorBoolean
         public boolean enableRebootAlert = true;
+
+        @Expose
+        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows a 5s countdown after using /warp. If /warp is used again during the cooldown, it is queued and sent automatically once the cooldown ends.")
+        @ConfigEditorBoolean
+        public boolean enableWarpQueue = true;
     }
 }
