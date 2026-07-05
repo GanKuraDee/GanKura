@@ -38,5 +38,10 @@ public class EquipmentScanner {
         }
 
         EquipmentState.items = found;
+        // CLIENT_STOPPING 時には既にワールドから切断済みでレジストリ情報が失われている場合があるため、
+        // スキャンできた時点でその都度保存しておく
+        if (client.world != null) {
+            EquipmentState.save(client.world.getRegistryManager());
+        }
     }
 }
