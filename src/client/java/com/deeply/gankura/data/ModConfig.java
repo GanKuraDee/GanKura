@@ -800,22 +800,16 @@ public class ModConfig extends Config {
         public boolean showPetHud = false;
 
         @Expose
-        @ConfigOption(name = "Day HUD", desc = "Shows the current lobby's age.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showDayHud = false;
-
-        @Expose
-        @ConfigOption(name = "Armor Stack HUD", desc = "Shows the number of armor stacks for Crimson, Terror, Aurora, Hollow, and Fervor.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showArmorStackHud = false;
-
-        @Expose
         @ConfigOption(name = "TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showTpsHud = false;
+
+        @Expose
+        @ConfigOption(name = "Day HUD", desc = "Shows the current lobby's age.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showDayHud = false;
 
         @Expose
         @ConfigOption(name = "Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
@@ -840,6 +834,12 @@ public class ModConfig extends Config {
         @ConfigEditorDropdown
         @ConfigAccordionId(id = 50)
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
+
+        @Expose
+        @ConfigOption(name = "Armor Stack HUD", desc = "Shows the number of armor stacks for Crimson, Terror, Aurora, Hollow, and Fervor.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showArmorStackHud = false;
 
         @Expose
         @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows Toxic/Twilight Arrow Poison uses left on your bows in the hotbar.")
