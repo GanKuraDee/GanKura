@@ -764,19 +764,58 @@ public class ModConfig extends Config {
 
     public static class MiscCategory {
         @Expose
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure HUD elements.")
+        @ConfigEditorAccordion(id = 50)
+        @ConfigEditorBoolean
+        public boolean hudFolder = false;
+
+        @Expose
         @ConfigOption(name = "Active Pet HUD", desc = "Shows your currently active pet.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
         public boolean showPetHud = false;
 
         @Expose
         @ConfigOption(name = "Day HUD", desc = "Shows the current lobby's age.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
         public boolean showDayHud = false;
 
         @Expose
         @ConfigOption(name = "Armor Stack HUD", desc = "Shows the number of armor stacks for Crimson, Terror, Aurora, Hollow, and Fervor.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
         public boolean showArmorStackHud = false;
+
+        @Expose
+        @ConfigOption(name = "TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showTpsHud = false;
+
+        @Expose
+        @ConfigOption(name = "Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showEquipmentHud = false;
+
+        @Expose
+        @ConfigOption(name = "Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 50)
+        public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
+
+        @Expose
+        @ConfigOption(name = "Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showGearHud = false;
+
+        @Expose
+        @ConfigOption(name = "Equipment HUD Orientation", desc = "Lays the Equipment HUD out horizontally or vertically.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 50)
+        public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
         @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows Toxic/Twilight Arrow Poison uses left on your bows in the hotbar.")
@@ -792,30 +831,5 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows a 5s countdown after using /warp. If /warp is used again during the cooldown, it is queued and sent automatically once the cooldown ends.")
         @ConfigEditorBoolean
         public boolean enableWarpQueue = true;
-
-        @Expose
-        @ConfigOption(name = "TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
-        @ConfigEditorBoolean
-        public boolean showTpsHud = false;
-
-        @Expose
-        @ConfigOption(name = "Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
-        @ConfigEditorBoolean
-        public boolean showEquipmentHud = false;
-
-        @Expose
-        @ConfigOption(name = "Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
-        @ConfigEditorDropdown
-        public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
-
-        @Expose
-        @ConfigOption(name = "Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
-        @ConfigEditorBoolean
-        public boolean showGearHud = false;
-
-        @Expose
-        @ConfigOption(name = "Equipment HUD Orientation", desc = "Lays the Equipment HUD out horizontally or vertically.")
-        @ConfigEditorDropdown
-        public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
     }
 }
