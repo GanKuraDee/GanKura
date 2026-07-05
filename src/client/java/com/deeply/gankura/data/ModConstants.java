@@ -34,12 +34,21 @@ public class ModConstants {
     // ★追加: Broodmother のタブリストスキャン用パターン
     public static final Pattern BROODMOTHER_PATTERN = Pattern.compile("Broodmother:\\s+(.+)");
 
+    // Hypixel側の表記ゆれ ("End Stone Protector" / "Endstone Protector") 両方に対応する共通の名前パターン
+    private static final String PROTECTOR_NAME_REGEX = "End ?Stone Protector";
+
+    // エンティティ名でのマッチング用 (EntityHealthScanner, EntityHighlightManager)
+    public static final Pattern PROTECTOR_ENTITY_NAME_PATTERN = Pattern.compile(PROTECTOR_NAME_REGEX, Pattern.CASE_INSENSITIVE);
+
     // Stage 5 (Spawn Timer Start)
-    public static final String GOLEM_SPAWN_MSG = "The ground begins to shake as an End Stone Protector rises from below!";
+    public static final Pattern GOLEM_SPAWN_PATTERN = Pattern.compile(
+            "The ground begins to shake as an " + PROTECTOR_NAME_REGEX + " rises from below!", Pattern.CASE_INSENSITIVE);
 
     // DPS計測用 (Fight Start / End)
-    public static final String GOLEM_RISE_MSG = "BEWARE - An Endstone Protector has risen!";
-    public static final String GOLEM_DOWN_MSG = "END STONE PROTECTOR DOWN!";
+    public static final Pattern GOLEM_RISE_PATTERN = Pattern.compile(
+            "BEWARE - An " + PROTECTOR_NAME_REGEX + " has risen!", Pattern.CASE_INSENSITIVE);
+    public static final Pattern GOLEM_DOWN_PATTERN = Pattern.compile(
+            PROTECTOR_NAME_REGEX + " DOWN!", Pattern.CASE_INSENSITIVE);
 
     // ダメージ取得用 ("Your Damage: 1,234,567 (Position #5)")
     public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)");

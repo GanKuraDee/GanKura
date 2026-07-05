@@ -134,7 +134,7 @@ public class EntityHighlightManager {
             if (customName == null) continue;
             String nameStr = customName.getString();
 
-            if (scanGolem && nameStr.contains("End Stone Protector")) {
+            if (scanGolem && ModConstants.PROTECTOR_ENTITY_NAME_PATTERN.matcher(nameStr).find()) {
                 Box box = entity.getBoundingBox().expand(8.0);
                 Entity g = getClosestEntity(client.world.getEntitiesByClass(IronGolemEntity.class, box, e -> true), entity);
                 if (g != null) highlightedEntities.add(g);

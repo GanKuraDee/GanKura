@@ -23,12 +23,12 @@ public class GolemHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("GolemHandler");
 
     public static void handleMessage(String msg, MinecraftClient client) {
-        if (msg.contains(ModConstants.GOLEM_SPAWN_MSG)) {
+        if (ModConstants.GOLEM_SPAWN_PATTERN.matcher(msg).find()) {
             client.execute(() -> setStageToSummoned(client));
             return;
         }
 
-        if (msg.contains(ModConstants.GOLEM_RISE_MSG)) {
+        if (ModConstants.GOLEM_RISE_PATTERN.matcher(msg).find()) {
             GameState.Golem.hasRisen = true;
             if (client.world != null) {
                 GameState.Golem.fightStartTime = client.world.getTime();
@@ -37,7 +37,7 @@ public class GolemHandler {
             return;
         }
 
-        if (msg.contains(ModConstants.GOLEM_DOWN_MSG)) {
+        if (ModConstants.GOLEM_DOWN_PATTERN.matcher(msg).find()) {
             if (client.world != null) {
                 GameState.Golem.fightEndTime = client.world.getTime();
                 GameState.Player.isLootScanning = true; GameState.Player.hasShownDropAlert = false;

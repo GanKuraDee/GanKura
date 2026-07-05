@@ -75,7 +75,7 @@ public class EntityHealthScanner {
             if (customName == null) continue;
             String nameStr = customName.getString();
 
-            if (scanGolem && foundGolemHealth == null && nameStr.contains("End Stone Protector")) {
+            if (scanGolem && foundGolemHealth == null && ModConstants.PROTECTOR_ENTITY_NAME_PATTERN.matcher(nameStr).find()) {
                 Matcher m = HEALTH_PATTERN.matcher(nameStr);
                 if (m.find()) foundGolemHealth = m.group(1);
             }
