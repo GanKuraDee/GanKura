@@ -9,7 +9,7 @@ public abstract class HudElement {
     public float scale;
     public final int defaultX, defaultY;
     public final float defaultScale;
-    public final int width, height;
+    public int width, height;
 
     private final Supplier<Boolean> enabledSupplier;
     private final Supplier<Boolean> visibilityCondition;
