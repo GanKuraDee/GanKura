@@ -46,6 +46,7 @@ public class NetworkHandler {
             ServerRestartHandler.handleChat(unformattedMsg, client);
             PetHandler.handleMessage(message);
             CrimsonDropHandler.handleMessage(unformattedMsg);
+            WarpCooldownHandler.handleMessage(unformattedMsg);
 
             if (DragonHandler.handleMessage(msg, client)) {
                 return true;
