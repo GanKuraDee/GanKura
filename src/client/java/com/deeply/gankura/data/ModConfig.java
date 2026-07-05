@@ -788,5 +788,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Server TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
         @ConfigEditorBoolean
         public boolean showTpsHud = false;
+
+        @Expose
+        @ConfigOption(name = "Equipped Armor HUD", desc = "Shows the armor pieces you currently have equipped.")
+        @ConfigEditorBoolean
+        public boolean showEquipmentHud = false;
     }
 }

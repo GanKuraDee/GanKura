@@ -1,0 +1,35 @@
+package com.deeply.gankura.render.hud;
+
+import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.render.HudElement;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+
+public class EquipmentHud extends HudElement {
+    private static final EquipmentSlot[] SLOTS = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
+    private static final ItemStack[] PREVIEW_STACKS = {
+            new ItemStack(Items.DIAMOND_HELMET), new ItemStack(Items.DIAMOND_CHESTPLATE),
+            new ItemStack(Items.DIAMOND_LEGGINGS), new ItemStack(Items.DIAMOND_BOOTS)
+    };
+    private static final int SLOT_SIZE = 18;
+
+    public EquipmentHud() {
+        super("equipment", 10, 170, 1.0f, SLOT_SIZE * SLOTS.length, SLOT_SIZE,
+                () -> ModConfig.INSTANCE.misc.showEquipmentHud, () -> true);
+    }
+
+    @Override
+    public void renderElement(DrawContext context, boolean isPreview) {
+        PlayerEntity player = MinecraftClient.getInstance().player;
+
+        for (int i = 0; i < SLOTS.length; i++) {
+            ItemStack stack = isPreview ? PREVIEW_STACKS[i] : (player != null ? player.getEquippedStack(SLOTS[i]) : ItemStack.EMPTY);
+            if (stack.isEmpty()) continue;
+            context.drawItem(stack, i * SLOT_SIZE + 1, 1);
+        }
+    }
+}
