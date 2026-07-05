@@ -47,6 +47,7 @@ public class HudConfig {
         ELEMENTS.add(new ArmorStackHud());
         ELEMENTS.add(new DayHud());
         ELEMENTS.add(new WarpCooldownHud());
+        ELEMENTS.add(new TpsHud());
     }
 
     public static void load() {
