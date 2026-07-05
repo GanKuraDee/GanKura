@@ -807,5 +807,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows a 5s countdown after using /warp. If /warp is used again during the cooldown, it is queued and sent automatically once the cooldown ends.")
         @ConfigEditorBoolean
         public boolean enableWarpQueue = true;
+
+        @Expose
+        @ConfigOption(name = "Server TPS HUD", desc = "Shows the server's estimated TPS (ticks per second).")
+        @ConfigEditorBoolean
+        public boolean showTpsHud = false;
     }
 }

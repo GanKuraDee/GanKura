@@ -13,6 +13,10 @@ public class GameState {
         public static long lastTimePacket = 0;
         public static long lastPacketArrivalMillis = 0;
 
+        public static double tps = 20.0;
+        public static long tpsWindowStartMillis = 0;
+        public static long tpsWindowStartTicks = 0;
+
         public static boolean isClosing = false;
         public static String closingTime = null;
         public static long lastWorldJoinTime = 0;
