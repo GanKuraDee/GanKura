@@ -189,6 +189,6 @@ public class GameState {
         AshfangUnderling.reset();
         MagmaBoss.reset();
         CrimsonDrop.reset();
-        Warp.reset();
+        // Warp のクールダウンは /warp 自体がワールド移動を伴うため、resetAll() の対象から除外する
     }
 }
