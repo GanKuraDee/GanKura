@@ -9,6 +9,7 @@ import com.deeply.gankura.handler.WarpCooldownHandler;
 import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
+import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.ModConfig;
 
 import io.github.notenoughupdates.moulconfig.gui.GuiContext;
@@ -50,6 +51,7 @@ public class GanKura implements ClientModInitializer {
         EntityHighlightManager.register();
         CrimsonDropHandler.register();
         WarpCooldownHandler.register();
+        EquipmentScanner.register();
 
         // ★追加: 毎ティック（1/20秒）ごとに予約チケットをチェックする
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -67,6 +69,10 @@ public class GanKura implements ClientModInitializer {
         // ★追加: ゲーム終了時に、確実に最新の設定をファイルに保存する
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             ModConfig.INSTANCE.saveNow();
+            // 最後にスキャンしたSkyblock Equipmentも保存する (レジストリ情報が必要なためワールド参加中のみ)
+            if (client.level != null) {
+                EquipmentState.save(client.level.registryAccess());
+            }
             LOGGER.info("GanKura config saved successfully on exit.");
         });
 

@@ -831,5 +831,15 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Equipped Armor HUD Orientation", desc = "Lays the armor HUD out horizontally or vertically.")
         @ConfigEditorDropdown
         public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
+
+        @Expose
+        @ConfigOption(name = "Skyblock Equipment HUD", desc = "Shows the Necklace/Cloak/Belt/Gloves last scanned by opening /equipment.")
+        @ConfigEditorBoolean
+        public boolean showGearHud = false;
+
+        @Expose
+        @ConfigOption(name = "Skyblock Equipment HUD Orientation", desc = "Lays the Skyblock Equipment HUD out horizontally or vertically.")
+        @ConfigEditorDropdown
+        public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
     }
 }

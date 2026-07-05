@@ -1,5 +1,6 @@
 package com.deeply.gankura.handler;
 
+import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.GameState;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -15,6 +16,8 @@ public class NetworkHandler {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             GameState.resetAll();
             PetHandler.reset();
+            // 保存されていたSkyblock Equipmentを、レジストリアクセスが手に入ったこのタイミングで復元する
+            EquipmentState.hydrate(handler.registryAccess());
 
             // ★変更: isInSingleplayer() -> isSingleplayer()、getServerInfo() -> getCurrentServer()
             if (!client.isSingleplayer() && client.getCurrentServer() != null) {
