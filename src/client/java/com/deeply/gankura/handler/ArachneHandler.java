@@ -33,7 +33,6 @@ public class ArachneHandler {
     public static void handleMessage(String unformattedMsg, Minecraft client) {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
-            GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
@@ -43,7 +42,6 @@ public class ArachneHandler {
 
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CRYSTAL_MSG)) {
             GameState.Arachne.isSummoning = true;
-            GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Big";
             // Quick Spawn(18秒)か通常スポーン(34秒)かは、観測時間内のDUSTパーティクル数で確定させる(上のtickで判定)
             GameState.Arachne.spawnTargetTime = 0;
@@ -61,7 +59,6 @@ public class ArachneHandler {
         }
 
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_DOWN_MSG)) {
-            GameState.Arachne.isReady = true;
             GameState.Arachne.isSummoning = false;
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
