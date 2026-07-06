@@ -27,6 +27,7 @@ public class EntityHighlightManager {
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
     public static final Set<Entity> arachneEntities = new HashSet<>();
+    public static final Set<Entity> arachneBroodEntities = new HashSet<>();
 
     // Ashfang のフォロワー3種（ハイライト・トレーサーの個別設定付き）
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
@@ -105,9 +106,11 @@ public class EntityHighlightManager {
 
     private static void updateHighlights(Minecraft client) {
         // Crimson ボス関連マップは毎 tick クリアして再検出（エンティティ参照が変わるため）
-        highlightedEntities.removeIf(e -> crimsonBossEntities.containsKey(e) || magmaGlareEntities.contains(e));
+        // Arachne's Brood も複数体が同時に増減するため同様に毎 tick クリアして再検出する
+        highlightedEntities.removeIf(e -> crimsonBossEntities.containsKey(e) || magmaGlareEntities.contains(e) || arachneBroodEntities.contains(e));
         crimsonBossEntities.clear();
         magmaGlareEntities.clear();
+        arachneBroodEntities.clear();
 
         if (client.level == null || client.player == null) {
             highlightedEntities.clear();
@@ -176,6 +179,14 @@ public class EntityHighlightManager {
                 if (visualTarget != null) {
                     highlightedEntities.add(visualTarget);
                     arachneEntities.add(visualTarget);
+                }
+            }
+
+            if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
+                Entity visualTarget = findVisualEntity(client, entity, "Arachne's Brood");
+                if (visualTarget != null) {
+                    highlightedEntities.add(visualTarget);
+                    arachneBroodEntities.add(visualTarget);
                 }
             }
 
