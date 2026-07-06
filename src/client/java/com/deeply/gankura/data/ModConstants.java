@@ -95,7 +95,10 @@ public class ModConstants {
     // Arachne (Spider's Den) 関連のメッセージ
     // =======================================================
     public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)";
-    public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A beffiting welcome!";
+    public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A befitting welcome!";
+
+    // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
+    public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";
 
     // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
     public static boolean containsIgnoreCase(String source, String target) {
