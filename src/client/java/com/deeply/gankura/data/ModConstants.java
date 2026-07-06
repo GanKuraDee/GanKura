@@ -106,4 +106,11 @@ public class ModConstants {
         return source != null && target != null
                 && source.toLowerCase(java.util.Locale.ROOT).contains(target.toLowerCase(java.util.Locale.ROOT));
     }
+
+    // Sanctuary内には「Arachne」を名前に含む雑魚も存在するため、
+    // 実際のボス(Lvl 300 または Lvl 500)かどうかをレベル表記の有無で判別する
+    public static boolean isArachneBossName(String nameStr) {
+        return containsIgnoreCase(nameStr, "Arachne")
+                && (containsIgnoreCase(nameStr, "Lvl 300") || containsIgnoreCase(nameStr, "Lvl 500"));
+    }
 }
