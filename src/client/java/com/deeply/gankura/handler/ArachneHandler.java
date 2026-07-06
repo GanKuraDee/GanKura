@@ -52,7 +52,9 @@ public class ArachneHandler {
             return;
         }
 
-        if (ModConstants.startsWithIgnoreCase(unformattedMsg, ModConstants.ARACHNE_BOSS_MSG_PREFIX)) {
+        if (ModConstants.startsWithIgnoreCase(unformattedMsg, ModConstants.ARACHNE_BOSS_MSG_PREFIX)
+                && !ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_DEFEAT_QUOTE_1)
+                && !ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_DEFEAT_QUOTE_2)) {
             // 蜘蛛の巣がまだ検知できていない間、間もなくスポーンする合図として使う(カウントダウン中は優先されない)
             GameState.Arachne.arachneMessageSeen = true;
             return;
