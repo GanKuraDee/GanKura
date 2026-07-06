@@ -11,7 +11,8 @@
 		"PlayerGlowingMixin",
 		"WorldBeaconRenderMixin",
 		"GizmoTextFogMixin",
-		"MouseCursorRestoreMixin"
+		"MouseCursorRestoreMixin",
+		"MouseAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
