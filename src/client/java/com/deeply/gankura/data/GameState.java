@@ -117,10 +117,11 @@ public class GameState {
         public static long spawnTargetTime = 0;
         public static boolean hasSpawned = false;
         public static boolean inSanctuary = false; // スコアボードに「Arachne's Sanctuary」の行が検出された場合 true
+        public static boolean isReady = false; // 「ARACHNE DOWN!」検知後、次の召喚まで true
         public static String health = null;
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false;
-            health = null;
+            isReady = false; health = null;
         }
     }
 

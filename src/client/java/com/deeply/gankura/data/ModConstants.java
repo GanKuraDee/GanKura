@@ -96,6 +96,7 @@ public class ModConstants {
     // =======================================================
     public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)";
     public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A befitting welcome!";
+    public static final String ARACHNE_DOWN_MSG = "ARACHNE DOWN!";
 
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
     public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";

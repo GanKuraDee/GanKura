@@ -25,7 +25,9 @@ public class ArachneStatusHud extends HudElement {
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
-            if (GameState.Arachne.hasSpawned) {
+            if (GameState.Arachne.isReady) {
+                status = "§aReady";
+            } else if (GameState.Arachne.hasSpawned) {
                 status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
             } else if (GameState.Arachne.isSummoning) {
                 long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
@@ -40,6 +42,6 @@ public class ArachneStatusHud extends HudElement {
         }
 
         context.drawTextWithShadow(tr, "§5§lArachne Status", 0, 0, 0xFFFFFFFF);
-        context.drawTextWithShadow(tr, "Status: " + status, 0, 12, 0xFFFFFFFF);
+        context.drawTextWithShadow(tr, "Altar: " + status, 0, 12, 0xFFFFFFFF);
     }
 }
