@@ -99,6 +99,9 @@ public class ModConstants {
     public static final String ARACHNE_DOWN_MSG = "ARACHNE DOWN!";
     // このプレフィックスで始まるメッセージが来たら、蜘蛛の巣未検知時の「間もなくスポーン」の合図として使う
     public static final String ARACHNE_BOSS_MSG_PREFIX = "[BOSS] Arachne";
+    // 撃破時の断末魔もこのプレフィックスに一致してしまうため、Soon判定から除外する
+    public static final String ARACHNE_DEFEAT_QUOTE_1 = "No, this is impossible...";
+    public static final String ARACHNE_DEFEAT_QUOTE_2 = "I will be back, even stronger!";
 
     // Arachne Crystal(Big)のQuick/Normal Spawn判定用に観測するパーティクルの基準座標(祭壇)
     public static final BlockPos ARACHNE_ALTAR_POS = new BlockPos(-283, 51, -179);
