@@ -94,8 +94,10 @@ public class ModConstants {
     // =======================================================
     // Arachne (Spider's Den) 関連のメッセージ
     // =======================================================
-    public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)";
-    public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A befitting welcome!";
+    public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)"; // Small
+    public static final String ARACHNE_CRYSTAL_MSG = "placed an Arachne Crystal! Something is awakening!"; // Big
+    public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A befitting welcome!"; // Small スポーン確定
+    public static final String ARACHNE_SPAWN_BIG_MSG = "[BOSS] Arachne: With your sacrifice."; // Big スポーン確定
     public static final String ARACHNE_DOWN_MSG = "ARACHNE DOWN!";
 
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
