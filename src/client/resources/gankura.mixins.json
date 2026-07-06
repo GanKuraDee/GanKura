@@ -11,7 +11,8 @@
 		"WorldTimeMixin",
 		"WorldTextRenderMixin",
 		"GizmoTextFogMixin",
-		"MouseCursorRestoreMixin"
+		"MouseCursorRestoreMixin",
+		"MouseHandlerAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

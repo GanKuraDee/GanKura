@@ -799,5 +799,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows a 5s countdown after using /warp. If /warp is used again during the cooldown, it is queued and sent automatically once the cooldown ends.")
         @ConfigEditorBoolean
         public boolean enableWarpQueue = true;
+
+        @Expose
+        @ConfigOption(name = "Keep Cursor Position On Rapid Screen Swap", desc = "Prevents the mouse cursor from snapping back to the center of the screen when a screen closes and another opens within 0.1s, such as switching between Storage units or Accessory pages.")
+        @ConfigEditorBoolean
+        public boolean enableCursorRestoreOnRapidReopen = true;
     }
 }
