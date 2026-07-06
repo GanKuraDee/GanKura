@@ -80,21 +80,15 @@ public class WorldTextRenderer {
             textColor = 0xFFFF5555;
             textToRender = inSanctuary ? "§c§lARACHNE §c(Spawned)" : "§c§lARACHNE §6(Spawned/Killed)";
         } else if (GameState.Arachne.isSummoning) {
-            if (GameState.Arachne.unknownBigSpawn) {
-                // Sanctuary外でArachne Crystalを検知した場合はパーティクルを観測できないためUnknown扱いにする
-                textColor = 0xFFAA00AA;
-                textToRender = "§5§lARACHNE";
+            textColor = 0xFFFF5555;
+            if (GameState.Arachne.awaitingCrystalParticles) {
+                textToRender = "§c§lARACHNE §c(...)";
             } else {
-                textColor = 0xFFFF5555;
-                if (GameState.Arachne.awaitingCrystalParticles) {
-                    textToRender = "§c§lARACHNE §c(...)";
+                long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
+                if (remainingMs > 0) {
+                    textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingMs / 1000.0);
                 } else {
-                    long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
-                    if (remainingMs > 0) {
-                        textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingMs / 1000.0);
-                    } else {
-                        textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
-                    }
+                    textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
                 }
             }
         } else if (inSanctuary && GameState.Arachne.isDetected) {

@@ -15,18 +15,9 @@ public class ArachneHandler {
     private static final int QUICK_SPAWN_THRESHOLD = 20;
 
     public static void register() {
+        // 観測時間が経過したら、その間に検知したDUSTパーティクル数(ArachneCrystalParticleMixinが加算)で
+        // Quick Spawn(閾値以下)か通常スポーン(閾値超)かを確定する
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // Sanctuary外でCrystalを検知しUnknown扱いにしていた場合、実際にSanctuaryへ入ったタイミングで
-            // そこからパーティクル観測を開始する(それまでは観測できないため)
-            if (GameState.Arachne.unknownBigSpawn && GameState.Arachne.inSanctuary) {
-                GameState.Arachne.unknownBigSpawn = false;
-                GameState.Arachne.awaitingCrystalParticles = true;
-                GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
-                GameState.Arachne.particleBurstCounter = 0;
-            }
-
-            // 観測時間が経過したら、その間に検知したDUSTパーティクル数(ArachneCrystalParticleMixinが加算)で
-            // Quick Spawn(閾値以下)か通常スポーン(閾値超)かを確定する
             if (GameState.Arachne.awaitingCrystalParticles
                     && System.currentTimeMillis() - GameState.Arachne.crystalMessageTime > CRYSTAL_PARTICLE_DETERMINATION_MS) {
                 long delay = GameState.Arachne.particleBurstCounter <= QUICK_SPAWN_THRESHOLD ? QUICK_SPAWN_DELAY_MS : NORMAL_SPAWN_DELAY_MS;
@@ -44,7 +35,6 @@ public class ArachneHandler {
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
             GameState.Arachne.awaitingCrystalParticles = false;
-            GameState.Arachne.unknownBigSpawn = false;
             GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_SMALL_MS;
             return;
         }
@@ -54,19 +44,11 @@ public class ArachneHandler {
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Big";
-            if (GameState.Arachne.inSanctuary) {
-                // Sanctuary内で検知できた場合のみ、DUSTパーティクルの観測でQuick/Normalを確定できる
-                GameState.Arachne.spawnTargetTime = 0;
-                GameState.Arachne.awaitingCrystalParticles = true;
-                GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
-                GameState.Arachne.particleBurstCounter = 0;
-                GameState.Arachne.unknownBigSpawn = false;
-            } else {
-                // Sanctuary外ではパーティクルを観測できないため、Sanctuaryに入るまでUnknown扱いにする
-                GameState.Arachne.spawnTargetTime = 0;
-                GameState.Arachne.awaitingCrystalParticles = false;
-                GameState.Arachne.unknownBigSpawn = true;
-            }
+            // Quick Spawn(21秒)か通常スポーン(37秒)かは、観測時間内のDUSTパーティクル数で確定させる(上のtickで判定)
+            GameState.Arachne.spawnTargetTime = 0;
+            GameState.Arachne.awaitingCrystalParticles = true;
+            GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
+            GameState.Arachne.particleBurstCounter = 0;
             return;
         }
 
@@ -83,7 +65,6 @@ public class ArachneHandler {
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
-            GameState.Arachne.unknownBigSpawn = false;
         }
     }
 }
