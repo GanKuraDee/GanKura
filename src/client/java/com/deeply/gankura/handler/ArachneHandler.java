@@ -2,21 +2,23 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
+import net.minecraft.client.MinecraftClient;
 
 public class ArachneHandler {
     // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間
-    private static final long SPAWN_DELAY_SMALL_MS = 18000L;
-    // Arachne Crystal (Big) 使用からスポーンまでの固定待機時間
-    private static final long SPAWN_DELAY_BIG_MS = 40000L;
+    // GolemやDragonと同様にTPS変動に連動させるため、ミリ秒ではなくTick単位で保持する
+    private static final long SPAWN_DELAY_SMALL_TICKS = 360L; // 18s * 20 ticks
+    // Arachne Crystal (Big) 使用からスポーンまでの固定待機時間 (Tick単位)
+    private static final long SPAWN_DELAY_BIG_TICKS = 800L; // 40s * 20 ticks
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
-    public static void handleMessage(String unformattedMsg) {
+    public static void handleMessage(String unformattedMsg, MinecraftClient client) {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
-            GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_SMALL_MS;
+            if (client.world != null) GameState.Arachne.spawnTargetTime = client.world.getTime() + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
 
@@ -25,7 +27,7 @@ public class ArachneHandler {
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Big";
-            GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_BIG_MS;
+            if (client.world != null) GameState.Arachne.spawnTargetTime = client.world.getTime() + SPAWN_DELAY_BIG_TICKS;
             return;
         }
 

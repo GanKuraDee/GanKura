@@ -50,7 +50,7 @@ public class NetworkHandler {
             PetHandler.handleMessage(message);
             CrimsonDropHandler.handleMessage(unformattedMsg);
             WarpCooldownHandler.handleMessage(unformattedMsg);
-            ArachneHandler.handleMessage(unformattedMsg);
+            ArachneHandler.handleMessage(unformattedMsg, client);
 
             if (DragonHandler.handleMessage(msg, client)) {
                 return true;
