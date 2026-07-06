@@ -123,9 +123,10 @@ public class GameState {
         public static boolean isDetected = false; // Sanctuary内でArachneエンティティを検知できている間 true
         public static String health = null;
         public static int broodCount = 0; // Arachne's Brood の残りエンティティ数
+        public static String size = null; // Lvl300/Lvl100 なら "Small"、Lvl500/Lvl200 なら "Big"
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false;
-            isReady = false; isDetected = false; health = null; broodCount = 0;
+            isReady = false; isDetected = false; health = null; broodCount = 0; size = null;
         }
     }
 

@@ -76,6 +76,7 @@ public class EntityHealthScanner {
         String foundArachneHealth = null;
         boolean foundArachne = false;
         int foundBroodCount = 0;
+        String foundSize = GameState.Arachne.size;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
 
         AABB scanBox = client.player.getBoundingBox().inflate(50.0);
@@ -101,10 +102,18 @@ public class EntityHealthScanner {
                     Matcher m = HEALTH_PATTERN.matcher(nameStr);
                     if (m.find()) foundArachneHealth = m.group(1);
                 }
+                if (foundSize == null) {
+                    if (ModConstants.containsIgnoreCase(nameStr, "Lvl300")) foundSize = "Small";
+                    else if (ModConstants.containsIgnoreCase(nameStr, "Lvl500")) foundSize = "Big";
+                }
             }
 
             if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
                 foundBroodCount++;
+                if (foundSize == null) {
+                    if (ModConstants.containsIgnoreCase(nameStr, "Lvl100")) foundSize = "Small";
+                    else if (ModConstants.containsIgnoreCase(nameStr, "Lvl200")) foundSize = "Big";
+                }
             }
 
             if (anyCrimsonScan) {
@@ -130,6 +139,7 @@ public class EntityHealthScanner {
             GameState.Arachne.health = foundArachneHealth;
             GameState.Arachne.isDetected = foundArachne;
             GameState.Arachne.broodCount = foundBroodCount;
+            GameState.Arachne.size = foundSize;
         }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {

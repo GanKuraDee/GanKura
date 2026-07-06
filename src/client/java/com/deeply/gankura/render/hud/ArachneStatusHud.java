@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
-        super("arachne_status", 400, 78, 1.0f, 270, 24,
+        super("arachne_status", 400, 78, 1.0f, 270, 36,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
     }
@@ -19,9 +19,11 @@ public class ArachneStatusHud extends HudElement {
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
         Font font = Minecraft.getInstance().font;
         String status;
+        boolean isSpawned;
 
         if (isPreview) {
             status = "§eSpawning §f(12.0s)";
+            isSpawned = false;
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
@@ -42,9 +44,18 @@ public class ArachneStatusHud extends HudElement {
             } else {
                 status = "§7Unknown §f(Go to Arachne's Sanctuary!)";
             }
+            // 「Spawned」と確定できている場合のみ Size を併せて表示する(Spawned/Killed 等の曖昧な状態では表示しない)
+            isSpawned = "§cSpawned".equals(status);
         }
 
         graphics.text(font, "§5§lArachne Status", 0, 0, 0xFFFFFFFF, true);
         graphics.text(font, "Altar: " + status, 0, 12, 0xFFFFFFFF, true);
+
+        if (isPreview) {
+            graphics.text(font, "Size: §aSmall", 0, 24, 0xFFFFFFFF, true);
+        } else if (isSpawned && GameState.Arachne.size != null) {
+            String sizeColor = "Big".equals(GameState.Arachne.size) ? "§c" : "§a";
+            graphics.text(font, "Size: " + sizeColor + GameState.Arachne.size, 0, 24, 0xFFFFFFFF, true);
+        }
     }
 }
