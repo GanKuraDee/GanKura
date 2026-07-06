@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class PetHud extends HudElement {
     public PetHud() {
-        super("pet", 400, 10, 1.0f, 120, 24, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
+        super("pet", 10, 10, 1.0f, 120, 24, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
     }
 
     @Override
