@@ -12,7 +12,8 @@
 		"WorldBeaconRenderMixin",
 		"GizmoTextFogMixin",
 		"MouseCursorRestoreMixin",
-		"MouseAccessor"
+		"MouseAccessor",
+		"ArachneCrystalParticleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

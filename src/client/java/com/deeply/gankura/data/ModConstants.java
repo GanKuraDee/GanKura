@@ -100,6 +100,9 @@ public class ModConstants {
     public static final String ARACHNE_SPAWN_BIG_MSG = "[BOSS] Arachne: With your sacrifice."; // Big スポーン確定
     public static final String ARACHNE_DOWN_MSG = "ARACHNE DOWN!";
 
+    // Arachne Crystal(Big)のQuick/Normal Spawn判定用に観測するパーティクルの基準座標(祭壇)
+    public static final BlockPos ARACHNE_ALTAR_POS = new BlockPos(-283, 51, -179);
+
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
     public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";
 
