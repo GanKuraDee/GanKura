@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayNetworkHandler.class)
 public class ArachneCrystalParticleMixin {
 
-    private static final double ALTAR_RADIUS = 30.0;
+    private static final double ALTAR_RADIUS = 4.0;
 
     @Inject(method = "onParticle", at = @At("HEAD"))
     private void onParticle(ParticleS2CPacket packet, CallbackInfo ci) {
