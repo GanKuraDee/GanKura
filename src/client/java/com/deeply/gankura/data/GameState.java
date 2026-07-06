@@ -116,8 +116,7 @@ public class GameState {
         public static boolean isSummoning = false;
         public static long spawnTargetTime = 0; // 目標ワールドTick数 (Golem/Dragonと同様のTPS考慮方式)
         public static boolean inSanctuary = false; // スコアボードに「Arachne's Sanctuary」の行が検出された場合 true
-        public static boolean isReady = false; // 「ARACHNE DOWN!」検知後、次の召喚まで true
-        public static boolean cobwebDetected = false; // 蜘蛛の巣ブロックが基準座標に存在する間 true。これでSpawnedを判定する
+        public static boolean cobwebDetected = false; // 蜘蛛の巣ブロックが基準座標に存在する間 true。これでSpawnedを判定し、エンティティスキャンの実行条件にもなる
         public static boolean arachneMessageSeen = false; // 「[BOSS] Arachne」で始まるメッセージを検知した間 true(蜘蛛の巣未検知時のSoon表示に使用)
         public static String health = null;
         public static int broodCount = 0; // Arachne's Brood の残りエンティティ数
@@ -127,7 +126,7 @@ public class GameState {
         public static int particleBurstCounter = 0; // 観測中のDUSTパーティクル数
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; inSanctuary = false;
-            isReady = false; cobwebDetected = false; arachneMessageSeen = false; health = null; broodCount = 0; size = null;
+            cobwebDetected = false; arachneMessageSeen = false; health = null; broodCount = 0; size = null;
             awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0;
         }
     }

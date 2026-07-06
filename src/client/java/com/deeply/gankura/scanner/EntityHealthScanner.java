@@ -38,10 +38,10 @@ public class EntityHealthScanner {
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
         boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
-        // ARACHNE DOWN! 検知後から次の Calling までは存在しないため、確認自体を行わない
-        boolean scanArachne = GameState.Arachne.inSanctuary && !GameState.Arachne.isReady;
         // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する
         GameState.Arachne.cobwebDetected = isSpidersDen && client.world.getBlockState(ModConstants.ARACHNE_WEB_POS).isOf(Blocks.COBWEB);
+        // Sanctuary内かつ蜘蛛の巣を検知できている間のみスキャンする(スポーン前・撃破後は存在しないため)
+        boolean scanArachne = GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected;
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
 
         if (!scanGolem) GameState.Golem.health = null;
