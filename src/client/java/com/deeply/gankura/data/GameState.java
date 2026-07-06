@@ -118,7 +118,8 @@ public class GameState {
         public static boolean isSummoning = false;
         public static long spawnTargetTime = 0;
         public static boolean hasSpawned = false;
-        public static void reset() { isSummoning = false; spawnTargetTime = 0; hasSpawned = false; }
+        public static boolean inSanctuary = false; // スコアボードに「Arachne's Sanctuary」の行が検出された場合 true
+        public static void reset() { isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false; }
     }
 
     public static class BarbarianDukeX {

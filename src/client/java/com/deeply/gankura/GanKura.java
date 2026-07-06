@@ -52,6 +52,7 @@ public class GanKura implements ClientModInitializer {
         CrimsonDropHandler.register();
         WarpCooldownHandler.register();
         EquipmentScanner.register();
+        AreaScanner.register();
 
         // ★追加: 毎ティック（1/20秒）ごとに予約チケットをチェックする
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
