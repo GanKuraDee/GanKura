@@ -251,15 +251,16 @@ public class EntityHighlightManager {
             return getClosestEntity(client.world.getEntitiesByClass(MagmaCubeEntity.class, wideBox, e -> true), namedEntity);
         }
 
-        // PlayerEntity型ボスは周辺MobによるマッチングをスキップしPlayerEntityを直接検索する
+        // PlayerEntity型ボス(Barbarian Duke X / Mage Outlaw)以外では、近傍にMobが見つからない場合でも
+        // Player を視覚エンティティとして誤マッチさせないよう、Player検索はPlayer型ボスのときのみ行う
         boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
-        if (!isPlayerTypeBoss) {
+        if (isPlayerTypeBoss) {
+            Entity closest = getClosestEntity(client.world.getEntitiesByClass(PlayerEntity.class, box, e -> e != client.player), namedEntity);
+            if (closest != null) return closest;
+        } else {
             Entity closest = getClosestEntity(client.world.getEntitiesByClass(MobEntity.class, box, e -> true), namedEntity);
             if (closest != null) return closest;
         }
-
-        Entity closest = getClosestEntity(client.world.getEntitiesByClass(PlayerEntity.class, box, e -> e != client.player), namedEntity);
-        if (closest != null) return closest;
 
         return getClosestEntity(client.world.getEntitiesByClass(ArmorStandEntity.class, box,
                 e -> e != namedEntity && e.getCustomName() == null), namedEntity);
