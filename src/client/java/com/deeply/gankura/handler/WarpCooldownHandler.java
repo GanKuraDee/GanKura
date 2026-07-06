@@ -30,7 +30,8 @@ public class WarpCooldownHandler {
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
     public static void handleMessage(String unformattedMsg) {
-        if (GameState.Warp.awaitingConfirmation && unformattedMsg.contains("Warping...")) {
+        if (GameState.Warp.awaitingConfirmation
+                && (unformattedMsg.contains("Warping...") || unformattedMsg.contains("Warping you to your Skyblock Island..."))) {
             GameState.Warp.awaitingConfirmation = false;
             GameState.Warp.cooldownEndAt = System.currentTimeMillis() + COOLDOWN_MS;
         }
