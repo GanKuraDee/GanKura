@@ -510,6 +510,12 @@ public class ModConfig extends Config {
         public boolean showArachneHealthHud = true;
 
         @Expose
+        @ConfigOption(name = "World Location Display", desc = "Shows floating ARACHNE text above the summoning altar.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean showArachneWorldText = true;
+
+        @Expose
         @ConfigOption(name = "Glowing", desc = "Highlights Arachne through walls. Only active while in Arachne's Sanctuary.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
