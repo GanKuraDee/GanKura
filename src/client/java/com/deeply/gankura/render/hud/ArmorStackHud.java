@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ArmorStackHud extends HudElement {
     public ArmorStackHud() {
-        super("armorStack", 400, 39, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
+        super("armorStack", 10, 39, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
     }
 
     @Override
