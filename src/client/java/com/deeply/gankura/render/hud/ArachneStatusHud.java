@@ -30,10 +30,7 @@ public class ArachneStatusHud extends HudElement {
             } else if (GameState.Arachne.hasSpawned) {
                 status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
             } else if (GameState.Arachne.isSummoning) {
-                if (GameState.Arachne.unknownBigSpawn) {
-                    // Sanctuary外でArachne Crystalを検知した場合はパーティクルを観測できないためUnknown扱いにする
-                    status = "§7Unknown §f(Go to Arachne's Sanctuary!)";
-                } else if (GameState.Arachne.awaitingCrystalParticles) {
+                if (GameState.Arachne.awaitingCrystalParticles) {
                     // Big(Crystal)はパーティクル観測でQuick/Normalが確定するまで秒数を出せない
                     status = "§eSpawning §f(...)";
                 } else {

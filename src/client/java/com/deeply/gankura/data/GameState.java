@@ -127,11 +127,10 @@ public class GameState {
         public static boolean awaitingCrystalParticles = false; // Arachne Crystal使用後、Quick/Normal判定のパーティクル観測中か
         public static long crystalMessageTime = 0; // Arachne Crystal検知時刻(ミリ秒)
         public static int particleBurstCounter = 0; // 観測中のDUSTパーティクル数
-        public static boolean unknownBigSpawn = false; // Sanctuary外でArachne Crystalを検知し、観測できずUnknown扱いにしている間 true
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false;
             isReady = false; isDetected = false; health = null; broodCount = 0; size = null;
-            awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0; unknownBigSpawn = false;
+            awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0;
         }
     }
 
