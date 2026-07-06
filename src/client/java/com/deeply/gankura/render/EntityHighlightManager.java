@@ -140,19 +140,19 @@ public class EntityHighlightManager {
                 if (g != null) highlightedEntities.add(g);
             }
 
-            if (scanBroodmother && nameStr.contains("Broodmother")) {
+            if (scanBroodmother && ModConstants.containsIgnoreCase(nameStr, "Broodmother")) {
                 Box box = entity.getBoundingBox().expand(8.0);
                 Entity s = getClosestEntity(client.world.getEntitiesByClass(SpiderEntity.class, box, e -> true), entity);
                 if (s != null) highlightedEntities.add(s);
             }
 
-            if (scanMagmaGlare && nameStr.contains("Magma Glare")) {
+            if (scanMagmaGlare && ModConstants.containsIgnoreCase(nameStr, "Magma Glare")) {
                 Box box = entity.getBoundingBox().expand(8.0);
                 Entity cube = getClosestEntity(client.world.getEntitiesByClass(MagmaCubeEntity.class, box, e -> true), entity);
                 if (cube != null) { highlightedEntities.add(cube); magmaGlareEntities.add(cube); }
             }
 
-            if (scanDragon && nameStr.contains("Dragon")) {
+            if (scanDragon && ModConstants.containsIgnoreCase(nameStr, "Dragon")) {
                 Box box = entity.getBoundingBox().expand(20.0);
                 Entity d = getClosestEntity(client.world.getEntitiesByClass(EnderDragonEntity.class, box, e -> true), entity);
                 if (d != null) highlightedEntities.add(d);
@@ -162,7 +162,7 @@ public class EntityHighlightManager {
                 for (int i = 0; i < CRIMSON_BOSSES.size(); i++) {
                     CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
                     if (!boss.enableHighlight().get()) continue;
-                    if (nameStr.contains(boss.nameTag())) {
+                    if (ModConstants.containsIgnoreCase(nameStr, boss.nameTag())) {
                         Entity visualTarget = findVisualEntity(client, entity, boss.nameTag());
                         if (visualTarget != null) {
                             highlightedEntities.add(visualTarget);
@@ -188,7 +188,7 @@ public class EntityHighlightManager {
                 for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
                     CrimsonBossEntry follower = ASHFANG_FOLLOWERS.get(i);
                     if (!follower.enableHighlight().get() && !follower.enableTracer().get()) continue;
-                    if (nameStr.contains(follower.nameTag())) {
+                    if (ModConstants.containsIgnoreCase(nameStr, follower.nameTag())) {
                         Entity visualTarget = findVisualEntity(client, entity, follower.nameTag());
                         if (visualTarget != null) {
                             if (follower.enableHighlight().get()) highlightedEntities.add(visualTarget);

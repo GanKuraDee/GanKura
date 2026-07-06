@@ -25,19 +25,19 @@ public class DragonHandler {
         Matcher m1 = ModConstants.EYE_PLACED_CHAT_PATTERN.matcher(cleanMsg);
         if (m1.find()) {
             GameState.Dragon.eyes = Integer.parseInt(m1.group(1)); GameState.Dragon.eggState = "Ready";
-            if (cleanMsg.contains("You placed a Summoning Eye!")) GameState.Dragon.playerEyes++;
+            if (ModConstants.containsIgnoreCase(cleanMsg, "You placed a Summoning Eye!")) GameState.Dragon.playerEyes++;
             GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
         }
 
         Matcher m2 = ModConstants.EYE_PLACED_8_CHAT_PATTERN.matcher(cleanMsg);
         if (m2.find()) {
             GameState.Dragon.eyes = 8; GameState.Dragon.eggState = "Hatching";
-            if (cleanMsg.contains("You placed a Summoning Eye! Brace yourselves!")) GameState.Dragon.playerEyes++;
+            if (ModConstants.containsIgnoreCase(cleanMsg, "You placed a Summoning Eye! Brace yourselves!")) GameState.Dragon.playerEyes++;
             if (client.world != null) GameState.Dragon.spawnTargetTime = client.world.getTime() + 180;
             GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
         }
 
-        if (cleanMsg.contains("You recovered a Summoning Eye!")) {
+        if (ModConstants.containsIgnoreCase(cleanMsg, "You recovered a Summoning Eye!")) {
             if (GameState.Dragon.playerEyes > 0) GameState.Dragon.playerEyes--;
             if (GameState.Dragon.eyes > 0) GameState.Dragon.eyes--;
             GameState.Dragon.eggState = "Ready"; GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
@@ -85,7 +85,7 @@ public class DragonHandler {
             }
         }
 
-        if (cleanMsg.contains(ModConstants.DRAGON_EGG_SPAWNED_MSG)) {
+        if (ModConstants.containsIgnoreCase(cleanMsg, ModConstants.DRAGON_EGG_SPAWNED_MSG)) {
             GameState.Dragon.eggState = "Ready"; GameState.Dragon.type = null; GameState.Dragon.eyes = 0; GameState.Dragon.playerEyes = 0; GameState.Dragon.spawnTargetTime = 0;
             GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
         }

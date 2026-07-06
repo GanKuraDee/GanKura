@@ -59,14 +59,14 @@ public class RareDropScanner {
                     String nameString = customName.getString();
 
                     // 1. Tier Boost Core (金)
-                    if (nameString.contains("Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
+                    if (ModConstants.containsIgnoreCase(nameString, "Tier Boost Core") && hasColor(customName, Formatting.GOLD)) {
                         LootStats.addTierBoostCore();
                         notifyDrop(client, Text.literal("Tier Boost Core").formatted(Formatting.GOLD), ModConfig.INSTANCE.theEnd.enableDropAlerts);
                         break;
                     }
 
                     // 2. [Lvl 1] Golem (Legendary / Epic)
-                    else if (nameString.contains("[Lvl 1] Golem")) {
+                    else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Golem")) {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryGolemPet();
                             MutableText itemText = Text.literal("Golem").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));
@@ -82,7 +82,7 @@ public class RareDropScanner {
                     }
 
                     // 3. [Lvl 1] Ender Dragon (Legendary / Epic)
-                    else if (nameString.contains("[Lvl 1] Ender Dragon")) {
+                    else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Ender Dragon")) {
                         if (hasColor(customName, Formatting.GOLD)) {
                             LootStats.addLegendaryDragonPet();
                             MutableText dragonText = Text.literal("Ender Dragon").formatted(Formatting.GOLD).append(Text.literal(" (Pet)").formatted(Formatting.GRAY));

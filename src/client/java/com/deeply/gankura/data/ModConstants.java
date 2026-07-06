@@ -29,10 +29,12 @@ public class ModConstants {
     public static final String STAGE_SUMMONED = "Summoned";   // Stage 5
 
     // 正規表現・メッセージ
-    public static final Pattern PROTECTOR_PATTERN = Pattern.compile("Protector:\\s*(.+)");
+    // Hypixel側の表記ゆれ（大文字小文字）に対応するため、chat/tabの文言にマッチする正規表現には
+    // 基本的に Pattern.CASE_INSENSITIVE を付与する
+    public static final Pattern PROTECTOR_PATTERN = Pattern.compile("Protector:\\s*(.+)", Pattern.CASE_INSENSITIVE);
 
     // ★追加: Broodmother のタブリストスキャン用パターン
-    public static final Pattern BROODMOTHER_PATTERN = Pattern.compile("Broodmother:\\s+(.+)");
+    public static final Pattern BROODMOTHER_PATTERN = Pattern.compile("Broodmother:\\s+(.+)", Pattern.CASE_INSENSITIVE);
 
     // Hypixel側の表記ゆれ ("End Stone Protector" / "Endstone Protector") 両方に対応する共通の名前パターン
     private static final String PROTECTOR_NAME_REGEX = "End ?Stone Protector";
@@ -51,14 +53,14 @@ public class ModConstants {
             PROTECTOR_NAME_REGEX + " DOWN!", Pattern.CASE_INSENSITIVE);
 
     // ダメージ取得用 ("Your Damage: 1,234,567 (Position #5)")
-    public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)");
+    public static final Pattern DAMAGE_PATTERN = Pattern.compile("Your Damage: ([\\d,]+) \\(Position #([\\d,]+)\\)", Pattern.CASE_INSENSITIVE);
 
     // 1位〜3位のDPS計算 & Loot Quality用
     // "1st Damager - [MVP+] Name - 1,000,000" や "2nd Damager - Name - 800,000" に対応
-    public static final Pattern TOP_DAMAGER_PATTERN = Pattern.compile("(1st|2nd|3rd) Damager - (?:.*\\] )?([A-Za-z0-9_]+) - ([\\d,]+)");
+    public static final Pattern TOP_DAMAGER_PATTERN = Pattern.compile("(1st|2nd|3rd) Damager - (?:.*\\] )?([A-Za-z0-9_]+) - ([\\d,]+)", Pattern.CASE_INSENSITIVE);
 
     // "Zealots Contributed: 50/100"
-    public static final Pattern ZEALOT_PATTERN = Pattern.compile("Zealots Contributed: ([\\d,]+)/100");
+    public static final Pattern ZEALOT_PATTERN = Pattern.compile("Zealots Contributed: ([\\d,]+)/100", Pattern.CASE_INSENSITIVE);
 
     // Crimson Isle ボスの固定スポーン座標
     public static final BlockPos BLADESOUL_POS        = new BlockPos(-295, 83,  -518);
@@ -81,11 +83,17 @@ public class ModConstants {
     // =======================================================
     // ドラゴン関連の正規表現
     // =======================================================
-    public static final Pattern EYE_PLACED_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! \\((\\d)/8\\)");
-    public static final Pattern EYE_PLACED_8_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! Brace yourselves! \\(8/8\\)");
-    public static final Pattern EYE_PLACED_TAB_PATTERN = Pattern.compile("Eyes placed: (\\d)/8");
-    public static final Pattern DRAGON_TYPE_TAB_PATTERN = Pattern.compile("Dragon: \\((.+)\\)");
-    public static final Pattern DRAGON_SPAWN_PATTERN = Pattern.compile("The .*?(Protector|Old|Unstable|Young|Strong|Wise|Superior) Dragon has spawned!");
-    public static final Pattern DRAGON_DOWN_PATTERN = Pattern.compile("([A-Za-z]+) DRAGON DOWN!");
+    public static final Pattern EYE_PLACED_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! \\((\\d)/8\\)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern EYE_PLACED_8_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! Brace yourselves! \\(8/8\\)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern EYE_PLACED_TAB_PATTERN = Pattern.compile("Eyes placed: (\\d)/8", Pattern.CASE_INSENSITIVE);
+    public static final Pattern DRAGON_TYPE_TAB_PATTERN = Pattern.compile("Dragon: \\((.+)\\)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern DRAGON_SPAWN_PATTERN = Pattern.compile("The .*?(Protector|Old|Unstable|Young|Strong|Wise|Superior) Dragon has spawned!", Pattern.CASE_INSENSITIVE);
+    public static final Pattern DRAGON_DOWN_PATTERN = Pattern.compile("([A-Za-z]+) DRAGON DOWN!", Pattern.CASE_INSENSITIVE);
     public static final String DRAGON_EGG_SPAWNED_MSG = "The Dragon Egg has spawned!";
+
+    // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
+    public static boolean containsIgnoreCase(String source, String target) {
+        return source != null && target != null
+                && source.toLowerCase(java.util.Locale.ROOT).contains(target.toLowerCase(java.util.Locale.ROOT));
+    }
 }

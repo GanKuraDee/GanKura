@@ -1,6 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -41,10 +42,10 @@ public class ArrowPoisonScanner {
             if (!stack.isEmpty()) {
                 String name = stack.getName().getString().replaceAll("§[0-9a-fk-or]", "");
 
-                if (name.contains("Toxic Arrow Poison")) {
+                if (ModConstants.containsIgnoreCase(name, "Toxic Arrow Poison")) {
                     if ("NONE".equals(firstFound)) firstFound = "TOXIC";
                     toxicTotal += stack.getCount(); // 個数を加算
-                } else if (name.contains("Twilight Arrow Poison")) {
+                } else if (ModConstants.containsIgnoreCase(name, "Twilight Arrow Poison")) {
                     if ("NONE".equals(firstFound)) firstFound = "TWILIGHT";
                     twilightTotal += stack.getCount(); // 個数を加算
                 }
