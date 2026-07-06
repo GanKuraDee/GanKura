@@ -46,7 +46,7 @@ public class EntityHealthScanner {
 
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
-        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.isDetected = false; }
+        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.isDetected = false; GameState.Arachne.broodCount = 0; }
 
         // Crimson Isle にいない場合は全ボスの HP をクリア
         if (!isCrimsonIsle) {
@@ -75,6 +75,7 @@ public class EntityHealthScanner {
         String foundBroodmotherHealth = null;
         String foundArachneHealth = null;
         boolean foundArachne = false;
+        int foundBroodCount = 0;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
 
         AABB scanBox = client.player.getBoundingBox().inflate(50.0);
@@ -102,6 +103,10 @@ public class EntityHealthScanner {
                 }
             }
 
+            if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
+                foundBroodCount++;
+            }
+
             if (anyCrimsonScan) {
                 for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                     if (!scanCrimson[i] || foundCrimsonHealth[i] != null) continue;
@@ -124,6 +129,7 @@ public class EntityHealthScanner {
         if (scanArachne) {
             GameState.Arachne.health = foundArachneHealth;
             GameState.Arachne.isDetected = foundArachne;
+            GameState.Arachne.broodCount = foundBroodCount;
         }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {

@@ -113,4 +113,10 @@ public class ModConstants {
         return containsIgnoreCase(nameStr, "Arachne")
                 && (containsIgnoreCase(nameStr, "Lvl300") || containsIgnoreCase(nameStr, "Lvl500"));
     }
+
+    // Arachneはダメージを受けると複数体の Arachne's Brood に分裂する。レベル表記(Lvl100/Lvl200)の有無で判別する
+    public static boolean isArachneBroodName(String nameStr) {
+        return containsIgnoreCase(nameStr, "Arachne's Brood")
+                && (containsIgnoreCase(nameStr, "Lvl100") || containsIgnoreCase(nameStr, "Lvl200"));
+    }
 }

@@ -47,6 +47,12 @@ public class EntityGlowingMixin {
                 return;
             }
 
+            // Arachne's Brood (Arachne 分裂後の Spider/CaveSpider 系のため instanceof 判定より先に判定する): 明るい紫
+            if (EntityHighlightManager.arachneBroodEntities.contains(entity)) {
+                cir.setReturnValue(0xFF55FF);
+                return;
+            }
+
             if (entity instanceof IronGolem) {
                 cir.setReturnValue(0xFFAA00); // ゴーレム: 金色
             } else if (entity instanceof Spider) {

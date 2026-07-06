@@ -45,6 +45,11 @@ public class EntityTracerRenderer {
                 if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
                 color = 0xFFAA00AA; // 紫
             }
+            // Arachne's Brood (Arachne 分裂後の Spider/CaveSpider 系のため instanceof 判定より先に判定する)
+            else if (EntityHighlightManager.arachneBroodEntities.contains(entity)) {
+                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
+                color = 0xFFFF55FF; // 明るい紫
+            }
             // Golem / Broodmother / Dragon
             else if (entity instanceof IronGolem) {
                 if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;
