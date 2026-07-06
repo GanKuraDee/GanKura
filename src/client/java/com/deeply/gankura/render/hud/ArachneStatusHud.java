@@ -21,14 +21,14 @@ public class ArachneStatusHud extends HudElement {
         String status;
 
         if (isPreview) {
-            status = "§eSpawning §f(12.0s)";
+            status = "§eSpawning §c(12.0s)";
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
             if (GameState.Arachne.isReady) {
                 status = "§aReady";
             } else if (GameState.Arachne.hasSpawned) {
-                status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
+                status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
             } else if (GameState.Arachne.isSummoning) {
                 if (GameState.Arachne.awaitingCrystalParticles) {
                     // Big(Crystal)はパーティクル観測でQuick/Normalが確定するまで秒数を出せない
@@ -37,16 +37,16 @@ public class ArachneStatusHud extends HudElement {
                     long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
                     double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
                     if (remainingTicks > 0) {
-                        status = String.format("§eSpawning §f(%.1fs)", remainingTicks / 20.0);
+                        status = String.format("§eSpawning §c(%.1fs)", remainingTicks / 20.0);
                     } else {
-                        status = inSanctuary ? "§eSpawning §f(Soon)" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
+                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
                     }
                 }
             } else if (inSanctuary) {
                 // チャットからの情報が何もない状態でSanctuaryにいる場合は、実際のエンティティ検知状況で判定する
                 status = GameState.Arachne.isDetected ? "§cSpawned" : "§aReady";
             } else {
-                status = "§7Unknown §f(Go to Arachne's Sanctuary!)";
+                status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
             }
         }
 
