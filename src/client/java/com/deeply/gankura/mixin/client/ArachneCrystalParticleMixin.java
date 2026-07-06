@@ -13,14 +13,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// Arachne Crystal(Big)使用後に観測されるDUSTパーティクル数を数える。
-// 最終的なQuick/Normal判定はArachneHandlerのtickループが閾値と比較して行う
+// Arachne Crystal(Big)使用直後に届く1個のパーティクルパケットのcountを見て、
+// 通常スポーン(37秒)かQuick Spawn(21秒)かをその場で即座に判定する
 @Mixin(ClientPlayNetworkHandler.class)
 public class ArachneCrystalParticleMixin {
 
-    private static final double ALTAR_RADIUS = 4.0;
+    private static final double ALTAR_RADIUS = 1.0;
     // 実機確認により、対象のDUSTパーティクルは黒(RGB全て0近辺)であることが判明したため色でも絞り込む
     private static final float BLACK_COLOR_EPSILON = 0.05f;
+    private static final int QUICK_SPAWN_THRESHOLD = 20;
+    private static final long QUICK_SPAWN_DELAY_MS = 21000L;
+    private static final long NORMAL_SPAWN_DELAY_MS = 37000L;
 
     @Inject(method = "onParticle", at = @At("HEAD"))
     private void onParticle(ParticleS2CPacket packet, CallbackInfo ci) {
@@ -38,6 +41,9 @@ public class ArachneCrystalParticleMixin {
         double dz = packet.getZ() - altar.getZ();
         if (Math.sqrt(dx * dx + dy * dy + dz * dz) > ALTAR_RADIUS) return;
 
-        GameState.Arachne.particleBurstCounter++;
+        // この1パケットのcountでQuick/Normalを即座に確定する
+        long delay = packet.getCount() <= QUICK_SPAWN_THRESHOLD ? QUICK_SPAWN_DELAY_MS : NORMAL_SPAWN_DELAY_MS;
+        GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + delay;
+        GameState.Arachne.awaitingCrystalParticles = false;
     }
 }
