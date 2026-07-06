@@ -24,6 +24,9 @@ import java.util.regex.Pattern;
 public class EntityHealthScanner {
     private static final Pattern HEALTH_PATTERN = Pattern.compile("([\\d\\.,]+[kM]?/[\\d\\.,]+[kM]?)");
     private static final Pattern MAGMA_PERCENT_PATTERN = Pattern.compile("Boss: (\\d{1,3})%", Pattern.CASE_INSENSITIVE);
+    // ARACHNE DOWN!もSanctuary内でしか表示されないため、検知できないだけで撃破済みと誤判定しないよう
+    // この時間継続して未検知の場合のみ撃破済みと確定する
+    private static final long NOT_DETECTED_CONFIRM_KILL_MS = 3000L;
     private static String previousMagmaSpawnStatus = null;
 
     public static void register() {
@@ -43,7 +46,10 @@ public class EntityHealthScanner {
 
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
-        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.isDetected = false; GameState.Arachne.broodCount = 0; }
+        if (!scanArachne) {
+            GameState.Arachne.health = null; GameState.Arachne.isDetected = false; GameState.Arachne.broodCount = 0;
+            GameState.Arachne.notDetectedSinceMillis = 0;
+        }
 
         // Crimson Isle bosses: clear health when not in area
         if (!isCrimsonIsle) {
@@ -135,13 +141,38 @@ public class EntityHealthScanner {
         if (scanArachne) {
             GameState.Arachne.health = foundArachneHealth;
             // Arachne本体だけでなくBroodの検知もSpawned判定に含める(分裂後は本体エンティティが消えるため)
-            GameState.Arachne.isDetected = foundArachne || foundBroodCount > 0;
+            boolean nowDetected = foundArachne || foundBroodCount > 0;
+            GameState.Arachne.isDetected = nowDetected;
             GameState.Arachne.broodCount = foundBroodCount;
             GameState.Arachne.size = foundSize;
-            // スポーン確定メッセージはSanctuary内でしかチャットに表示されないため、
-            // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する
-            if (GameState.Arachne.isDetected && GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
-                GameState.Arachne.hasSpawned = true;
+
+            if (nowDetected) {
+                GameState.Arachne.notDetectedSinceMillis = 0;
+                // スポーン確定メッセージはSanctuary内でしかチャットに表示されないため、
+                // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する
+                if (GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
+                    GameState.Arachne.hasSpawned = true;
+                }
+            } else {
+                // ARACHNE DOWN!も同様にSanctuary内でしか表示されないため、既にスポーンしているはず(hasSpawned)、
+                // あるいは目標時刻を過ぎている(isSummoning)のに検知できない場合はエリア外で撃破された可能性がある。
+                // パケット到着順のズレ等による誤検知を避けるため、一定時間継続して未検知の場合のみ撃破済みと確定する
+                boolean shouldBeVisible = GameState.Arachne.hasSpawned
+                        || (GameState.Arachne.isSummoning && !GameState.Arachne.awaitingCrystalParticles
+                                && client.world.getTime() >= GameState.Arachne.spawnTargetTime);
+                if (shouldBeVisible) {
+                    if (GameState.Arachne.notDetectedSinceMillis == 0) {
+                        GameState.Arachne.notDetectedSinceMillis = System.currentTimeMillis();
+                    } else if (System.currentTimeMillis() - GameState.Arachne.notDetectedSinceMillis > NOT_DETECTED_CONFIRM_KILL_MS) {
+                        GameState.Arachne.isReady = true;
+                        GameState.Arachne.isSummoning = false;
+                        GameState.Arachne.hasSpawned = false;
+                        GameState.Arachne.size = null;
+                        GameState.Arachne.notDetectedSinceMillis = 0;
+                    }
+                } else {
+                    GameState.Arachne.notDetectedSinceMillis = 0;
+                }
             }
         }
         if (anyCrimsonScan) {
