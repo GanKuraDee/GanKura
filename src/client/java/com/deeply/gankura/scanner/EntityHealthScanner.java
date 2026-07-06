@@ -100,16 +100,16 @@ public class EntityHealthScanner {
                     if (m.find()) foundArachneHealth = m.group(1);
                 }
                 if (foundSize == null) {
-                    if (ModConstants.containsIgnoreCase(nameStr, "Lvl300")) foundSize = "Small";
-                    else if (ModConstants.containsIgnoreCase(nameStr, "Lvl500")) foundSize = "Big";
+                    if (ModConstants.containsIgnoreCase(nameStr, "Lv300")) foundSize = "Small";
+                    else if (ModConstants.containsIgnoreCase(nameStr, "Lv500")) foundSize = "Big";
                 }
             }
 
             if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
                 foundBroodCount++;
                 if (foundSize == null) {
-                    if (ModConstants.containsIgnoreCase(nameStr, "Lvl100")) foundSize = "Small";
-                    else if (ModConstants.containsIgnoreCase(nameStr, "Lvl200")) foundSize = "Big";
+                    if (ModConstants.containsIgnoreCase(nameStr, "Lv100")) foundSize = "Small";
+                    else if (ModConstants.containsIgnoreCase(nameStr, "Lv200")) foundSize = "Big";
                 }
             }
 
