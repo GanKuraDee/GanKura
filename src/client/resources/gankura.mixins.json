@@ -10,7 +10,8 @@
 		"WorldBeaconRenderMixin",
 		"WorldTimeMixin",
 		"WorldTextRenderMixin",
-		"GizmoTextFogMixin"
+		"GizmoTextFogMixin",
+		"MouseCursorRestoreMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
