@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
-        super("arachne_status", 400, 78, 1.0f, 230, 24,
+        super("arachne_status", 400, 78, 1.0f, 270, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
     }
@@ -21,21 +21,21 @@ public class ArachneStatusHud extends HudElement {
         String status;
 
         if (isPreview) {
-            status = "§e(12.0s)";
+            status = "§eSpawning §f(12.0s)";
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
             if (GameState.Arachne.hasSpawned) {
-                status = "§c(Spawned)";
+                status = "§cSpawned";
             } else if (GameState.Arachne.isSummoning) {
                 long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
                 if (remainingMs > 0) {
-                    status = String.format("§e(%.1fs)", remainingMs / 1000.0);
+                    status = String.format("§eSpawning §f(%.1fs)", remainingMs / 1000.0);
                 } else {
-                    status = inSanctuary ? "§e(Soon)" : "§6(Spawned/Killed - Go to Sanctuary)";
+                    status = inSanctuary ? "§eSpawning §f(Soon)" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
                 }
             } else {
-                status = inSanctuary ? "§7(Unknown)" : "§7(Unknown - Go to Sanctuary)";
+                status = inSanctuary ? "§7Unknown" : "§7Unknown §f(Go to Arachne's Sanctuary!)";
             }
         }
 
