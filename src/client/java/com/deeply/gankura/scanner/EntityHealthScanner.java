@@ -37,7 +37,8 @@ public class EntityHealthScanner {
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
         boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
-        boolean scanArachne = GameState.Arachne.inSanctuary;
+        // ARACHNE DOWN! 検知後から次の Calling までは存在しないため、確認自体を行わない
+        boolean scanArachne = GameState.Arachne.inSanctuary && !GameState.Arachne.isReady;
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
 
         if (!scanGolem) GameState.Golem.health = null;
