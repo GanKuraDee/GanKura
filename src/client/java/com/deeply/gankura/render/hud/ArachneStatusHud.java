@@ -25,7 +25,8 @@ public class ArachneStatusHud extends HudElement {
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
-            if (inSanctuary && GameState.Arachne.isDetected) {
+            if (GameState.Arachne.cobwebDetected) {
+                // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定
                 status = "§cSpawned";
             } else if (GameState.Arachne.isSummoning) {
                 if (GameState.Arachne.awaitingCrystalParticles) {
@@ -40,8 +41,11 @@ public class ArachneStatusHud extends HudElement {
                         status = inSanctuary ? "§eSpawning §e(Soon)" : "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
                     }
                 }
+            } else if (GameState.Arachne.arachneMessageSeen) {
+                // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
+                status = "§eSpawning §e(Soon)";
             } else if (inSanctuary) {
-                // Sanctuary入場時のデフォルトはReady。エンティティを検知した時点でSpawnedに切り替わる
+                // Sanctuary入場時のデフォルトはReady。蜘蛛の巣を検知した時点でSpawnedに切り替わる
                 status = "§aReady";
             } else {
                 status = "§7Unknown §7(Go to Arachne's Sanctuary!)";

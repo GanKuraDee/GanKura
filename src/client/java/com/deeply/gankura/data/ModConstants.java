@@ -97,9 +97,13 @@ public class ModConstants {
     public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)"; // Small
     public static final String ARACHNE_CRYSTAL_MSG = "placed an Arachne Crystal! Something is awakening!"; // Big
     public static final String ARACHNE_DOWN_MSG = "ARACHNE DOWN!";
+    // このプレフィックスで始まるメッセージが来たら、蜘蛛の巣未検知時の「間もなくスポーン」の合図として使う
+    public static final String ARACHNE_BOSS_MSG_PREFIX = "[BOSS] Arachne";
 
     // Arachne Crystal(Big)のQuick/Normal Spawn判定用に観測するパーティクルの基準座標(祭壇)
     public static final BlockPos ARACHNE_ALTAR_POS = new BlockPos(-283, 51, -179);
+    // Arachneがスポーンすると、この座標に蜘蛛の巣ブロックが出現する(スポーン確定の判定に使用)
+    public static final BlockPos ARACHNE_WEB_POS = new BlockPos(-283, 48, -210);
 
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
     public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";
@@ -108,6 +112,11 @@ public class ModConstants {
     public static boolean containsIgnoreCase(String source, String target) {
         return source != null && target != null
                 && source.toLowerCase(java.util.Locale.ROOT).contains(target.toLowerCase(java.util.Locale.ROOT));
+    }
+
+    public static boolean startsWithIgnoreCase(String source, String prefix) {
+        return source != null && prefix != null
+                && source.toLowerCase(java.util.Locale.ROOT).startsWith(prefix.toLowerCase(java.util.Locale.ROOT));
     }
 
     // Sanctuary内には「Arachne」を名前に含む雑魚も存在するため、

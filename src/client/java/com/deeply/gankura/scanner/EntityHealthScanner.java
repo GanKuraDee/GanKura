@@ -8,6 +8,7 @@ import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.MutableText;
@@ -39,11 +40,13 @@ public class EntityHealthScanner {
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
         // ARACHNE DOWN! 検知後から次の Calling までは存在しないため、確認自体を行わない
         boolean scanArachne = GameState.Arachne.inSanctuary && !GameState.Arachne.isReady;
+        // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する
+        GameState.Arachne.cobwebDetected = isSpidersDen && client.world.getBlockState(ModConstants.ARACHNE_WEB_POS).isOf(Blocks.COBWEB);
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
 
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
-        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.isDetected = false; GameState.Arachne.broodCount = 0; }
+        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.broodCount = 0; }
 
         // Crimson Isle bosses: clear health when not in area
         if (!isCrimsonIsle) {
@@ -71,7 +74,6 @@ public class EntityHealthScanner {
         String foundGolemHealth = null;
         String foundBroodmotherHealth = null;
         String foundArachneHealth = null;
-        boolean foundArachne = false;
         int foundBroodCount = 0;
         String foundSize = GameState.Arachne.size;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
@@ -94,7 +96,6 @@ public class EntityHealthScanner {
             }
 
             if (scanArachne && ModConstants.isArachneBossName(nameStr)) {
-                foundArachne = true;
                 if (foundArachneHealth == null) {
                     Matcher m = HEALTH_PATTERN.matcher(nameStr);
                     if (m.find()) foundArachneHealth = m.group(1);
@@ -136,12 +137,6 @@ public class EntityHealthScanner {
             GameState.Arachne.health = foundArachneHealth;
             GameState.Arachne.broodCount = foundBroodCount;
             GameState.Arachne.size = foundSize;
-            // Arachne本体だけでなくBroodの検知もSpawned判定に含める(分裂後は本体エンティティが消えるため)。
-            // 撃破直後にすぐ次の召喚が始まった場合、消え際の古いエンティティを新しいスポーンの検知として
-            // 誤認しないよう、目標スポーン時刻に達するまでは検知済み扱いにしない
-            boolean spawnTimeReached = !GameState.Arachne.isSummoning
-                    || (!GameState.Arachne.awaitingCrystalParticles && client.world.getTime() >= GameState.Arachne.spawnTargetTime);
-            GameState.Arachne.isDetected = (foundArachne || foundBroodCount > 0) && spawnTimeReached;
         }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {

@@ -92,7 +92,8 @@ public class WorldTextRenderer {
         int textColor;
         String textToRender;
 
-        if (inSanctuary && GameState.Arachne.isDetected) {
+        if (GameState.Arachne.cobwebDetected) {
+            // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定
             textColor = 0xFFFF5555;
             textToRender = "§c§lARACHNE §c(Spawned)";
         } else if (GameState.Arachne.isSummoning) {
@@ -108,6 +109,10 @@ public class WorldTextRenderer {
                     textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
                 }
             }
+        } else if (GameState.Arachne.arachneMessageSeen) {
+            // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
+            textColor = 0xFFFF5555;
+            textToRender = "§c§lARACHNE §e(Soon)";
         } else {
             // Ready(Sanctuary内でのデフォルト)、またはSanctuary外で情報なしの場合、どちらも通常表示
             textColor = 0xFFAA00AA;
