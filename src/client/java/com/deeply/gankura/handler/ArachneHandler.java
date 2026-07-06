@@ -2,23 +2,20 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
-import net.minecraft.client.Minecraft;
 
 public class ArachneHandler {
-    // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間
-    // GolemやDragonと同様にTPS変動に連動させるため、ミリ秒ではなくTick単位で保持する
-    private static final long SPAWN_DELAY_SMALL_TICKS = 360L; // 18s * 20 ticks
-    // Arachne Crystal (Big) 使用からスポーンまでの固定待機時間 (Tick単位)
-    private static final long SPAWN_DELAY_BIG_TICKS = 800L; // 40s * 20 ticks
+    // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間 (SkyHanniの実装に準拠)
+    private static final long SPAWN_DELAY_SMALL_MS = 19000L;
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
-    public static void handleMessage(String unformattedMsg, Minecraft client) {
+    public static void handleMessage(String unformattedMsg) {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
-            if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
+            GameState.Arachne.awaitingCrystalParticles = false;
+            GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_SMALL_MS;
             return;
         }
 
@@ -27,7 +24,13 @@ public class ArachneHandler {
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Big";
-            if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_BIG_TICKS;
+            // Quick Spawn(21秒)か通常スポーン(37秒)かは、直後のパーティクルのバーストを
+            // ArachneCrystalParticleMixin で観測して確定させる(SkyHanniの実装を移植)
+            GameState.Arachne.spawnTargetTime = 0;
+            GameState.Arachne.awaitingCrystalParticles = true;
+            GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
+            GameState.Arachne.particleBurstCounter = 0;
+            GameState.Arachne.particleBurstStartTime = 0;
             return;
         }
 
@@ -43,6 +46,7 @@ public class ArachneHandler {
             GameState.Arachne.isSummoning = false;
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.size = null;
+            GameState.Arachne.awaitingCrystalParticles = false;
         }
     }
 }
