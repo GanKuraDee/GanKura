@@ -36,8 +36,11 @@ public class ArachneStatusHud extends HudElement {
                 } else {
                     status = inSanctuary ? "§eSpawning §f(Soon)" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
                 }
+            } else if (inSanctuary) {
+                // チャットからの情報が何もない状態でSanctuaryにいる場合は、実際のエンティティ検知状況で判定する
+                status = GameState.Arachne.isDetected ? "§cSpawned" : "§aReady";
             } else {
-                status = inSanctuary ? "§7Unknown" : "§7Unknown §f(Go to Arachne's Sanctuary!)";
+                status = "§7Unknown §f(Go to Arachne's Sanctuary!)";
             }
         }
 
