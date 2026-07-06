@@ -68,7 +68,7 @@ public class WorldTextRenderer {
         if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
         if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
 
-        BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS.offset(0, 2, 0);
+        BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS;
         boolean inSanctuary = GameState.Arachne.inSanctuary;
         int textColor;
         String textToRender;
