@@ -134,12 +134,13 @@ public class EntityHealthScanner {
         if (scanBroodmother) GameState.Broodmother.health = foundBroodmotherHealth;
         if (scanArachne) {
             GameState.Arachne.health = foundArachneHealth;
-            GameState.Arachne.isDetected = foundArachne;
+            // Arachne本体だけでなくBroodの検知もSpawned判定に含める(分裂後は本体エンティティが消えるため)
+            GameState.Arachne.isDetected = foundArachne || foundBroodCount > 0;
             GameState.Arachne.broodCount = foundBroodCount;
             GameState.Arachne.size = foundSize;
             // スポーン確定メッセージはSanctuary内でしかチャットに表示されないため、
             // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する
-            if ((foundArachne || foundBroodCount > 0) && GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
+            if (GameState.Arachne.isDetected && GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
                 GameState.Arachne.hasSpawned = true;
             }
         }
