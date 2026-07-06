@@ -150,7 +150,7 @@ public class EntityHighlightManager {
                 if (s != null) highlightedEntities.add(s);
             }
 
-            if (scanArachne && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+            if (scanArachne && ModConstants.isArachneBossName(nameStr)) {
                 Entity visualTarget = findVisualEntity(client, entity, "Arachne");
                 if (visualTarget != null) {
                     highlightedEntities.add(visualTarget);

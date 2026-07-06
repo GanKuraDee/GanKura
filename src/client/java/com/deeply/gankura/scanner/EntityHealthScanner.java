@@ -91,7 +91,7 @@ public class EntityHealthScanner {
                 if (m.find()) foundBroodmotherHealth = m.group(1);
             }
 
-            if (scanArachne && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+            if (scanArachne && ModConstants.isArachneBossName(nameStr)) {
                 foundArachne = true;
                 if (foundArachneHealth == null) {
                     Matcher m = HEALTH_PATTERN.matcher(nameStr);
