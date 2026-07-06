@@ -276,9 +276,15 @@ public class EntityHighlightManager {
         }
 
         // Barbarian Duke X と Mage Outlaw は Player エンティティ型のボス。
-        // Mob 検索をスキップして直接 Player を探す（近傍 Mob に誤ってマッチするのを防ぐ）
+        // それ以外のボス(Arachne等)では、近傍にMobが見つからない場合でも
+        // Player を視覚エンティティとして誤マッチさせないよう、Player検索はPlayer型ボスのときのみ行う
         boolean isPlayerTypeBoss = "Barbarian Duke X".equals(bossName) || "Mage Outlaw".equals(bossName);
-        if (!isPlayerTypeBoss) {
+        if (isPlayerTypeBoss) {
+            Entity closest = getClosestEntity(
+                    client.level.getEntitiesOfClass(Player.class, box, e -> e != client.player),
+                    namedEntity);
+            if (closest != null) return closest;
+        } else {
             // Skeleton 系はボスの視覚エンティティとして扱わない
             // （Bladesoul の Wither Skeleton は別途明示的に追加されるため影響なし）
             Entity closest = getClosestEntity(
@@ -286,11 +292,6 @@ public class EntityHighlightManager {
                     namedEntity);
             if (closest != null) return closest;
         }
-
-        Entity closest = getClosestEntity(
-                client.level.getEntitiesOfClass(Player.class, box, e -> e != client.player),
-                namedEntity);
-        if (closest != null) return closest;
 
         return getClosestEntity(client.level.getEntitiesOfClass(ArmorStand.class, box,
                 e -> e != namedEntity && e.getCustomName() == null), namedEntity);
