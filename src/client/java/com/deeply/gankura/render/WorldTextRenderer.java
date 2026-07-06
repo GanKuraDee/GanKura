@@ -73,12 +73,9 @@ public class WorldTextRenderer {
         int textColor;
         String textToRender;
 
-        if (GameState.Arachne.isReady) {
-            textColor = 0xFFAA00AA;
-            textToRender = "§5§lARACHNE";
-        } else if (GameState.Arachne.hasSpawned) {
+        if (inSanctuary && GameState.Arachne.isDetected) {
             textColor = 0xFFFF5555;
-            textToRender = inSanctuary ? "§c§lARACHNE §c(Spawned)" : "§c§lARACHNE §6(Spawned/Killed)";
+            textToRender = "§c§lARACHNE §c(Spawned)";
         } else if (GameState.Arachne.isSummoning) {
             textColor = 0xFFFF5555;
             if (GameState.Arachne.awaitingCrystalParticles) {
@@ -92,10 +89,8 @@ public class WorldTextRenderer {
                     textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
                 }
             }
-        } else if (inSanctuary && GameState.Arachne.isDetected) {
-            textColor = 0xFFFF5555;
-            textToRender = "§c§lARACHNE §c(Spawned)";
         } else {
+            // Ready(Sanctuary内でのデフォルト)、またはSanctuary外で情報なしの場合、どちらも通常表示
             textColor = 0xFFAA00AA;
             textToRender = "§5§lARACHNE";
         }
