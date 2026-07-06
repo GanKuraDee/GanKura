@@ -777,7 +777,7 @@ public class ModConfig extends Config {
         public boolean enableWarpQueue = true;
 
         @Expose
-        @ConfigOption(name = "Keep Cursor Position On Rapid Screen Swap", desc = "Prevents the mouse cursor from snapping back to the center of the screen when a screen closes and another opens within 0.1s, such as switching between Storage units or Accessory pages.")
+        @ConfigOption(name = "Keep Cursor Position", desc = "Prevents the mouse cursor from snapping back to the center of the screen when a screen closes and another opens within 0.1s, such as switching between Storage units or Accessory pages.")
         @ConfigEditorBoolean
         public boolean enableCursorRestoreOnRapidReopen = true;
     }
