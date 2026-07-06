@@ -26,7 +26,7 @@ public class ArachneStatusHud extends HudElement {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
             if (GameState.Arachne.hasSpawned) {
-                status = "§cSpawned";
+                status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
             } else if (GameState.Arachne.isSummoning) {
                 long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
                 if (remainingMs > 0) {
