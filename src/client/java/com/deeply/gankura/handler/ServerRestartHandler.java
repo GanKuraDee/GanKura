@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class ServerRestartHandler {
 
     // スコアボードから時間を抽出する正規表現 (例: "Server closing: 02:30")
-    private static final Pattern CLOSING_PATTERN = Pattern.compile("Server closing: (\\d{1,2}:\\d{2})");
+    private static final Pattern CLOSING_PATTERN = Pattern.compile("Server closing: (\\d{1,2}:\\d{2})", Pattern.CASE_INSENSITIVE);
     private static int tickCounter = 0;
 
     public static void register() {
@@ -80,7 +80,7 @@ public class ServerRestartHandler {
         // 設定がOFFなら何もしない
         if (!ModConfig.INSTANCE.misc.enableRebootAlert) return;
 
-        if (unformattedMsg.startsWith("[Important] This server will restart soon:")) {
+        if (unformattedMsg.regionMatches(true, 0, "[Important] This server will restart soon:", 0, "[Important] This server will restart soon:".length())) {
             GameState.Server.isClosing = true;
             if (client.player != null) {
                 // ★復元: アイアンゴーレムのデス音を1回鳴らす (音量最大)

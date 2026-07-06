@@ -59,14 +59,14 @@ public class RareDropScanner {
                 String nameString = customName.getString();
 
                 // 1. Tier Boost Core (金)
-                if (nameString.contains("Tier Boost Core") && hasColor(customName, ChatFormatting.GOLD)) {
+                if (ModConstants.containsIgnoreCase(nameString, "Tier Boost Core") && hasColor(customName, ChatFormatting.GOLD)) {
                     LootStats.addTierBoostCore();
                     notifyDrop(client, Component.literal("Tier Boost Core").withStyle(ChatFormatting.GOLD), ModConfig.INSTANCE.theEnd.enableDropAlerts);
                     break;
                 }
 
                 // 2. [Lvl 1] Golem (Legendary / Epic)
-                else if (nameString.contains("[Lvl 1] Golem")) {
+                else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Golem")) {
                     if (hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryGolemPet();
                         MutableComponent itemText = Component.literal("Golem").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
@@ -82,7 +82,7 @@ public class RareDropScanner {
                 }
 
                 // 3. [Lvl 1] Ender Dragon (Legendary / Epic)
-                else if (nameString.contains("[Lvl 1] Ender Dragon")) {
+                else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Ender Dragon")) {
                     if (hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryDragonPet();
                         MutableComponent dragonText = Component.literal("Ender Dragon").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
