@@ -26,6 +26,7 @@ public class EntityHighlightManager {
     public static final Set<Entity> highlightedEntities = new HashSet<>();
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
+    public static final Set<Entity> arachneEntities = new HashSet<>();
 
     // Ashfang のフォロワー3種（ハイライト・トレーサーの個別設定付き）
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
@@ -118,6 +119,7 @@ public class EntityHighlightManager {
 
         boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.spidersDen.enableBroodmotherHighlight;
+        boolean scanArachne = GameState.Arachne.inSanctuary && ModConfig.INSTANCE.spidersDen.enableArachneHighlight;
 
         boolean scanDragon = isTheEnd && GameState.Dragon.type != null && ModConfig.INSTANCE.theEnd.enableDragonHighlight;
 
@@ -133,16 +135,18 @@ public class EntityHighlightManager {
         if (!scanGolem)       highlightedEntities.removeIf(e -> e instanceof IronGolem);
         if (!scanBroodmother) highlightedEntities.removeIf(e -> e instanceof Spider);
         if (!scanDragon)      highlightedEntities.removeIf(e -> e instanceof EnderDragon);
+        if (!scanArachne)     { highlightedEntities.removeAll(arachneEntities); arachneEntities.clear(); }
 
         // ワールドから削除済みのエンティティを削除
         highlightedEntities.removeIf(Entity::isRemoved);
+        arachneEntities.removeIf(Entity::isRemoved);
 
         // Crimson Isle にいない場合は isDetected をリセット
         if (!isCrimsonIsle) {
             for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
         }
 
-        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
         boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
@@ -164,6 +168,14 @@ public class EntityHighlightManager {
                 List<Spider> spiders = client.level.getEntitiesOfClass(Spider.class, searchBox, e -> true);
                 Entity closest = getClosestEntity(spiders, entity);
                 if (closest != null) highlightedEntities.add(closest);
+            }
+
+            if (scanArachne && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+                Entity visualTarget = findVisualEntity(client, entity, "Arachne");
+                if (visualTarget != null) {
+                    highlightedEntities.add(visualTarget);
+                    arachneEntities.add(visualTarget);
+                }
             }
 
             if (scanMagmaGlare && ModConstants.containsIgnoreCase(nameStr, "Magma Glare")) {

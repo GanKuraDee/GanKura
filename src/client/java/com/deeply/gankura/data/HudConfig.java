@@ -40,6 +40,7 @@ public class HudConfig {
         ELEMENTS.add(new BroodmotherStatusHud());
         ELEMENTS.add(new BroodmotherHealthHud());
         ELEMENTS.add(new ArachneStatusHud());
+        ELEMENTS.add(new ArachneHealthHud());
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
         ELEMENTS.add(new CrimsonBossesHealthHud());
