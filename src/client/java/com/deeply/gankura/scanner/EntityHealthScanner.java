@@ -39,13 +39,16 @@ public class EntityHealthScanner {
 
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
-        // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する
-        GameState.Arachne.cobwebDetected = isSpidersDen && client.level.getBlockState(ModConstants.ARACHNE_WEB_POS).is(Blocks.COBWEB);
+        // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する。
+        // 遠すぎてチャンクが読み込まれていない場合は判定不能(Scanning...)として区別する
+        GameState.Arachne.webAreaLoaded = isSpidersDen && client.level.isLoaded(ModConstants.ARACHNE_WEB_POS);
+        GameState.Arachne.cobwebDetected = GameState.Arachne.webAreaLoaded && client.level.getBlockState(ModConstants.ARACHNE_WEB_POS).is(Blocks.COBWEB);
         // Sanctuary内かつ蜘蛛の巣を検知できている間のみスキャンする(スポーン前・撃破後は存在しないため)
         boolean scanArachne = GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected;
         // 蜘蛛の巣もカウントダウンもSoon表示も無い完全なReady状態になったら、
-        // ARACHNE DOWN!を見逃していても古いSizeの表示が残らないようクリアする
-        if (!GameState.Arachne.cobwebDetected && !GameState.Arachne.isSummoning && !GameState.Arachne.arachneMessageSeen) {
+        // ARACHNE DOWN!を見逃していても古いSizeの表示が残らないようクリアする(判定不能の間はクリアしない)
+        if (GameState.Arachne.webAreaLoaded && !GameState.Arachne.cobwebDetected
+                && !GameState.Arachne.isSummoning && !GameState.Arachne.arachneMessageSeen) {
             GameState.Arachne.size = null;
         }
 

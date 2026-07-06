@@ -44,11 +44,12 @@ public class ArachneStatusHud extends HudElement {
             } else if (GameState.Arachne.arachneMessageSeen) {
                 // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
                 status = "§eSpawning §e(Soon)";
-            } else if (inSanctuary) {
-                // Sanctuary入場時のデフォルトはReady。蜘蛛の巣を検知した時点でSpawnedに切り替わる
-                status = "§aReady";
+            } else if (!GameState.Arachne.webAreaLoaded) {
+                // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
+                status = "§8Scanning...";
             } else {
-                status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
+                // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
+                status = "§aReady";
             }
         }
 
