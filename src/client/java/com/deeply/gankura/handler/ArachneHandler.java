@@ -36,6 +36,7 @@ public class ArachneHandler {
             GameState.Arachne.size = "Small";
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
+            GameState.Arachne.downConfirmed = false;
             if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
@@ -49,6 +50,7 @@ public class ArachneHandler {
             GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
             GameState.Arachne.particleBurstCounter = 0;
             GameState.Arachne.arachneMessageSeen = false;
+            GameState.Arachne.downConfirmed = false;
             return;
         }
 
@@ -64,6 +66,7 @@ public class ArachneHandler {
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
+            GameState.Arachne.downConfirmed = true;
         }
     }
 }

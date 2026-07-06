@@ -121,6 +121,7 @@ public class GameState {
         public static boolean cobwebDetected = false; // 蜘蛛の巣ブロックが基準座標に存在する間 true。これでSpawnedを判定し、エンティティスキャンの実行条件にもなる
         public static boolean webAreaLoaded = false; // 基準座標のチャンクが読み込まれている間 true。falseなら判定不能(Scanning...)
         public static boolean arachneMessageSeen = false; // 「[BOSS] Arachne」で始まるメッセージを検知した間 true(蜘蛛の巣未検知時のSoon表示に使用)
+        public static boolean downConfirmed = false; // 「ARACHNE DOWN!」検知で true。次のCalling/Crystalまではチャンク未読み込みでもScanning...にせずReady扱いにする
         public static String health = null;
         public static int broodCount = 0; // Arachne's Brood の残りエンティティ数
         public static String size = null; // Lvl300/Lvl100 なら "Small"、Lvl500/Lvl200 なら "Big"
@@ -129,7 +130,7 @@ public class GameState {
         public static int particleBurstCounter = 0; // 観測中のDUSTパーティクル数
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; inSanctuary = false;
-            cobwebDetected = false; webAreaLoaded = false; arachneMessageSeen = false; health = null; broodCount = 0; size = null;
+            cobwebDetected = false; webAreaLoaded = false; arachneMessageSeen = false; downConfirmed = false; health = null; broodCount = 0; size = null;
             awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0;
         }
     }
