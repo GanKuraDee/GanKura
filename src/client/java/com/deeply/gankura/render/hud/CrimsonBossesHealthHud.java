@@ -13,7 +13,7 @@ import net.minecraft.client.gui.DrawContext;
 public class CrimsonBossesHealthHud extends HudElement {
 
     public CrimsonBossesHealthHud() {
-        super("crimson_bosses_health", 400, 367, 1.0f, 185, 24,
+        super("crimson_bosses_health", 400, 396, 1.0f, 185, 24,
                 CrimsonBossesHealthHud::isAnyEnabled,
                 CrimsonBossesHealthHud::isAnyVisible);
     }

@@ -25,6 +25,7 @@ public class EntityHighlightManager {
     public static final Set<Entity> highlightedEntities = new HashSet<>();
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
+    public static final Set<Entity> arachneEntities = new HashSet<>();
 
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
         new CrimsonBossEntry("Ashfang Follower",
@@ -104,6 +105,7 @@ public class EntityHighlightManager {
         highlightedEntities.clear();
         crimsonBossEntities.clear();
         magmaGlareEntities.clear();
+        arachneEntities.clear();
 
         if (client.world == null || client.player == null) return;
 
@@ -111,6 +113,7 @@ public class EntityHighlightManager {
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage) && ModConfig.INSTANCE.theEnd.enableGolemHighlight;
         boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.spidersDen.enableBroodmotherHighlight;
+        boolean scanArachne = GameState.Arachne.inSanctuary && ModConfig.INSTANCE.spidersDen.enableArachneHighlight;
         boolean scanDragon = isTheEnd && "Hatched".equals(GameState.Dragon.eggState) && ModConfig.INSTANCE.theEnd.enableDragonHighlight;
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
         boolean scanCrimsonBosses = isCrimsonIsle && CRIMSON_BOSSES.stream().anyMatch(b -> b.enableHighlight().get());
@@ -119,7 +122,7 @@ public class EntityHighlightManager {
                 && ModConfig.INSTANCE.crimsonIsle.enableMagmaBossHighlight;
         boolean scanAshfangFollowers = isCrimsonIsle && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get());
 
-        if (!scanGolem && !scanBroodmother && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) {
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) {
             if (!isCrimsonIsle) {
                 for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
             }
@@ -144,6 +147,14 @@ public class EntityHighlightManager {
                 Box box = entity.getBoundingBox().expand(8.0);
                 Entity s = getClosestEntity(client.world.getEntitiesByClass(SpiderEntity.class, box, e -> true), entity);
                 if (s != null) highlightedEntities.add(s);
+            }
+
+            if (scanArachne && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+                Entity visualTarget = findVisualEntity(client, entity, "Arachne");
+                if (visualTarget != null) {
+                    highlightedEntities.add(visualTarget);
+                    arachneEntities.add(visualTarget);
+                }
             }
 
             if (scanMagmaGlare && ModConstants.containsIgnoreCase(nameStr, "Magma Glare")) {

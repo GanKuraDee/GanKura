@@ -502,6 +502,24 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showArachneStatusHud = true;
+
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Toggles the Arachne Health HUD.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean showArachneHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Arachne through walls. Only active while in Arachne's Sanctuary.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean enableArachneHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Arachne. Only active while in Arachne's Sanctuary.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean enableArachneTracer = true;
     }
 
     // ==========================================

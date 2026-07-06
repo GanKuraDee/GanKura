@@ -148,6 +148,10 @@ public class WorldTextRenderer {
             if (entity instanceof IronGolemEntity) {
                 if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;
                 color = 0xFFFFAA00;
+            } else if (EntityHighlightManager.arachneEntities.contains(entity)) {
+                // Arachne は Broodmother と同じ SpiderEntity 型のため、instanceof 判定より先に判定する
+                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
+                color = 0xFFAA00AA;
             } else if (entity instanceof SpiderEntity) {
                 if (!ModConfig.INSTANCE.spidersDen.enableBroodmotherTracer) continue;
                 color = 0xFFFF5555;
