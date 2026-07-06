@@ -22,12 +22,12 @@ public class WarpCooldownHud extends HudElement {
         graphics.text(font, String.format("§bWarp: %.1fs%s", remaining, suffix), 0, 0, 0xFFFFFFFF, true);
     }
 
-    // "warp nest" のようなキュー済みコマンドから引数部分を取り出し、"Queue (nest)" の形で表示する
+    // /warp は必ず引数(warp名)を伴うため、"warp nest" のようなキュー済みコマンドから
+    // 引数部分を取り出し、"(Queued - nest)" の形で表示する
     private static String formatQueued(String queuedCommand) {
-        String arg = null;
-        if (queuedCommand.length() > 5 && queuedCommand.regionMatches(true, 0, "warp ", 0, 5)) {
-            arg = queuedCommand.substring(5).trim();
-        }
-        return (arg != null && !arg.isEmpty()) ? "Queue (" + arg + ")" : "(Queued)";
+        String arg = queuedCommand.regionMatches(true, 0, "warp ", 0, 5)
+                ? queuedCommand.substring(5).trim()
+                : queuedCommand;
+        return "(Queued - " + arg + ")";
     }
 }
