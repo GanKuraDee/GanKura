@@ -12,12 +12,20 @@ public class ArachneHandler {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.hasSpawned = false;
+            GameState.Arachne.isReady = false;
             GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_MS;
             return;
         }
 
         if (GameState.Arachne.isSummoning && ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_SPAWN_MSG)) {
             GameState.Arachne.hasSpawned = true;
+            return;
+        }
+
+        if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_DOWN_MSG)) {
+            GameState.Arachne.isReady = true;
+            GameState.Arachne.isSummoning = false;
+            GameState.Arachne.hasSpawned = false;
         }
     }
 }
