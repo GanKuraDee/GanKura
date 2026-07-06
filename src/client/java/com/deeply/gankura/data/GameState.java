@@ -115,21 +115,19 @@ public class GameState {
     public static class Arachne {
         public static boolean isSummoning = false;
         public static long spawnTargetTime = 0; // 目標ワールドTick数 (Golem/Dragonと同様のTPS考慮方式)
-        public static boolean hasSpawned = false;
         public static boolean inSanctuary = false; // スコアボードに「Arachne's Sanctuary」の行が検出された場合 true
         public static boolean isReady = false; // 「ARACHNE DOWN!」検知後、次の召喚まで true
-        public static boolean isDetected = false; // Sanctuary内でArachneエンティティを検知できている間 true
+        public static boolean isDetected = false; // Sanctuary内でArachneエンティティを検知できている間 true。Sanctuary入退場のたびにリセットされる
         public static String health = null;
         public static int broodCount = 0; // Arachne's Brood の残りエンティティ数
         public static String size = null; // Lvl300/Lvl100 なら "Small"、Lvl500/Lvl200 なら "Big"
         public static boolean awaitingCrystalParticles = false; // Arachne Crystal使用後、Quick/Normal判定のパーティクル観測中か
         public static long crystalMessageTime = 0; // Arachne Crystal検知時刻(ミリ秒)
         public static int particleBurstCounter = 0; // 観測中のDUSTパーティクル数
-        public static long notDetectedSinceMillis = 0; // スポーン済みのはずが検知できなくなった時刻(0なら継続未検知でない)
         public static void reset() {
-            isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false;
+            isSummoning = false; spawnTargetTime = 0; inSanctuary = false;
             isReady = false; isDetected = false; health = null; broodCount = 0; size = null;
-            awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0; notDetectedSinceMillis = 0;
+            awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0;
         }
     }
 

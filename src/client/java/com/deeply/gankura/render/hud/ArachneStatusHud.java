@@ -25,10 +25,8 @@ public class ArachneStatusHud extends HudElement {
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
-            if (GameState.Arachne.isReady) {
-                status = "§aReady";
-            } else if (GameState.Arachne.hasSpawned) {
-                status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
+            if (inSanctuary && GameState.Arachne.isDetected) {
+                status = "§cSpawned";
             } else if (GameState.Arachne.isSummoning) {
                 if (GameState.Arachne.awaitingCrystalParticles) {
                     // Big(Crystal)はパーティクル観測でQuick/Normalが確定するまで秒数を出せない
@@ -43,8 +41,8 @@ public class ArachneStatusHud extends HudElement {
                     }
                 }
             } else if (inSanctuary) {
-                // チャットからの情報が何もない状態でSanctuaryにいる場合は、実際のエンティティ検知状況で判定する
-                status = GameState.Arachne.isDetected ? "§cSpawned" : "§aReady";
+                // Sanctuary入場時のデフォルトはReady。エンティティを検知した時点でSpawnedに切り替わる
+                status = "§aReady";
             } else {
                 status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
             }
