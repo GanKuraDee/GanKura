@@ -17,6 +17,7 @@ public class WorldTextRenderer {
         if (client.player == null) return;
         renderGolemWaypoint(client, client.player);
         renderCrimsonBossWaypoints(client.player);
+        renderArachneWaypoint(client, client.player);
     }
 
     private static void renderGolemWaypoint(Minecraft client, Player player) {
@@ -54,6 +55,48 @@ public class WorldTextRenderer {
                 textToRender = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName))
                         ? "§c§lGOLEM §e(Soon)" : "§c§lGOLEM §c(Spawned)";
             }
+        }
+
+        Vec3 eyePos = player.getEyePosition();
+        double distance = eyePos.distanceTo(Vec3.atCenterOf(renderPos));
+        float textScale = (float) Math.max(0.02, distance * 0.0025);
+
+        renderGizmoLabel(textToRender, renderPos, textColor, textScale);
+    }
+
+    private static void renderArachneWaypoint(Minecraft client, Player player) {
+        if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
+        if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
+
+        BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS.offset(0, 2, 0);
+        boolean inSanctuary = GameState.Arachne.inSanctuary;
+        int textColor;
+        String textToRender;
+
+        if (GameState.Arachne.isReady) {
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE";
+        } else if (GameState.Arachne.hasSpawned) {
+            textColor = 0xFFFF5555;
+            textToRender = inSanctuary ? "§c§lARACHNE §c(Spawned)" : "§c§lARACHNE §6(Spawned/Killed)";
+        } else if (GameState.Arachne.isSummoning) {
+            textColor = 0xFFFF5555;
+            if (GameState.Arachne.awaitingCrystalParticles) {
+                textToRender = "§c§lARACHNE §c(...)";
+            } else {
+                long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
+                if (remainingMs > 0) {
+                    textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingMs / 1000.0);
+                } else {
+                    textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
+                }
+            }
+        } else if (inSanctuary && GameState.Arachne.isDetected) {
+            textColor = 0xFFFF5555;
+            textToRender = "§c§lARACHNE §c(Spawned)";
+        } else {
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE";
         }
 
         Vec3 eyePos = player.getEyePosition();
