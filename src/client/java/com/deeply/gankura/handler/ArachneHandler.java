@@ -9,8 +9,8 @@ public class ArachneHandler {
     // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間 (SkyHanniの実装に準拠、Golem/Dragonと同様にTick数で管理)
     private static final long SPAWN_DELAY_SMALL_TICKS = 380L; // 19秒
     // Arachne Crystal (Big): Quick Spawn / 通常スポーンそれぞれの待機時間(Tick数)
-    private static final long QUICK_SPAWN_DELAY_TICKS = 420L; // 21秒
-    private static final long NORMAL_SPAWN_DELAY_TICKS = 740L; // 37秒
+    private static final long QUICK_SPAWN_DELAY_TICKS = 360L; // 18秒
+    private static final long NORMAL_SPAWN_DELAY_TICKS = 680L; // 34秒
     // Crystal使用後、DUSTパーティクル数を観測する時間(実時間)。この間の検知数が閾値以下ならQuick Spawnと判定する
     private static final long CRYSTAL_PARTICLE_DETERMINATION_MS = 1000L;
     private static final int QUICK_SPAWN_THRESHOLD = 20;
@@ -45,7 +45,7 @@ public class ArachneHandler {
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Big";
-            // Quick Spawn(21秒)か通常スポーン(37秒)かは、観測時間内のDUSTパーティクル数で確定させる(上のtickで判定)
+            // Quick Spawn(18秒)か通常スポーン(34秒)かは、観測時間内のDUSTパーティクル数で確定させる(上のtickで判定)
             GameState.Arachne.spawnTargetTime = 0;
             GameState.Arachne.awaitingCrystalParticles = true;
             GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
