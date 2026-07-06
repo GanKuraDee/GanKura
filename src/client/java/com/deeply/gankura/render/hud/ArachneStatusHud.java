@@ -44,6 +44,9 @@ public class ArachneStatusHud extends HudElement {
             } else if (GameState.Arachne.arachneMessageSeen) {
                 // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
                 status = "§eSpawning §e(Soon)";
+            } else if (GameState.Arachne.downConfirmed) {
+                // ARACHNE DOWN!確定済み。次のCalling/Crystalまではチャンク未読み込みでもReadyを信頼する
+                status = "§aReady";
             } else if (!GameState.Arachne.webAreaLoaded) {
                 // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
                 status = "§8Scanning...";
