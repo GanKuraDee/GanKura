@@ -149,8 +149,12 @@ public class EntityHealthScanner {
             if (nowDetected) {
                 GameState.Arachne.notDetectedSinceMillis = 0;
                 // スポーン確定メッセージはSanctuary内でしかチャットに表示されないため、
-                // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する
-                if (GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
+                // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する。
+                // ただし撃破直後にすぐ次の召喚が始まった場合、消え際の古いエンティティを新しいスポーンの
+                // 確定として誤検知しないよう、目標スポーン時刻に達してから初めて確定する
+                boolean spawnTimeReached = !GameState.Arachne.awaitingCrystalParticles
+                        && client.world.getTime() >= GameState.Arachne.spawnTargetTime;
+                if (GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned && spawnTimeReached) {
                     GameState.Arachne.hasSpawned = true;
                 }
             } else {
