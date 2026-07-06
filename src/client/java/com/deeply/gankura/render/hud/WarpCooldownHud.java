@@ -18,7 +18,16 @@ public class WarpCooldownHud extends HudElement {
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         double remaining = isPreview ? 5.0 : Math.max(0, GameState.Warp.cooldownEndAt - System.currentTimeMillis()) / 1000.0;
-        String suffix = (!isPreview && GameState.Warp.queuedCommand != null) ? " §e(Queued)" : "";
+        String suffix = (!isPreview && GameState.Warp.queuedCommand != null) ? " §e" + formatQueued(GameState.Warp.queuedCommand) : "";
         context.drawTextWithShadow(tr, String.format("§bWarp: %.1fs%s", remaining, suffix), 0, 0, 0xFFFFFFFF);
+    }
+
+    // "warp nest" のようなキュー済みコマンドから引数部分を取り出し、"Queue (nest)" の形で表示する
+    private static String formatQueued(String queuedCommand) {
+        String arg = null;
+        if (queuedCommand.length() > 5 && queuedCommand.regionMatches(true, 0, "warp ", 0, 5)) {
+            arg = queuedCommand.substring(5).trim();
+        }
+        return (arg != null && !arg.isEmpty()) ? "Queue (" + arg + ")" : "(Queued)";
     }
 }
