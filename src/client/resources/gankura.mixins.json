@@ -12,7 +12,8 @@
 		"WorldTextRenderMixin",
 		"GizmoTextFogMixin",
 		"MouseCursorRestoreMixin",
-		"MouseHandlerAccessor"
+		"MouseHandlerAccessor",
+		"ArachneCrystalParticleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
