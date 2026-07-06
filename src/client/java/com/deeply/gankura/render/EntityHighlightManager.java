@@ -119,7 +119,8 @@ public class EntityHighlightManager {
 
         boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage) && ModConfig.INSTANCE.spidersDen.enableBroodmotherHighlight;
-        boolean scanArachne = GameState.Arachne.inSanctuary && ModConfig.INSTANCE.spidersDen.enableArachneHighlight;
+        // ARACHNE DOWN! 検知後から次の Calling までは存在しないため、確認自体を行わない
+        boolean scanArachne = GameState.Arachne.inSanctuary && !GameState.Arachne.isReady && ModConfig.INSTANCE.spidersDen.enableArachneHighlight;
 
         boolean scanDragon = isTheEnd && GameState.Dragon.type != null && ModConfig.INSTANCE.theEnd.enableDragonHighlight;
 
