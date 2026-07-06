@@ -38,12 +38,14 @@ public class EntityHealthScanner {
 
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
+        boolean scanArachne = GameState.Arachne.inSanctuary;
 
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
                 || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
 
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
+        if (!scanArachne) GameState.Arachne.health = null;
 
         // Crimson Isle にいない場合は全ボスの HP をクリア
         if (!isCrimsonIsle) {
@@ -52,7 +54,7 @@ public class EntityHealthScanner {
             }
         }
 
-        if (!scanGolem && !scanBroodmother && !isCrimsonIsle) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !isCrimsonIsle) return;
 
         if (isCrimsonIsle) scanMagmaBossScoreboard(client);
 
@@ -66,10 +68,11 @@ public class EntityHealthScanner {
             }
         }
 
-        if (!scanGolem && !scanBroodmother && !anyCrimsonScan) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !anyCrimsonScan) return;
 
         String foundGolemHealth = null;
         String foundBroodmotherHealth = null;
+        String foundArachneHealth = null;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
 
         AABB scanBox = client.player.getBoundingBox().inflate(50.0);
@@ -87,6 +90,11 @@ public class EntityHealthScanner {
                     && (ModConstants.containsIgnoreCase(nameStr, "Brood Mother") || ModConstants.containsIgnoreCase(nameStr, "Broodmother"))) {
                 Matcher m = HEALTH_PATTERN.matcher(nameStr);
                 if (m.find()) foundBroodmotherHealth = m.group(1);
+            }
+
+            if (scanArachne && foundArachneHealth == null && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+                Matcher m = HEALTH_PATTERN.matcher(nameStr);
+                if (m.find()) foundArachneHealth = m.group(1);
             }
 
             if (anyCrimsonScan) {
@@ -108,6 +116,7 @@ public class EntityHealthScanner {
 
         if (scanGolem) GameState.Golem.health = foundGolemHealth;
         if (scanBroodmother) GameState.Broodmother.health = foundBroodmotherHealth;
+        if (scanArachne) GameState.Arachne.health = foundArachneHealth;
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                 if (scanCrimson[i]) EntityHighlightManager.CRIMSON_BOSSES.get(i).setHealth().accept(foundCrimsonHealth[i]);

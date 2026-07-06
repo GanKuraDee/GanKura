@@ -40,6 +40,11 @@ public class EntityTracerRenderer {
                 if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
                 color = 0xFFFF5555; // 赤
             }
+            // Arachne (Broodmother と同じ Spider 型のため instanceof 判定より先に判定する)
+            else if (EntityHighlightManager.arachneEntities.contains(entity)) {
+                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
+                color = 0xFFAA00AA; // 紫
+            }
             // Golem / Broodmother / Dragon
             else if (entity instanceof IronGolem) {
                 if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;

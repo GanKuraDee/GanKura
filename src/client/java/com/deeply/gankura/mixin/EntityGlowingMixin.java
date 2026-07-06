@@ -41,6 +41,12 @@ public class EntityGlowingMixin {
                 return;
             }
 
+            // Arachne (Broodmother と同じ Spider 型のため instanceof 判定より先に判定する): 紫
+            if (EntityHighlightManager.arachneEntities.contains(entity)) {
+                cir.setReturnValue(0xAA00AA);
+                return;
+            }
+
             if (entity instanceof IronGolem) {
                 cir.setReturnValue(0xFFAA00); // ゴーレム: 金色
             } else if (entity instanceof Spider) {
