@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPacketListener.class)
 public class ArachneCrystalParticleMixin {
 
-    private static final double ALTAR_RADIUS = 1.0;
+    private static final double ALTAR_RADIUS = 2.0;
     // 実機確認により、対象のDUSTパーティクルは黒(RGB全て0近辺)であることが判明したため色でも絞り込む
     private static final float BLACK_COLOR_EPSILON = 0.05f;
     private static final int QUICK_SPAWN_THRESHOLD = 20;
