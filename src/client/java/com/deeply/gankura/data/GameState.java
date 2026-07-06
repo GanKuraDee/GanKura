@@ -120,9 +120,10 @@ public class GameState {
         public static boolean isReady = false; // 「ARACHNE DOWN!」検知後、次の召喚まで true
         public static boolean isDetected = false; // Sanctuary内でArachneエンティティを検知できている間 true
         public static String health = null;
+        public static int broodCount = 0; // Arachne's Brood の残りエンティティ数
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; hasSpawned = false; inSanctuary = false;
-            isReady = false; isDetected = false; health = null;
+            isReady = false; isDetected = false; health = null; broodCount = 0;
         }
     }
 

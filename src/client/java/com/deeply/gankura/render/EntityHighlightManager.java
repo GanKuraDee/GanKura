@@ -26,6 +26,7 @@ public class EntityHighlightManager {
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
     public static final Set<Entity> arachneEntities = new HashSet<>();
+    public static final Set<Entity> arachneBroodEntities = new HashSet<>();
 
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
         new CrimsonBossEntry("Ashfang Follower",
@@ -106,6 +107,7 @@ public class EntityHighlightManager {
         crimsonBossEntities.clear();
         magmaGlareEntities.clear();
         arachneEntities.clear();
+        arachneBroodEntities.clear();
 
         if (client.world == null || client.player == null) return;
 
@@ -155,6 +157,14 @@ public class EntityHighlightManager {
                 if (visualTarget != null) {
                     highlightedEntities.add(visualTarget);
                     arachneEntities.add(visualTarget);
+                }
+            }
+
+            if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
+                Entity visualTarget = findVisualEntity(client, entity, "Arachne's Brood");
+                if (visualTarget != null) {
+                    highlightedEntities.add(visualTarget);
+                    arachneBroodEntities.add(visualTarget);
                 }
             }
 

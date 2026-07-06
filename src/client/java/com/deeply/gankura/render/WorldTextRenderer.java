@@ -152,6 +152,10 @@ public class WorldTextRenderer {
                 // Arachne は Broodmother と同じ SpiderEntity 型のため、instanceof 判定より先に判定する
                 if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
                 color = 0xFFAA00AA;
+            } else if (EntityHighlightManager.arachneBroodEntities.contains(entity)) {
+                // Arachne's Brood も同じ SpiderEntity(CaveSpiderEntity) 系のため、instanceof 判定より先に判定する
+                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
+                color = 0xFFFF55FF;
             } else if (entity instanceof SpiderEntity) {
                 if (!ModConfig.INSTANCE.spidersDen.enableBroodmotherTracer) continue;
                 color = 0xFFFF5555;
