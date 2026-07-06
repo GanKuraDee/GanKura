@@ -39,6 +39,7 @@ public class HudConfig {
         ELEMENTS.add(new DragonLootTrackerHud()); // ここでバグも修正！
         ELEMENTS.add(new BroodmotherStatusHud());
         ELEMENTS.add(new BroodmotherHealthHud());
+        ELEMENTS.add(new ArachneStatusHud());
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
 

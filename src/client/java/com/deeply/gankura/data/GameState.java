@@ -112,6 +112,13 @@ public class GameState {
         }
     }
 
+    public static class Arachne {
+        public static boolean isSummoning = false;
+        public static long spawnTargetTime = 0;
+        public static boolean hasSpawned = false;
+        public static void reset() { isSummoning = false; spawnTargetTime = 0; hasSpawned = false; }
+    }
+
     public static class BarbarianDukeX {
         public static boolean isDetected = false;
         public static String health = null;
@@ -185,6 +192,7 @@ public class GameState {
         Golem.reset();
         Dragon.reset();
         Broodmother.reset();
+        Arachne.reset();
         BarbarianDukeX.reset();
         Bladesoul.reset();
         MageOutlaw.reset();

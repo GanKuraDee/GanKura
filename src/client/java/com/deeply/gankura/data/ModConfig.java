@@ -490,6 +490,18 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 4)
         public boolean enableBroodmotherTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Arachne", desc = "Expand to configure Arachne settings.")
+        @ConfigEditorAccordion(id = 5)
+        @ConfigEditorBoolean
+        public boolean arachneSection = false;
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Shows a countdown until Arachne spawns after using an Arachne's Calling.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 5)
+        public boolean showArachneStatusHud = true;
     }
 
     // ==========================================

@@ -91,6 +91,12 @@ public class ModConstants {
     public static final Pattern DRAGON_DOWN_PATTERN = Pattern.compile("([A-Za-z]+) DRAGON DOWN!", Pattern.CASE_INSENSITIVE);
     public static final String DRAGON_EGG_SPAWNED_MSG = "The Dragon Egg has spawned!";
 
+    // =======================================================
+    // Arachne (Spider's Den) 関連のメッセージ
+    // =======================================================
+    public static final String ARACHNE_CALLING_MSG = "placed an Arachne's Calling! Something is awakening! (4/4)";
+    public static final String ARACHNE_SPAWN_MSG = "[BOSS] Arachne: A beffiting welcome!";
+
     // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
     public static boolean containsIgnoreCase(String source, String target) {
         return source != null && target != null
