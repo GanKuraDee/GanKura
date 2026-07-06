@@ -45,7 +45,7 @@ public class EntityHealthScanner {
 
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
-        if (!scanArachne) GameState.Arachne.health = null;
+        if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.isDetected = false; }
 
         // Crimson Isle にいない場合は全ボスの HP をクリア
         if (!isCrimsonIsle) {
@@ -73,6 +73,7 @@ public class EntityHealthScanner {
         String foundGolemHealth = null;
         String foundBroodmotherHealth = null;
         String foundArachneHealth = null;
+        boolean foundArachne = false;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
 
         AABB scanBox = client.player.getBoundingBox().inflate(50.0);
@@ -92,9 +93,12 @@ public class EntityHealthScanner {
                 if (m.find()) foundBroodmotherHealth = m.group(1);
             }
 
-            if (scanArachne && foundArachneHealth == null && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
-                Matcher m = HEALTH_PATTERN.matcher(nameStr);
-                if (m.find()) foundArachneHealth = m.group(1);
+            if (scanArachne && ModConstants.containsIgnoreCase(nameStr, "Arachne")) {
+                foundArachne = true;
+                if (foundArachneHealth == null) {
+                    Matcher m = HEALTH_PATTERN.matcher(nameStr);
+                    if (m.find()) foundArachneHealth = m.group(1);
+                }
             }
 
             if (anyCrimsonScan) {
@@ -116,7 +120,10 @@ public class EntityHealthScanner {
 
         if (scanGolem) GameState.Golem.health = foundGolemHealth;
         if (scanBroodmother) GameState.Broodmother.health = foundBroodmotherHealth;
-        if (scanArachne) GameState.Arachne.health = foundArachneHealth;
+        if (scanArachne) {
+            GameState.Arachne.health = foundArachneHealth;
+            GameState.Arachne.isDetected = foundArachne;
+        }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                 if (scanCrimson[i]) EntityHighlightManager.CRIMSON_BOSSES.get(i).setHealth().accept(foundCrimsonHealth[i]);
