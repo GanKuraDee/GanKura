@@ -32,9 +32,11 @@ public class ArachneStatusHud extends HudElement {
             } else if (GameState.Arachne.hasSpawned) {
                 status = inSanctuary ? "§cSpawned" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
             } else if (GameState.Arachne.isSummoning) {
-                long remainingMs = GameState.Arachne.spawnTargetTime - System.currentTimeMillis();
-                if (remainingMs > 0) {
-                    status = String.format("§eSpawning §f(%.1fs)", remainingMs / 1000.0);
+                // Golem/Dragonと同様、サーバーTickベースで残り時間を推定しTPS変動に対応する
+                long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
+                double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
+                if (remainingTicks > 0) {
+                    status = String.format("§eSpawning §f(%.1fs)", remainingTicks / 20.0);
                 } else {
                     status = inSanctuary ? "§eSpawning §f(Soon)" : "§6Spawned/Killed §f(Go to Arachne's Sanctuary!)";
                 }
