@@ -29,13 +29,14 @@ public class ArachneHandler {
     }
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
-    // Spawned/Readyの判定はEntityHealthScannerによるエンティティ検知のみで行う(スポーン確定チャットは使用しない)
+    // Spawnedの確定はEntityHealthScannerによる蜘蛛の巣ブロックの検知のみで行う
     public static void handleMessage(String unformattedMsg, Minecraft client) {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
             GameState.Arachne.awaitingCrystalParticles = false;
+            GameState.Arachne.arachneMessageSeen = false;
             if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
@@ -49,6 +50,13 @@ public class ArachneHandler {
             GameState.Arachne.awaitingCrystalParticles = true;
             GameState.Arachne.crystalMessageTime = System.currentTimeMillis();
             GameState.Arachne.particleBurstCounter = 0;
+            GameState.Arachne.arachneMessageSeen = false;
+            return;
+        }
+
+        if (ModConstants.startsWithIgnoreCase(unformattedMsg, ModConstants.ARACHNE_BOSS_MSG_PREFIX)) {
+            // 蜘蛛の巣がまだ検知できていない間、間もなくスポーンする合図として使う(カウントダウン中は優先されない)
+            GameState.Arachne.arachneMessageSeen = true;
             return;
         }
 
@@ -57,6 +65,7 @@ public class ArachneHandler {
             GameState.Arachne.isSummoning = false;
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
+            GameState.Arachne.arachneMessageSeen = false;
         }
     }
 }
