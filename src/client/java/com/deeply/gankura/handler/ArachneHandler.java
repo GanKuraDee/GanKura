@@ -13,6 +13,7 @@ public class ArachneHandler {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
+            GameState.Arachne.size = null;
             GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_MS;
             return;
         }
@@ -26,6 +27,7 @@ public class ArachneHandler {
             GameState.Arachne.isReady = true;
             GameState.Arachne.isSummoning = false;
             GameState.Arachne.hasSpawned = false;
+            GameState.Arachne.size = null;
         }
     }
 }
