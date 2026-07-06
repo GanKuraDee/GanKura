@@ -11,12 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// Arachne Crystal(Big)使用後、DUSTパーティクルが現れるかどうかで
-// 通常スポーン(37秒)かQuick Spawn(21秒、パーティクルが一切現れない)かを判定する
+// Arachne Crystal(Big)使用後に観測されるDUSTパーティクル数を数える。
+// 最終的なQuick/Normal判定はArachneHandlerのtickループが閾値と比較して行う
 @Mixin(ClientPacketListener.class)
 public class ArachneCrystalParticleMixin {
 
-    private static final long NORMAL_SPAWN_DELAY_MS = 37000L;
     private static final double ALTAR_RADIUS = 30.0;
 
     @Inject(method = "handleParticleEvent", at = @At("HEAD"))
@@ -32,8 +31,6 @@ public class ArachneCrystalParticleMixin {
         double dz = packet.getZ() - altar.getZ();
         if (Math.sqrt(dx * dx + dy * dy + dz * dz) > ALTAR_RADIUS) return;
 
-        // パーティクルを検知できた = 通常スポーン確定
-        GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + NORMAL_SPAWN_DELAY_MS;
-        GameState.Arachne.awaitingCrystalParticles = false;
+        GameState.Arachne.particleBurstCounter++;
     }
 }
