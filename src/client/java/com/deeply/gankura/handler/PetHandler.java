@@ -1,6 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.Component;
@@ -15,10 +16,10 @@ public class PetHandler {
     public static boolean hasScannedTabList = false;
     private static int widgetCheckTicker = 0;
 
-    private static final Pattern MANUAL_SUMMON = Pattern.compile("You summoned your (.+?)!");
+    private static final Pattern MANUAL_SUMMON = Pattern.compile("You summoned your (.+?)!", Pattern.CASE_INSENSITIVE);
 
     // ★修正: [Lvl 100] 等のレベル表記をスキップ(除外)し、スキン(♦)と名前だけを抽出する正規表現
-    private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your (?:\\[Lvl \\d+\\] )?(.+?)! VIEW RULE");
+    private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your (?:\\[Lvl \\d+\\] )?(.+?)! VIEW RULE", Pattern.CASE_INSENSITIVE);
 
     public static void register() {
     }
@@ -37,7 +38,7 @@ public class PetHandler {
         String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
 
         // 2. しまった時の判定
-        if (unformatted.contains("You despawned your") || unformatted.contains("No pet selected")) {
+        if (ModConstants.containsIgnoreCase(unformatted, "You despawned your") || ModConstants.containsIgnoreCase(unformatted, "No pet selected")) {
             GameState.Player.activePetName = null;
             return;
         }
@@ -78,7 +79,7 @@ public class PetHandler {
             String formatted = formattedLines.get(i);
 
             // タブリストからも [Lvl X] を除外して抽出
-            if (unformatted.contains("[Lvl ")) {
+            if (ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) {
                 int startIdx = unformatted.indexOf("] ");
                 if (startIdx != -1) {
                     String petName = unformatted.substring(startIdx + 2).trim();
@@ -87,7 +88,7 @@ public class PetHandler {
                     return;
                 }
             }
-            if (unformatted.contains("No pet selected")) {
+            if (ModConstants.containsIgnoreCase(unformatted, "No pet selected")) {
                 GameState.Player.activePetName = null;
                 hasScannedTabList = true;
                 return;

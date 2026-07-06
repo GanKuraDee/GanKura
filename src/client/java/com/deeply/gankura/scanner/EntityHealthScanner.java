@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class EntityHealthScanner {
     private static final Pattern HEALTH_PATTERN = Pattern.compile("([\\d\\.,]+[kM]?/[\\d\\.,]+[kM]?)");
-    private static final Pattern MAGMA_PERCENT_PATTERN = Pattern.compile("Boss: (\\d{1,3})%");
+    private static final Pattern MAGMA_PERCENT_PATTERN = Pattern.compile("Boss: (\\d{1,3})%", Pattern.CASE_INSENSITIVE);
     private static String previousMagmaSpawnStatus = null;
 
     public static void register() {
@@ -84,7 +84,7 @@ public class EntityHealthScanner {
             }
 
             if (scanBroodmother && foundBroodmotherHealth == null
-                    && (nameStr.contains("Brood Mother") || nameStr.contains("Broodmother"))) {
+                    && (ModConstants.containsIgnoreCase(nameStr, "Brood Mother") || ModConstants.containsIgnoreCase(nameStr, "Broodmother"))) {
                 Matcher m = HEALTH_PATTERN.matcher(nameStr);
                 if (m.find()) foundBroodmotherHealth = m.group(1);
             }
@@ -93,7 +93,7 @@ public class EntityHealthScanner {
                 for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                     if (!scanCrimson[i] || foundCrimsonHealth[i] != null) continue;
                     CrimsonBossEntry boss = EntityHighlightManager.CRIMSON_BOSSES.get(i);
-                    if (nameStr.contains(boss.nameTag())) {
+                    if (ModConstants.containsIgnoreCase(nameStr, boss.nameTag())) {
                         Matcher m = HEALTH_PATTERN.matcher(nameStr);
                         if (m.find()) {
                             foundCrimsonHealth[i] = m.group(1);
@@ -124,9 +124,9 @@ public class EntityHealthScanner {
                     .replaceAll("§[0-9a-fk-or]", "");
             Matcher m = MAGMA_PERCENT_PATTERN.matcher(line);
             if (m.find()) { found = m.group(1) + "%"; break; }
-            if (line.contains("Kill the Magmas:"))       { found = "Kill the Magmas"; break; }
-            if (line.contains("Boss Health:"))           { found = "Final Stage";     break; }
-            if (line.contains("The boss is reforming!")) { found = "Reforming...";    break; }
+            if (ModConstants.containsIgnoreCase(line, "Kill the Magmas:"))       { found = "Kill the Magmas"; break; }
+            if (ModConstants.containsIgnoreCase(line, "Boss Health:"))           { found = "Final Stage";     break; }
+            if (ModConstants.containsIgnoreCase(line, "The boss is reforming!")) { found = "Reforming...";    break; }
         }
         // Final Stage 以外で値が変化した場合にタイトル表示
         if (found != null && !"Final Stage".equals(found) && !found.equals(previousMagmaSpawnStatus)) {
@@ -145,7 +145,7 @@ public class EntityHealthScanner {
         boolean[] afterBossName = {false};
         text.visit((Style style, String str) -> {
             if (!afterBossName[0]) {
-                if (str.contains("Magma Boss")) afterBossName[0] = true;
+                if (ModConstants.containsIgnoreCase(str, "Magma Boss")) afterBossName[0] = true;
                 return Optional.empty();
             }
             StringBuilder filtered = new StringBuilder();
