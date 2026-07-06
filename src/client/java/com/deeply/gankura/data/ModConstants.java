@@ -107,16 +107,25 @@ public class ModConstants {
                 && source.toLowerCase(java.util.Locale.ROOT).contains(target.toLowerCase(java.util.Locale.ROOT));
     }
 
+    // 実際の表示は "[Lvl300] ✷ Arachne 1,234,567/2,000,000" のように記号や
+    // 見えないNBSP等が挟まることがあり、単純な部分一致では検知漏れが起きうるため、
+    // 英数字以外を取り除いた文字列同士で比較する
+    private static String toCompactLower(String s) {
+        return s == null ? "" : s.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]", "");
+    }
+
     // Sanctuary内には「Arachne」を名前に含む雑魚も存在するため、
     // 実際のボス(Lvl300 または Lvl500)かどうかをレベル表記の有無で判別する
     public static boolean isArachneBossName(String nameStr) {
-        return containsIgnoreCase(nameStr, "Arachne")
-                && (containsIgnoreCase(nameStr, "Lvl300") || containsIgnoreCase(nameStr, "Lvl500"));
+        String compact = toCompactLower(nameStr);
+        return compact.contains("arachne")
+                && (compact.contains("lvl300") || compact.contains("lvl500"));
     }
 
     // Arachneはダメージを受けると複数体の Arachne's Brood に分裂する。レベル表記(Lvl100/Lvl200)の有無で判別する
     public static boolean isArachneBroodName(String nameStr) {
-        return containsIgnoreCase(nameStr, "Arachne's Brood")
-                && (containsIgnoreCase(nameStr, "Lvl100") || containsIgnoreCase(nameStr, "Lvl200"));
+        String compact = toCompactLower(nameStr);
+        return compact.contains("arachnesbrood")
+                && (compact.contains("lvl100") || compact.contains("lvl200"));
     }
 }
