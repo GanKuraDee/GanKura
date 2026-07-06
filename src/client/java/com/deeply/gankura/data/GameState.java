@@ -116,7 +116,7 @@ public class GameState {
 
     public static class Arachne {
         public static boolean isSummoning = false;
-        public static long spawnTargetTime = 0;
+        public static long spawnTargetTime = 0; // 目標ワールドTick数 (Golem/Dragonと同様のTPS考慮方式)
         public static boolean hasSpawned = false;
         public static boolean inSanctuary = false; // スコアボードに「Arachne's Sanctuary」の行が検出された場合 true
         public static boolean isReady = false; // 「ARACHNE DOWN!」検知後、次の召喚まで true

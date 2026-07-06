@@ -3,14 +3,15 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
 
 public class ArachneHandler {
-    // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間 (SkyHanniの実装に準拠)
-    private static final long SPAWN_DELAY_SMALL_MS = 19000L;
-    // Arachne Crystal (Big): Quick Spawn / 通常スポーンそれぞれの待機時間
-    private static final long QUICK_SPAWN_DELAY_MS = 21000L;
-    private static final long NORMAL_SPAWN_DELAY_MS = 37000L;
-    // Crystal使用後、DUSTパーティクル数を観測する時間。この間の検知数が閾値以下ならQuick Spawnと判定する
+    // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間 (SkyHanniの実装に準拠、Golem/Dragonと同様にTick数で管理)
+    private static final long SPAWN_DELAY_SMALL_TICKS = 380L; // 19秒
+    // Arachne Crystal (Big): Quick Spawn / 通常スポーンそれぞれの待機時間(Tick数)
+    private static final long QUICK_SPAWN_DELAY_TICKS = 420L; // 21秒
+    private static final long NORMAL_SPAWN_DELAY_TICKS = 740L; // 37秒
+    // Crystal使用後、DUSTパーティクル数を観測する時間(実時間)。この間の検知数が閾値以下ならQuick Spawnと判定する
     private static final long CRYSTAL_PARTICLE_DETERMINATION_MS = 1000L;
     private static final int QUICK_SPAWN_THRESHOLD = 20;
 
@@ -20,22 +21,22 @@ public class ArachneHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (GameState.Arachne.awaitingCrystalParticles
                     && System.currentTimeMillis() - GameState.Arachne.crystalMessageTime > CRYSTAL_PARTICLE_DETERMINATION_MS) {
-                long delay = GameState.Arachne.particleBurstCounter <= QUICK_SPAWN_THRESHOLD ? QUICK_SPAWN_DELAY_MS : NORMAL_SPAWN_DELAY_MS;
-                GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + delay;
+                long delayTicks = GameState.Arachne.particleBurstCounter <= QUICK_SPAWN_THRESHOLD ? QUICK_SPAWN_DELAY_TICKS : NORMAL_SPAWN_DELAY_TICKS;
+                if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + delayTicks;
                 GameState.Arachne.awaitingCrystalParticles = false;
             }
         });
     }
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
-    public static void handleMessage(String unformattedMsg) {
+    public static void handleMessage(String unformattedMsg, Minecraft client) {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.ARACHNE_CALLING_MSG)) {
             GameState.Arachne.isSummoning = true;
             GameState.Arachne.hasSpawned = false;
             GameState.Arachne.isReady = false;
             GameState.Arachne.size = "Small";
             GameState.Arachne.awaitingCrystalParticles = false;
-            GameState.Arachne.spawnTargetTime = System.currentTimeMillis() + SPAWN_DELAY_SMALL_MS;
+            if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
 
