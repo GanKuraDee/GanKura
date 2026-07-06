@@ -113,6 +113,10 @@ public class WorldTextRenderer {
             // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
             textColor = 0xFFFF5555;
             textToRender = "§c§lARACHNE §e(Soon)";
+        } else if (GameState.Arachne.downConfirmed) {
+            // ARACHNE DOWN!確定済み。次のCalling/Crystalまではチャンク未読み込みでもReadyを信頼する
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE";
         } else if (!GameState.Arachne.webAreaLoaded) {
             // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
             textColor = 0xFF555555;
