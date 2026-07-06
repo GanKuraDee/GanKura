@@ -137,6 +137,11 @@ public class EntityHealthScanner {
             GameState.Arachne.isDetected = foundArachne;
             GameState.Arachne.broodCount = foundBroodCount;
             GameState.Arachne.size = foundSize;
+            // スポーン確定メッセージはSanctuary内でしかチャットに表示されないため、
+            // エリア外にいた間に見逃していても、実際にArachne本体かBroodを検知できた時点でスポーン済みと確定する
+            if ((foundArachne || foundBroodCount > 0) && GameState.Arachne.isSummoning && !GameState.Arachne.hasSpawned) {
+                GameState.Arachne.hasSpawned = true;
+            }
         }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
