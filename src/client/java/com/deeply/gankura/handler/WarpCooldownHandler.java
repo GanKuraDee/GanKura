@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
@@ -30,9 +31,7 @@ public class WarpCooldownHandler {
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
     public static void handleMessage(String unformattedMsg) {
-        String lowerMsg = unformattedMsg.toLowerCase();
-        if (GameState.Warp.awaitingConfirmation
-                && (lowerMsg.contains("warping...") || lowerMsg.contains("warping you to your skyblock island..."))) {
+        if (GameState.Warp.awaitingConfirmation && ModConstants.containsIgnoreCase(unformattedMsg, "warping")) {
             GameState.Warp.awaitingConfirmation = false;
             GameState.Warp.cooldownEndAt = System.currentTimeMillis() + COOLDOWN_MS;
         }
