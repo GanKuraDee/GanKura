@@ -176,7 +176,8 @@ public class GameState {
         public static long cooldownEndAt = 0;
         public static String queuedCommand = null;
         public static boolean awaitingConfirmation = false;
-        public static void reset() { cooldownEndAt = 0; queuedCommand = null; awaitingConfirmation = false; }
+        public static long awaitingConfirmationSince = 0;
+        public static void reset() { cooldownEndAt = 0; queuedCommand = null; awaitingConfirmation = false; awaitingConfirmationSince = 0; }
     }
 
     public static void resetAll() {
