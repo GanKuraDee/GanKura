@@ -47,9 +47,18 @@ public class EntityHealthScanner {
         boolean scanArachne = GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected;
         // 蜘蛛の巣もカウントダウンもSoon表示も無い完全なReady状態になったら、
         // ARACHNE DOWN!を見逃していても古いSizeの表示が残らないようクリアする(判定不能の間はクリアしない)
-        if (GameState.Arachne.webAreaLoaded && !GameState.Arachne.cobwebDetected
-                && !GameState.Arachne.isSummoning && !GameState.Arachne.arachneMessageSeen) {
+        boolean confirmedReadyNow = GameState.Arachne.webAreaLoaded && !GameState.Arachne.cobwebDetected
+                && !GameState.Arachne.isSummoning && !GameState.Arachne.arachneMessageSeen;
+        if (confirmedReadyNow) {
             GameState.Arachne.size = null;
+        }
+        // Sanctuary内で状態を確定できたら、エリア外に出た後の表示に使うためRead/Spawned系状態をラッチしておく
+        if (GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected) {
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = false;
+        } else if (confirmedReadyNow) {
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = true;
         }
 
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
