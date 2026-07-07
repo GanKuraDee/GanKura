@@ -38,7 +38,7 @@ public class ArachneStatusHud extends HudElement {
                     if (remainingTicks > 0) {
                         status = String.format("§eSpawning §c(%.1fs)", remainingTicks / 20.0);
                     } else {
-                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§6Ready/Spawning/Killed §7(Go to Arachne's Sanctuary!)";
+                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§6Ready/Spawning §7(Go to Arachne's Sanctuary!)";
                     }
                 }
             } else if (GameState.Arachne.arachneMessageSeen) {
