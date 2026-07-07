@@ -37,6 +37,8 @@ public class ArachneHandler {
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
             GameState.Arachne.downConfirmed = false;
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = false;
             if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
@@ -51,6 +53,8 @@ public class ArachneHandler {
             GameState.Arachne.particleBurstCounter = 0;
             GameState.Arachne.arachneMessageSeen = false;
             GameState.Arachne.downConfirmed = false;
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = false;
             return;
         }
 
@@ -58,6 +62,8 @@ public class ArachneHandler {
                 && !ModConstants.isArachneExcludedQuote(unformattedMsg)) {
             // 蜘蛛の巣がまだ検知できていない間、間もなくスポーンする合図として使う(カウントダウン中は優先されない)
             GameState.Arachne.arachneMessageSeen = true;
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = false;
             return;
         }
 
@@ -67,6 +73,8 @@ public class ArachneHandler {
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
             GameState.Arachne.downConfirmed = true;
+            GameState.Arachne.everConfirmed = true;
+            GameState.Arachne.lastConfirmedWasReady = true;
         }
     }
 }

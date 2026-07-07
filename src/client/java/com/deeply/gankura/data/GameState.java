@@ -128,10 +128,13 @@ public class GameState {
         public static boolean awaitingCrystalParticles = false; // Arachne Crystal使用後、Quick/Normal判定のパーティクル観測中か
         public static long crystalMessageTime = 0; // Arachne Crystal検知時刻(ミリ秒)
         public static int particleBurstCounter = 0; // 観測中のDUSTパーティクル数
+        public static boolean everConfirmed = false; // Sanctuary内で一度でも状態(Ready/Spawning/Spawned)を確定できたか。falseの間はエリア外でUnknown表示
+        public static boolean lastConfirmedWasReady = false; // 直近確定した状態がReadyだったか。falseならSpawning/Spawned(エリア外ではSpawned/Killed表示に使う)
         public static void reset() {
             isSummoning = false; spawnTargetTime = 0; inSanctuary = false;
             cobwebDetected = false; webAreaLoaded = false; arachneMessageSeen = false; downConfirmed = false; health = null; broodCount = 0; size = null;
             awaitingCrystalParticles = false; crystalMessageTime = 0; particleBurstCounter = 0;
+            everConfirmed = false; lastConfirmedWasReady = false;
         }
     }
 
