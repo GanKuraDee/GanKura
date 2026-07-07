@@ -73,8 +73,8 @@ public class WorldTextRenderer {
         int textColor;
         String textToRender;
 
-        if (GameState.Arachne.cobwebDetected) {
-            // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定
+        if (inSanctuary && GameState.Arachne.cobwebDetected) {
+            // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定(Sanctuary外はスキャンしないため判定に使わない)
             textColor = 0xFFFF5555;
             textToRender = "§c§lARACHNE §c(Spawned)";
         } else if (GameState.Arachne.isSummoning) {
@@ -86,20 +86,24 @@ public class WorldTextRenderer {
                 double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
                 if (remainingTicks > 0) {
                     textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingTicks / 20.0);
+                } else if (inSanctuary) {
+                    textToRender = "§c§lARACHNE §e(Soon)";
                 } else {
-                    textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Ready/Spawning)";
+                    // カウントダウン終了後、Sanctuary外ではスキャンしないためUnknown扱いとする
+                    textColor = 0xFFAAAAAA;
+                    textToRender = "§7§lARACHNE §7(Unknown) §7(Go to Arachne's Sanctuary!)";
                 }
             }
-        } else if (GameState.Arachne.arachneMessageSeen) {
+        } else if (inSanctuary && GameState.Arachne.arachneMessageSeen) {
             // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
             textColor = 0xFFFF5555;
             textToRender = "§c§lARACHNE §e(Soon)";
-        } else if (GameState.Arachne.downConfirmed) {
-            // ARACHNE DOWN!確定済み。次のCalling/Crystalまではチャンク未読み込みでもReadyを信頼する
+        } else if (inSanctuary && GameState.Arachne.downConfirmed) {
+            // ARACHNE DOWN!確定済み
             textColor = 0xFFAA00AA;
             textToRender = "§5§lARACHNE";
-        } else if (!GameState.Arachne.webAreaLoaded) {
-            // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
+        } else if (!inSanctuary || !GameState.Arachne.webAreaLoaded) {
+            // Sanctuary外、またはSanctuary内でも基準座標のチャンクが読み込まれておらず判定できない
             textColor = 0xFFAAAAAA;
             textToRender = "§7§lARACHNE §7(Unknown) §7(Go to Arachne's Sanctuary!)";
         } else {
