@@ -29,14 +29,27 @@ public class AreaScanner {
         // Sanctuaryへの再入場(外→内への切り替わり)を検知したら、DOWN!等のチャットを見逃していても
         // 古いカウントダウン/セリフ状態を引きずらないようReadyへ強制リセットする。
         // 実際にArachneが健在なら、蜘蛛の巣検知が同tick中に改めてSpawnedへ確定させる
-        // ただし、カウントダウンが作動中(isSummoning)の場合はそのタイマーが正当なものなので、
+        // ただし、カウントダウンの目標時刻にまだ到達していない(=本当に作動中)場合はそのタイマーが正当なものなので、
         // Sanctuary外へ移動して戻ってきただけでReadyに巻き戻さないようにする
-        if (found && !GameState.Arachne.inSanctuary && !GameState.Arachne.isSummoning) {
+        if (found && !GameState.Arachne.inSanctuary && !isCountdownActive()) {
+            GameState.Arachne.isSummoning = false;
+            GameState.Arachne.spawnTargetTime = 0;
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
+            GameState.Arachne.downConfirmed = false;
         }
 
         GameState.Arachne.inSanctuary = found;
+    }
+
+    // isSummoningの真偽だけでなく残り時間も見て、本当にまだカウントダウン中かどうかを判定する。
+    // 目標時刻を過ぎている場合はARACHNE DOWN!等のチャットを見逃して古い状態が残っているだけと判断し、リセット対象とする
+    private static boolean isCountdownActive() {
+        if (!GameState.Arachne.isSummoning) return false;
+        if (GameState.Arachne.awaitingCrystalParticles) return true;
+        long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
+        double remainingTicks = GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0));
+        return remainingTicks > 0;
     }
 }
