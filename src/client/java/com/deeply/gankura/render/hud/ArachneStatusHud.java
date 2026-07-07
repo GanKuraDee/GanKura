@@ -49,7 +49,7 @@ public class ArachneStatusHud extends HudElement {
                 status = "§aReady";
             } else if (!GameState.Arachne.webAreaLoaded) {
                 // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
-                status = "§8Scanning...";
+                status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
             } else {
                 // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
                 status = "§aReady";

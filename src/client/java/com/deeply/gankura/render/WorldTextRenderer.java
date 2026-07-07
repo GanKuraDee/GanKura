@@ -119,8 +119,8 @@ public class WorldTextRenderer {
             textToRender = "§5§lARACHNE";
         } else if (!GameState.Arachne.webAreaLoaded) {
             // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
-            textColor = 0xFF555555;
-            textToRender = "§8§lARACHNE §8(Scanning...)";
+            textColor = 0xFFAAAAAA;
+            textToRender = "§7§lARACHNE §7(Unknown) §7(Go to Arachne's Sanctuary!)";
         } else {
             // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
             textColor = 0xFFAA00AA;
