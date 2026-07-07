@@ -87,7 +87,7 @@ public class WorldTextRenderer {
                 if (remainingTicks > 0) {
                     textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingTicks / 20.0);
                 } else {
-                    textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Spawned/Killed)";
+                    textToRender = inSanctuary ? "§c§lARACHNE §e(Soon)" : "§c§lARACHNE §6(Ready/Spawning/Killed)";
                 }
             }
         } else if (GameState.Arachne.arachneMessageSeen) {
