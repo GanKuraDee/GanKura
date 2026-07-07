@@ -29,8 +29,9 @@ public class AreaScanner {
         // Sanctuaryへの再入場(外→内への切り替わり)を検知したら、DOWN!等のチャットを見逃していても
         // 古いカウントダウン/セリフ状態を引きずらないようReadyへ強制リセットする。
         // 実際にArachneが健在なら、蜘蛛の巣検知が同tick中に改めてSpawnedへ確定させる
-        if (found && !GameState.Arachne.inSanctuary) {
-            GameState.Arachne.isSummoning = false;
+        // ただし、カウントダウンが作動中(isSummoning)の場合はそのタイマーが正当なものなので、
+        // Sanctuary外へ移動して戻ってきただけでReadyに巻き戻さないようにする
+        if (found && !GameState.Arachne.inSanctuary && !GameState.Arachne.isSummoning) {
             GameState.Arachne.size = null;
             GameState.Arachne.awaitingCrystalParticles = false;
             GameState.Arachne.arachneMessageSeen = false;
