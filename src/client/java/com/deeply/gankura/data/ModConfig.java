@@ -522,15 +522,22 @@ public class ModConfig extends Config {
         public boolean arachneSection = false;
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Shows a countdown until Arachne spawns after using an Arachne's Calling.")
+        @ConfigOption(name = "HUD Settings", desc = "Expand to configure Arachne HUD elements.")
+        @ConfigEditorAccordion(id = 6)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
+        public boolean arachneHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Shows a countdown until Arachne spawns after using an Arachne's Calling.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 6)
         public boolean showArachneStatusHud = true;
 
         @Expose
         @ConfigOption(name = "HP HUD", desc = "Toggles the Arachne Health HUD.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
+        @ConfigAccordionId(id = 6)
         public boolean showArachneHealthHud = true;
 
         @Expose
@@ -540,15 +547,22 @@ public class ModConfig extends Config {
         public boolean showArachneWorldText = true;
 
         @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Arachne through walls. Only active while in Arachne's Sanctuary.")
+        @ConfigOption(name = "Boss Highlight", desc = "Expand to configure Arachne highlight settings.")
+        @ConfigEditorAccordion(id = 7)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
+        public boolean arachneHighlightFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Glowing", desc = "Highlights Arachne through walls. Only active while in Arachne's Sanctuary.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 7)
         public boolean enableArachneHighlight = true;
 
         @Expose
         @ConfigOption(name = "Tracer", desc = "Draws a tracer line from your position to Arachne. Only active while in Arachne's Sanctuary.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
+        @ConfigAccordionId(id = 7)
         public boolean enableArachneTracer = true;
     }
 
