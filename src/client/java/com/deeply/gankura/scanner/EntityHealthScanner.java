@@ -40,8 +40,8 @@ public class EntityHealthScanner {
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
         // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する。
-        // 遠すぎてチャンクが読み込まれていない場合は判定不能(Scanning...)として区別する
-        GameState.Arachne.webAreaLoaded = isSpidersDen && client.level.isLoaded(ModConstants.ARACHNE_WEB_POS);
+        // Sanctuary外ではスキャンを行わない(エリア外は常にUnknown扱いとし、Sanctuary入場時に改めて判定する)
+        GameState.Arachne.webAreaLoaded = GameState.Arachne.inSanctuary && client.level.isLoaded(ModConstants.ARACHNE_WEB_POS);
         GameState.Arachne.cobwebDetected = GameState.Arachne.webAreaLoaded && client.level.getBlockState(ModConstants.ARACHNE_WEB_POS).is(Blocks.COBWEB);
         // Sanctuary内かつ蜘蛛の巣を検知できている間のみスキャンする(スポーン前・撃破後は存在しないため)
         boolean scanArachne = GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected;

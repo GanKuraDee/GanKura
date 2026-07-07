@@ -25,8 +25,8 @@ public class ArachneStatusHud extends HudElement {
         } else {
             boolean inSanctuary = GameState.Arachne.inSanctuary;
 
-            if (GameState.Arachne.cobwebDetected) {
-                // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定
+            if (inSanctuary && GameState.Arachne.cobwebDetected) {
+                // 基準座標に蜘蛛の巣ブロックが存在する = Spawned確定(Sanctuary外はスキャンしないため判定に使わない)
                 status = "§cSpawned";
             } else if (GameState.Arachne.isSummoning) {
                 if (GameState.Arachne.awaitingCrystalParticles) {
@@ -38,17 +38,18 @@ public class ArachneStatusHud extends HudElement {
                     if (remainingTicks > 0) {
                         status = String.format("§eSpawning §c(%.1fs)", remainingTicks / 20.0);
                     } else {
-                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§6Ready/Spawning §7(Go to Arachne's Sanctuary!)";
+                        // カウントダウン終了後、Sanctuary外ではスキャンしないためUnknown扱いとする
+                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§7Unknown §7(Go to Arachne's Sanctuary!)";
                     }
                 }
-            } else if (GameState.Arachne.arachneMessageSeen) {
+            } else if (inSanctuary && GameState.Arachne.arachneMessageSeen) {
                 // カウントダウン情報がない状態で「[BOSS] Arachne」を検知した場合の「間もなく」表示
                 status = "§eSpawning §e(Soon)";
-            } else if (GameState.Arachne.downConfirmed) {
-                // ARACHNE DOWN!確定済み。次のCalling/Crystalまではチャンク未読み込みでもReadyを信頼する
+            } else if (inSanctuary && GameState.Arachne.downConfirmed) {
+                // ARACHNE DOWN!確定済み
                 status = "§aReady";
-            } else if (!GameState.Arachne.webAreaLoaded) {
-                // 基準座標が遠すぎてチャンクが読み込まれておらず、蜘蛛の巣の有無を判定できない
+            } else if (!inSanctuary || !GameState.Arachne.webAreaLoaded) {
+                // Sanctuary外、またはSanctuary内でも基準座標のチャンクが読み込まれておらず判定できない
                 status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
             } else {
                 // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
