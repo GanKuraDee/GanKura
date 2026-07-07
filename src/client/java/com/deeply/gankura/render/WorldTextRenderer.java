@@ -108,9 +108,8 @@ public class WorldTextRenderer {
                 } else if (inSanctuary) {
                     textToRender = "§c§lARACHNE §e(Soon)";
                 } else {
-                    // カウントダウン終了後、Sanctuary外ではスキャンしないためUnknown扱いとする
-                    textColor = 0xFFAAAAAA;
-                    textToRender = "§7§lARACHNE §7(Unknown) §7(Go to Arachne's Sanctuary!)";
+                    // カウントダウン終了時点でSanctuary外にいた場合はSpawned/Killedとする
+                    textToRender = "§c§lARACHNE §6(Spawned/Killed)";
                 }
             }
         } else if (inSanctuary && GameState.Arachne.arachneMessageSeen) {
@@ -120,15 +119,27 @@ public class WorldTextRenderer {
         } else if (inSanctuary && GameState.Arachne.downConfirmed) {
             // ARACHNE DOWN!確定済み
             textColor = 0xFFAA00AA;
-            textToRender = "§5§lARACHNE";
-        } else if (!inSanctuary || !GameState.Arachne.webAreaLoaded) {
-            // Sanctuary外、またはSanctuary内でも基準座標のチャンクが読み込まれておらず判定できない
-            textColor = 0xFFAAAAAA;
-            textToRender = "§7§lARACHNE §7(Unknown) §7(Go to Arachne's Sanctuary!)";
-        } else {
+            textToRender = "§5§lARACHNE §a(Ready)";
+        } else if (inSanctuary && !GameState.Arachne.webAreaLoaded) {
+            // Sanctuary内だが基準座標のチャンクが読み込まれておらず判定できない(稀なエッジケース)
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE §7(Unknown)";
+        } else if (inSanctuary) {
             // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
             textColor = 0xFFAA00AA;
-            textToRender = "§5§lARACHNE";
+            textToRender = "§5§lARACHNE §a(Ready)";
+        } else if (!GameState.Arachne.everConfirmed) {
+            // Sanctuaryに一度もアクセスしておらず状態を確定できたことがない
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE §7(Unknown)";
+        } else if (GameState.Arachne.lastConfirmedWasReady) {
+            // 直近Sanctuary内で確定した状態がReadyだった場合はエリア外でもReadyを維持する
+            textColor = 0xFFAA00AA;
+            textToRender = "§5§lARACHNE §a(Ready)";
+        } else {
+            // 直近確定した状態がSpawning/Spawnedだった場合はエリア外ではSpawned/Killedとする
+            textColor = 0xFFFF5555;
+            textToRender = "§c§lARACHNE §6(Spawned/Killed)";
         }
 
         Vec3d eyePos = player.getEyePos();

@@ -37,9 +37,11 @@ public class ArachneStatusHud extends HudElement {
                     double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
                     if (remainingTicks > 0) {
                         status = String.format("§eSpawning §c(%.1fs)", remainingTicks / 20.0);
+                    } else if (inSanctuary) {
+                        status = "§eSpawning §e(Soon)";
                     } else {
-                        // カウントダウン終了後、Sanctuary外ではスキャンしないためUnknown扱いとする
-                        status = inSanctuary ? "§eSpawning §e(Soon)" : "§7Unknown §7(Go to Arachne's Sanctuary!)";
+                        // カウントダウン終了時点でSanctuary外にいた場合はSpawned/Killedとする
+                        status = "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
                     }
                 }
             } else if (inSanctuary && GameState.Arachne.arachneMessageSeen) {
@@ -48,12 +50,21 @@ public class ArachneStatusHud extends HudElement {
             } else if (inSanctuary && GameState.Arachne.downConfirmed) {
                 // ARACHNE DOWN!確定済み
                 status = "§aReady";
-            } else if (!inSanctuary || !GameState.Arachne.webAreaLoaded) {
-                // Sanctuary外、またはSanctuary内でも基準座標のチャンクが読み込まれておらず判定できない
+            } else if (inSanctuary && !GameState.Arachne.webAreaLoaded) {
+                // Sanctuary内だが基準座標のチャンクが読み込まれておらず判定できない(稀なエッジケース)
                 status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
-            } else {
+            } else if (inSanctuary) {
                 // チャンクは読み込めており、蜘蛛の巣が存在しないと確認できた = Ready
                 status = "§aReady";
+            } else if (!GameState.Arachne.everConfirmed) {
+                // Sanctuaryに一度もアクセスしておらず状態を確定できたことがない
+                status = "§7Unknown §7(Go to Arachne's Sanctuary!)";
+            } else if (GameState.Arachne.lastConfirmedWasReady) {
+                // 直近Sanctuary内で確定した状態がReadyだった場合はエリア外でもReadyを維持する
+                status = "§aReady";
+            } else {
+                // 直近確定した状態がSpawning/Spawnedだった場合はエリア外ではSpawned/Killedとする
+                status = "§6Spawned/Killed §7(Go to Arachne's Sanctuary!)";
             }
         }
 
