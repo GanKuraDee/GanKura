@@ -7,7 +7,7 @@ import net.minecraft.client.MinecraftClient;
 
 public class ArachneHandler {
     // Arachne's Calling (Small) 使用からスポーンまでの固定待機時間 (SkyHanniの実装に準拠、Golem/Dragonと同様にTick数で管理)
-    private static final long SPAWN_DELAY_SMALL_TICKS = 380L; // 19秒
+    private static final long SPAWN_DELAY_SMALL_TICKS = 360L; // 18秒
     // Arachne Crystal (Big): Quick Spawn / 通常スポーンそれぞれの待機時間(Tick数)
     private static final long QUICK_SPAWN_DELAY_TICKS = 420L; // 21秒
     private static final long NORMAL_SPAWN_DELAY_TICKS = 740L; // 37秒
