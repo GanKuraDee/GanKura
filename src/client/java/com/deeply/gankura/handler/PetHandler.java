@@ -22,6 +22,8 @@ public class PetHandler {
     // [Lvl 100] 等のレベル表記があれば名前と合わせて抽出する(HUDにレベルまで表示するため)
     private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your ((?:\\[Lvl \\d+\\] )?.+?)! VIEW RULE", Pattern.CASE_INSENSITIVE);
 
+    private static final Pattern LEVEL_UP = Pattern.compile("Your (.+?) leveled up to level (\\d+)!", Pattern.CASE_INSENSITIVE);
+
     public static void register() {
     }
 
@@ -51,6 +53,32 @@ public class PetHandler {
             GameState.Player.activePetName = extractPerfectColor(formatted, levelAndName);
             return;
         }
+
+        // 4. レベルアップ時の判定 (HUD表示中のペットと名前・色が一致する場合のみレベル数値を更新)
+        Matcher levelUpMatcher = LEVEL_UP.matcher(unformatted);
+        if (levelUpMatcher.find()) {
+            String petName = levelUpMatcher.group(1).trim();
+            String newLevel = levelUpMatcher.group(2).trim();
+            updateLevelIfSamePet(formatted, petName, newLevel);
+        }
+    }
+
+    // チャットのレベルアップメッセージに含まれるペット名(色込み)がHUD表示中のペット名と
+    // 完全一致する場合に限り、"[Lvl X]" のレベル数値だけを新しい値に置き換える
+    private static void updateLevelIfSamePet(String chatFormatted, String petName, String newLevel) {
+        String current = GameState.Player.activePetName;
+        if (current == null) return;
+
+        String currentUnformatted = current.replaceAll("§[0-9a-fk-or]", "");
+        int bracketEnd = currentUnformatted.indexOf("] ");
+        if (bracketEnd == -1) return;
+
+        String currentNamePart = currentUnformatted.substring(bracketEnd + 2).trim();
+        String currentNameColored = extractPerfectColor(current, currentNamePart);
+        String chatNameColored = extractPerfectColor(chatFormatted, petName);
+        if (!currentNameColored.equals(chatNameColored)) return;
+
+        GameState.Player.activePetName = current.replaceFirst("\\[Lvl \\d+\\]", "[Lvl " + newLevel + "]");
     }
 
     public static void processTabList(List<String> formattedLines, List<String> unformattedLines, MinecraftClient client) {
