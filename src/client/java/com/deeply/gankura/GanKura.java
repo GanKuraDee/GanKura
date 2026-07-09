@@ -1,5 +1,6 @@
 package com.deeply.gankura;
 
+import com.deeply.gankura.config.PlainSliderEditor;
 import com.deeply.gankura.handler.ArachneHandler;
 import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.CrimsonDropHandler;
@@ -13,6 +14,7 @@ import com.deeply.gankura.render.HudEditorScreen;
 import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.ModConfig;
 
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.gui.GuiContext;
 import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent;
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
@@ -107,6 +109,10 @@ public class GanKura implements ClientModInitializer {
         try {
             // 1. デフォルトのUIパーツを登録した状態でプロセッサを生成
             MoulConfigProcessor<ModConfig> processor = MoulConfigProcessor.withDefaults(ModConfig.INSTANCE);
+            // 標準のスライダー(数値入力欄付き)は欄の幅が狭くクリックするまで値が見切れるため、
+            // 数値欄のないシンプルなスライダーに差し替える
+            processor.registerConfigEditor(ConfigEditorSlider.class, (option, annotation) ->
+                    new PlainSliderEditor(option, annotation.minValue(), annotation.maxValue(), annotation.minStep()));
 
             // 2. 【修正】ドライバーの生成時に、引数としてプロセッサ(reader)を渡す！
             ConfigProcessorDriver driver = new ConfigProcessorDriver(processor);
