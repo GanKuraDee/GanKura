@@ -108,26 +108,33 @@ public class PetHandler {
 
     // Loadoutsメニューの3行4列目(Active Pet表示スロット)のアイテムのツールチップから
     // "[Lvl X] {ペット名}" の行を読み取り、ペット名だけをHUD表示に反映する
+    // ツールチップは「アイテム名(1行目)」+「Lore」で構成されるため両方をチェックする
+    // (SkyblockのペットアイテムはLoreではなくアイテム名自体が [Lvl X] 表記になっていることが多い)
     public static void processLoadoutsPetItem(ItemStack stack) {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
         if (stack.isEmpty()) return;
+
+        if (tryExtractPetNameLine(stack.getName())) return;
 
         LoreComponent lore = stack.get(DataComponentTypes.LORE);
         if (lore == null) return;
 
         for (Text line : lore.lines()) {
-            String formatted = toLegacyString(line);
-            String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
-
-            if (ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) {
-                int startIdx = unformatted.indexOf("] ");
-                if (startIdx != -1) {
-                    String petName = unformatted.substring(startIdx + 2).trim();
-                    GameState.Player.activePetName = extractPerfectColor(formatted, petName);
-                    return;
-                }
-            }
+            if (tryExtractPetNameLine(line)) return;
         }
+    }
+
+    private static boolean tryExtractPetNameLine(Text line) {
+        String formatted = toLegacyString(line);
+        String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
+
+        if (!ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) return false;
+        int startIdx = unformatted.indexOf("] ");
+        if (startIdx == -1) return false;
+
+        String petName = unformatted.substring(startIdx + 2).trim();
+        GameState.Player.activePetName = extractPerfectColor(formatted, petName);
+        return true;
     }
 
     // 元々の完璧な色抽出ロジック
