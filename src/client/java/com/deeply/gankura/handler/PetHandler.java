@@ -79,6 +79,7 @@ public class PetHandler {
         if (!currentNameColored.equals(chatNameColored)) return;
 
         GameState.Player.activePetName = current.replaceFirst("\\[Lvl \\d+\\]", "[Lvl " + newLevel + "]");
+        GameState.Player.petLevelUpTime = System.currentTimeMillis();
     }
 
     public static void processTabList(List<String> formattedLines, List<String> unformattedLines, Minecraft client) {
