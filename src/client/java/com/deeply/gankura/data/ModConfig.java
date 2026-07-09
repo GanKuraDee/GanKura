@@ -854,5 +854,10 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Keep Cursor Position", desc = "Prevents the mouse cursor from snapping back to the center of the screen when a screen closes and another opens within 0.1s, such as switching between Storage units or Accessory pages.")
         @ConfigEditorBoolean
         public boolean enableCursorRestoreOnRapidReopen = true;
+
+        @Expose
+        @ConfigOption(name = "Held Item Size", desc = "Changes the size of the item currently held in your hand, shown at the bottom-right of the screen.")
+        @ConfigEditorSlider(minValue = 0.1f, maxValue = 1.0f, minStep = 0.05f)
+        public float heldItemScale = 1.0f;
     }
 }

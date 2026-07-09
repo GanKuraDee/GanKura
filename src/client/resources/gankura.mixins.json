@@ -14,7 +14,8 @@
 		"MouseCursorRestoreMixin",
 		"MouseHandlerAccessor",
 		"ArachneCrystalParticleMixin",
-		"PetsMenuClickMixin"
+		"PetsMenuClickMixin",
+		"HeldItemScaleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
