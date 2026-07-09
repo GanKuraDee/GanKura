@@ -19,8 +19,8 @@ public class PetHandler {
     public static boolean hasScannedTabList = false;
     private static int widgetCheckTicker = 0;
 
-    // ★修正: [Lvl 100] 等のレベル表記をスキップ(除外)し、スキン(♦)と名前だけを抽出する正規表現
-    private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your (?:\\[Lvl \\d+\\] )?(.+?)! VIEW RULE", Pattern.CASE_INSENSITIVE);
+    // [Lvl 100] 等のレベル表記があれば名前と合わせて抽出する(HUDにレベルまで表示するため)
+    private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your ((?:\\[Lvl \\d+\\] )?.+?)! VIEW RULE", Pattern.CASE_INSENSITIVE);
 
     public static void register() {
     }
@@ -44,11 +44,11 @@ public class PetHandler {
             return;
         }
 
-        // 3. オートペット装備時の判定 (レベルを除外して抽出)
+        // 3. オートペット装備時の判定 (レベル表記も含めて抽出)
         Matcher autoMatcher = AUTOPET_SUMMON.matcher(unformatted);
         if (autoMatcher.find()) {
-            String petName = autoMatcher.group(1).trim();
-            GameState.Player.activePetName = extractPerfectColor(formatted, petName);
+            String levelAndName = autoMatcher.group(1).trim();
+            GameState.Player.activePetName = extractPerfectColor(formatted, levelAndName);
             return;
         }
     }
@@ -71,15 +71,13 @@ public class PetHandler {
             String unformatted = unformattedLines.get(i);
             String formatted = formattedLines.get(i);
 
-            // タブリストからも [Lvl X] を除外して抽出
-            if (ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) {
-                int startIdx = unformatted.indexOf("] ");
-                if (startIdx != -1) {
-                    String petName = unformatted.substring(startIdx + 2).trim();
-                    GameState.Player.activePetName = extractPerfectColor(formatted, petName);
-                    hasScannedTabList = true;
-                    return;
-                }
+            // タブリストの [Lvl X] {ペット名} をレベル表記ごと抽出
+            int bracketIdx = unformatted.indexOf("[Lvl ");
+            if (bracketIdx != -1 && unformatted.indexOf("] ", bracketIdx) != -1) {
+                String levelAndName = unformatted.substring(bracketIdx).trim();
+                GameState.Player.activePetName = extractPerfectColor(formatted, levelAndName);
+                hasScannedTabList = true;
+                return;
             }
             if (ModConstants.containsIgnoreCase(unformatted, "No pet selected")) {
                 GameState.Player.activePetName = null;
@@ -97,34 +95,21 @@ public class PetHandler {
     }
 
     // Loadoutsメニューの3行4列目(Active Pet表示スロット)のアイテムのツールチップから
-    // "[Lvl X] {ペット名}" の行を読み取り、ペット名だけをHUD表示に反映する
+    // "[Lvl X] {ペット名}" の行をレベル表記ごとHUD表示に反映する
     // ツールチップは「アイテム名(1行目)」+「Lore」で構成されるため両方をチェックする
     // (SkyblockのペットアイテムはLoreではなくアイテム名自体が [Lvl X] 表記になっていることが多い)
     public static void processLoadoutsPetItem(ItemStack stack) {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
         if (stack.isEmpty()) return;
 
-        if (tryExtractPetNameLine(stack.getName())) return;
+        if (tryExtractPetNameAndLevelLine(stack.getName())) return;
 
         LoreComponent lore = stack.get(DataComponentTypes.LORE);
         if (lore == null) return;
 
         for (Text line : lore.lines()) {
-            if (tryExtractPetNameLine(line)) return;
+            if (tryExtractPetNameAndLevelLine(line)) return;
         }
-    }
-
-    private static boolean tryExtractPetNameLine(Text line) {
-        String formatted = toLegacyString(line);
-        String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
-
-        if (!ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) return false;
-        int startIdx = unformatted.indexOf("] ");
-        if (startIdx == -1) return false;
-
-        String petName = unformatted.substring(startIdx + 2).trim();
-        GameState.Player.activePetName = extractPerfectColor(formatted, petName);
-        return true;
     }
 
     // Petsメニューでアイテムを左クリックした瞬間のスロットのツールチップから
