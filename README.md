@@ -40,3 +40,4 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Server Reboot Alert
   - Warp Cooldown Queue
   - Keep Cursor Position
+  - Held Item Size
