@@ -1,5 +1,6 @@
 package com.deeply.gankura.mixin;
 
+import com.deeply.gankura.GanKura;
 import com.deeply.gankura.data.ModConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -18,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // メインハンド/オフハンドそれぞれ独立して適用される
 @Mixin(ItemInHandRenderer.class)
 public class HeldItemScaleMixin {
+    // ★デバッグ用: Mixinが実際に発火し、どのスケール値を読んでいるかをログに残す(値が変化した時のみ)
+    private static float lastLoggedScale = Float.NaN;
 
     @Inject(
             method = "renderArmWithItem",
@@ -27,6 +30,10 @@ public class HeldItemScaleMixin {
                                       float attack, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack,
                                       SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
         float scale = ModConfig.INSTANCE.misc.heldItemScale;
+        if (scale != lastLoggedScale) {
+            GanKura.LOGGER.info("[HeldItemScaleMixin] renderArmWithItem fired, applying scale={}", scale);
+            lastLoggedScale = scale;
+        }
         if (scale != 1.0f) {
             poseStack.scale(scale, scale, scale);
         }
