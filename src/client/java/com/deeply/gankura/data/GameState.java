@@ -33,6 +33,7 @@ public class GameState {
         public static String locationName = "None";
         public static BlockPos locationPos = null;
         public static String activePetName = "§8Scanning...";
+        public static long petLevelUpTime = 0;
 
         public static int crimsonStack = 0; public static boolean isCrimsonBold = false;
         public static int terrorStack = 0;  public static boolean isTerrorBold = false;
@@ -48,7 +49,7 @@ public class GameState {
         public static boolean isLootScanning = false;
 
         public static void reset() {
-            locationName = "None"; locationPos = null; activePetName = "§8Scanning...";
+            locationName = "None"; locationPos = null; activePetName = "§8Scanning..."; petLevelUpTime = 0;
             crimsonStack = 0; isCrimsonBold = false; terrorStack = 0; isTerrorBold = false;
             hollowStack = 0; isHollowBold = false; fervorStack = 0; isFervorBold = false;
             auroraStack = 0; isAuroraBold = false; lastArmorStackUpdateTime = 0;
