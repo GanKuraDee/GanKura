@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 // "/equipment" (Your Equipment and Stats) メニューを開いた時にNecklace/Cloak/Belt/Gloves等を読み取る。
+// "/loadouts" (Loadouts) メニューでも同じスロット構成でEquipmentが表示されるため、こちらも読み取り対象とする。
 // これらはSkyblock独自のスロットでありAPI経由では取得できないため、メニューを開いた瞬間のスロットを直接スキャンする。
 // メニューはラージチェスト(6行9列, スロット0-53)と同じ構造で、Equipmentは上から2行目〜5行目の2列目
 // (スロット10, 19, 28, 37) に上から順に並んでいる。
 public class EquipmentScanner {
     private static final String EQUIPMENT_TITLE = "Your Equipment and Stats";
+    private static final String EQUIPMENT_TITLE_LOADOUTS = "Loadouts";
     private static final int[] EQUIPMENT_SLOTS = {10, 19, 28, 37};
 
     public static void register() {
@@ -26,7 +28,8 @@ public class EquipmentScanner {
     private static void scan(MinecraftClient client) {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
         if (!(client.currentScreen instanceof HandledScreen<?> screen)) return;
-        if (!screen.getTitle().getString().contains(EQUIPMENT_TITLE)) return;
+        String title = screen.getTitle().getString();
+        if (!title.contains(EQUIPMENT_TITLE) && !title.contains(EQUIPMENT_TITLE_LOADOUTS)) return;
 
         ScreenHandler handler = screen.getScreenHandler();
         if (handler.slots.size() <= EQUIPMENT_SLOTS[EQUIPMENT_SLOTS.length - 1]) return;
