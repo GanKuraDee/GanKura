@@ -3,6 +3,9 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -100,6 +103,30 @@ public class PetHandler {
             hasScannedTabList = true;
         } else {
             GameState.Player.activePetName = "§8Scanning...";
+        }
+    }
+
+    // Loadoutsメニューの3行4列目(Active Pet表示スロット)のアイテムのツールチップから
+    // "[Lvl X] {ペット名}" の行を読み取り、ペット名だけをHUD表示に反映する
+    public static void processLoadoutsPetItem(ItemStack stack) {
+        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (stack.isEmpty()) return;
+
+        LoreComponent lore = stack.get(DataComponentTypes.LORE);
+        if (lore == null) return;
+
+        for (Text line : lore.lines()) {
+            String formatted = toLegacyString(line);
+            String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
+
+            if (ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) {
+                int startIdx = unformatted.indexOf("] ");
+                if (startIdx != -1) {
+                    String petName = unformatted.substring(startIdx + 2).trim();
+                    GameState.Player.activePetName = extractPerfectColor(formatted, petName);
+                    return;
+                }
+            }
         }
     }
 
