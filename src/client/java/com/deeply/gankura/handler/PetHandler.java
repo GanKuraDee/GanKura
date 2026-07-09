@@ -19,8 +19,6 @@ public class PetHandler {
     public static boolean hasScannedTabList = false;
     private static int widgetCheckTicker = 0;
 
-    private static final Pattern MANUAL_SUMMON = Pattern.compile("You summoned your (.+?)!", Pattern.CASE_INSENSITIVE);
-
     // ★修正: [Lvl 100] 等のレベル表記をスキップ(除外)し、スキン(♦)と名前だけを抽出する正規表現
     private static final Pattern AUTOPET_SUMMON = Pattern.compile("Autopet equipped your (?:\\[Lvl \\d+\\] )?(.+?)! VIEW RULE", Pattern.CASE_INSENSITIVE);
 
@@ -46,15 +44,7 @@ public class PetHandler {
             return;
         }
 
-        // 3. 手動召喚時の判定
-        Matcher manualMatcher = MANUAL_SUMMON.matcher(unformatted);
-        if (manualMatcher.find()) {
-            String petName = manualMatcher.group(1).trim();
-            GameState.Player.activePetName = extractPerfectColor(formatted, petName);
-            return;
-        }
-
-        // 4. オートペット装備時の判定 (レベルを除外して抽出)
+        // 3. オートペット装備時の判定 (レベルを除外して抽出)
         Matcher autoMatcher = AUTOPET_SUMMON.matcher(unformatted);
         if (autoMatcher.find()) {
             String petName = autoMatcher.group(1).trim();
