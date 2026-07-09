@@ -44,6 +44,10 @@ public class GanKura implements ClientModInitializer {
         TabListScanner.register();
         GolemLocationScanner.register();
         RareDropScanner.register();
+        // AreaScanner(inSanctuary判定)は、同tick内でEntityHealthScannerが古い値を参照して
+        // webAreaLoaded/cobwebDetectedが1tick分staleになりHUDがUnknownに一瞬なる不具合を防ぐため、
+        // 必ずEntityHealthScannerより先に登録する
+        AreaScanner.register();
         EntityHealthScanner.register();
         PetHandler.register();
         ServerRestartHandler.register();
@@ -53,7 +57,6 @@ public class GanKura implements ClientModInitializer {
         CrimsonDropHandler.register();
         WarpCooldownHandler.register();
         EquipmentScanner.register();
-        AreaScanner.register();
         ArachneHandler.register();
 
         // ★追加: 毎ティック（1/20秒）ごとに予約チケットをチェックする
