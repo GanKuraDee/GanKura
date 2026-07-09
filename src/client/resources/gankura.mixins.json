@@ -13,7 +13,8 @@
 		"GizmoTextFogMixin",
 		"MouseCursorRestoreMixin",
 		"MouseAccessor",
-		"ArachneCrystalParticleMixin"
+		"ArachneCrystalParticleMixin",
+		"PetsMenuClickMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

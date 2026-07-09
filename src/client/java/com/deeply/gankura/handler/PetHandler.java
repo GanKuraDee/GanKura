@@ -137,6 +137,34 @@ public class PetHandler {
         return true;
     }
 
+    // Petsメニューでアイテムを左クリックした瞬間のスロットのツールチップから
+    // "[Lvl X] {ペット名}" の行を読み取り、レベル表記まで含めてそのままHUD表示に反映する
+    // (Loadoutsと違い名前だけに絞らず、行全体の色付き文字列をそのまま使うことでレベル部分の色も維持する)
+    public static void processPetsMenuClick(ItemStack stack) {
+        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (stack.isEmpty()) return;
+
+        if (tryExtractPetNameAndLevelLine(stack.getName())) return;
+
+        LoreComponent lore = stack.get(DataComponentTypes.LORE);
+        if (lore == null) return;
+
+        for (Text line : lore.lines()) {
+            if (tryExtractPetNameAndLevelLine(line)) return;
+        }
+    }
+
+    private static boolean tryExtractPetNameAndLevelLine(Text line) {
+        String formatted = toLegacyString(line);
+        String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
+
+        if (!ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) return false;
+        if (unformatted.indexOf("] ") == -1) return false;
+
+        GameState.Player.activePetName = formatted.trim();
+        return true;
+    }
+
     // 元々の完璧な色抽出ロジック
     private static String extractPerfectColor(String formatted, String targetUnformatted) {
         String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
