@@ -62,6 +62,11 @@ public class ModConfig extends Config {
                 MinecraftClient.getInstance().setScreen(new HudEditorScreen());
             });
         };
+        INSTANCE.misc.resetHeldItem = () -> {
+            INSTANCE.misc.heldItemScale = 1.0f;
+            INSTANCE.misc.heldItemOffsetX = 0.0f;
+            INSTANCE.misc.heldItemOffsetY = 0.0f;
+        };
 
         INSTANCE.saveNow();
     }
@@ -832,18 +837,37 @@ public class ModConfig extends Config {
         public boolean enableCursorRestoreOnRapidReopen = true;
 
         @Expose
-        @ConfigOption(name = "Held Item Size", desc = "Changes the size of the item currently held in your hand, shown at the bottom-right of the screen.")
+        @ConfigOption(name = "Held Item Size", desc = "Expand to adjust the size and position of the item currently held in your hand, shown at the bottom-right of the screen.")
+        @ConfigEditorAccordion(id = 53)
+        @ConfigEditorBoolean
+        public boolean heldItemFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Size", desc = "Changes the size of the item currently held in your hand.")
         @ConfigEditorSlider(minValue = 0.1f, maxValue = 1.0f, minStep = 0.01f)
+        @ConfigAccordionId(id = 53)
         public float heldItemScale = 1.0f;
 
         @Expose
-        @ConfigOption(name = "Held Item Offset X", desc = "Shifts the held item horizontally. The slider's center is the default (unshifted) position.")
+        @ConfigOption(name = "X", desc = "Shifts the held item horizontally. The slider's center is the default (unshifted) position.")
         @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.02f)
+        @ConfigAccordionId(id = 53)
         public float heldItemOffsetX = 0.0f;
 
         @Expose
-        @ConfigOption(name = "Held Item Offset Y", desc = "Shifts the held item vertically. The slider's center is the default (unshifted) position.")
+        @ConfigOption(name = "Y", desc = "Shifts the held item vertically. The slider's center is the default (unshifted) position.")
         @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.02f)
+        @ConfigAccordionId(id = 53)
         public float heldItemOffsetY = 0.0f;
+
+        // ボタンには @Expose は付けず、代わりに transient を付けます！
+        @ConfigOption(name = "Reset", desc = "Resets Size, X, and Y back to their default values.")
+        @ConfigEditorButton(buttonText = "Reset")
+        @ConfigAccordionId(id = 53)
+        public transient Runnable resetHeldItem = () -> {
+            heldItemScale = 1.0f;
+            heldItemOffsetX = 0.0f;
+            heldItemOffsetY = 0.0f;
+        };
     }
 }
