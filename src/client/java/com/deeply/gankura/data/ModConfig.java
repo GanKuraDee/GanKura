@@ -866,7 +866,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Size", desc = "Changes the size of the item currently held in your hand.")
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 1.0f, minStep = 0.01f)
+        @ConfigEditorSlider(minValue = 0.01f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemScale = 1.0f;
 
@@ -878,7 +878,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "X", desc = "Shifts the held item horizontally. The slider's center is the default (unshifted) position.")
-        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.02f)
+        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetX = 0.0f;
 
@@ -889,7 +889,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Y", desc = "Shifts the held item vertically. The slider's center is the default (unshifted) position.")
-        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.02f)
+        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetY = 0.0f;
 
