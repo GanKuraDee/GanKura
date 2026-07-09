@@ -1,5 +1,6 @@
 package com.deeply.gankura.mixin.client;
 
+import com.deeply.gankura.GanKura;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -18,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // メインハンド/オフハンドそれぞれ独立して適用される
 @Mixin(HeldItemRenderer.class)
 public class HeldItemScaleMixin {
+    // ★デバッグ用: Mixinが実際に発火し、どのスケール値を読んでいるかをログに残す(値が変化した時のみ)
+    private static float lastLoggedScale = Float.NaN;
 
     @Inject(
             method = "renderFirstPersonItem",
@@ -27,6 +30,10 @@ public class HeldItemScaleMixin {
                                           float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
                                           OrderedRenderCommandQueue orderedRenderCommandQueue, int light, CallbackInfo ci) {
         float scale = ModConfig.INSTANCE.misc.heldItemScale;
+        if (scale != lastLoggedScale) {
+            GanKura.LOGGER.info("[HeldItemScaleMixin] renderFirstPersonItem fired, applying scale={}", scale);
+            lastLoggedScale = scale;
+        }
         if (scale != 1.0f) {
             matrices.scale(scale, scale, scale);
         }
