@@ -62,11 +62,9 @@ public class ModConfig extends Config {
                 MinecraftClient.getInstance().setScreen(new HudEditorScreen());
             });
         };
-        INSTANCE.misc.resetHeldItem = () -> {
-            INSTANCE.misc.heldItemScale = 1.0f;
-            INSTANCE.misc.heldItemOffsetX = 0.0f;
-            INSTANCE.misc.heldItemOffsetY = 0.0f;
-        };
+        INSTANCE.misc.resetHeldItemScale = () -> INSTANCE.misc.heldItemScale = 1.0f;
+        INSTANCE.misc.resetHeldItemOffsetX = () -> INSTANCE.misc.heldItemOffsetX = 0.0f;
+        INSTANCE.misc.resetHeldItemOffsetY = () -> INSTANCE.misc.heldItemOffsetY = 0.0f;
 
         INSTANCE.saveNow();
     }
@@ -848,11 +846,22 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 53)
         public float heldItemScale = 1.0f;
 
+        // ボタンには @Expose は付けず、代わりに transient を付けます！
+        @ConfigOption(name = "Reset Size", desc = "Resets Size back to its default value.")
+        @ConfigEditorButton(buttonText = "Reset")
+        @ConfigAccordionId(id = 53)
+        public transient Runnable resetHeldItemScale = () -> heldItemScale = 1.0f;
+
         @Expose
         @ConfigOption(name = "X", desc = "Shifts the held item horizontally. The slider's center is the default (unshifted) position.")
         @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.02f)
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetX = 0.0f;
+
+        @ConfigOption(name = "Reset X", desc = "Resets X back to its default value.")
+        @ConfigEditorButton(buttonText = "Reset")
+        @ConfigAccordionId(id = 53)
+        public transient Runnable resetHeldItemOffsetX = () -> heldItemOffsetX = 0.0f;
 
         @Expose
         @ConfigOption(name = "Y", desc = "Shifts the held item vertically. The slider's center is the default (unshifted) position.")
@@ -860,14 +869,9 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetY = 0.0f;
 
-        // ボタンには @Expose は付けず、代わりに transient を付けます！
-        @ConfigOption(name = "Reset", desc = "Resets Size, X, and Y back to their default values.")
+        @ConfigOption(name = "Reset Y", desc = "Resets Y back to its default value.")
         @ConfigEditorButton(buttonText = "Reset")
         @ConfigAccordionId(id = 53)
-        public transient Runnable resetHeldItem = () -> {
-            heldItemScale = 1.0f;
-            heldItemOffsetX = 0.0f;
-            heldItemOffsetY = 0.0f;
-        };
+        public transient Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
     }
 }
