@@ -833,7 +833,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Held Item Size", desc = "Changes the size of the item currently held in your hand, shown at the bottom-right of the screen.")
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 1.0f, minStep = 0.05f)
+        @ConfigEditorSlider(minValue = 0.1f, maxValue = 1.0f, minStep = 0.1f)
         public float heldItemScale = 1.0f;
     }
 }
