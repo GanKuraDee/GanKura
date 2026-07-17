@@ -11,14 +11,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 // "Loadouts" メニューはロードアウト切り替え後、サーバーからコンテナ内容の同期パケット
 // (initializeContents/setItem)が届くまでEquipmentプレビューの内容が更新されない。
 // クリックした瞬間に読み取ると同期前の古い内容を読んでしまうため、実際にサーバーから
 // 内容が届いたこのタイミングでEquipment Hudを再スキャンする。
+// タイトルは "(1/3) Loadouts" のようにページ番号付きで表示されるため、他の類似メニューへの
+// 誤反応を避けるためページ番号表記込みで厳密にマッチさせる
 @Mixin(AbstractContainerMenu.class)
 public class LoadoutsContentSyncMixin {
-    private static final String LOADOUTS_TITLE = "Loadouts";
+    private static final Pattern LOADOUTS_TITLE_PATTERN = Pattern.compile("\\(\\d+/\\d+\\)\\s*Loadouts");
 
     @Inject(method = "initializeContents", at = @At("TAIL"))
     private void onInitializeContents(int stateId, List<ItemStack> items, ItemStack carried, CallbackInfo ci) {
@@ -34,7 +37,7 @@ public class LoadoutsContentSyncMixin {
         AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
         if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return;
         if (screen.getMenu() != menu) return;
-        if (!screen.getTitle().getString().contains(LOADOUTS_TITLE)) return;
+        if (!LOADOUTS_TITLE_PATTERN.matcher(screen.getTitle().getString()).find()) return;
 
         EquipmentScanner.onLoadoutsContentsSynced(menu);
     }
