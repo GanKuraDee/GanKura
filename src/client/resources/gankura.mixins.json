@@ -16,6 +16,7 @@
 		"ArachneCrystalParticleMixin",
 		"PetsMenuClickMixin",
 		"LoadoutsClickMixin",
+		"LoadoutsContentSyncMixin",
 		"HeldItemScaleMixin"
 	],
 	"injectors": {

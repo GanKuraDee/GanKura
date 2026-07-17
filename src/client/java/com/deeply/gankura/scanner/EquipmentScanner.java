@@ -16,9 +16,11 @@ import java.util.List;
 // これはSkyblock独自のスロットでありAPI経由では取得できないため、メニューを開いた瞬間のスロットを直接スキャンする。
 // メニューはラージチェスト(6行9列, スロット0-53)と同じ構造で、Equipmentは上から2行目〜5行目の2列目
 // (スロット10, 19, 28, 37) に上から順に並んでいる。
-// "/loadouts" (Loadouts) メニューはロードアウト切り替えスロットをクリックしない限り最新の内容が
-// 保証されないため、こちらは継続スキャンの対象外とし、LoadoutsClickMixin経由のonLoadoutsSlotClickedで
-// クリックされた瞬間にのみ読み取る。
+// "/loadouts" (Loadouts) メニューはロードアウト切り替えスロットをクリックした直後、サーバーから
+// コンテナ内容の同期パケットが届くまでスロットの中身が古いロードアウトのままになる。
+// そのため継続スキャンの対象外とし、クリック直後はLoadoutsClickMixin経由のresetToUnknownで
+// 一旦Barrier(Unknown)化するだけにとどめ、実際の読み取りはLoadoutsContentSyncMixin経由の
+// onLoadoutsContentsSynced(サーバーから内容が同期された瞬間)で行う。
 public class EquipmentScanner {
     private static final String EQUIPMENT_TITLE = "Your Equipment and Stats";
     private static final int[] EQUIPMENT_SLOTS = {10, 19, 28, 37};
@@ -51,9 +53,21 @@ public class EquipmentScanner {
     }
 
     // Loadoutsメニューのロードアウト切り替えスロットがクリックされた瞬間に呼び出される。
-    // 切り替え直後はサーバーからの更新が届くまでスロットの中身が古いロードアウトのままになる場合があるため、
-    // まず全EquipmentスロットをBarrier(Unknown)化した上で、その時点で読み取れたスロットだけを実際のアイテムで置き換える。
-    public static void onLoadoutsSlotClicked(AbstractContainerMenu menu) {
+    // 実際の読み取りはまだ行わず、切り替え中であることを示すため全EquipmentスロットをBarrier(Unknown)化するだけにとどめる。
+    public static void resetToUnknown() {
+        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+
+        List<ItemStack> barrier = new ArrayList<>();
+        for (int i = 0; i < EQUIPMENT_SLOTS.length; i++) {
+            barrier.add(new ItemStack(Items.BARRIER));
+        }
+        EquipmentState.items = barrier;
+    }
+
+    // Loadoutsメニューが開かれている間にサーバーからコンテナ内容の同期パケットが届いた瞬間に呼び出される。
+    // この時点でスロットの中身は実際に切り替わった後の最新の状態が保証されているため、
+    // まず全EquipmentスロットをBarrier(Unknown)化した上で、読み取れたスロットだけを実際のアイテムで置き換える。
+    public static void onLoadoutsContentsSynced(AbstractContainerMenu menu) {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
         if (menu.slots.size() <= EQUIPMENT_SLOTS[EQUIPMENT_SLOTS.length - 1]) return;
 
