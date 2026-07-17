@@ -3,6 +3,7 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
@@ -123,21 +124,16 @@ public class PetHandler {
         }
     }
 
-    // Loadoutsメニューの3行4列目(Active Pet表示スロット)のアイテムのツールチップから
-    // "[Lvl X] {ペット名}" の行をレベル表記ごとHUD表示に反映する
-    // ツールチップは「アイテム名(1行目)」+「Lore」で構成されるため両方をチェックする
-    // (SkyblockのペットアイテムはLoreではなくアイテム名自体が [Lvl X] 表記になっていることが多い)
-    public static void processLoadoutsPetItem(ItemStack stack) {
+    // Loadoutsメニューのロードアウト切り替えスロットをクリックした瞬間のツールチップから
+    // "Pet: [Lvl X] {ペット名}" の行を探し、"Pet: " より後ろの部分だけをレベル表記ごとHUD表示に反映する
+    // (ホバーだけでは切り替え先の情報を継続的に読み取れないため、クリックをトリガーとして読み取る)
+    public static void processLoadoutsSlotClick(ItemStack stack) {
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
         if (stack.isEmpty()) return;
 
-        if (tryExtractPetNameAndLevelLine(stack.getName())) return;
-
-        LoreComponent lore = stack.get(DataComponentTypes.LORE);
-        if (lore == null) return;
-
-        for (Text line : lore.lines()) {
-            if (tryExtractPetNameAndLevelLine(line)) return;
+        List<Text> tooltip = Screen.getTooltipFromItem(MinecraftClient.getInstance(), stack);
+        for (Text line : tooltip) {
+            if (tryExtractPetLineFromTooltip(line)) return;
         }
     }
 
@@ -166,6 +162,21 @@ public class PetHandler {
         if (unformatted.indexOf("] ") == -1) return false;
 
         GameState.Player.activePetName = formatted.trim();
+        return true;
+    }
+
+    // "Pet: [Lvl X] {ペット名}" 行から "Pet: " より後ろの部分だけを色付きのまま抽出する
+    private static boolean tryExtractPetLineFromTooltip(Text line) {
+        String formatted = toLegacyString(line);
+        String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
+
+        int petIdx = unformatted.indexOf("Pet:");
+        if (petIdx == -1) return false;
+
+        String afterPet = unformatted.substring(petIdx + "Pet:".length()).trim();
+        if (afterPet.isEmpty()) return false;
+
+        GameState.Player.activePetName = extractPerfectColor(formatted, afterPet).trim();
         return true;
     }
 
