@@ -219,13 +219,13 @@ public class ModConfig extends Config {
         public boolean stage4Folder = false;
 
         @Expose
-        @ConfigOption(name = "Show Title", desc = "Stage 4 title.")
+        @ConfigOption(name = "Show Title", desc = "Shows stage 4 title.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 3)
         public boolean enableStage4Title = true;
 
         @Expose
-        @ConfigOption(name = "Play Sound", desc = "Stage 4 sound.")
+        @ConfigOption(name = "Play Sound", desc = "Plays stage 4 sound.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 3)
         public boolean enableStage4Sound = true;
@@ -238,13 +238,13 @@ public class ModConfig extends Config {
         public boolean stage5Folder = false;
 
         @Expose
-        @ConfigOption(name = "Show Title", desc = "Stage 5 title.")
+        @ConfigOption(name = "Show Title", desc = "Shows stage 5 title.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 4)
         public boolean enableStage5Title = true;
 
         @Expose
-        @ConfigOption(name = "Play Sound", desc = "Stage 5 sound.")
+        @ConfigOption(name = "Play Sound", desc = "Plays stage 5 sound.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 4)
         public boolean enableStage5Sound = true;
@@ -257,19 +257,19 @@ public class ModConfig extends Config {
         public boolean golemChatFolder = false;
 
         @Expose
-        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Stage 4→5 duration.")
+        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows stage 4→5 duration.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showStage4Duration = true;
 
         @Expose
-        @ConfigOption(name = "DPS Chat", desc = "DPS results in chat.")
+        @ConfigOption(name = "DPS Chat", desc = "Shows DPS results in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showDpsChat = true;
 
         @Expose
-        @ConfigOption(name = "Loot Quality Chat", desc = "Loot quality in chat.")
+        @ConfigOption(name = "Loot Quality Chat", desc = "Shows loot quality in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showLootQualityChat = true;
@@ -388,13 +388,13 @@ public class ModConfig extends Config {
         public boolean dragonChatFolder = false;
 
         @Expose
-        @ConfigOption(name = "DPS Chat", desc = "DPS results in chat.")
+        @ConfigOption(name = "DPS Chat", desc = "Shows DPS results in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 13)
         public boolean showDragonDpsChat = true;
 
         @Expose
-        @ConfigOption(name = "Loot Quality Chat", desc = "Loot quality in chat.")
+        @ConfigOption(name = "Loot Quality Chat", desc = "Shows loot quality in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 13)
         public boolean showDragonLootQualityChat = true;
@@ -463,13 +463,13 @@ public class ModConfig extends Config {
         public boolean broodmotherStage4Folder = false;
 
         @Expose
-        @ConfigOption(name = "Show Title", desc = "Stage 4 title.")
+        @ConfigOption(name = "Show Title", desc = "Shows stage 4 title.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean enableStage4Title = true;
 
         @Expose
-        @ConfigOption(name = "Play Sound", desc = "Stage 4 sound.")
+        @ConfigOption(name = "Play Sound", desc = "Plays stage 4 sound.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 2)
         public boolean enableStage4Sound = true;
@@ -482,19 +482,19 @@ public class ModConfig extends Config {
         public boolean broodmotherStage5Folder = false;
 
         @Expose
-        @ConfigOption(name = "Show Title", desc = "Stage 5 title.")
+        @ConfigOption(name = "Show Title", desc = "Shows stage 5 title.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 3)
         public boolean enableStage5Title = true;
 
         @Expose
-        @ConfigOption(name = "Play Sound", desc = "Stage 5 sound.")
+        @ConfigOption(name = "Play Sound", desc = "Plays stage 5 sound.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 3)
         public boolean enableStage5Sound = true;
 
         @Expose
-        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Stage 4→5 duration.")
+        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows stage 4→5 duration.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 0)
         public boolean showBroodmotherStage4Duration = true;
@@ -532,7 +532,7 @@ public class ModConfig extends Config {
         public boolean arachneHudFolder = false;
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Spawn countdown.")
+        @ConfigOption(name = "Status HUD", desc = "Shows spawn countdown.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 6)
         public boolean showArachneStatusHud = true;
@@ -544,7 +544,7 @@ public class ModConfig extends Config {
         public boolean showArachneHealthHud = true;
 
         @Expose
-        @ConfigOption(name = "World Location Display", desc = "Floating text at altar.")
+        @ConfigOption(name = "World Location Display", desc = "Shows floating text at altar.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showArachneWorldText = true;
@@ -575,12 +575,12 @@ public class ModConfig extends Config {
     public static class CrimsonIsleCategory {
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Boss status HUD.")
+        @ConfigOption(name = "Status HUD", desc = "Shows boss status.")
         @ConfigEditorBoolean
         public boolean showCrimsonIsleStatusHud = true;
 
         @Expose
-        @ConfigOption(name = "World Location Display", desc = "Floating text at spawns.")
+        @ConfigOption(name = "World Location Display", desc = "Shows floating text at spawns.")
         @ConfigEditorBoolean
         public boolean showCrimsonIsleWorldText = true;
 
@@ -751,7 +751,7 @@ public class ModConfig extends Config {
         public boolean showMagmaBossHealthHud = true;
 
         @Expose
-        @ConfigOption(name = "Stage Status Title", desc = "Stage status title.")
+        @ConfigOption(name = "Stage Status Title", desc = "Shows stage status title.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossSpawnTitle = true;
@@ -777,25 +777,25 @@ public class ModConfig extends Config {
         public boolean hudFolder = false;
 
         @Expose
-        @ConfigOption(name = "Pet HUD", desc = "Active pet HUD.")
+        @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showPetHud = false;
 
         @Expose
-        @ConfigOption(name = "TPS HUD", desc = "Server TPS HUD.")
+        @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showTpsHud = false;
 
         @Expose
-        @ConfigOption(name = "Day HUD", desc = "Lobby day HUD.")
+        @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showDayHud = false;
 
         @Expose
-        @ConfigOption(name = "Armor HUD", desc = "Equipped armor HUD.")
+        @ConfigOption(name = "Armor HUD", desc = "Shows equipped armor.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showEquipmentHud = false;
@@ -814,7 +814,7 @@ public class ModConfig extends Config {
         public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
-        @ConfigOption(name = "Equipment HUD", desc = "Necklace/Cloak/Belt/Gloves.")
+        @ConfigOption(name = "Equipment HUD", desc = "Shows Necklace/Cloak/Belt/Gloves.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showGearHud = false;
@@ -833,13 +833,13 @@ public class ModConfig extends Config {
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
-        @ConfigOption(name = "Armor Stack HUD", desc = "Armor stack counts.")
+        @ConfigOption(name = "Armor Stack HUD", desc = "Shows armor stack counts.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showArmorStackHud = false;
 
         @Expose
-        @ConfigOption(name = "Arrow Poison Indicator", desc = "Arrow poison uses left.")
+        @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
         @ConfigEditorBoolean
         public boolean showPoisonIndicator = false;
 
@@ -849,7 +849,7 @@ public class ModConfig extends Config {
         public boolean enableRebootAlert = true;
 
         @Expose
-        @ConfigOption(name = "Warp Cooldown Queue", desc = "Queue /warp during cooldown.")
+        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
         @ConfigEditorBoolean
         public boolean enableWarpQueue = true;
 
@@ -865,7 +865,7 @@ public class ModConfig extends Config {
         public boolean heldItemFolder = false;
 
         @Expose
-        @ConfigOption(name = "Size", desc = "Held item size.")
+        @ConfigOption(name = "Size", desc = "Changes held item size.")
         @ConfigEditorSlider(minValue = 0.01f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemScale = 1.0f;
@@ -877,7 +877,7 @@ public class ModConfig extends Config {
         public transient Runnable resetHeldItemScale = () -> heldItemScale = 1.0f;
 
         @Expose
-        @ConfigOption(name = "X", desc = "Horizontal offset.")
+        @ConfigOption(name = "X", desc = "Shifts item horizontally.")
         @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetX = 0.0f;
@@ -888,7 +888,7 @@ public class ModConfig extends Config {
         public transient Runnable resetHeldItemOffsetX = () -> heldItemOffsetX = 0.0f;
 
         @Expose
-        @ConfigOption(name = "Y", desc = "Vertical offset.")
+        @ConfigOption(name = "Y", desc = "Shifts item vertically.")
         @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
         @ConfigAccordionId(id = 53)
         public float heldItemOffsetY = 0.0f;
