@@ -35,7 +35,7 @@ public class LoadoutsContentSyncMixin {
 
     private void onContentsChanged() {
         AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return;
+        if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) return;
         if (screen.getMenu() != menu) return;
         if (!LOADOUTS_TITLE_PATTERN.matcher(screen.getTitle().getString()).find()) return;
 
