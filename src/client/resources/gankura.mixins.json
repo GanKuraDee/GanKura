@@ -15,6 +15,7 @@
 		"MouseHandlerAccessor",
 		"ArachneCrystalParticleMixin",
 		"PetsMenuClickMixin",
+		"LoadoutsClickMixin",
 		"HeldItemScaleMixin"
 	],
 	"injectors": {
