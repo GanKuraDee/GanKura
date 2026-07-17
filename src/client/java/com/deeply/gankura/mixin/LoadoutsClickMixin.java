@@ -11,9 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// "Loadouts" メニューはロードアウト切り替えスロットをクリックした瞬間にしか最新のPet/Equipment情報が
-// 確定しないため(ホバーだけの継続スキャンでは切り替え前の古い情報が残り続ける)、クリックされた瞬間の
-// スロットのツールチップからPet Hud用の情報を読み取り、合わせてEquipment Hudの再スキャンも行う
+// "Loadouts" メニューのロードアウト切り替えスロットをクリックした瞬間、そのスロット自身のツールチップから
+// Pet Hud用の情報を読み取る(こちらはロードアウトに保存された情報のためクリック時点で確定している)。
+// Equipment Hudについては、クリック直後はまだサーバー側の切り替えが反映されていないため、
+// ここでは全EquipmentスロットをBarrier(Unknown)化するだけにとどめ、実際の読み取りは
+// LoadoutsContentSyncMixin(サーバーからコンテナ内容が同期された瞬間)に委譲する。
 @Mixin(AbstractContainerScreen.class)
 public class LoadoutsClickMixin {
     private static final String LOADOUTS_TITLE = "Loadouts";
@@ -27,6 +29,6 @@ public class LoadoutsClickMixin {
         if (!screen.getTitle().getString().contains(LOADOUTS_TITLE)) return;
 
         PetHandler.processLoadoutsSlotClick(slot.getItem());
-        EquipmentScanner.onLoadoutsSlotClicked(((AbstractContainerScreen<?>) screen).getMenu());
+        EquipmentScanner.resetToUnknown();
     }
 }
