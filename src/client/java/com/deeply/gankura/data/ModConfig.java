@@ -840,29 +840,16 @@ public class ModConfig extends Config {
         public boolean showArmorStackHud = false;
 
         @Expose
-        @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
+        @ConfigOption(name = "Keybind Settings", desc = "Expands menu keybind settings.")
+        @ConfigEditorAccordion(id = 59)
         @ConfigEditorBoolean
-        public boolean showPoisonIndicator = false;
-
-        @Expose
-        @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
-        @ConfigEditorBoolean
-        public boolean enableRebootAlert = true;
-
-        @Expose
-        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
-        @ConfigEditorBoolean
-        public boolean enableWarpQueue = true;
-
-        @Expose
-        @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")
-        @ConfigEditorBoolean
-        public boolean enableCursorRestoreOnRapidReopen = true;
+        public boolean keybindFolder = false;
 
         @Expose
         @ConfigOption(name = "Loadouts Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 60)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 59)
         public boolean loadoutsKeybindFolder = false;
 
         @Expose
@@ -929,6 +916,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Armor Set Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 61)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 59)
         public boolean armorSetKeybindFolder = false;
 
         @Expose
@@ -995,6 +983,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Equipment Set Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 62)
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 59)
         public boolean equipmentSetKeybindFolder = false;
 
         @Expose
@@ -1096,5 +1085,25 @@ public class ModConfig extends Config {
         @ConfigEditorButton(buttonText = "Reset")
         @ConfigAccordionId(id = 53)
         public transient Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
+
+        @Expose
+        @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
+        @ConfigEditorBoolean
+        public boolean showPoisonIndicator = false;
+
+        @Expose
+        @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
+        @ConfigEditorBoolean
+        public boolean enableRebootAlert = true;
+
+        @Expose
+        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
+        @ConfigEditorBoolean
+        public boolean enableWarpQueue = true;
+
+        @Expose
+        @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")
+        @ConfigEditorBoolean
+        public boolean enableCursorRestoreOnRapidReopen = true;
     }
 }
