@@ -772,17 +772,17 @@ public class ModConfig extends Config {
         public boolean showDayHud = false;
 
         @Expose
-        @ConfigOption(name = "Armor HUD", desc = "Shows equipped armor.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showEquipmentHud = false;
-
-        @Expose
-        @ConfigOption(name = "Armor HUD Orientation", desc = "Expands armor HUD layout.")
+        @ConfigOption(name = "Armor HUD", desc = "Expands armor HUD settings.")
         @ConfigEditorAccordion(id = 51)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean armorOrientationFolder = false;
+        public boolean armorHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows equipped armor.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 51)
+        public boolean showEquipmentHud = false;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
@@ -791,17 +791,17 @@ public class ModConfig extends Config {
         public HudOrientation equipmentHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
-        @ConfigOption(name = "Equipment HUD", desc = "Shows Necklace/Cloak/Belt/Gloves.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showGearHud = false;
-
-        @Expose
-        @ConfigOption(name = "Equipment HUD Orientation", desc = "Expands equipment HUD layout.")
+        @ConfigOption(name = "Equipment HUD", desc = "Expands equipment HUD settings.")
         @ConfigEditorAccordion(id = 52)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean gearOrientationFolder = false;
+        public boolean equipmentHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows Necklace/Cloak/Belt/Gloves.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 52)
+        public boolean showGearHud = false;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
