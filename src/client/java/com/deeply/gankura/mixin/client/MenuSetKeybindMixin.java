@@ -16,20 +16,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// SkyHanniの「Loadouts Keybind」を参考に、"Loadouts" メニューが開いている間は数字キー(1〜9)で
-// 現在のページのロードアウト切り替えスロットを直接クリックできるようにする。
-// スロット位置はHypixel側のGUIレイアウト固定値(1列目末尾の3列×最大4行、1ページ目の先頭スロットは14)
-// で、Minecraftのバージョン/マッピングに依存しない。
+// SkyHanniの「Loadouts/Wardrobe Keybind」を参考に、"Loadouts" "Armor Sets" "Equipment Sets"
+// の各メニューが開いている間は数字キー(1〜9)で現在のページの項目を直接クリックできるようにする。
+// スロット位置はHypixel側のGUIレイアウト固定値(Minecraftのバージョン/マッピングに依存しない):
+//   - Loadouts: 先頭スロット14から3列×最大4行(1ページ目・2ページ目)、3ページ目のみ1行
+//   - Armor Sets / Equipment Sets: 5行目(0-index 4)の9列がそれぞれの切り替えボタン
 // 実際のクリックはonMouseClickを直接呼び出すことで、左クリックした場合と完全に同じ経路(サーバーへの
 // パケット送信、LoadoutsClickMixin/LoadoutsContentSyncMixinによるPet/Equipment Hud更新)を通す。
 // 数字キーはバニラでは「ホバー中スロットをホットバーへスワップ」に使われるため、ここで消費して
 // 意図しないスワップが発生しないようにする。
 @Mixin(HandledScreen.class)
-public abstract class LoadoutsKeybindMixin {
+public abstract class MenuSetKeybindMixin {
     private static final Pattern LOADOUTS_TITLE_PATTERN = Pattern.compile("\\((?<page>\\d+)/\\d+\\)\\s*Loadouts");
-    private static final int FIRST_ICON_SLOT = 14;
-    private static final int[] ROWS_PER_PAGE = {4, 4, 1};
-    private static final int SLOTS_PER_ROW = 3;
+    private static final Pattern SET_TITLE_PATTERN = Pattern.compile("\\(\\d+/\\d+\\)\\s*(?:Armor|Equipment) Sets");
+
+    private static final int MENU_WIDTH = 9;
+
+    private static final int LOADOUTS_FIRST_SLOT = 14;
+    private static final int[] LOADOUTS_ROWS_PER_PAGE = {4, 4, 1};
+    private static final int LOADOUTS_SLOTS_PER_ROW = 3;
+
+    private static final int SET_BUTTON_ROW = 4; // 5行目(0-index)
+    private static final int SET_COLUMNS = 9;
+
     private static final int[] NUMBER_KEYS = {
             GLFW.GLFW_KEY_1, GLFW.GLFW_KEY_2, GLFW.GLFW_KEY_3,
             GLFW.GLFW_KEY_4, GLFW.GLFW_KEY_5, GLFW.GLFW_KEY_6,
@@ -41,20 +50,15 @@ public abstract class LoadoutsKeybindMixin {
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void onKeyPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
-        if (!ModConfig.INSTANCE.misc.enableLoadoutsKeybind) return;
-
-        HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
-        Matcher matcher = LOADOUTS_TITLE_PATTERN.matcher(screen.getTitle().getString());
-        if (!matcher.find()) return;
+        if (!ModConfig.INSTANCE.misc.enableSetKeybind) return;
 
         int index = indexOfNumberKey(input.key());
         if (index < 0) return;
 
-        int page = Integer.parseInt(matcher.group("page"));
-        int rows = (page >= 1 && page <= ROWS_PER_PAGE.length) ? ROWS_PER_PAGE[page - 1] : 0;
-        if (index >= rows * SLOTS_PER_ROW) return;
+        HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
+        int slotIndex = resolveTargetSlot(screen.getTitle().getString(), index);
+        if (slotIndex < 0) return;
 
-        int slotIndex = FIRST_ICON_SLOT + (index / SLOTS_PER_ROW) * 9 + (index % SLOTS_PER_ROW);
         ScreenHandler handler = screen.getScreenHandler();
         if (slotIndex >= handler.slots.size()) return;
 
@@ -63,6 +67,23 @@ public abstract class LoadoutsKeybindMixin {
 
         onMouseClick(slot, slotIndex, 0, SlotActionType.PICKUP);
         cir.setReturnValue(true);
+    }
+
+    private static int resolveTargetSlot(String title, int index) {
+        Matcher loadoutsMatcher = LOADOUTS_TITLE_PATTERN.matcher(title);
+        if (loadoutsMatcher.find()) {
+            int page = Integer.parseInt(loadoutsMatcher.group("page"));
+            int rows = (page >= 1 && page <= LOADOUTS_ROWS_PER_PAGE.length) ? LOADOUTS_ROWS_PER_PAGE[page - 1] : 0;
+            if (index >= rows * LOADOUTS_SLOTS_PER_ROW) return -1;
+            return LOADOUTS_FIRST_SLOT + (index / LOADOUTS_SLOTS_PER_ROW) * MENU_WIDTH + (index % LOADOUTS_SLOTS_PER_ROW);
+        }
+
+        if (SET_TITLE_PATTERN.matcher(title).find()) {
+            if (index >= SET_COLUMNS) return -1;
+            return SET_BUTTON_ROW * MENU_WIDTH + index;
+        }
+
+        return -1;
     }
 
     private static int indexOfNumberKey(int keyCode) {
