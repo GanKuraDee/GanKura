@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.common.text.StructuredText;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.FileReader;
@@ -859,9 +860,202 @@ public class ModConfig extends Config {
         public boolean enableCursorRestoreOnRapidReopen = true;
 
         @Expose
-        @ConfigOption(name = "Set Keybind", desc = "Switches Loadouts/Armor/Equipment Sets via number keys.")
+        @ConfigOption(name = "Loadouts Keybind", desc = "Expands per-slot keybind settings.")
+        @ConfigEditorAccordion(id = 60)
         @ConfigEditorBoolean
-        public boolean enableSetKeybind = true;
+        public boolean loadoutsKeybindFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Switches Loadouts via configured keys.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 60)
+        public boolean enableLoadoutsKeybind = true;
+
+        @Expose
+        @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_1)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot1 = GLFW.GLFW_KEY_1;
+
+        @Expose
+        @ConfigOption(name = "Slot 2", desc = "Sets key for slot 2.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_2)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot2 = GLFW.GLFW_KEY_2;
+
+        @Expose
+        @ConfigOption(name = "Slot 3", desc = "Sets key for slot 3.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_3)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot3 = GLFW.GLFW_KEY_3;
+
+        @Expose
+        @ConfigOption(name = "Slot 4", desc = "Sets key for slot 4.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_4)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot4 = GLFW.GLFW_KEY_4;
+
+        @Expose
+        @ConfigOption(name = "Slot 5", desc = "Sets key for slot 5.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_5)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot5 = GLFW.GLFW_KEY_5;
+
+        @Expose
+        @ConfigOption(name = "Slot 6", desc = "Sets key for slot 6.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_6)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot6 = GLFW.GLFW_KEY_6;
+
+        @Expose
+        @ConfigOption(name = "Slot 7", desc = "Sets key for slot 7.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_7)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot7 = GLFW.GLFW_KEY_7;
+
+        @Expose
+        @ConfigOption(name = "Slot 8", desc = "Sets key for slot 8.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_8)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot8 = GLFW.GLFW_KEY_8;
+
+        @Expose
+        @ConfigOption(name = "Slot 9", desc = "Sets key for slot 9.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_9)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot9 = GLFW.GLFW_KEY_9;
+
+        @Expose
+        @ConfigOption(name = "Armor Set Keybind", desc = "Expands per-slot keybind settings.")
+        @ConfigEditorAccordion(id = 61)
+        @ConfigEditorBoolean
+        public boolean armorSetKeybindFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Switches Armor Sets via configured keys.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 61)
+        public boolean enableArmorSetKeybind = true;
+
+        @Expose
+        @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_1)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot1 = GLFW.GLFW_KEY_1;
+
+        @Expose
+        @ConfigOption(name = "Slot 2", desc = "Sets key for slot 2.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_2)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot2 = GLFW.GLFW_KEY_2;
+
+        @Expose
+        @ConfigOption(name = "Slot 3", desc = "Sets key for slot 3.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_3)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot3 = GLFW.GLFW_KEY_3;
+
+        @Expose
+        @ConfigOption(name = "Slot 4", desc = "Sets key for slot 4.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_4)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot4 = GLFW.GLFW_KEY_4;
+
+        @Expose
+        @ConfigOption(name = "Slot 5", desc = "Sets key for slot 5.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_5)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot5 = GLFW.GLFW_KEY_5;
+
+        @Expose
+        @ConfigOption(name = "Slot 6", desc = "Sets key for slot 6.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_6)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot6 = GLFW.GLFW_KEY_6;
+
+        @Expose
+        @ConfigOption(name = "Slot 7", desc = "Sets key for slot 7.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_7)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot7 = GLFW.GLFW_KEY_7;
+
+        @Expose
+        @ConfigOption(name = "Slot 8", desc = "Sets key for slot 8.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_8)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot8 = GLFW.GLFW_KEY_8;
+
+        @Expose
+        @ConfigOption(name = "Slot 9", desc = "Sets key for slot 9.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_9)
+        @ConfigAccordionId(id = 61)
+        public int armorSetKeybindSlot9 = GLFW.GLFW_KEY_9;
+
+        @Expose
+        @ConfigOption(name = "Equipment Set Keybind", desc = "Expands per-slot keybind settings.")
+        @ConfigEditorAccordion(id = 62)
+        @ConfigEditorBoolean
+        public boolean equipmentSetKeybindFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Switches Equipment Sets via configured keys.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 62)
+        public boolean enableEquipmentSetKeybind = true;
+
+        @Expose
+        @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_1)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot1 = GLFW.GLFW_KEY_1;
+
+        @Expose
+        @ConfigOption(name = "Slot 2", desc = "Sets key for slot 2.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_2)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot2 = GLFW.GLFW_KEY_2;
+
+        @Expose
+        @ConfigOption(name = "Slot 3", desc = "Sets key for slot 3.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_3)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot3 = GLFW.GLFW_KEY_3;
+
+        @Expose
+        @ConfigOption(name = "Slot 4", desc = "Sets key for slot 4.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_4)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot4 = GLFW.GLFW_KEY_4;
+
+        @Expose
+        @ConfigOption(name = "Slot 5", desc = "Sets key for slot 5.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_5)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot5 = GLFW.GLFW_KEY_5;
+
+        @Expose
+        @ConfigOption(name = "Slot 6", desc = "Sets key for slot 6.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_6)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot6 = GLFW.GLFW_KEY_6;
+
+        @Expose
+        @ConfigOption(name = "Slot 7", desc = "Sets key for slot 7.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_7)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot7 = GLFW.GLFW_KEY_7;
+
+        @Expose
+        @ConfigOption(name = "Slot 8", desc = "Sets key for slot 8.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_8)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot8 = GLFW.GLFW_KEY_8;
+
+        @Expose
+        @ConfigOption(name = "Slot 9", desc = "Sets key for slot 9.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_9)
+        @ConfigAccordionId(id = 62)
+        public int equipmentSetKeybindSlot9 = GLFW.GLFW_KEY_9;
 
         @Expose
         @ConfigOption(name = "Held Item Size", desc = "Expands size and position settings.")
