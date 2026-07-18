@@ -30,14 +30,17 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - DPS Calculator
   - Loot Quality Calculator
 - **Misc**
+  - Armor HUD
+  - Equipment HUD
   - Active Pet HUD
   - Day HUD
   - TPS HUD
-  - Armor HUD
-  - Equipment HUD
   - Armor Stack HUD
   - Arrow Poison Indicator
   - Server Reboot Alert
   - Warp Cooldown Queue
   - Keep Cursor Position
   - Held Item Size
+  - Loadouts Menu Keybind
+  - Armor Menu Keybind
+  - Equipment Menu Keybind
