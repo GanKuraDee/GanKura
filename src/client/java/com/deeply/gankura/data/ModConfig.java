@@ -913,6 +913,24 @@ public class ModConfig extends Config {
         public int loadoutsKeybindSlot9 = GLFW.GLFW_KEY_9;
 
         @Expose
+        @ConfigOption(name = "Slot 10", desc = "Sets key for slot 10.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_0)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot10 = GLFW.GLFW_KEY_0;
+
+        @Expose
+        @ConfigOption(name = "Slot 11", desc = "Sets key for slot 11.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_MINUS)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot11 = GLFW.GLFW_KEY_MINUS;
+
+        @Expose
+        @ConfigOption(name = "Slot 12", desc = "Sets key for slot 12.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_EQUAL)
+        @ConfigAccordionId(id = 60)
+        public int loadoutsKeybindSlot12 = GLFW.GLFW_KEY_EQUAL;
+
+        @Expose
         @ConfigOption(name = "Armor Set Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 61)
         @ConfigEditorBoolean
