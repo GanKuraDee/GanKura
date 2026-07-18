@@ -118,6 +118,11 @@ public class EquipmentScanner {
     }
 
     private static void commit(List<ItemStack> found, Minecraft client) {
+        // 内容が前回と同じ場合はディスクへの書き込みをスキップする。Loadouts/Equipment Setsは
+        // サーバーからスロットごとに個別の同期パケットが届くことがあり、その都度同期的に保存すると
+        // メニューを開いた瞬間に短時間フリーズする原因になっていたため
+        if (ItemStack.listMatches(found, EquipmentState.items)) return;
+
         EquipmentState.items = found;
         // CLIENT_STOPPING 時には既にワールドから切断済みでレジストリ情報が失われている場合があるため、
         // スキャンできた時点でその都度保存しておく
@@ -156,10 +161,6 @@ public class EquipmentScanner {
             }
         }
 
-        EquipmentState.items = found;
-        Minecraft client = Minecraft.getInstance();
-        if (client.level != null) {
-            EquipmentState.save(client.level.registryAccess());
-        }
+        commit(found, Minecraft.getInstance());
     }
 }
