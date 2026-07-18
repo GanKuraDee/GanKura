@@ -68,7 +68,8 @@ public abstract class MenuSetKeybindMixin {
             int index = indexOfKey(keyCode,
                     misc.loadoutsKeybindSlot1, misc.loadoutsKeybindSlot2, misc.loadoutsKeybindSlot3,
                     misc.loadoutsKeybindSlot4, misc.loadoutsKeybindSlot5, misc.loadoutsKeybindSlot6,
-                    misc.loadoutsKeybindSlot7, misc.loadoutsKeybindSlot8, misc.loadoutsKeybindSlot9);
+                    misc.loadoutsKeybindSlot7, misc.loadoutsKeybindSlot8, misc.loadoutsKeybindSlot9,
+                    misc.loadoutsKeybindSlot10, misc.loadoutsKeybindSlot11, misc.loadoutsKeybindSlot12);
             if (index < 0) return -1;
 
             int page = Integer.parseInt(loadoutsMatcher.group("page"));
