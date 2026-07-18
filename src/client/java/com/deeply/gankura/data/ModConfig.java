@@ -764,7 +764,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows equipped armor.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 51)
-        public boolean showEquipmentHud = false;
+        public boolean showEquipmentHud = true;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
@@ -783,7 +783,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows Necklace/Cloak/Belt/Gloves.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 52)
-        public boolean showGearHud = false;
+        public boolean showGearHud = true;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
@@ -795,25 +795,25 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean showPetHud = false;
+        public boolean showPetHud = true;
 
         @Expose
         @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean showTpsHud = false;
+        public boolean showTpsHud = true;
 
         @Expose
         @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean showDayHud = false;
+        public boolean showDayHud = true;
 
         @Expose
         @ConfigOption(name = "Armor Stack HUD", desc = "Shows armor stack counts.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
-        public boolean showArmorStackHud = false;
+        public boolean showArmorStackHud = true;
 
         @Expose
         @ConfigOption(name = "Keybind Settings", desc = "Expands menu keybind settings.")
@@ -832,7 +832,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Switches Loadouts via configured keys.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 60)
-        public boolean enableLoadoutsKeybind = true;
+        public boolean enableLoadoutsKeybind = false;
 
         @Expose
         @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
@@ -917,7 +917,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Switches Armor Sets via configured keys.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 61)
-        public boolean enableArmorSetKeybind = true;
+        public boolean enableArmorSetKeybind = false;
 
         @Expose
         @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
@@ -984,7 +984,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Switches Equipment Sets via configured keys.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 62)
-        public boolean enableEquipmentSetKeybind = true;
+        public boolean enableEquipmentSetKeybind = false;
 
         @Expose
         @ConfigOption(name = "Slot 1", desc = "Sets key for slot 1.")
@@ -1083,7 +1083,7 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
         @ConfigEditorBoolean
-        public boolean showPoisonIndicator = false;
+        public boolean showPoisonIndicator = true;
 
         @Expose
         @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
