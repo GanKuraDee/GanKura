@@ -17,6 +17,7 @@
 		"PetsMenuClickMixin",
 		"LoadoutsClickMixin",
 		"LoadoutsContentSyncMixin",
+		"EquipmentSetsClickMixin",
 		"MenuSetKeybindMixin",
 		"HeldItemScaleMixin"
 	],

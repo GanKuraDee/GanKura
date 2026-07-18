@@ -32,6 +32,12 @@ public class EquipmentScanner {
     // ラージチェスト(6行9列)のうち、Equipment Setsの各セットが1列を占める
     private static final int MENU_WIDTH = 9;
     private static final int EQUIPPED_LABEL_ROW = 4; // 5行目(0-index)
+    private static final long PENDING_TIMEOUT_MS = 2000L;
+
+    // 5行目クリック直後、サーバーが切り替えを反映する(=Slot X: Equippedが移動する)までの間、
+    // 継続スキャンが古い列で上書きしてしまわないようにするための待機列
+    private static int pendingEquipmentSetColumn = -1;
+    private static long pendingEquipmentSetSince = 0L;
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(EquipmentScanner::scan);
@@ -79,13 +85,36 @@ public class EquipmentScanner {
         }
         if (activeColumn == -1) return;
 
-        List<ItemStack> found = new ArrayList<>();
-        for (int row = 0; row < 4; row++) {
-            ItemStack stack = handler.slots.get(row * MENU_WIDTH + activeColumn).getStack();
-            found.add(stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+        if (pendingEquipmentSetColumn != -1) {
+            if (activeColumn != pendingEquipmentSetColumn
+                    && System.currentTimeMillis() - pendingEquipmentSetSince < PENDING_TIMEOUT_MS) {
+                return; // サーバーがまだクリックした列を反映していないので、古い列で上書きしない
+            }
+            pendingEquipmentSetColumn = -1;
         }
 
-        commit(found, client);
+        commit(readColumn(handler, activeColumn), client);
+    }
+
+    private static List<ItemStack> readColumn(ScreenHandler handler, int column) {
+        List<ItemStack> found = new ArrayList<>();
+        for (int row = 0; row < 4; row++) {
+            ItemStack stack = handler.slots.get(row * MENU_WIDTH + column).getStack();
+            found.add(stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+        }
+        return found;
+    }
+
+    // "Equipment Sets" メニューの5行目(切り替えボタン)がクリックされた瞬間に呼び出される。
+    // クリックされた列のプレビュー(1〜4行目)はサーバー同期を待たずともメニュー内に既に
+    // 表示されているため、その場で読み取ってすぐにEquipment Hudへ反映できる。
+    public static void onEquipmentSetSlotClicked(ScreenHandler handler, int column) {
+        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (handler.slots.size() <= EQUIPPED_LABEL_ROW * MENU_WIDTH + MENU_WIDTH - 1) return;
+
+        pendingEquipmentSetColumn = column;
+        pendingEquipmentSetSince = System.currentTimeMillis();
+        commit(readColumn(handler, column), MinecraftClient.getInstance());
     }
 
     private static void commit(List<ItemStack> found, MinecraftClient client) {
