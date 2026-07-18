@@ -778,24 +778,6 @@ public class ModConfig extends Config {
         public boolean hudFolder = false;
 
         @Expose
-        @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showPetHud = false;
-
-        @Expose
-        @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showTpsHud = false;
-
-        @Expose
-        @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean showDayHud = false;
-
-        @Expose
         @ConfigOption(name = "Armor HUD", desc = "Expands armor HUD settings.")
         @ConfigEditorAccordion(id = 51)
         @ConfigEditorBoolean
@@ -832,6 +814,24 @@ public class ModConfig extends Config {
         @ConfigEditorDropdown
         @ConfigAccordionId(id = 52)
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
+
+        @Expose
+        @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showPetHud = false;
+
+        @Expose
+        @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showTpsHud = false;
+
+        @Expose
+        @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showDayHud = false;
 
         @Expose
         @ConfigOption(name = "Armor Stack HUD", desc = "Shows armor stack counts.")
