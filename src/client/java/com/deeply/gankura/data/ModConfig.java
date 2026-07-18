@@ -835,6 +835,11 @@ public class ModConfig extends Config {
         public boolean enableCursorRestoreOnRapidReopen = true;
 
         @Expose
+        @ConfigOption(name = "Loadouts Keybind", desc = "Switches Loadouts via number keys.")
+        @ConfigEditorBoolean
+        public boolean enableLoadoutsKeybind = true;
+
+        @Expose
         @ConfigOption(name = "Held Item Size", desc = "Expands size and position settings.")
         @ConfigEditorAccordion(id = 53)
         @ConfigEditorBoolean

@@ -17,6 +17,7 @@
 		"PetsMenuClickMixin",
 		"LoadoutsClickMixin",
 		"LoadoutsContentSyncMixin",
+		"LoadoutsKeybindMixin",
 		"HeldItemScaleMixin"
 	],
 	"injectors": {
