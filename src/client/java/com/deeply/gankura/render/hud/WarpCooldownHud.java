@@ -17,7 +17,7 @@ public class WarpCooldownHud extends HudElement {
     @Override
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        double remaining = isPreview ? 5.0 : Math.max(0, GameState.Warp.cooldownEndAt - System.currentTimeMillis()) / 1000.0;
+        double remaining = isPreview ? 3.0 : Math.max(0, GameState.Warp.cooldownEndAt - System.currentTimeMillis()) / 1000.0;
         String suffix = (!isPreview && GameState.Warp.queuedCommand != null) ? " §e" + formatQueued(GameState.Warp.queuedCommand) : "";
         context.drawTextWithShadow(tr, String.format("§bWarp: %.1fs%s", remaining, suffix), 0, 0, 0xFFFFFFFF);
     }
