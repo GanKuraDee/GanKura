@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
 
 public class WarpCooldownHandler {
-    private static final long COOLDOWN_MS = 5000L;
+    private static final long COOLDOWN_MS = 3000L;
     // 無効なWarp名などサーバーが「Warping...」以外(エラーメッセージ等)を返した場合に、
     // 確認待ち状態のまま固まってしまわないようにするためのタイムアウト
     private static final long CONFIRMATION_TIMEOUT_MS = 3000L;
