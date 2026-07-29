@@ -37,10 +37,10 @@ public class GolemStatusHud extends HudElement {
                 }
             } else {
                 String num = switch (stage) {
-                    case ModConstants.STAGE_RESTING -> "§f0";
-                    case ModConstants.STAGE_DORMANT -> "§f1";
-                    case ModConstants.STAGE_AGITATED -> "§f2";
-                    case ModConstants.STAGE_DISTURBED -> "§f3";
+                    case ModConstants.STAGE_RESTING -> "§70";
+                    case ModConstants.STAGE_DORMANT -> "§71";
+                    case ModConstants.STAGE_AGITATED -> "§72";
+                    case ModConstants.STAGE_DISTURBED -> "§73";
                     case ModConstants.STAGE_AWAKENING -> "§e4";
                     default -> "§f?";
                 };
