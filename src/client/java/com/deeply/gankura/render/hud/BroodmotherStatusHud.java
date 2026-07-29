@@ -31,10 +31,10 @@ public class BroodmotherStatusHud extends HudElement {
                 displayStats = "Stage: §8Scanning...";
             } else {
                 String num = switch (stage) {
-                    case "Slain" -> "§f0";
-                    case "Dormant" -> "§f1";
-                    case "Soon" -> "§f2";
-                    case "Awakening" -> "§f3";
+                    case "Slain" -> "§70";
+                    case "Dormant" -> "§71";
+                    case "Soon" -> "§72";
+                    case "Awakening" -> "§73";
                     case "Imminent" -> "§e4";
                     default -> "§f?";
                 };
