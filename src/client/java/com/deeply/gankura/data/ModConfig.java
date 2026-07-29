@@ -846,6 +846,37 @@ public class ModConfig extends Config {
         public boolean keybindFolder = false;
 
         @Expose
+        @ConfigOption(name = "Open Menu Keybind", desc = "Expands menu opening keybind settings.")
+        @ConfigEditorAccordion(id = 63)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 59)
+        public boolean openMenuKeybindFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Opens menus via configured keys.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 63)
+        public boolean enableOpenMenuKeybind = false;
+
+        @Expose
+        @ConfigOption(name = "Loadouts", desc = "Sets key for /loadouts.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+        @ConfigAccordionId(id = 63)
+        public int openLoadoutsKeybind = GLFW.GLFW_KEY_UNKNOWN;
+
+        @Expose
+        @ConfigOption(name = "Wardrobe", desc = "Sets key for /wardrobe.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+        @ConfigAccordionId(id = 63)
+        public int openWardrobeKeybind = GLFW.GLFW_KEY_UNKNOWN;
+
+        @Expose
+        @ConfigOption(name = "Equipment", desc = "Sets key for /equipment.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+        @ConfigAccordionId(id = 63)
+        public int openEquipmentKeybind = GLFW.GLFW_KEY_UNKNOWN;
+
+        @Expose
         @ConfigOption(name = "Loadouts Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 60)
         @ConfigEditorBoolean
