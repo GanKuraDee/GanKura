@@ -6,7 +6,6 @@ import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoProperties;
 import net.minecraft.gizmos.TextGizmo;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.gizmos.Gizmos; // 26.1.2 での新しい描画クラス
@@ -15,12 +14,12 @@ public class WorldTextRenderer {
 
     public static void render(Minecraft client) {
         if (client.player == null) return;
-        renderGolemWaypoint(client, client.player);
-        renderCrimsonBossWaypoints(client.player);
-        renderArachneWaypoint(client, client.player);
+        renderGolemLocationText();
+        renderCrimsonBossLocationTexts();
+        renderArachneLocationText();
     }
 
-    private static void renderGolemWaypoint(Minecraft client, Player player) {
+    private static void renderGolemLocationText() {
         if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
 
@@ -57,14 +56,10 @@ public class WorldTextRenderer {
             }
         }
 
-        Vec3 eyePos = player.getEyePosition();
-        double distance = eyePos.distanceTo(Vec3.atCenterOf(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-
-        renderGizmoLabel(textToRender, renderPos, textColor, textScale);
+        renderGizmoLabel(textToRender, renderPos, textColor);
     }
 
-    private static void renderArachneWaypoint(Minecraft client, Player player) {
+    private static void renderArachneLocationText() {
         if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
         if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
 
@@ -123,43 +118,43 @@ public class WorldTextRenderer {
             textToRender = "§c§lARACHNE §6(Spawned/Killed)";
         }
 
-        Vec3 eyePos = player.getEyePosition();
-        double distance = eyePos.distanceTo(Vec3.atCenterOf(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-
-        renderGizmoLabel(textToRender, renderPos, textColor, textScale);
+        renderGizmoLabel(textToRender, renderPos, textColor);
     }
 
-    private static void renderCrimsonBossWaypoints(Player player) {
+    private static void renderCrimsonBossLocationTexts() {
         if (!ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleWorldText) return;
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
                 || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
         if (!isCrimsonIsle) return;
 
-        renderCrimsonLabel(player, ModConstants.BLADESOUL_POS,        "§8§lBLADESOUL",        0xFF555555, bladesoulStatus());
-        renderCrimsonLabel(player, ModConstants.BARBARIAN_DUKE_X_POS, "§c§lBARBARIAN DUKE X", 0xFFFF5555, regularBossStatus(GameState.BarbarianDukeX.respawnEndTime, GameState.BarbarianDukeX.isDetected));
-        renderCrimsonLabel(player, ModConstants.MAGE_OUTLAW_POS,      "§5§lMAGE OUTLAW",       0xFFAA00AA, regularBossStatus(GameState.MageOutlaw.respawnEndTime,      GameState.MageOutlaw.isDetected));
-        renderCrimsonLabel(player, ModConstants.ASHFANG_POS,          "§7§lASHFANG",           0xFFAAAAAA, regularBossStatus(GameState.Ashfang.respawnEndTime,          GameState.Ashfang.isDetected));
-        renderCrimsonLabel(player, ModConstants.MAGMA_BOSS_POS,       "§6§lMAGMA BOSS",        0xFFFFAA00, magmaBossStatus());
+        renderCrimsonLabel(ModConstants.BLADESOUL_POS,        "§8§lBLADESOUL",        0xFF555555, bladesoulStatus());
+        renderCrimsonLabel(ModConstants.BARBARIAN_DUKE_X_POS, "§c§lBARBARIAN DUKE X", 0xFFFF5555, regularBossStatus("Barbarian Duke X", GameState.BarbarianDukeX.respawnEndTime, GameState.BarbarianDukeX.isDetected));
+        renderCrimsonLabel(ModConstants.MAGE_OUTLAW_POS,      "§5§lMAGE OUTLAW",       0xFFAA00AA, regularBossStatus("Mage Outlaw",      GameState.MageOutlaw.respawnEndTime,      GameState.MageOutlaw.isDetected));
+        renderCrimsonLabel(ModConstants.ASHFANG_POS,          "§7§lASHFANG",           0xFFAAAAAA, regularBossStatus("Ashfang",          GameState.Ashfang.respawnEndTime,          GameState.Ashfang.isDetected));
+        renderCrimsonLabel(ModConstants.MAGMA_BOSS_POS,       "§6§lMAGMA BOSS",        0xFFFFAA00, magmaBossStatus());
     }
 
-    private static void renderCrimsonLabel(Player player, BlockPos base, String nameText, int argbColor, String status) {
+    private static void renderCrimsonLabel(BlockPos base, String nameText, int argbColor, String status) {
         BlockPos renderPos = base.offset(0, 2, 0);
-        Vec3 eyePos = player.getEyePosition();
-        double distance = eyePos.distanceTo(Vec3.atCenterOf(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-        renderGizmoLabel(nameText + " " + status, renderPos, argbColor, textScale);
+        renderGizmoLabel(nameText + " " + status, renderPos, argbColor);
     }
 
-    private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor, float textScale) {
+    private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
+        Vec3 pos = new Vec3(renderPos.getX() + 0.5, renderPos.getY() + 1.5, renderPos.getZ() + 0.5);
+
+        // 距離に比例して拡大し、見かけの大きさを一定に保つ。
+        // プレイヤーのtick座標を使うと20回/秒でしかスケールが更新されずカクつくため、
+        // フレームごとに補間されるカメラ座標を基準にする
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        float textScale = (float) Math.max(0.02, cameraPos.distanceTo(pos) * 0.0025);
+
         TextGizmo.Style style = TextGizmo.Style.forColorAndCentered(argbColor)
                 .withScale(textScale * 20.0F);
-        Vec3 pos = new Vec3(renderPos.getX() + 0.5, renderPos.getY() + 1.5, renderPos.getZ() + 0.5);
         GizmoProperties properties = Gizmos.billboardText(text, pos, style);
         properties.setAlwaysOnTop();
     }
 
-    private static String regularBossStatus(long respawnEnd, boolean isDetected) {
+    private static String regularBossStatus(String bossName, long respawnEnd, boolean isDetected) {
         long remaining = respawnEnd - System.currentTimeMillis();
         if (remaining > 0) {
             long secs = remaining / 1000;
@@ -167,23 +162,27 @@ public class WorldTextRenderer {
         }
         if (isDetected) return "§a(Spawned)";
         if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) return "§a(Ready)";
-        return "§7(Unknown)";
+        // リスポーン推定タイマーが動いている間、または範囲内で未検出が続いている間は「いない」
+        if (EntityHighlightManager.killedRemainingMs(bossName) > 0
+                || EntityHighlightManager.canConfirmAbsence(bossName)) {
+            return "§c(Killed)";
+        }
+        // 範囲外。居たことがある / リスポーン時間を過ぎた のいずれも生死は判別できない
+        return EntityHighlightManager.wasSpawnedWhenLastConfirmed(bossName)
+                || EntityHighlightManager.wasKilledConfirmed(bossName)
+                ? "§6(Spawned/Killed)"
+                : "§7(Unknown)";
     }
 
     private static String bladesoulStatus() {
-        return regularBossStatus(GameState.Bladesoul.respawnEndTime, GameState.Bladesoul.isDetected);
+        return regularBossStatus("Bladesoul", GameState.Bladesoul.respawnEndTime, GameState.Bladesoul.isDetected);
     }
 
     private static String magmaBossStatus() {
-        String sp = GameState.MagmaBoss.spawnStatus;
+        // サイドバーが読めている間はフェーズをそのまま出す(エリア内でしか読めない)。
+        // フェーズ行に加え、念のため「Magma Chamber」の行も確認する
+        String sp = GameState.MagmaBoss.inArena ? GameState.MagmaBoss.spawnStatus : null;
         if (sp != null) return "§a(" + sp + ")";
-        long respawnEnd = GameState.MagmaBoss.respawnEndTime;
-        long remaining = respawnEnd - System.currentTimeMillis();
-        if (remaining > 0) {
-            long secs = remaining / 1000;
-            return String.format("§e(%dm %02ds)", secs / 60, secs % 60);
-        }
-        if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) return "§a(Ready)";
-        return "§7(Unknown)";
+        return regularBossStatus("Magma Boss", GameState.MagmaBoss.respawnEndTime, GameState.MagmaBoss.isDetected);
     }
 }

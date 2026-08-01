@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ArmorStackHud extends HudElement {
     public ArmorStackHud() {
-        super("armorStack", 10, 39, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
+        super("armorStack", 10, 34, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ArmorStackHud extends HudElement {
              * GuiGraphicsExtractor のメソッド:
              * public void text(Font font, String str, int x, int y, int color, boolean dropShadow)
              */
-            graphics.text(font, part, currentX, 0, 0xFFFFFFFF, true);
+            text(graphics, font, part, currentX, 0, 0xFFFFFFFF, true);
             currentX += font.width(part) + spacing;
         }
     }

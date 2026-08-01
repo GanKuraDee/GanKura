@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class DayHud extends HudElement {
     public DayHud() {
-        super("day", 10, 59, 1.0f, 60, 15, () -> ModConfig.INSTANCE.misc.showDayHud, () -> true);
+        super("day", 10, 46, 1.0f, 60, 15, () -> ModConfig.INSTANCE.misc.showDayHud, () -> true);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class DayHud extends HudElement {
             color = 0xFFFF5555;
         }
 
-        graphics.text(font, "Day: " + String.format("%,d", day), 0, 0, color, true);
+        text(graphics, font, "Day: " + String.format("%,d", day), 0, 0, color, true);
     }
 }

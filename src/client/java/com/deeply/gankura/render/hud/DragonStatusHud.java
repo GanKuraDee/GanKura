@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class DragonStatusHud extends HudElement {
     public DragonStatusHud() {
-        super("dragon", 200, 145, 1.0f, 150, 50,
+        super("dragon", 165, 118, 1.0f, 150, 50,
                 () -> ModConfig.INSTANCE.theEnd.showDragonStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
@@ -66,16 +66,16 @@ public class DragonStatusHud extends HudElement {
         }
 
         // GuiGraphicsExtractor のメソッド: text(Font, String, x, y, color, shadow)
-        graphics.text(font, "§d§lDragon Status", 0, 0, 0xFFFF55FF, true);
-        graphics.text(font, eggState, 0, 12, 0xFFFFFFFF, true);
+        text(graphics, font, "§d§lDragon Status", 0, 0, 0xFFFF55FF, true);
+        text(graphics, font, eggState, 0, 12, 0xFFFFFFFF, true);
 
         int nextY = 24;
         if (eyePlaced != null) {
-            graphics.text(font, eyePlaced, 0, nextY, 0xFFFFFFFF, true);
+            text(graphics, font, eyePlaced, 0, nextY, 0xFFFFFFFF, true);
             nextY += 12;
         }
         if (dragonType != null) {
-            graphics.text(font, dragonType, 0, nextY, 0xFFFFFFFF, true);
+            text(graphics, font, dragonType, 0, nextY, 0xFFFFFFFF, true);
         }
     }
 }

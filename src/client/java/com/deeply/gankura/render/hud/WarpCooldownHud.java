@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class WarpCooldownHud extends HudElement {
     public WarpCooldownHud() {
-        super("warp_cooldown", 10, 79, 1.0f, 100, 15,
+        super("warp_cooldown", 10, 58, 1.0f, 100, 15,
                 () -> ModConfig.INSTANCE.misc.enableWarpQueue,
                 () -> GameState.Warp.cooldownEndAt > System.currentTimeMillis());
     }
@@ -19,7 +19,7 @@ public class WarpCooldownHud extends HudElement {
         Font font = Minecraft.getInstance().font;
         double remaining = isPreview ? 3.0 : Math.max(0, GameState.Warp.cooldownEndAt - System.currentTimeMillis()) / 1000.0;
         String suffix = (!isPreview && GameState.Warp.queuedCommand != null) ? " §e" + formatQueued(GameState.Warp.queuedCommand) : "";
-        graphics.text(font, String.format("§bWarp: %.1fs%s", remaining, suffix), 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, String.format("§bWarp: %.1fs%s", remaining, suffix), 0, 0, 0xFFFFFFFF, true);
     }
 
     // /warp は必ず引数(warp名)を伴うため、"warp nest" のようなキュー済みコマンドから

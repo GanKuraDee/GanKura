@@ -33,11 +33,13 @@ public class EntityTracerRenderer {
                 if (!boss.enableTracer().get()) continue;
                 // Bladesoul は Blaze + Wither Skeleton の合体構成。Tracer は Wither Skeleton のみ
                 if ("Bladesoul".equals(boss.nameTag()) && !(entity instanceof WitherSkeleton)) continue;
+                // Ashfang は2体のBlazeで構成される。Tracer は基準座標に近い1体のみ
+                if ("Ashfang".equals(boss.nameTag()) && entity != EntityHighlightManager.ashfangTracerTarget) continue;
                 color = boss.tracerColorARGB();
             }
             // Magma Glare (Magma Boss 配下の MagmaCube)
             else if (EntityHighlightManager.magmaGlareEntities.contains(entity)) {
-                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
+                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareTracer) continue;
                 color = 0xFFFF5555; // 赤
             }
             // Arachne (Broodmother と同じ Spider 型のため instanceof 判定より先に判定する)

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ArachneHealthHud extends HudElement {
     public ArachneHealthHud() {
-        super("arachne_health", 200, 360, 1.0f, 120, 24,
+        super("arachne_health", 10, 208, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneHealthHud,
                 () -> GameState.Arachne.inSanctuary && (GameState.Arachne.health != null || GameState.Arachne.broodCount > 0));
     }
@@ -19,18 +19,18 @@ public class ArachneHealthHud extends HudElement {
         Font font = Minecraft.getInstance().font;
 
         if (isPreview) {
-            graphics.text(font, "§5§lArachne HP", 0, 0, 0xFFFFFFFF, true);
-            graphics.text(font, "§e3,000§f/§a6,000", 0, 12, 0xFFFFFFFF, true);
+            text(graphics, font, "§5§lArachne HP", 0, 0, 0xFFFFFFFF, true);
+            text(graphics, font, "§e3,000§f/§a6,000", 0, 12, 0xFFFFFFFF, true);
             return;
         }
 
         // Arachne 本体の HP が取得できている間はそちらを優先し、分裂後(HP不明)は Brood の残数を表示する
         if (GameState.Arachne.health != null) {
-            graphics.text(font, "§5§lArachne HP", 0, 0, 0xFFFFFFFF, true);
-            graphics.text(font, parseHealthString(GameState.Arachne.health), 0, 12, 0xFFFFFFFF, true);
+            text(graphics, font, "§5§lArachne HP", 0, 0, 0xFFFFFFFF, true);
+            text(graphics, font, parseHealthString(GameState.Arachne.health), 0, 12, 0xFFFFFFFF, true);
         } else {
-            graphics.text(font, "§d§lArachne's Brood", 0, 0, 0xFFFFFFFF, true);
-            graphics.text(font, "§fRemaining: §e" + GameState.Arachne.broodCount, 0, 12, 0xFFFFFFFF, true);
+            text(graphics, font, "§d§lArachne's Brood", 0, 0, 0xFFFFFFFF, true);
+            text(graphics, font, "§fRemaining: §e" + GameState.Arachne.broodCount, 0, 12, 0xFFFFFFFF, true);
         }
     }
 

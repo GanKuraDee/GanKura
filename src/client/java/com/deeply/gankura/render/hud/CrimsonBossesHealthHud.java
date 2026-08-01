@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class CrimsonBossesHealthHud extends HudElement {
 
     public CrimsonBossesHealthHud() {
-        super("crimson_bosses_health", 400, 260, 1.0f, 185, 24,
+        super("crimson_bosses_health", 305, 228, 1.0f, 185, 24,
                 CrimsonBossesHealthHud::isAnyEnabled,
                 CrimsonBossesHealthHud::isAnyVisible);
     }
@@ -49,32 +49,32 @@ public class CrimsonBossesHealthHud extends HudElement {
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
         Font font = Minecraft.getInstance().font;
         if (isPreview) {
-            graphics.text(font, "§c§lNether Boss HP", 0, 0, 0xFFFFFFFF, true);
-            graphics.text(font, "§e30M§f/§a60M", 0, 12, 0xFFFFFFFF, true);
+            text(graphics, font, "§c§lNether Boss HP", 0, 0, 0xFFFFFFFF, true);
+            text(graphics, font, "§e30M§f/§a60M", 0, 12, 0xFFFFFFFF, true);
             return;
         }
         for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
             if (!isBossEnabled(boss)) continue;
             String raw = boss.getHealth().get();
             if (raw == null) continue;
-            boolean isBar = raw.startsWith("BAR:");
-            String hpText = parseHealthString(raw);
-            graphics.text(font, "§c§l" + boss.nameTag() + " HP", 0, 0, 0xFFFFFFFF, true);
-            if (isBar) {
-                graphics.pose().pushMatrix();
-                graphics.pose().scale(0.5f, 0.5f);
-                graphics.text(font, hpText, 0, 24, 0xFFFFFFFF, true);
-                graphics.pose().popMatrix();
-            } else {
-                graphics.text(font, hpText, 0, 12, 0xFFFFFFFF, true);
-            }
+            text(graphics, font, "§c§l" + titleOf(boss), 0, 0, 0xFFFFFFFF, true);
+            text(graphics, font, parseHealthString(raw), 0, 12, 0xFFFFFFFF, true);
             return;
         }
     }
 
+    // Magma Boss は分裂中(Kill the Magmas)だけタイトルが変わる
+    private static String titleOf(CrimsonBossEntry boss) {
+        if ("Magma Boss".equals(boss.nameTag()) && GameState.MagmaBoss.healthLabel != null) {
+            return GameState.MagmaBoss.healthLabel;
+        }
+        return boss.nameTag() + " HP";
+    }
+
     private static String parseHealthString(String raw) {
         if (raw == null) return "";
-        if (raw.startsWith("BAR:")) return raw.substring(4);
+        // サイドバー由来の値は色コード込みで完成しているのでそのまま表示する
+        if (raw.startsWith(ModConstants.RAW_HEALTH_PREFIX)) return raw.substring(ModConstants.RAW_HEALTH_PREFIX.length());
         String[] parts = raw.split("/");
         if (parts.length == 2) {
             double current = parseHealthValue(parts[0]);
