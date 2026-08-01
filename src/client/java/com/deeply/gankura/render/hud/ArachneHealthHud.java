@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class ArachneHealthHud extends HudElement {
     public ArachneHealthHud() {
-        super("arachne_health", 200, 360, 1.0f, 120, 24,
+        super("arachne_health", 10, 208, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneHealthHud,
                 () -> GameState.Arachne.inSanctuary && (GameState.Arachne.health != null || GameState.Arachne.broodCount > 0));
     }
@@ -19,18 +19,18 @@ public class ArachneHealthHud extends HudElement {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
 
         if (isPreview) {
-            context.drawTextWithShadow(tr, "§5§lArachne HP", 0, 0, 0xFFFFFFFF);
-            context.drawTextWithShadow(tr, "§e3,000§f/§a6,000", 0, 12, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, "§5§lArachne HP", 0, 0, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, "§e3,000§f/§a6,000", 0, 12, 0xFFFFFFFF);
             return;
         }
 
         // Arachne 本体の HP が取得できている間はそちらを優先し、分裂後(HP不明)は Brood の残数を表示する
         if (GameState.Arachne.health != null) {
-            context.drawTextWithShadow(tr, "§5§lArachne HP", 0, 0, 0xFFFFFFFF);
-            context.drawTextWithShadow(tr, parseHealthString(GameState.Arachne.health), 0, 12, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, "§5§lArachne HP", 0, 0, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, parseHealthString(GameState.Arachne.health), 0, 12, 0xFFFFFFFF);
         } else {
-            context.drawTextWithShadow(tr, "§d§lArachne's Brood", 0, 0, 0xFFFFFFFF);
-            context.drawTextWithShadow(tr, "§fRemaining: §e" + GameState.Arachne.broodCount, 0, 12, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, "§d§lArachne's Brood", 0, 0, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, "§fRemaining: §e" + GameState.Arachne.broodCount, 0, 12, 0xFFFFFFFF);
         }
     }
 

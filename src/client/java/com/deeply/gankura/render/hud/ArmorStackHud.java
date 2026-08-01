@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ArmorStackHud extends HudElement {
     public ArmorStackHud() {
-        super("armorStack", 10, 39, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
+        super("armorStack", 10, 34, 1.0f, 150, 15, () -> ModConfig.INSTANCE.misc.showArmorStackHud, () -> true);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ArmorStackHud extends HudElement {
         int currentX = (150 / 2) - (totalWidth / 2); // 0基準での中央揃え
 
         for (String part : parts) {
-            context.drawTextWithShadow(tr, part, currentX, 0, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, part, currentX, 0, 0xFFFFFFFF);
             currentX += tr.getWidth(part) + spacing;
         }
     }

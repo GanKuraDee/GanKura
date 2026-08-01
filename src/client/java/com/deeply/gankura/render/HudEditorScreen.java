@@ -33,25 +33,28 @@ public class HudEditorScreen extends Screen {
         for (HudElement element : HudConfig.ELEMENTS) {
             if (!element.isEnabled()) continue; // 設定でOFFのものはエディタにも出さない
 
-            boolean isHovering = element.isHovering(mouseX, mouseY);
+            boolean isHovering = element.isHovering(mouseX, mouseY, this.width, this.height);
             boolean isDraggingThis = (draggingElement == element);
             int boxColor = (isHovering || isDraggingThis) ? 0x80FFFFFF : 0x40000000;
 
-            // 当たり判定の枠を描画
-            int scaledW = (int)(element.width * element.scale);
-            int scaledH = (int)(element.height * element.scale);
-            context.fill(element.x - 5, element.y - 5, element.x + scaledW, element.y + scaledH, boxColor);
+            // 当たり判定の枠を描画。枠は直前フレームの計測結果を使う(初回だけ固定サイズ)
+            int drawX = element.renderX(this.width);
+            int drawY = element.renderY(this.height);
+            int boxX = drawX + element.hitOffsetX();
+            int boxY = drawY + element.hitOffsetY();
+            context.fill(boxX, boxY, boxX + element.hitWidth(), boxY + element.hitHeight(), boxColor);
 
             // HUDの中身を描画
             context.getMatrices().pushMatrix();
-            context.getMatrices().translate((float) element.x, (float) element.y);
+            context.getMatrices().translate((float) drawX, (float) drawY);
             context.getMatrices().scale(element.scale, element.scale);
+            // プレビューは固定文字列なので、ここで測った範囲がそのまま選択範囲になる
+            element.beginMeasure();
             element.renderElement(context, true); // true = プレビューモード
+            element.endMeasure();
             context.getMatrices().popMatrix();
         }
-
-        context.drawCenteredTextWithShadow(textRenderer, "Drag to move HUDs. Scroll to Resize. Press ESC to save & exit.", width / 2, 20, 0xFFFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
@@ -62,10 +65,11 @@ public class HudEditorScreen extends Screen {
 
         if (button == 0) { // 0 = 左クリック
             for (HudElement element : HudConfig.ELEMENTS) {
-                if (element.isEnabled() && element.isHovering(mouseX, mouseY)) {
+                if (element.isEnabled() && element.isHovering(mouseX, mouseY, this.width, this.height)) {
                     draggingElement = element;
-                    dragOffsetX = (int)mouseX - element.x;
-                    dragOffsetY = (int)mouseY - element.y;
+                    // 画面外に出ていたHUDは寄せた位置から掴めるよう、描画位置を基準にオフセットを取る
+                    dragOffsetX = (int)mouseX - element.renderX(this.width);
+                    dragOffsetY = (int)mouseY - element.renderY(this.height);
                     return true;
                 }
             }
@@ -88,8 +92,9 @@ public class HudEditorScreen extends Screen {
         double mouseY = click.y();
 
         if (draggingElement != null) {
-            draggingElement.x = (int)mouseX - dragOffsetX;
-            draggingElement.y = (int)mouseY - dragOffsetY;
+            // ドラッグ中も画面内に収める
+            draggingElement.x = draggingElement.clampX((int)mouseX - dragOffsetX, this.width);
+            draggingElement.y = draggingElement.clampY((int)mouseY - dragOffsetY, this.height);
             return true;
         }
         return super.mouseDragged(click, offsetX, offsetY);
@@ -100,7 +105,7 @@ public class HudEditorScreen extends Screen {
         float scroll = (float) verticalAmount * 0.1f;
 
         for (HudElement element : HudConfig.ELEMENTS) {
-            if (element.isEnabled() && element.isHovering(mouseX, mouseY)) {
+            if (element.isEnabled() && element.isHovering(mouseX, mouseY, this.width, this.height)) {
                 element.scale = Math.max(0.5f, Math.min(3.0f, element.scale + scroll));
                 return true;
             }

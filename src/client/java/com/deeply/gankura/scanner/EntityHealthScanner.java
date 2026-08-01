@@ -6,6 +6,7 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
+import com.deeply.gankura.util.ScoreboardUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.block.Blocks;
@@ -18,13 +19,18 @@ import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EntityHealthScanner {
     private static final Pattern HEALTH_PATTERN = Pattern.compile("([\\d\\.,]+[kM]?/[\\d\\.,]+[kM]?)");
     private static final Pattern MAGMA_PERCENT_PATTERN = Pattern.compile("Boss: (\\d{1,3})%", Pattern.CASE_INSENSITIVE);
+    // Dragonのネームタグには残りHPが載らないため、サイドバーの「Dragon HP: 4,824,217❤」から取得する
+    private static final Pattern DRAGON_HP_PATTERN = Pattern.compile("Dragon HP:\\s*([\\d,.]+)", Pattern.CASE_INSENSITIVE);
+    // Golem(Endstone Protector)は遠距離だとネームタグを読めないため、サイドバーの
+    // 「Protector HP: 1,234,567❤」を代替に使う(ネームタグが読めた場合はそちらを優先)
+    private static final Pattern PROTECTOR_HP_PATTERN = Pattern.compile("Protector HP:\\s*([\\d,.]+)", Pattern.CASE_INSENSITIVE);
     private static String previousMagmaSpawnStatus = null;
 
     public static void register() {
@@ -61,6 +67,11 @@ public class EntityHealthScanner {
         }
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
 
+        // Dragonのみサイドバー由来のため、他のスキャン条件に関係なく毎tick更新する
+        GameState.Dragon.health = isTheEnd ? findSidebarHealth(client, DRAGON_HP_PATTERN) : null;
+        // Golemはネームタグ優先。読めなかったときのフォールバックとして先に取得しておく
+        String golemSidebarHealth = isTheEnd ? findSidebarHealth(client, PROTECTOR_HP_PATTERN) : null;
+
         if (!scanGolem) GameState.Golem.health = null;
         if (!scanBroodmother) GameState.Broodmother.health = null;
         if (!scanArachne) { GameState.Arachne.health = null; GameState.Arachne.broodCount = 0; }
@@ -70,6 +81,8 @@ public class EntityHealthScanner {
             for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
                 boss.setHealth().accept(null);
             }
+            GameState.MagmaBoss.healthLabel = null;
+            GameState.MagmaBoss.inArena = false;
         }
 
         if (!scanGolem && !scanBroodmother && !scanArachne && !isCrimsonIsle) return;
@@ -135,20 +148,18 @@ public class EntityHealthScanner {
                 for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                     if (!scanCrimson[i] || foundCrimsonHealth[i] != null) continue;
                     CrimsonBossEntry boss = EntityHighlightManager.CRIMSON_BOSSES.get(i);
+                    // Magma Boss はサイドバー由来なので、ネームタグからは読まない
+                    if ("Magma Boss".equals(boss.nameTag())) continue;
                     if (ModConstants.containsIgnoreCase(nameStr, boss.nameTag())) {
                         Matcher m = HEALTH_PATTERN.matcher(nameStr);
-                        if (m.find()) {
-                            foundCrimsonHealth[i] = m.group(1);
-                        } else if ("Magma Boss".equals(boss.nameTag())) {
-                            String bar = extractBarHealth(customName);
-                            if (bar != null) foundCrimsonHealth[i] = bar;
-                        }
+                        if (m.find()) foundCrimsonHealth[i] = m.group(1);
                     }
                 }
             }
         }
 
-        if (scanGolem) GameState.Golem.health = foundGolemHealth;
+        // ネームタグは「現在HP/最大HP」まで取れるので優先し、遠距離等で読めない場合のみサイドバーの現在HPを使う
+        if (scanGolem) GameState.Golem.health = foundGolemHealth != null ? foundGolemHealth : golemSidebarHealth;
         if (scanBroodmother) GameState.Broodmother.health = foundBroodmotherHealth;
         if (scanArachne) {
             GameState.Arachne.health = foundArachneHealth;
@@ -157,24 +168,87 @@ public class EntityHealthScanner {
         }
         if (anyCrimsonScan) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
-                if (scanCrimson[i]) EntityHighlightManager.CRIMSON_BOSSES.get(i).setHealth().accept(foundCrimsonHealth[i]);
+                CrimsonBossEntry boss = EntityHighlightManager.CRIMSON_BOSSES.get(i);
+                // Magma Boss は scanMagmaBossScoreboard 側で更新済みのため上書きしない
+                if ("Magma Boss".equals(boss.nameTag())) continue;
+                if (scanCrimson[i]) boss.setHealth().accept(foundCrimsonHealth[i]);
             }
         }
     }
 
     // Crimson Isle 滞在中に毎 tick スコアボードをスキャンし Magma Boss の状態を更新する
-    private static void scanMagmaBossScoreboard(MinecraftClient client) {
-        if (client.world == null) { GameState.MagmaBoss.spawnStatus = null; return; }
-        String found = null;
+    // サイドバーの「<名前> HP: <数値>❤」形式の行から現在HPを取り出す(見つからなければ null)。
+    // ボスが生存している間のみ表示される行なので、消えたら未検出として扱ってよい
+    private static String findSidebarHealth(MinecraftClient client, Pattern pattern) {
+        if (client.world == null) return null;
         for (Team team : client.world.getScoreboard().getTeams()) {
             String line = (team.getPrefix().getString() + team.getSuffix().getString())
                     .replaceAll("§[0-9a-fk-or]", "");
-            Matcher m = MAGMA_PERCENT_PATTERN.matcher(line);
-            if (m.find()) { found = m.group(1) + "%"; break; }
-            if (ModConstants.containsIgnoreCase(line, "Kill the Magmas:"))       { found = "Kill the Magmas"; break; }
-            if (ModConstants.containsIgnoreCase(line, "Boss Health:"))           { found = "Final Stage";     break; }
-            if (ModConstants.containsIgnoreCase(line, "The boss is reforming!")) { found = "Reforming...";    break; }
+            Matcher m = pattern.matcher(line);
+            if (m.find()) return m.group(1);
         }
+        return null;
+    }
+
+    // Crimson Isle 滞在中に毎 tick サイドバーをスキャンして Magma Boss の状態とHP表示を更新する。
+    //
+    // Magma Boss はネームタグに残りHPが載らないため、Dragon と同じくサイドバー由来にしている。
+    // サイドバーの構成(いずれも「ラベル行の1つ下」がプログレスバー):
+    //   §7Boss: §c45% / §7Damage Soaked: / §a▎▎▎▎▎§7▎▎▎▎▎...   … 本体が分裂していない状態
+    //   §6Kill the Magmas: / §a▎▎▎§7▎▎▎...                      … 分裂中
+    //   §cThe boss is reforming!                                 … 再結合中(HPは非表示)
+    //   §7Boss Health: / §e389.6k§f/§a10M§c❤                     … 最終フェーズ
+    private static void scanMagmaBossScoreboard(MinecraftClient client) {
+        if (client.world == null) {
+            GameState.MagmaBoss.spawnStatus = null;
+            GameState.MagmaBoss.health = null;
+            GameState.MagmaBoss.healthLabel = null;
+            GameState.MagmaBoss.inArena = false;
+            return;
+        }
+
+        List<String> lines = ScoreboardUtils.getSidebarLines(client);
+        boolean inArena = false;
+        String percent = null;
+        String soakedBar = null;
+        String killMagmasBar = null;
+        String bossHealthBar = null;
+        boolean reforming = false;
+
+        for (int i = 0; i < lines.size(); i++) {
+            String plain = ScoreboardUtils.stripColor(lines.get(i));
+            // ラベル行の1つ下が実際のバー。色コードを含んだまま利用する
+            String next = (i + 1 < lines.size()) ? lines.get(i + 1) : null;
+
+            Matcher m = MAGMA_PERCENT_PATTERN.matcher(plain);
+            if (m.find()) percent = m.group(1) + "%";
+
+            if (ModConstants.containsIgnoreCase(plain, ModConstants.AREA_MAGMA_CHAMBER)) inArena = true;
+            if (ModConstants.containsIgnoreCase(plain, "Damage Soaked:"))        soakedBar = next;
+            if (ModConstants.containsIgnoreCase(plain, "Kill the Magmas:"))      killMagmasBar = next;
+            if (ModConstants.containsIgnoreCase(plain, "Boss Health:"))          bossHealthBar = next;
+            if (ModConstants.containsIgnoreCase(plain, "The boss is reforming!")) reforming = true;
+        }
+
+        // フェーズの進行順に沿って優先度を決める(古い行が残っていても後段のフェーズを優先する)
+        String found;
+        String health;
+        String label = null;
+        if (reforming) {
+            found = "Reforming...";
+            health = null;                       // 再結合中はHP HUDを隠す
+        } else if (bossHealthBar != null) {
+            found = "Final Stage";
+            health = raw(bossHealthBar);
+        } else if (killMagmasBar != null) {
+            found = "Kill the Magmas";
+            health = raw(killMagmasBar);
+            label = "Kill the Magmas";           // タイトルを差し替える
+        } else {
+            found = percent;
+            health = raw(soakedBar);
+        }
+
         // Final Stage 以外で値が変化した場合にタイトル表示
         if (found != null && !"Final Stage".equals(found) && !found.equals(previousMagmaSpawnStatus)
                 && ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTitle) {
@@ -183,46 +257,16 @@ public class EntityHealthScanner {
         }
         previousMagmaSpawnStatus = found;
         GameState.MagmaBoss.spawnStatus = found;
+        GameState.MagmaBoss.health = health;
+        GameState.MagmaBoss.healthLabel = label;
+        GameState.MagmaBoss.inArena = inArena;
     }
 
-    // "Magma Boss" 以降のセグメントからバー文字のみをホワイトリストで抽出する
-    // 装飾文字（括弧・記号など）は文字種で除外するため、未知の閉じ文字も自動的に除去される
-    private static String extractBarHealth(Text text) {
-        StringBuilder bar = new StringBuilder();
-        boolean[] afterBossName = {false};
-        text.visit((Style style, String str) -> {
-            if (!afterBossName[0]) {
-                if (ModConstants.containsIgnoreCase(str, "Magma Boss")) afterBossName[0] = true;
-                return Optional.empty();
-            }
-            // バー文字のみを取り込む（それ以外は無視）
-            StringBuilder filtered = new StringBuilder();
-            for (char ch : str.toCharArray()) {
-                if (isBarChar(ch)) filtered.append(ch);
-            }
-            if (filtered.length() == 0) return Optional.empty();
-            // 色コードを §x 形式で付与
-            TextColor color = style.getColor();
-            if (color != null) {
-                int rgb = color.getRgb();
-                for (Formatting f : Formatting.values()) {
-                    if (f.isColor() && f.getColorValue() != null && f.getColorValue() == rgb) {
-                        bar.append('§').append(f.getCode());
-                        break;
-                    }
-                }
-            }
-            bar.append(filtered);
-            return Optional.empty();
-        }, Style.EMPTY);
-        return bar.length() > 0 ? "BAR:" + bar : null;
+    // サイドバーの行は色コード込みで完成しているため、整形せずそのまま表示する印を付ける
+    private static String raw(String line) {
+        if (line == null) return null;
+        String trimmed = line.trim();
+        return trimmed.isEmpty() ? null : ModConstants.RAW_HEALTH_PREFIX + trimmed;
     }
 
-    // バー文字として認める文字種（ブロック・幾何図形・ボックス描画・パイプ）
-    private static boolean isBarChar(char ch) {
-        return ch == '|'
-            || (ch >= '▀' && ch <= '▟')  // Block Elements: █ ░ ▌ 等
-            || (ch >= '■' && ch <= '◿')  // Geometric Shapes: ■ □ ▪ 等
-            || (ch >= '─' && ch <= '╿'); // Box Drawing Characters
-    }
 }

@@ -18,16 +18,25 @@ public class HudRenderer {
 
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
 
+        // ボスのネームプレート(ワールド座標をスクリーンへ投影)
+        // Glow(ポストエフェクト)より確実に手前へ出すため、ワールド内テキストではなくHUDとして描画する
+        BossNameplateRenderer.render(context, client, tickCounter.getTickProgress(true));
+
         // 各HUDオブジェクトが自分自身の描き方を知っているので、ただループで呼ぶだけ！
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
         for (HudElement element : HudConfig.ELEMENTS) {
             if (element.shouldRender(false)) {
                 context.getMatrices().pushMatrix();
                 // ★修正: Z軸の 0.0f を削除し、XとYのみを指定
-                context.getMatrices().translate((float) element.x, (float) element.y);
+                context.getMatrices().translate((float) element.renderX(screenWidth), (float) element.renderY(screenHeight));
                 // ★修正: Z軸の 1.0f を削除し、XとYのみを指定
                 context.getMatrices().scale(element.scale, element.scale);
 
+                // 実プレイ中も範囲を測っておく。画面内へ寄せる判定を実表示基準で行うため
+                element.beginMeasure();
                 element.renderElement(context, false);
+                element.endMeasure();
                 context.getMatrices().popMatrix();
             }
         }

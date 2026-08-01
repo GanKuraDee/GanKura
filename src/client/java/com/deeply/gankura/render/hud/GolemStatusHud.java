@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
-        super("stats", 200, 10, 1.0f, 150, 36,
+        super("stats", 165, 10, 1.0f, 150, 36,
                 () -> ModConfig.INSTANCE.theEnd.showGolemStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
@@ -50,8 +50,8 @@ public class GolemStatusHud extends HudElement {
             }
         }
 
-        context.drawTextWithShadow(tr, "§lGolem Status", 0, 0, 0xFFFFAA00);
-        context.drawTextWithShadow(tr, displayStats, 0, 12, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, "§lGolem Status", 0, 0, 0xFFFFAA00);
+        drawTextWithShadow(context, tr, displayStats, 0, 12, 0xFFFFFFFF);
 
         String locText = null;
         if (isPreview) {
@@ -66,6 +66,6 @@ public class GolemStatusHud extends HudElement {
             }
         }
 
-        if (locText != null) context.drawTextWithShadow(tr, locText, 0, 24, 0xFFFFFFFF);
+        if (locText != null) drawTextWithShadow(context, tr, locText, 0, 24, 0xFFFFFFFF);
     }
 }

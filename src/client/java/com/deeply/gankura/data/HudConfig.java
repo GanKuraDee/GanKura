@@ -23,6 +23,11 @@ public class HudConfig {
             .toFile();
     private static final Properties properties = new Properties();
 
+    // 座標の保存形式。画面左上からの絶対座標 + 描画時クランプ形式。
+    // これが一致しない設定ファイルは互換性がないものとして破棄する
+    private static final String FORMAT_VERSION_KEY = "formatVersion";
+    private static final String FORMAT_VERSION = "9";
+
     public static final List<HudElement> ELEMENTS = new ArrayList<>();
 
     static {
@@ -37,13 +42,13 @@ public class HudConfig {
         ELEMENTS.add(new GolemHealthHud());
         ELEMENTS.add(new DragonStatusHud());
         ELEMENTS.add(new DragonLootTrackerHud()); // ここでバグも修正！
+        ELEMENTS.add(new DragonHealthHud());
         ELEMENTS.add(new BroodmotherStatusHud());
         ELEMENTS.add(new BroodmotherHealthHud());
         ELEMENTS.add(new ArachneStatusHud());
         ELEMENTS.add(new ArachneHealthHud());
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
-
         ELEMENTS.add(new CrimsonBossesHealthHud());
 
         ELEMENTS.add(new PetHud());
@@ -62,6 +67,16 @@ public class HudConfig {
         }
         try (FileInputStream in = new FileInputStream(CONFIG_FILE)) {
             properties.load(in);
+
+            // 保存形式が変わった設定ファイルは読み込まず、既定値から作り直す
+            if (!FORMAT_VERSION.equals(properties.getProperty(FORMAT_VERSION_KEY))) {
+                LOGGER.info("HUD config format changed; resetting HUD positions to defaults");
+                properties.clear();
+                resetToDefault();
+                save();
+                return;
+            }
+
             for (HudElement element : ELEMENTS) {
                 element.x = parseInt(properties.getProperty(element.id + "X"), element.defaultX);
                 element.y = parseInt(properties.getProperty(element.id + "Y"), element.defaultY);
@@ -76,6 +91,7 @@ public class HudConfig {
         File parentDir = CONFIG_FILE.getParentFile();
         if (parentDir != null && !parentDir.exists()) parentDir.mkdirs();
 
+        properties.setProperty(FORMAT_VERSION_KEY, FORMAT_VERSION);
         for (HudElement element : ELEMENTS) {
             properties.setProperty(element.id + "X", String.valueOf(element.x));
             properties.setProperty(element.id + "Y", String.valueOf(element.y));

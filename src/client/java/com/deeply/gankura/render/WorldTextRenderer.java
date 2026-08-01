@@ -21,13 +21,13 @@ public class WorldTextRenderer {
     public static void render(MinecraftClient client, float tickProgress) {
         if (client.player == null) return;
 
-        renderGolemWaypoint(client, client.player);
-        renderCrimsonBossWaypoints(client.player);
-        renderArachneWaypoint(client, client.player);
+        renderGolemLocationText(client, client.player);
+        renderCrimsonBossLocationTexts(client.player);
+        renderArachneLocationText(client, client.player);
         renderBossTracers(client, tickProgress);
     }
 
-    private static void renderGolemWaypoint(MinecraftClient client, PlayerEntity player) {
+    private static void renderGolemLocationText(MinecraftClient client, PlayerEntity player) {
         if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
 
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
@@ -76,14 +76,10 @@ public class WorldTextRenderer {
             }
         }
 
-        Vec3d eyePos = player.getEyePos();
-        double distance = eyePos.distanceTo(Vec3d.ofCenter(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-
-        GizmoDrawing.blockLabel(textToRender, renderPos, 0, textColor, textScale * 20);
+        renderGizmoLabel(textToRender, renderPos, textColor);
     }
 
-    private static void renderArachneWaypoint(MinecraftClient client, PlayerEntity player) {
+    private static void renderArachneLocationText(MinecraftClient client, PlayerEntity player) {
         if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
         if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
 
@@ -142,35 +138,37 @@ public class WorldTextRenderer {
             textToRender = "§c§lARACHNE §6(Spawned/Killed)";
         }
 
-        Vec3d eyePos = player.getEyePos();
-        double distance = eyePos.distanceTo(Vec3d.ofCenter(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-
-        GizmoDrawing.blockLabel(textToRender, renderPos, 0, textColor, textScale * 20);
+        renderGizmoLabel(textToRender, renderPos, textColor);
     }
 
-    private static void renderCrimsonBossWaypoints(PlayerEntity player) {
+    private static void renderCrimsonBossLocationTexts(PlayerEntity player) {
         if (!ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleWorldText) return;
         boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
                 || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
         if (!isCrimsonIsle) return;
 
         renderCrimsonLabel(player, ModConstants.BLADESOUL_POS,       "§8§lBLADESOUL",       0xFF555555, bladesoulStatus());
-        renderCrimsonLabel(player, ModConstants.BARBARIAN_DUKE_X_POS, "§c§lBARBARIAN DUKE X", 0xFFFF5555, regularBossStatus(GameState.BarbarianDukeX.respawnEndTime, GameState.BarbarianDukeX.isDetected));
-        renderCrimsonLabel(player, ModConstants.MAGE_OUTLAW_POS,     "§5§lMAGE OUTLAW",      0xFFAA00AA, regularBossStatus(GameState.MageOutlaw.respawnEndTime,      GameState.MageOutlaw.isDetected));
-        renderCrimsonLabel(player, ModConstants.ASHFANG_POS,         "§7§lASHFANG",          0xFFAAAAAA, regularBossStatus(GameState.Ashfang.respawnEndTime,          GameState.Ashfang.isDetected));
+        renderCrimsonLabel(player, ModConstants.BARBARIAN_DUKE_X_POS, "§c§lBARBARIAN DUKE X", 0xFFFF5555, regularBossStatus("Barbarian Duke X", GameState.BarbarianDukeX.respawnEndTime, GameState.BarbarianDukeX.isDetected));
+        renderCrimsonLabel(player, ModConstants.MAGE_OUTLAW_POS,     "§5§lMAGE OUTLAW",      0xFFAA00AA, regularBossStatus("Mage Outlaw",      GameState.MageOutlaw.respawnEndTime,      GameState.MageOutlaw.isDetected));
+        renderCrimsonLabel(player, ModConstants.ASHFANG_POS,         "§7§lASHFANG",          0xFFAAAAAA, regularBossStatus("Ashfang",          GameState.Ashfang.respawnEndTime,          GameState.Ashfang.isDetected));
         renderCrimsonLabel(player, ModConstants.MAGMA_BOSS_POS,      "§6§lMAGMA BOSS",       0xFFFFAA00, magmaBossStatus());
     }
 
     private static void renderCrimsonLabel(PlayerEntity player, BlockPos base, String nameText, int argbColor, String status) {
         BlockPos renderPos = base.add(0, 2, 0);
-        Vec3d eyePos = player.getEyePos();
-        double distance = eyePos.distanceTo(Vec3d.ofCenter(renderPos));
-        float textScale = (float) Math.max(0.02, distance * 0.0025);
-        GizmoDrawing.blockLabel(nameText + " " + status, renderPos, 0, argbColor, textScale * 20);
+        renderGizmoLabel(nameText + " " + status, renderPos, argbColor);
     }
 
-    private static String regularBossStatus(long respawnEnd, boolean isDetected) {
+    private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
+        // 距離に比例して拡大し、見かけの大きさを一定に保つ。
+        // プレイヤーのtick座標を使うと20回/秒でしかスケールが更新されずカクつくため、
+        // フレームごとに補間されるカメラ座標を基準にする
+        Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getCameraPos();
+        float textScale = (float) Math.max(0.02, cameraPos.distanceTo(Vec3d.ofCenter(renderPos)) * 0.0025);
+        GizmoDrawing.blockLabel(text, renderPos, 0, argbColor, textScale * 20);
+    }
+
+    private static String regularBossStatus(String bossName, long respawnEnd, boolean isDetected) {
         long remaining = respawnEnd - System.currentTimeMillis();
         if (remaining > 0) {
             long secs = remaining / 1000;
@@ -178,24 +176,28 @@ public class WorldTextRenderer {
         }
         if (isDetected) return "§a(Spawned)";
         if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) return "§a(Ready)";
-        return "§7(Unknown)";
+        // リスポーン推定タイマーが動いている間、または範囲内で未検出が続いている間は「いない」
+        if (EntityHighlightManager.killedRemainingMs(bossName) > 0
+                || EntityHighlightManager.canConfirmAbsence(bossName)) {
+            return "§c(Killed)";
+        }
+        // 範囲外。居たことがある / リスポーン時間を過ぎた のいずれも生死は判別できない
+        return EntityHighlightManager.wasSpawnedWhenLastConfirmed(bossName)
+                || EntityHighlightManager.wasKilledConfirmed(bossName)
+                ? "§6(Spawned/Killed)"
+                : "§7(Unknown)";
     }
 
     private static String bladesoulStatus() {
-        return regularBossStatus(GameState.Bladesoul.respawnEndTime, GameState.Bladesoul.isDetected);
+        return regularBossStatus("Bladesoul", GameState.Bladesoul.respawnEndTime, GameState.Bladesoul.isDetected);
     }
 
     private static String magmaBossStatus() {
-        String sp = GameState.MagmaBoss.spawnStatus;
+        // サイドバーが読めている間はフェーズをそのまま出す(エリア内でしか読めない)
+        // フェーズ行に加え、念のため「Magma Chamber」の行も確認する
+        String sp = GameState.MagmaBoss.inArena ? GameState.MagmaBoss.spawnStatus : null;
         if (sp != null) return "§a(" + sp + ")";
-        long respawnEnd = GameState.MagmaBoss.respawnEndTime;
-        long remaining = respawnEnd - System.currentTimeMillis();
-        if (remaining > 0) {
-            long secs = remaining / 1000;
-            return String.format("§e(%dm %02ds)", secs / 60, secs % 60);
-        }
-        if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) return "§a(Ready)";
-        return "§7(Unknown)";
+        return regularBossStatus("Magma Boss", GameState.MagmaBoss.respawnEndTime, GameState.MagmaBoss.isDetected);
     }
 
     private static void renderBossTracers(MinecraftClient client, float tickProgress) {
@@ -231,13 +233,15 @@ public class WorldTextRenderer {
                 color = 0xFF000000 | dragonTracerColor(GameState.Dragon.type);
             } else if (entity instanceof MagmaCubeEntity
                     && EntityHighlightManager.magmaGlareEntities.contains(entity)) {
-                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer) continue;
+                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareTracer) continue;
                 color = 0xFFFF5555;
             } else {
                 CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
                 if (boss == null || !boss.enableTracer().get()) continue;
                 // Bladesoul は Wither Skeleton のみにトレーサーを表示（本体は Glow のみ）
                 if ("Bladesoul".equals(boss.nameTag()) && !(entity instanceof WitherSkeletonEntity)) continue;
+                // Ashfang は2体のBlazeで構成される。Tracer は基準座標に近い1体のみ
+                if ("Ashfang".equals(boss.nameTag()) && entity != EntityHighlightManager.ashfangTracerTarget) continue;
                 color = boss.tracerColorARGB();
             }
 

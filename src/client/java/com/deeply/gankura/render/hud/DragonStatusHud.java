@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class DragonStatusHud extends HudElement {
     public DragonStatusHud() {
-        super("dragon", 200, 145, 1.0f, 150, 50,
+        super("dragon", 165, 118, 1.0f, 150, 50,
                 () -> ModConfig.INSTANCE.theEnd.showDragonStatusHud,
                 () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
     }
@@ -47,10 +47,10 @@ public class DragonStatusHud extends HudElement {
             }
         }
 
-        context.drawTextWithShadow(tr, "§d§lDragon Status", 0, 0, 0xFFFF55FF);
-        context.drawTextWithShadow(tr, eggState, 0, 12, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, "§d§lDragon Status", 0, 0, 0xFFFF55FF);
+        drawTextWithShadow(context, tr, eggState, 0, 12, 0xFFFFFFFF);
         int nextY = 24;
-        if (eyePlaced != null) { context.drawTextWithShadow(tr, eyePlaced, 0, nextY, 0xFFFFFFFF); nextY += 12; }
-        if (dragonType != null) { context.drawTextWithShadow(tr, dragonType, 0, nextY, 0xFFFFFFFF); }
+        if (eyePlaced != null) { drawTextWithShadow(context, tr, eyePlaced, 0, nextY, 0xFFFFFFFF); nextY += 12; }
+        if (dragonType != null) { drawTextWithShadow(context, tr, dragonType, 0, nextY, 0xFFFFFFFF); }
     }
 }

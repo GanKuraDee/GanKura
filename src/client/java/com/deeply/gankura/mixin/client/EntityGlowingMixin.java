@@ -24,6 +24,20 @@ public class EntityGlowingMixin {
         }
     }
 
+    /**
+     * バニラは「当たり判定の平均辺長 × 64 × 描画距離倍率」より遠いエンティティを描画しない。
+     * Glow はエンティティが描画されて初めて輪郭が出るため、この距離を超えると
+     * Tracer だけが表示されて Glow が消える、という食い違いが起きる。
+     * 追跡中のボスに限り距離によるカリングを無効化し、両者の見え方を揃える。
+     * (フラスタム外のカリングは別処理なので、画面外のエンティティは従来どおり描画されない)
+     */
+    @Inject(method = "shouldRender(D)Z", at = @At("HEAD"), cancellable = true)
+    private void forceBossRenderDistance(double distanceSqr, CallbackInfoReturnable<Boolean> cir) {
+        if (EntityHighlightManager.highlightedEntities.contains((Entity) (Object) this)) {
+            cir.setReturnValue(true);
+        }
+    }
+
     // =======================================================
     // ★追加: 発光色（アウトラインの色）を強制的に上書きする
     // マイクラが色を取得しようとした瞬間に割り込み、好きな色を渡します。

@@ -1,7 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
-import com.deeply.gankura.data.LootStats;
+import com.deeply.gankura.data.CrimsonRareDrop;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
@@ -18,29 +18,19 @@ import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class CrimsonDropHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("CrimsonDropHandler");
     private static int scanDurationTicks = 0;
     private static final int MAX_SCAN_DURATION = 1200;
 
-    // 全ボス共通ドロップ（"Hot Kuudra Key" を "Kuudra Key" より先にチェック）
-    private static final List<String> COMMON_DROPS = List.of(
-        "Hot Kuudra Key", "Kuudra Key", "Magma Urchin"
+    // 撃破メッセージ "{BOSS} DOWN!" の検知に使うボス名。
+    // リスポーンタイマーはドロップの設定と無関係に動かす必要があるため、ドロップ一覧とは別に持つ
+    private static final List<String> BOSS_NAMES = List.of(
+        "MAGMA BOSS", "ASHFANG", "BARBARIAN DUKE X", "BLADESOUL", "MAGE OUTLAW"
     );
-
-    // ボス固有ドロップ
-    private static final Map<String, List<String>> BOSS_DROPS = new LinkedHashMap<>();
-    static {
-        BOSS_DROPS.put("MAGMA BOSS",      List.of("Fire Fury Staff")); // Magma Cube は完全一致で別途処理
-        BOSS_DROPS.put("ASHFANG",         List.of("Fire Veil Wand"));
-        BOSS_DROPS.put("BARBARIAN DUKE X",List.of("Flaming Fist"));
-        BOSS_DROPS.put("BLADESOUL",       List.of("Ragnarock Axe"));
-        BOSS_DROPS.put("MAGE OUTLAW",     List.of("Fire Freeze Staff", "Wand Of Strength"));
-    }
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> scan(client));
@@ -52,7 +42,7 @@ public class CrimsonDropHandler {
 
     // NetworkHandler から呼ばれる。"{BOSS} DOWN!" を検知してスキャン開始 & タイマーセット
     public static void handleMessage(String unformattedMsg) {
-        for (String boss : BOSS_DROPS.keySet()) {
+        for (String boss : BOSS_NAMES) {
             if (unformattedMsg.contains(boss + " DOWN!")) {
                 setRespawnTimer(boss);
                 if (!GameState.CrimsonDrop.isScanning) {
@@ -111,52 +101,45 @@ public class CrimsonDropHandler {
             String nameStr = customName.getString();
 
             // Magma Cube Pet: "[Lvl 1] Magma Cube" に完全一致した場合のみ、色で Epic/Legendary を判別
-            if ("MAGMA BOSS".equals(killedBoss) && nameStr.equals("[Lvl 1] Magma Cube")) {
-                if (hasColor(customName, Formatting.GOLD)) {
-                    LootStats.addLegendaryMagmaCubePet();
+            if (nameStr.equals("[Lvl 1] Magma Cube")) {
+                if (isTracked(CrimsonRareDrop.LEGENDARY_MAGMA_CUBE_PET, killedBoss)
+                        && hasColor(customName, Formatting.GOLD)) {
+                    CrimsonRareDrop.LEGENDARY_MAGMA_CUBE_PET.increment();
                     notifyDrop(client, Text.literal("Magma Cube").formatted(Formatting.GOLD)
                             .append(Text.literal(" (Pet)").formatted(Formatting.GRAY)));
                     return;
-                } else if (hasColor(customName, Formatting.DARK_PURPLE)) {
-                    LootStats.addEpicMagmaCubePet();
+                } else if (isTracked(CrimsonRareDrop.EPIC_MAGMA_CUBE_PET, killedBoss)
+                        && hasColor(customName, Formatting.DARK_PURPLE)) {
+                    CrimsonRareDrop.EPIC_MAGMA_CUBE_PET.increment();
                     notifyDrop(client, Text.literal("Magma Cube").formatted(Formatting.DARK_PURPLE)
                             .append(Text.literal(" (Pet)").formatted(Formatting.GRAY)));
                     return;
                 }
             }
 
-            // 共通ドロップ
-            for (String item : COMMON_DROPS) {
-                if (nameStr.contains(item)) {
-                    switch (item) {
-                        case "Hot Kuudra Key" -> LootStats.addHotKuudraKey();
-                        case "Kuudra Key"     -> LootStats.addKuudraKey();
-                        case "Magma Urchin"   -> LootStats.addMagmaUrchin();
-                    }
+            // アイテム名による判定。"Hot Kuudra Key" が "Kuudra Key" に埋もれないよう、
+            // 長い名前から順に照合する
+            for (CrimsonRareDrop drop : nameMatchedDrops(killedBoss)) {
+                if (nameStr.contains(drop.itemName())) {
+                    drop.increment();
                     notifyDrop(client, customName);
                     return;
                 }
             }
-
-            // ボス固有ドロップ
-            List<String> specificDrops = BOSS_DROPS.get(killedBoss);
-            if (specificDrops != null) {
-                for (String item : specificDrops) {
-                    if (nameStr.contains(item)) {
-                        switch (item) {
-                            case "Fire Fury Staff"   -> LootStats.addFireFuryStaff();
-                            case "Fire Veil Wand"    -> LootStats.addFireVeilWand();
-                            case "Flaming Fist"      -> LootStats.addFlamingFist();
-                            case "Ragnarock Axe"     -> LootStats.addRagnarockAxe();
-                            case "Fire Freeze Staff" -> LootStats.addFireFreezeStaff();
-                            case "Wand Of Strength"  -> LootStats.addWandOfStrength();
-                        }
-                        notifyDrop(client, customName);
-                        return;
-                    }
-                }
-            }
         }
+    }
+
+    // 設定画面のドラッグリストで有効になっていて、かつ撃破したボスのドロップになりうるものだけを返す
+    private static List<CrimsonRareDrop> nameMatchedDrops(String killedBoss) {
+        return ModConfig.INSTANCE.crimsonIsle.trackedCrimsonDrops.stream()
+                .filter(drop -> drop.itemName() != null)
+                .filter(drop -> drop.matchesBoss(killedBoss))
+                .sorted(Comparator.comparingInt((CrimsonRareDrop drop) -> drop.itemName().length()).reversed())
+                .toList();
+    }
+
+    private static boolean isTracked(CrimsonRareDrop drop, String killedBoss) {
+        return drop.matchesBoss(killedBoss) && ModConfig.INSTANCE.crimsonIsle.trackedCrimsonDrops.contains(drop);
     }
 
     private static boolean hasColor(Text text, Formatting targetFormatting) {

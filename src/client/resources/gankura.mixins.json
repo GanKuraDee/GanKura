@@ -8,6 +8,7 @@
 		"WorldTextRenderMixin",
 		"HotbarItemMixin",
 		"EntityGlowingMixin",
+		"BossSectionVisibilityMixin",
 		"PlayerGlowingMixin",
 		"WorldBeaconRenderMixin",
 		"GizmoTextFogMixin",

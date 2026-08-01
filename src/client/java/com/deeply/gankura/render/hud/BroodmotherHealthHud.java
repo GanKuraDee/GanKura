@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class BroodmotherHealthHud extends HudElement {
     public BroodmotherHealthHud() {
-        super("broodmother_health", 200, 280, 1.0f, 120, 24,
+        super("broodmother_health", 10, 148, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showBroodmotherHealthHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map) && GameState.Broodmother.health != null);
     }
@@ -21,8 +21,8 @@ public class BroodmotherHealthHud extends HudElement {
 
         String hpText = isPreview ? "§e3,000§f/§a6,000" : parseHealthString(GameState.Broodmother.health);
 
-        context.drawTextWithShadow(tr, "§4§lBroodmother HP", 0, 0, 0xFFFFFFFF);
-        context.drawTextWithShadow(tr, hpText, 0, 12, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, "§4§lBroodmother HP", 0, 0, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, hpText, 0, 12, 0xFFFFFFFF);
     }
 
     private String parseHealthString(String raw) {

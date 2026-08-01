@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
 public class ModConstants {
     public static final String LOGGER_NAME = "HypixelMod";
 
+    // HP文字列の先頭に付ける印。サイドバーから取得済みで色コードも含んでいるため、
+    // 表示側で数値パース・色付けを行わずそのまま描画することを示す
+    public static final String RAW_HEALTH_PREFIX = "RAW:";
+
     // エリア判定用
     public static final String GAME_TYPE_SKYBLOCK = "SKYBLOCK";
     public static final String MODE_COMBAT_3 = "combat_3"; // The End
@@ -122,6 +126,7 @@ public class ModConstants {
 
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
     public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";
+    public static final String AREA_MAGMA_CHAMBER = "Magma Chamber";
 
     // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
     public static boolean containsIgnoreCase(String source, String target) {

@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class GolemHealthHud extends HudElement {
     public GolemHealthHud() {
-        super("health", 200, 106, 1.0f, 100, 24,
+        super("health", 165, 94, 1.0f, 100, 24,
                 () -> ModConfig.INSTANCE.theEnd.showGolemHealthHud,
                 () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) && GameState.Golem.health != null);
     }
@@ -19,8 +19,8 @@ public class GolemHealthHud extends HudElement {
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         String hpText = isPreview ? "§e2.4M§f/§a5M" : parseHealthString(GameState.Golem.health);
-        context.drawTextWithShadow(tr, "§c§lGolem HP", 0, 0, 0xFFFFFFFF);
-        context.drawTextWithShadow(tr, hpText, 0, 12, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, "§c§lGolem HP", 0, 0, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, hpText, 0, 12, 0xFFFFFFFF);
     }
 
     private String parseHealthString(String raw) {

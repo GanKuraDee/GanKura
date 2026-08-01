@@ -86,6 +86,8 @@ public class GameState {
         public static int eyes = 0;
         public static int playerEyes = 0;
         public static String type = null;
+        // スコアボードの「Dragon HP: 4,824,217❤」から取得する現在HP(カンマ区切りの生文字列)
+        public static String health = null;
         public static long spawnTargetTime = 0;
         public static long lastChatTime = 0;
         public static long fightStartTime = 0; public static long fightEndTime = 0;
@@ -95,7 +97,7 @@ public class GameState {
         public static String top3Name = null; public static long top3Damage = 0;
 
         public static void reset() {
-            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null;
+            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null; health = null;
             spawnTargetTime = 0; lastChatTime = 0; fightStartTime = 0; fightEndTime = 0;
             top1Name = null; top1Damage = 0; top2Name = null; top2Damage = 0; top3Name = null; top3Damage = 0;
         }
@@ -184,9 +186,14 @@ public class GameState {
         public static boolean isDetected = false;
         public static String health = null;
         public static long respawnEndTime = 0;
+        // HP HUDのタイトル差し替え。Kill the Magmasフェーズ中のみ非nullになる(nullなら既定の「Magma Boss HP」)
+        public static String healthLabel = null;
+        // サイドバーに「Magma Chamber」が出ているか(= 戦闘エリア内)。
+        // 判定用のフェーズ行が1つも無い状態を「撃破済み」と確定してよいかの前提になる
+        public static boolean inArena = false;
         /** スコアボードから検出したスポーン状態。null=未スポーン、"75%"/"Kill the Magmas"/"Final Stage" */
         public static String spawnStatus = null;
-        public static void reset() { isDetected = false; health = null; respawnEndTime = 0; spawnStatus = null; }
+        public static void reset() { isDetected = false; health = null; healthLabel = null; inArena = false; respawnEndTime = 0; spawnStatus = null; }
     }
 
     public static class CrimsonDrop {

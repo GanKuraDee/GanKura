@@ -1,0 +1,120 @@
+package com.deeply.gankura.render;
+
+import com.deeply.gankura.data.ModConstants;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.Camera;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.Map;
+
+// EntityHighlightManagerが検出したボスの視覚エンティティに追従する形で、名前とHPを2行で表示する。
+// 表示位置はモブの当たり判定の中心(足元 + 高さの半分)をスクリーン座標へ投影したもので、
+// バニラのネームタグ(頭上)とは重ならない。
+//
+// ワールド内テキスト(TextGizmo)ではなくHUDとして描画している理由:
+// Gizmoはワールド描画パスの中で処理されるため、Glow(エンティティ輪郭)のポストエフェクトに
+// 上書きされてしまう。HUDはワールド描画とポストエフェクトがすべて終わった後に描かれるので、
+// 確実に最前面になる。
+//
+// 表示対象と文字列の組み立ては tick 側(EntityHighlightManager)で行い、ここでは毎フレームの描画のみを担当する。
+public class BossNameplateRenderer {
+    // 行の区切り
+    private static final String LINE_SEPARATOR = "\n";
+    // project の戻り値は正規化デバイス座標。z > 1 はカメラの後方を意味する
+    private static final double NDC_BEHIND_CAMERA_Z = 1.0;
+
+    public static void render(DrawContext context, MinecraftClient client, float tickProgress) {
+        if (EntityHighlightManager.nameplateEntities.isEmpty()) return;
+
+        TextRenderer tr = client.textRenderer;
+        Camera camera = client.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getCameraPos();
+        float screenWidth = client.getWindow().getScaledWidth();
+        float screenHeight = client.getWindow().getScaledHeight();
+
+        for (Map.Entry<Entity, String> entry : EntityHighlightManager.nameplateEntities.entrySet()) {
+            Entity entity = entry.getKey();
+            if (entity.isRemoved()) continue;
+
+            // 補間済み座標を使い、tick間でも滑らかにモブへ追従させる
+            Vec3d center = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
+            // カメラと同じ位置だと投影が破綻するため除外する
+            if (cameraPos.squaredDistanceTo(center) < 1.0E-4) continue;
+
+            Vec3d ndc = client.gameRenderer.project(center);
+            // カメラの後方にある対象は、投影結果が反転して画面内に現れてしまうので描画しない
+            if (ndc.z > NDC_BEHIND_CAMERA_Z) continue;
+
+            float centerX = (float) (ndc.x * 0.5 + 0.5) * screenWidth;
+            float centerY = (float) (0.5 - ndc.y * 0.5) * screenHeight;
+
+            String[] lines = entry.getValue().split(LINE_SEPARATOR);
+            // 2行分の高さの中心がモブの中心に来るように、全体を半分だけ上へずらす
+            float topY = centerY - lines.length * tr.fontHeight / 2.0F;
+
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(centerX, topY);
+            for (int i = 0; i < lines.length; i++) {
+                context.drawTextWithShadow(tr, lines[i], -tr.getWidth(lines[i]) / 2, i * tr.fontHeight, 0xFFFFFFFF);
+            }
+            context.getMatrices().popMatrix();
+        }
+    }
+
+    // 1行目に名前、2行目にHPを置いた表示文字列を組み立てる。
+    // HPが未取得(スキャン直後など)の場合は名前のみを返す
+    public static String buildLabel(String coloredName, String rawHealth, boolean showHealth) {
+        if (!showHealth) return coloredName;
+        String hp = formatHealth(rawHealth);
+        return hp.isEmpty() ? coloredName : coloredName + LINE_SEPARATOR + hp;
+    }
+
+    // ハイライト色(ARGB)に対応する§カラーコードを求め、名前部分の色として使う
+    public static String colorCode(int argb) {
+        return switch (argb & 0xFFFFFF) {
+            case 0x555555 -> "§8";
+            case 0xAAAAAA -> "§7";
+            case 0xFF5555 -> "§c";
+            case 0xAA00AA -> "§5";
+            case 0xFFAA00 -> "§6";
+            default       -> "§f";
+        };
+    }
+
+    // HP HUD (CrimsonBossHealthHud) と同じ配色ルールで残量に応じて色分けする
+    private static String formatHealth(String raw) {
+        if (raw == null || raw.isEmpty()) return "";
+        // Magma Boss のみ、色コードを含むゲージ文字列がそのまま入る
+        if (raw.startsWith(ModConstants.RAW_HEALTH_PREFIX)) return raw.substring(ModConstants.RAW_HEALTH_PREFIX.length());
+
+        String[] parts = raw.split("/");
+        if (parts.length != 2) return "§a" + raw.replace("/", "§f/§a");
+
+        double current = parseHealthValue(parts[0]);
+        double max = parseHealthValue(parts[1]);
+        String color = "§a";
+        if (current >= 0 && max > 0) {
+            if (current < max * 0.2) color = "§c";
+            else if (current < max * 0.5) color = "§e";
+        }
+        return color + parts[0] + "§f/§a" + parts[1];
+    }
+
+    // 「1.2M」「850k」のような省略表記を数値に戻す
+    private static double parseHealthValue(String s) {
+        try {
+            s = s.trim().replace(",", "");
+            if (s.isEmpty()) return 0;
+            double mult = 1.0;
+            char last = s.charAt(s.length() - 1);
+            if (last == 'M' || last == 'm') { mult = 1_000_000.0; s = s.substring(0, s.length() - 1); }
+            else if (last == 'k' || last == 'K') { mult = 1_000.0; s = s.substring(0, s.length() - 1); }
+            return Double.parseDouble(s) * mult;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+}

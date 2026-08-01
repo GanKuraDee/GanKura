@@ -11,7 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class CrimsonIsleStatusHud extends HudElement {
     public CrimsonIsleStatusHud() {
-        super("crimson_isle_status", 400, 10, 1.0f, 180, 76,
+        super("crimson_isle_status", 305, 10, 1.0f, 185, 76,
                 () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleStatusHud,
                 () -> ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
                         || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode));
@@ -20,47 +20,58 @@ public class CrimsonIsleStatusHud extends HudElement {
     @Override
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        context.drawTextWithShadow(tr, "§c§lNether Boss Status", 0, 0, 0xFFFFFFFF);
+        drawTextWithShadow(context, tr, "§c§lNether Boss Status", 0, 0, 0xFFFFFFFF);
         int y = 14;
         for (var boss : EntityHighlightManager.CRIMSON_BOSSES) {
             String status;
+            // Magma Boss はエリア内にいる間だけサイドバーからフェーズも取れる
+            // フェーズ行に加え、念のため「Magma Chamber」の行も確認する
+            String magmaPhase = "Magma Boss".equals(boss.nameTag()) && GameState.MagmaBoss.inArena
+                    ? GameState.MagmaBoss.spawnStatus
+                    : null;
             if (isPreview) {
                 status = "§aSpawned";
-            } else if ("Magma Boss".equals(boss.nameTag())) {
-                // Magma Boss はスコアボードのみで判定
-                String sp = GameState.MagmaBoss.spawnStatus;
-                if (sp != null) {
-                    status = "§aSpawned §7(" + sp + ")";
-                } else {
-                    long respawnEnd = GameState.MagmaBoss.respawnEndTime;
-                    long remaining = respawnEnd - System.currentTimeMillis();
-                    if (remaining > 0) {
-                        long secs = remaining / 1000;
-                        status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
-                    } else if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) {
-                        status = "§aReady";
-                    } else {
-                        status = "§7Unknown §8(spawns within 2m)";
-                    }
-                }
+            } else if (magmaPhase != null) {
+                status = "§aSpawned §7(" + magmaPhase + ")";
             } else {
                 long respawnEnd = getRespawnEndTime(boss.nameTag());
                 long remaining = respawnEnd - System.currentTimeMillis();
                 if (remaining > 0) {
                     long secs = remaining / 1000;
-                    status = String.format("§eRespawning §f%dm %02ds", secs / 60, secs % 60);
+                    status = String.format("§eRespawning §f(%dm %02ds)", secs / 60, secs % 60);
                 } else if (boss.getIsDetected().get()) {
+                    // エリア外でもエンティティ検出で存在は分かる
                     status = "§aSpawned";
                 } else if (respawnEnd > 0 && System.currentTimeMillis() - respawnEnd < 10_000L) {
                     status = "§aReady";
                 } else {
-                    status = "§7Unknown §8(spawns within 2m)";
+                    status = absenceStatus(boss.nameTag());
                 }
             }
             String nameColor = colorCode(boss.glowColorRGB());
-            context.drawTextWithShadow(tr, nameColor + boss.nameTag() + "§f: " + status, 0, y, 0xFFFFFFFF);
+            drawTextWithShadow(context, tr, nameColor + boss.nameTag() + "§f: " + status, 0, y, 0xFFFFFFFF);
             y += 12;
         }
+    }
+
+    // スポーン地点のチャンクが読み込まれていて検出できない場合のみ「いない」と確定できる。
+    // 遠い場合はエンティティが送られてこないだけの可能性があるためUnknownのままにする
+    private static String absenceStatus(String bossName) {
+        // 撃破メッセージを見ていないためリスポーン時刻が不明。
+        // 「いないと確認できた時点」からリスポーン間隔を数えた推定値を出す。
+        // このタイマーは範囲外に出ても継続する
+        long remaining = EntityHighlightManager.killedRemainingMs(bossName);
+        if (remaining > 0) {
+            long secs = remaining / 1000;
+            return String.format("§cKilled §f(%dm %02ds)", secs / 60, secs % 60);
+        }
+        // 範囲内で未検出が続いているならまだいない
+        if (EntityHighlightManager.canConfirmAbsence(bossName)) return "§cKilled";
+        // 範囲外。居たことがある / リスポーン時間を過ぎた のいずれも生死は判別できない
+        return EntityHighlightManager.wasSpawnedWhenLastConfirmed(bossName)
+                || EntityHighlightManager.wasKilledConfirmed(bossName)
+                ? "§6Spawned/Killed"
+                : "§7Unknown";
     }
 
     private static long getRespawnEndTime(String nameTag) {
