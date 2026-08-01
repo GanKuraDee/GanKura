@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class BroodmotherHealthHud extends HudElement {
     public BroodmotherHealthHud() {
-        super("broodmother_health", 200, 280, 1.0f, 120, 24,
+        super("broodmother_health", 10, 148, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showBroodmotherHealthHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map) && GameState.Broodmother.health != null);
     }
@@ -23,9 +23,9 @@ public class BroodmotherHealthHud extends HudElement {
         String hpText = isPreview ? "§e3,000§f/§a6,000" : parseHealthString(GameState.Broodmother.health);
 
         // GuiGraphicsExtractor のメソッド形式に修正
-        // graphics.text(font, 文字列, x, y, 色, 影の有無)
-        graphics.text(font, "§4§lBroodmother HP", 0, 0, 0xFFFFFFFF, true);
-        graphics.text(font, hpText, 0, 12, 0xFFFFFFFF, true);
+        // text(graphics, font, 文字列, x, y, 色, 影の有無)
+        text(graphics, font, "§4§lBroodmother HP", 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, hpText, 0, 12, 0xFFFFFFFF, true);
     }
 
     private String parseHealthString(String raw) {

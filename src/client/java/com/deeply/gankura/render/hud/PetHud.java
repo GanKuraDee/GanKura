@@ -20,7 +20,9 @@ public class PetHud extends HudElement {
         Font font = Minecraft.getInstance().font;
 
         // プレビュー時はダミー、それ以外はGameStateから取得
-        String petText = GameState.Player.activePetName != null ? GameState.Player.activePetName : "§7None";
+        String petText = isPreview
+                ? "§7[Pet Lvl] §fPet Name"
+                : (GameState.Player.activePetName != null ? GameState.Player.activePetName : "§7None");
 
         // レベルアップ直後は一定時間だけペット名の横に黄色く表示する
         if (!isPreview && System.currentTimeMillis() - GameState.Player.petLevelUpTime < LEVEL_UP_DISPLAY_MS) {
@@ -28,7 +30,7 @@ public class PetHud extends HudElement {
         }
 
         // GuiGraphicsExtractor のメソッド: text(Font, String, x, y, color, shadow)
-        graphics.text(font, "§e§lActive Pet", 0, 0, 0xFFFFFFFF, true);
-        graphics.text(font, petText, 0, 12, 0xFFFFFFFF, true);
+        text(graphics, font, "§e§lActive Pet", 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, petText, 0, 12, 0xFFFFFFFF, true);
     }
 }

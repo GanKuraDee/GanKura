@@ -1,6 +1,8 @@
 package com.deeply.gankura.scanner;
 
+import com.deeply.gankura.data.DragonRareDrop;
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.GolemRareDrop;
 import com.deeply.gankura.data.LootStats;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
@@ -59,7 +61,8 @@ public class RareDropScanner {
                 String nameString = customName.getString();
 
                 // 1. Tier Boost Core (金)
-                if (ModConstants.containsIgnoreCase(nameString, "Tier Boost Core") && hasColor(customName, ChatFormatting.GOLD)) {
+                if (isTracked(GolemRareDrop.TIER_BOOST_CORE)
+                        && ModConstants.containsIgnoreCase(nameString, "Tier Boost Core") && hasColor(customName, ChatFormatting.GOLD)) {
                     LootStats.addTierBoostCore();
                     notifyDrop(client, Component.literal("Tier Boost Core").withStyle(ChatFormatting.GOLD), ModConfig.INSTANCE.theEnd.enableDropAlerts);
                     break;
@@ -67,13 +70,13 @@ public class RareDropScanner {
 
                 // 2. [Lvl 1] Golem (Legendary / Epic)
                 else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Golem")) {
-                    if (hasColor(customName, ChatFormatting.GOLD)) {
+                    if (isTracked(GolemRareDrop.LEGENDARY_GOLEM_PET) && hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryGolemPet();
                         MutableComponent itemText = Component.literal("Golem").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
                         notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
                         break;
                     }
-                    else if (hasColor(customName, ChatFormatting.DARK_PURPLE)) {
+                    else if (isTracked(GolemRareDrop.EPIC_GOLEM_PET) && hasColor(customName, ChatFormatting.DARK_PURPLE)) {
                         LootStats.addEpicGolemPet();
                         MutableComponent itemText = Component.literal("Golem").withStyle(ChatFormatting.DARK_PURPLE).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
                         notifyDrop(client, itemText, ModConfig.INSTANCE.theEnd.enableDropAlerts);
@@ -83,13 +86,13 @@ public class RareDropScanner {
 
                 // 3. [Lvl 1] Ender Dragon (Legendary / Epic)
                 else if (ModConstants.containsIgnoreCase(nameString, "[Lvl 1] Ender Dragon")) {
-                    if (hasColor(customName, ChatFormatting.GOLD)) {
+                    if (isTracked(DragonRareDrop.LEGENDARY_DRAGON_PET) && hasColor(customName, ChatFormatting.GOLD)) {
                         LootStats.addLegendaryDragonPet();
                         MutableComponent dragonText = Component.literal("Ender Dragon").withStyle(ChatFormatting.GOLD).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
                         notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
                         break;
                     }
-                    else if (hasColor(customName, ChatFormatting.DARK_PURPLE)) {
+                    else if (isTracked(DragonRareDrop.EPIC_DRAGON_PET) && hasColor(customName, ChatFormatting.DARK_PURPLE)) {
                         LootStats.addEpicDragonPet();
                         MutableComponent dragonText = Component.literal("Ender Dragon").withStyle(ChatFormatting.DARK_PURPLE).append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
                         notifyDrop(client, dragonText, ModConfig.INSTANCE.theEnd.enableDragonDropAlerts);
@@ -98,6 +101,15 @@ public class RareDropScanner {
                 }
             }
         }
+    }
+
+    // 設定画面のドラッグリストから外されたドロップはスキャンしない
+    private static boolean isTracked(GolemRareDrop drop) {
+        return ModConfig.INSTANCE.theEnd.trackedGolemDrops.contains(drop);
+    }
+
+    private static boolean isTracked(DragonRareDrop drop) {
+        return ModConfig.INSTANCE.theEnd.trackedDragonDrops.contains(drop);
     }
 
     private static void notifyDrop(Minecraft client, Component itemText, boolean isAlertEnabled) {

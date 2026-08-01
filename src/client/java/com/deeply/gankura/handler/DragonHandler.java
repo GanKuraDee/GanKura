@@ -1,5 +1,6 @@
 package com.deeply.gankura.handler;
 
+import com.deeply.gankura.data.DragonAlertType;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
@@ -179,17 +180,10 @@ public class DragonHandler {
 
     // ★追加: ドラゴンの種類に応じてアラート設定がONになっているか確認するメソッド
     private static boolean isAlertEnabledFor(String dragonType) {
-        if (dragonType == null) return false;
-        return switch (dragonType) {
-            case "Protector" -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Protector;
-            case "Old"       -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Old;
-            case "Unstable"  -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Unstable;
-            case "Young"     -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Young;
-            case "Strong"    -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Strong;
-            case "Wise"      -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Wise;
-            case "Superior"  -> ModConfig.INSTANCE.theEnd.enableDragonAlert_Superior;
-            default          -> false; // 万が一未知のドラゴンが出た場合は表示しない
-        };
+        if (!ModConfig.INSTANCE.theEnd.enableDragonSpawnAlert) return false;
+        // 未知のドラゴンは fromTypeName が null を返し、リストにも含まれないため表示しない
+        DragonAlertType type = DragonAlertType.fromTypeName(dragonType);
+        return type != null && ModConfig.INSTANCE.theEnd.dragonSpawnAlerts.contains(type);
     }
 
     // ★Utilsから引き継いだドラゴンスポーンの表示処理

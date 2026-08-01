@@ -26,18 +26,27 @@ public class HudRenderer {
         // Skyblock 以外では表示しない
         if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
 
+        // --- ボスのネームプレート(ワールド座標をスクリーンへ投影) ---
+        // Glow(ポストエフェクト)より確実に手前へ出すため、ワールド内テキストではなくHUDとして描画する
+        BossNameplateRenderer.render(graphics, client, deltaTracker.getGameTimeDeltaPartialTick(true));
+
         // --- 各HUD要素のループ描画 ---
+        int screenWidth = client.getWindow().getGuiScaledWidth();
+        int screenHeight = client.getWindow().getGuiScaledHeight();
         for (HudElement element : HudConfig.ELEMENTS) {
             if (element.shouldRender(false)) {
                 // 2D行列スタック (Matrix3x2fStack) の操作
                 graphics.pose().pushMatrix();
 
                 // 26.1.2 では Z軸指定が不要な translate(x, y) / scale(x, y) を使用
-                graphics.pose().translate((float) element.x, (float) element.y);
+                graphics.pose().translate((float) element.renderX(screenWidth), (float) element.renderY(screenHeight));
                 graphics.pose().scale(element.scale, element.scale);
 
                 // 各HUDクラス側の renderElement(GuiGraphicsExtractor, boolean) を呼び出す
+                // 実プレイ中も範囲を測っておく。画面内へ寄せる判定を実表示基準で行うため
+                element.beginMeasure();
                 element.renderElement(graphics, false);
+                element.endMeasure();
 
                 graphics.pose().popMatrix();
             }

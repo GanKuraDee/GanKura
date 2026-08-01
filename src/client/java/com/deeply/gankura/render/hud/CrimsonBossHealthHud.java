@@ -1,5 +1,6 @@
 package com.deeply.gankura.render.hud;
 
+import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -27,25 +28,14 @@ public class CrimsonBossHealthHud extends HudElement {
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
         Font font = Minecraft.getInstance().font;
         String raw = isPreview ? null : healthSupplier.get();
-        boolean isBar = !isPreview && raw != null && raw.startsWith("BAR:");
         String hpText = isPreview ? previewHp : parseHealthString(raw);
-        graphics.text(font, titleLabel, 0, 0, 0xFFFFFFFF, true);
-        if (isBar) {
-            graphics.pose().pushMatrix();
-            graphics.pose().scale(0.5f, 0.5f);
-            // 0.5 スケールのため、画面上の y=12 に表示するには y=24 を指定
-            graphics.text(font, hpText, 0, 24, 0xFFFFFFFF, true);
-            graphics.pose().popMatrix();
-        } else {
-            graphics.text(font, hpText, 0, 12, 0xFFFFFFFF, true);
-        }
+        text(graphics, font, titleLabel, 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, hpText, 0, 12, 0xFFFFFFFF, true);
     }
 
     private String parseHealthString(String raw) {
         if (raw == null) return "";
-        if (raw.startsWith("BAR:")) {
-            return raw.substring(4);
-        }
+        if (raw.startsWith(ModConstants.RAW_HEALTH_PREFIX)) return raw.substring(ModConstants.RAW_HEALTH_PREFIX.length());
         String[] parts = raw.split("/");
         if (parts.length == 2) {
             double current = parseHealthValue(parts[0]);

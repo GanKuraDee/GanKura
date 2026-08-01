@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
-        super("arachne_status", 200, 319, 1.0f, 270, 36,
+        super("arachne_status", 10, 172, 1.0f, 270, 36,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
                 () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
     }
@@ -68,15 +68,15 @@ public class ArachneStatusHud extends HudElement {
             }
         }
 
-        graphics.text(font, "§5§lArachne Status", 0, 0, 0xFFFFFFFF, true);
-        graphics.text(font, "Altar: " + status, 0, 12, 0xFFFFFFFF, true);
+        text(graphics, font, "§5§lArachne Status", 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, "Altar: " + status, 0, 12, 0xFFFFFFFF, true);
 
         // Small/Bigはカウントダウン開始メッセージの時点で確定しているため、Spawned確定を待たず表示する
         if (isPreview) {
-            graphics.text(font, "Size: §aSmall", 0, 24, 0xFFFFFFFF, true);
+            text(graphics, font, "Size: §aSmall", 0, 24, 0xFFFFFFFF, true);
         } else if (GameState.Arachne.size != null) {
             String sizeColor = "Big".equals(GameState.Arachne.size) ? "§c" : "§a";
-            graphics.text(font, "Size: " + sizeColor + GameState.Arachne.size, 0, 24, 0xFFFFFFFF, true);
+            text(graphics, font, "Size: " + sizeColor + GameState.Arachne.size, 0, 24, 0xFFFFFFFF, true);
         }
     }
 }
