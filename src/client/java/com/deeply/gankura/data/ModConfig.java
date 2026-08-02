@@ -341,7 +341,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Golem.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 8)
-        public boolean enableGolemNameplate = false;
+        public boolean enableGolemNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -463,7 +463,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Dragon.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 16)
-        public boolean enableDragonNameplate = false;
+        public boolean enableDragonNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -577,7 +577,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Broodmother.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 8)
-        public boolean enableBroodmotherNameplate = false;
+        public boolean enableBroodmotherNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -647,7 +647,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Arachne.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 9)
-        public boolean enableArachneNameplate = false;
+        public boolean enableArachneNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -746,7 +746,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Barbarian Duke X.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 1)
-        public boolean enableBarbarianNameplate = false;
+        public boolean enableBarbarianNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -797,7 +797,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Bladesoul.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 11)
-        public boolean enableBladesoulNameplate = false;
+        public boolean enableBladesoulNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -848,7 +848,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Mage Outlaw.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 21)
-        public boolean enableMageOutlawNameplate = false;
+        public boolean enableMageOutlawNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -899,7 +899,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Ashfang.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 31)
-        public boolean enableAshfangNameplate = false;
+        public boolean enableAshfangNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -999,7 +999,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows a nameplate on Magma Boss.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 42)
-        public boolean enableMagmaBossNameplate = false;
+        public boolean enableMagmaBossNameplate = true;
 
         @Expose
         @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
@@ -1031,7 +1031,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Nameplate", desc = "Shows a warning label on Magma Glare.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 41)
-        public boolean enableMagmaGlareNameplate = false;
+        public boolean enableMagmaGlareNameplate = true;
     }
 
     public static class MiscCategory {
