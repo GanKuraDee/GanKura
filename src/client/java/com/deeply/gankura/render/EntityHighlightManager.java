@@ -166,6 +166,16 @@ public class EntityHighlightManager {
         ClientTickEvents.END_CLIENT_TICK.register(EntityHighlightManager::updateHighlights);
     }
 
+    // 不在計測とラッチをすべて破棄し、全ボスを Unknown に戻す。
+    // これらは GameState の外に持っているため resetAll() では消えない。
+    // 別サーバー(=エリアの入り直し)では前のエリアのスキャン結果は無効なので、
+    // ワールド離脱時に加えてサーバー参加時にも呼ぶ
+    public static void resetCrimsonBossTracking() {
+        absenceSince.clear();
+        lastConfirmedSpawned.clear();
+        killedConfirmedAt.clear();
+    }
+
     // Crimson Isle 各ボスのスポーン地点(ワールドテキストの基準座標)
     public static BlockPos spawnPosOf(String bossName) {
         return switch (bossName) {
@@ -274,9 +284,7 @@ public class EntityHighlightManager {
 
         if (client.world == null || client.player == null) {
             // ワールド遷移をまたいで古い計測・ラッチを持ち越さない
-            absenceSince.clear();
-            lastConfirmedSpawned.clear();
-            killedConfirmedAt.clear();
+            resetCrimsonBossTracking();
             return;
         }
 
