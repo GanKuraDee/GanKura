@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.render.EntityHighlightManager;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
@@ -16,6 +17,10 @@ public class NetworkHandler {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             GameState.resetAll();
             PetHandler.reset();
+            // Nether ボスの不在計測・ラッチは GameState の外にあるため個別にリセットする。
+            // これを消さないとエリアを入り直しても前回のスキャン結果が残り、
+            // Unknown ではなく Spawned/Killed から始まってしまう
+            EntityHighlightManager.resetCrimsonBossTracking();
             // 保存されていたSkyblock Equipmentを、レジストリアクセスが手に入ったこのタイミングで復元する
             EquipmentState.hydrate(handler.registryAccess());
 
