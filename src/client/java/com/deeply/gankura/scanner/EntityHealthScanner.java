@@ -150,6 +150,9 @@ public class EntityHealthScanner {
                     CrimsonBossEntry boss = EntityHighlightManager.CRIMSON_BOSSES.get(i);
                     // Magma Boss はサイドバー由来なので、ネームタグからは読まない
                     if ("Magma Boss".equals(boss.nameTag())) continue;
+                    // フォロワー3種の名前は「Ashfang」を含むため、部分一致では本体と区別できない。
+                    // 先に見つかった方のHPを採用してしまうので、フォロワーは明示的に除外する
+                    if ("Ashfang".equals(boss.nameTag()) && isAshfangFollowerName(nameStr)) continue;
                     if (ModConstants.containsIgnoreCase(nameStr, boss.nameTag())) {
                         Matcher m = HEALTH_PATTERN.matcher(nameStr);
                         if (m.find()) foundCrimsonHealth[i] = m.group(1);
@@ -174,6 +177,15 @@ public class EntityHealthScanner {
                 if (scanCrimson[i]) boss.setHealth().accept(foundCrimsonHealth[i]);
             }
         }
+    }
+
+    // Ashfang Follower / Acolyte / Underling のいずれかのネームタグか。
+    // 名前は ASHFANG_FOLLOWERS が持つものを唯一の定義とし、ここでは二重に持たない
+    private static boolean isAshfangFollowerName(String nameStr) {
+        for (CrimsonBossEntry follower : EntityHighlightManager.ASHFANG_FOLLOWERS) {
+            if (ModConstants.containsIgnoreCase(nameStr, follower.nameTag())) return true;
+        }
+        return false;
     }
 
     // サイドバーの「<名前> HP: <数値>❤」形式の行から現在HPを取り出す(見つからなければ null)。
