@@ -5,6 +5,7 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoProperties;
+import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.TextGizmo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -17,6 +18,22 @@ public class WorldTextRenderer {
         renderGolemLocationText();
         renderCrimsonBossLocationTexts();
         renderArachneLocationText();
+        renderWumpaWaypoint();
+    }
+
+
+    // Wumpaに敗れた後、戦闘エリアへ戻る小さな穴の目印。
+    // Wumpaが湧いている間しか使い道がないので、その間だけ表示する
+    private static void renderWumpaWaypoint() {
+        if (!ModConfig.INSTANCE.foraging.enableWumpaWaypoint) return;
+        if (!GameState.Server.isSafari()) return;
+        if (!GameState.CritterSafari.isWumpaSpawned()) return;
+
+        BlockPos pos = ModConstants.WUMPA_REENTER_POS;
+        // 枠線ではなくブロック全体を塗りつぶす
+        GizmoProperties box = Gizmos.cuboid(pos, GizmoStyle.fill(0x8055FFFF));
+        box.setAlwaysOnTop();
+        renderGizmoLabel("§fRe-enter", pos, 0xFFFFFFFF);
     }
 
     private static void renderGolemLocationText() {

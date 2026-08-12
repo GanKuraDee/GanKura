@@ -50,6 +50,8 @@ public class HudConfig {
         ELEMENTS.add(new CrimsonIsleStatusHud());
         ELEMENTS.add(new CrimsonLootTrackerHud());
         ELEMENTS.add(new CrimsonBossesHealthHud());
+        ELEMENTS.add(new CritterCaptureHud());
+        ELEMENTS.add(new DoomspiralHud());
 
         ELEMENTS.add(new PetHud());
         ELEMENTS.add(new ArmorStackHud());
