@@ -23,6 +23,9 @@ import java.util.Map;
 public class BossNameplateRenderer {
     // 行の区切り
     private static final String LINE_SEPARATOR = "\n";
+    // ネームプレートの基準GUIスケール。実際のGUIスケールでこの値を割った倍率で描画することで、
+    // GUIスケール設定を変えても画面上での大きさが変わらないようにする
+    private static final double REFERENCE_GUI_SCALE = 3.0;
     // projectPointToScreen の戻り値は正規化デバイス座標。z > 1 はカメラの後方を意味する
     private static final double NDC_BEHIND_CAMERA_Z = 1.0;
 
@@ -34,6 +37,8 @@ public class BossNameplateRenderer {
         Vec3 cameraPos = camera.position();
         float screenWidth = client.getWindow().getGuiScaledWidth();
         float screenHeight = client.getWindow().getGuiScaledHeight();
+        // GUIスケールの影響を打ち消し、設定を変えても常に同じ大きさで表示する
+        float textScale = (float) (REFERENCE_GUI_SCALE / client.getWindow().getGuiScale());
 
         for (Map.Entry<Entity, String> entry : EntityHighlightManager.nameplateEntities.entrySet()) {
             Entity entity = entry.getKey();
@@ -52,13 +57,15 @@ public class BossNameplateRenderer {
             float centerY = (float) (0.5 - ndc.y * 0.5) * screenHeight;
 
             String[] lines = entry.getValue().split(LINE_SEPARATOR);
-            // 2行分の高さの中心がモブの中心に来るように、全体を半分だけ上へずらす
-            float topY = centerY - lines.length * font.lineHeight / 2.0F;
 
             graphics.pose().pushMatrix();
-            graphics.pose().translate(centerX, topY);
+            // 先にモブの中心へ移動してから縮小する。順序が逆だと表示位置までスケールされてずれる
+            graphics.pose().translate(centerX, centerY);
+            graphics.pose().scale(textScale, textScale);
+            // 以降はスケール後の座標系。2行分の高さの中心が原点に来るように上へずらす
+            int topY = -lines.length * font.lineHeight / 2;
             for (int i = 0; i < lines.length; i++) {
-                graphics.text(font, lines[i], -font.width(lines[i]) / 2, i * font.lineHeight, 0xFFFFFFFF, true);
+                graphics.text(font, lines[i], -font.width(lines[i]) / 2, topY + i * font.lineHeight, 0xFFFFFFFF, true);
             }
             graphics.pose().popMatrix();
         }
