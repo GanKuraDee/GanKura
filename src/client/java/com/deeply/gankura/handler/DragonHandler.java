@@ -200,7 +200,7 @@ public class DragonHandler {
     }
 
     public static void processTabList(List<String> lines, Minecraft client) {
-        boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTargetMap = GameState.Server.isTheEnd();
         if (!isTargetMap) { GameState.Dragon.eggState = "Scanning..."; return; }
 
         boolean foundEyePlaced = false, foundDragonSpawned = false, foundEggRespawning = false;

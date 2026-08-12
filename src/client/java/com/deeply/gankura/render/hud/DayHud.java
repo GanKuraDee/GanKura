@@ -22,7 +22,7 @@ public class DayHud extends HudElement {
         long day = GameState.Server.dayTime / 24000L;
 
         int color = 0xFFFFFFFF;
-        boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTargetMap = GameState.Server.isTheEnd();
 
         if (ModConfig.INSTANCE.theEnd.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             color = 0xFFFF5555;

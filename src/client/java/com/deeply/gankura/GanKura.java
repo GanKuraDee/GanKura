@@ -42,6 +42,8 @@ public class GanKura implements ClientModInitializer {
     public void onInitializeClient() {
         ModConfig.load();
         NetworkHandler.init();
+        // エリア判定(タブリスト/スコアボード由来)は他のスキャナーの前提条件なので最初に登録する
+        LocationScanner.register();
         TabListScanner.register();
         GolemLocationScanner.register();
         RareDropScanner.register();

@@ -11,18 +11,20 @@ public class ModConstants {
     public static final String RAW_HEALTH_PREFIX = "RAW:";
     public static final String LOGGER_NAME = "HypixelMod";
 
-    // エリア判定用
+    // エリア判定用。値はタブリストの "Area: " 行に出る表示名そのもの
     public static final String GAME_TYPE_SKYBLOCK = "SKYBLOCK";
-    public static final String MODE_COMBAT_3 = "combat_3"; // The End
     public static final String MAP_THE_END = "The End";
-
-    // ★追加: Spider's Den 判定用
-    public static final String MODE_COMBAT_1 = "combat_1";
     public static final String MAP_SPIDERS_DEN = "Spider's Den";
-
-    // ★追加: Crimson Isle 判定用
-    public static final String MODE_CRIMSON_ISLE = "crimson_isle";
     public static final String MAP_CRIMSON_ISLE = "Crimson Isle";
+    // Critter Safari のエリア名はタブリスト上では "Safari" とだけ表示される
+    public static final String MAP_SAFARI = "Safari";
+
+    // タブリスト上で現在地とサーバーIDを載せている行の接頭辞
+    public static final String TAB_AREA_PREFIX = "Area:";
+    public static final String TAB_SERVER_PREFIX = "Server:";
+
+    // サイドバーのタイトル。"SKYBLOCK CO-OP" のような派生表記があるため部分一致で判定する
+    public static final String SIDEBAR_SKYBLOCK_TITLE = "SKYBLOCK";
 
     // ステージ名
     public static final String STAGE_RESTING = "Resting";
@@ -127,6 +129,20 @@ public class ModConstants {
     // スコアボードに「Arachne's Sanctuary」の行がそのまま表示されるので、それを直接検知する
     public static final String AREA_ARACHNES_SANCTUARY = "Arachne's Sanctuary";
     public static final String AREA_MAGMA_CHAMBER = "Magma Chamber";
+
+    // =======================================================
+    // Foraging 関連のチャット
+    // =======================================================
+    // 通常は木を最後まで切らないと倒せないが、特定の効果が発動すると途中でも一度に切り倒せる
+    public static final String TREE_FELLED_MSG = "You felled the entire Tree!";
+    // 切り倒した木からモブが降ってきたときに流れる。モブ名は複数種類あるのでキャプチャして表示に使う
+    public static final Pattern TREE_MOB_FELL_PATTERN =
+            Pattern.compile("A (.+?) fell from the Tree!", Pattern.CASE_INSENSITIVE);
+
+    // Critter Safari の Wumpa スポーン告知。
+    // 全文は "You hear the sound of massive footsteps echoing through the Icy Biome... What could it be?" だが、
+    // 末尾の煽り文が変わっても拾えるよう、核となる部分だけを一致条件にする
+    public static final String WUMPA_SPAWN_MSG = "massive footsteps echoing through the Icy Biome";
 
     // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
     public static boolean containsIgnoreCase(String source, String target) {

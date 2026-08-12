@@ -299,12 +299,12 @@ public class EntityHighlightManager {
 
         // 各ボスについて「その場に居るか(Present)」「Glowing対象か(glow)」「探索が必要か(scan)」を分けて持つ。
         // ネームプレートのみ有効な場合も探索は必要だが、Glowing対象には加えない
-        boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTheEnd = GameState.Server.isTheEnd();
         boolean golemPresent = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
         boolean glowGolem = golemPresent && theEnd.enableGolemHighlight;
         boolean scanGolem = golemPresent && (theEnd.enableGolemHighlight || theEnd.enableGolemNameplate);
 
-        boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
+        boolean isSpidersDen = GameState.Server.isSpidersDen();
         boolean broodmotherPresent = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
         boolean glowBroodmother = broodmotherPresent && spidersDen.enableBroodmotherHighlight;
         boolean scanBroodmother = broodmotherPresent && (spidersDen.enableBroodmotherHighlight || spidersDen.enableBroodmotherNameplate);
@@ -317,7 +317,7 @@ public class EntityHighlightManager {
         boolean glowDragon = dragonPresent && theEnd.enableDragonHighlight;
         boolean scanDragon = dragonPresent && (theEnd.enableDragonHighlight || theEnd.enableDragonNameplate);
 
-        boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
+        boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
         boolean scanCrimsonBosses = isCrimsonIsle && CRIMSON_BOSSES.stream().anyMatch(b -> b.enableHighlight().get() || b.enableNameplate().get());
         boolean scanMagmaGlare = isCrimsonIsle
                 && "Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)

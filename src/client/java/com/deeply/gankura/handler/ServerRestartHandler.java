@@ -27,7 +27,7 @@ public class ServerRestartHandler {
             // ========================================================
             // The EndでのDay30到達 ＆ Stage4 アナウンス処理
             // ========================================================
-            boolean isTargetMap = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+            boolean isTargetMap = GameState.Server.isTheEnd();
             if (isTargetMap) {
                 long currentDay = GameState.Server.dayTime / 24000L;
 

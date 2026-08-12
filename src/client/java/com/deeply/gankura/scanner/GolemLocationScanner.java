@@ -19,8 +19,7 @@ public class GolemLocationScanner {
         if (client.level == null || client.player == null) return;
 
         // エリアチェック
-        boolean isTargetMap = ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)
-                || ModConstants.MAP_THE_END.equals(GameState.Server.map);
+        boolean isTargetMap = GameState.Server.isTheEnd();
         if (!isTargetMap) return;
 
         String stage = GameState.Golem.stage;

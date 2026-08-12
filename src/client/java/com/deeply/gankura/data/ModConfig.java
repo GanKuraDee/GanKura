@@ -73,6 +73,7 @@ public class ModConfig extends Config {
         if (INSTANCE.theEnd == null)      INSTANCE.theEnd      = new TheEndCategory();
         if (INSTANCE.spidersDen == null)  INSTANCE.spidersDen  = new SpidersDenCategory();
         if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
+        if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
         INSTANCE.gui.openHudEditor = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().gui.setScreen(new HudEditorScreen());
@@ -150,6 +151,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Crimson Isle", desc = "Crimson Isle bosses.")
     public CrimsonIsleCategory crimsonIsle = new CrimsonIsleCategory();
+
+    @Expose
+    @Category(name = "Foraging", desc = "Foraging features.")
+    public ForagingCategory foraging = new ForagingCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous features.")
@@ -1032,6 +1037,41 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 41)
         public boolean enableMagmaGlareNameplate = true;
+    }
+
+    // ==========================================
+    // Foraging
+    // ==========================================
+    public static class ForagingCategory {
+        @Expose
+        @ConfigOption(name = "Title Settings", desc = "Expands title notification settings.")
+        @ConfigEditorAccordion(id = 70)
+        @ConfigEditorBoolean
+        public boolean titleFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Tree Felled Title", desc = "Shows a title when the whole tree is felled at once.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean enableTreeFelledTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Mob From Tree Title", desc = "Shows a title when a mob falls from the felled tree.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean enableTreeMobTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari settings.")
+        @ConfigEditorAccordion(id = 71)
+        @ConfigEditorBoolean
+        public boolean critterSafariFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Wumpa Spawn Title", desc = "Shows a title when Wumpa spawns in the Icy Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableWumpaSpawnTitle = true;
     }
 
     public static class MiscCategory {

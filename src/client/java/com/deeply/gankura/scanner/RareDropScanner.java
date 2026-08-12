@@ -36,8 +36,7 @@ public class RareDropScanner {
             return;
         }
 
-        if (!ModConstants.MAP_THE_END.equals(GameState.Server.map) &&
-                !ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) return;
+        if (!GameState.Server.isTheEnd()) return;
 
         if (client.level == null || client.player == null) return;
 
