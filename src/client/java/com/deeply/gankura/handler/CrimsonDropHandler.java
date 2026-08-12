@@ -3,7 +3,6 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.CrimsonRareDrop;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.ChatFormatting;
@@ -75,8 +74,7 @@ public class CrimsonDropHandler {
             return;
         }
 
-        boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
+        boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
         if (!isCrimsonIsle) return;
 
         if (client.level == null || client.player == null) return;

@@ -37,7 +37,7 @@ public class EntityHealthScanner {
     private static void scan(Minecraft client) {
         if (client.level == null || client.player == null) return;
 
-        boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTheEnd = GameState.Server.isTheEnd();
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
 
         boolean isSpidersDen = "Spider's Den".equals(GameState.Server.map);
@@ -64,8 +64,7 @@ public class EntityHealthScanner {
             GameState.Arachne.lastConfirmedWasReady = true;
         }
 
-        boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
+        boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
 
         // Dragonのみサイドバー由来のため、他のスキャン条件に関係なく毎tick更新する
         GameState.Dragon.health = isTheEnd ? findSidebarHealth(client, DRAGON_HP_PATTERN) : null;

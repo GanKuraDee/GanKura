@@ -23,7 +23,7 @@ public class GolemBeaconRenderer {
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;
 
-        boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTheEnd = GameState.Server.isTheEnd();
         if (!isTheEnd) return;
 
         if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;

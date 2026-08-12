@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.Minecraft;
@@ -13,8 +12,7 @@ public class CrimsonIsleStatusHud extends HudElement {
     public CrimsonIsleStatusHud() {
         super("crimson_isle_status", 305, 10, 1.0f, 185, 76,
                 () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleStatusHud,
-                () -> ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                        || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode));
+                () -> GameState.Server.isCrimsonIsle());
     }
 
     @Override

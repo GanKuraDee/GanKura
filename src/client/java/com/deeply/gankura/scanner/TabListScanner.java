@@ -65,6 +65,8 @@ public class TabListScanner {
         previousUnformattedLines = new ArrayList<>(unformattedLines);
         previousFormattedLines = new ArrayList<>(formattedLines);
 
+        // エリア/サーバーIDは他のハンドラーの判定条件になるため、必ず先に更新する
+        LocationScanner.processTabList(unformattedLines);
         GolemHandler.processTabList(unformattedLines, client);
         BroodmotherHandler.processTabList(unformattedLines);
         DragonHandler.processTabList(unformattedLines, client);

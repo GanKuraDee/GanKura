@@ -22,7 +22,7 @@ public class HudRenderer {
         if (client.screen instanceof HudEditorScreen) return;
 
         // Skyblock 以外では表示しない
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
 
         // --- ボスのネームプレート(ワールド座標をスクリーンへ投影) ---
         // Glow(ポストエフェクト)より確実に手前へ出すため、ワールド内テキストではなくHUDとして描画する

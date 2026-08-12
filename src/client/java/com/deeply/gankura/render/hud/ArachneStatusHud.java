@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -12,7 +11,7 @@ public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
         super("arachne_status", 10, 172, 1.0f, 270, 36,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
-                () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
+                () -> GameState.Server.isSpidersDen());
     }
 
     @Override

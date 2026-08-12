@@ -44,7 +44,7 @@ public class EquipmentScanner {
     }
 
     private static void scan(Minecraft client) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (!(client.screen instanceof AbstractContainerScreen<?> screen)) return;
         String title = screen.getTitle().getString();
         AbstractContainerMenu menu = screen.getMenu();
@@ -109,7 +109,7 @@ public class EquipmentScanner {
     // クリックされた列のプレビュー(1〜4行目)はサーバー同期を待たずともメニュー内に既に
     // 表示されているため、その場で読み取ってすぐにEquipment Hudへ反映できる。
     public static void onEquipmentSetSlotClicked(AbstractContainerMenu menu, int column) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (menu.slots.size() <= EQUIPPED_LABEL_ROW * MENU_WIDTH + MENU_WIDTH - 1) return;
 
         pendingEquipmentSetColumn = column;
@@ -134,7 +134,7 @@ public class EquipmentScanner {
     // Loadoutsメニューのロードアウト切り替えスロットがクリックされた瞬間に呼び出される。
     // 実際の読み取りはまだ行わず、切り替え中であることを示すため全EquipmentスロットをBarrier(Unknown)化するだけにとどめる。
     public static void resetToUnknown() {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
 
         List<ItemStack> barrier = new ArrayList<>();
         for (int i = 0; i < EQUIPMENT_SLOTS.length; i++) {
@@ -147,7 +147,7 @@ public class EquipmentScanner {
     // この時点でスロットの中身は実際に切り替わった後の最新の状態が保証されているため、
     // まず全EquipmentスロットをBarrier(Unknown)化した上で、読み取れたスロットだけを実際のアイテムで置き換える。
     public static void onLoadoutsContentsSynced(AbstractContainerMenu menu) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (menu.slots.size() <= EQUIPMENT_SLOTS[EQUIPMENT_SLOTS.length - 1]) return;
 
         List<ItemStack> found = new ArrayList<>();

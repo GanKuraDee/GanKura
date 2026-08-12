@@ -19,7 +19,7 @@ public class EntityTracerRenderer {
     public static void emitGizmos(Minecraft client) {
         if (EntityHighlightManager.highlightedEntities.isEmpty()) return;
         if (client.player == null) return;
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
 
         Vec3 eyePos = client.gameRenderer.getMainCamera().position();
         Vec3 startPos = eyePos.add(client.player.getLookAngle().scale(0.2));

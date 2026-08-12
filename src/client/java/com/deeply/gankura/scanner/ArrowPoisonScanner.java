@@ -18,7 +18,7 @@ public class ArrowPoisonScanner {
         if (client.player == null || client.level == null) return;
 
         // SKYBLOCK内でのみスキャン
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) {
+        if (!GameState.Server.isSkyblock()) {
             GameState.Player.activePoison = "NONE";
             GameState.Player.activePoisonCount = 0;
             return;

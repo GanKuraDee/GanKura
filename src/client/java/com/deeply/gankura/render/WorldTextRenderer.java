@@ -61,7 +61,7 @@ public class WorldTextRenderer {
 
     private static void renderArachneLocationText() {
         if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
-        if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
+        if (!GameState.Server.isSpidersDen()) return;
 
         BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS;
         boolean inSanctuary = GameState.Arachne.inSanctuary;
@@ -123,8 +123,7 @@ public class WorldTextRenderer {
 
     private static void renderCrimsonBossLocationTexts() {
         if (!ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleWorldText) return;
-        boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
+        boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
         if (!isCrimsonIsle) return;
 
         renderCrimsonLabel(ModConstants.BLADESOUL_POS,        "§8§lBLADESOUL",        0xFF555555, bladesoulStatus());
