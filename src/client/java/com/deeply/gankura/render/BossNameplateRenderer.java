@@ -25,7 +25,7 @@ public class BossNameplateRenderer {
     private static final String LINE_SEPARATOR = "\n";
     // ネームプレートの基準GUIスケール。実際のGUIスケールでこの値を割った倍率で描画することで、
     // GUIスケール設定を変えても画面上での大きさが変わらないようにする
-    private static final double REFERENCE_GUI_SCALE = 3.0;
+    private static final double REFERENCE_GUI_SCALE = 4.0;
     // project の戻り値は正規化デバイス座標。z > 1 はカメラの後方を意味する
     private static final double NDC_BEHIND_CAMERA_Z = 1.0;
 
