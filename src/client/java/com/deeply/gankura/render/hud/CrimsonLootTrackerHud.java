@@ -3,7 +3,6 @@ package com.deeply.gankura.render.hud;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.CrimsonRareDrop;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -13,8 +12,7 @@ public class CrimsonLootTrackerHud extends HudElement {
     public CrimsonLootTrackerHud() {
         super("crimson_loot_tracker", 305, 84, 1.0f, 185, 144,
                 () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonLootTrackerHud,
-                () -> ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                        || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode));
+                () -> GameState.Server.isCrimsonIsle());
     }
 
     @Override

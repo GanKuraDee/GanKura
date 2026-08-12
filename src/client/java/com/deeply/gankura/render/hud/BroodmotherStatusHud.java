@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +11,7 @@ public class BroodmotherStatusHud extends HudElement {
     public BroodmotherStatusHud() {
         super("broodmother", 10, 124, 1.0f, 150, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud,
-                () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map));
+                () -> GameState.Server.isSpidersDen());
     }
 
     @Override

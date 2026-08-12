@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -15,7 +14,7 @@ public class DragonHealthHud extends HudElement {
     public DragonHealthHud() {
         super("dragon_health", 165, 202, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.theEnd.showDragonHealthHud,
-                () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode))
+                () -> (GameState.Server.isTheEnd())
                         && GameState.Dragon.health != null);
     }
 

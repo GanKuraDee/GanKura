@@ -46,6 +46,14 @@ public class ScoreboardUtils {
         return lines;
     }
 
+    // サイドバーのタイトル(SkyBlockでは "SKYBLOCK")。各行と違いObjective側に載っているため別途取得する
+    public static String getSidebarTitle(MinecraftClient client) {
+        if (client.world == null) return "";
+        ScoreboardObjective objective = client.world.getScoreboard().getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return "";
+        return toLegacyString(objective.getDisplayName());
+    }
+
     public static String stripColor(String text) {
         return text == null ? "" : text.replaceAll("(?i)§[0-9A-FK-OR]", "");
     }

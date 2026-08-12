@@ -40,9 +40,9 @@ public class EntityHealthScanner {
     private static void scan(MinecraftClient client) {
         if (client.world == null || client.player == null) return;
 
-        boolean isTheEnd = ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode);
+        boolean isTheEnd = GameState.Server.isTheEnd();
         boolean scanGolem = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
-        boolean isSpidersDen = ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map);
+        boolean isSpidersDen = GameState.Server.isSpidersDen();
         boolean scanBroodmother = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
         // Arachneがスポーンすると基準座標に蜘蛛の巣ブロックが出現するため、これでSpawnedを確定する。
         // Sanctuary外ではスキャンを行わない(エリア外は常にUnknown扱いとし、Sanctuary入場時に改めて判定する)
@@ -65,7 +65,7 @@ public class EntityHealthScanner {
             GameState.Arachne.everConfirmed = true;
             GameState.Arachne.lastConfirmedWasReady = true;
         }
-        boolean isCrimsonIsle = ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map) || ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode);
+        boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
 
         // Dragonのみサイドバー由来のため、他のスキャン条件に関係なく毎tick更新する
         GameState.Dragon.health = isTheEnd ? findSidebarHealth(client, DRAGON_HP_PATTERN) : null;

@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +11,7 @@ public class GolemHealthHud extends HudElement {
     public GolemHealthHud() {
         super("health", 165, 94, 1.0f, 100, 24,
                 () -> ModConfig.INSTANCE.theEnd.showGolemHealthHud,
-                () -> (ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode)) && GameState.Golem.health != null);
+                () -> (GameState.Server.isTheEnd()) && GameState.Golem.health != null);
     }
 
     @Override

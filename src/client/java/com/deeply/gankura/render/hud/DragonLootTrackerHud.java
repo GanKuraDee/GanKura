@@ -3,7 +3,6 @@ package com.deeply.gankura.render.hud;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.DragonRareDrop;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -13,7 +12,7 @@ public class DragonLootTrackerHud extends HudElement {
     public DragonLootTrackerHud() {
         super("dragonTracker", 165, 166, 1.0f, 150, 36,
                 () -> ModConfig.INSTANCE.theEnd.showDragonTrackerHud,
-                () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
+                () -> GameState.Server.isTheEnd());
     }
 
     @Override

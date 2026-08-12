@@ -15,7 +15,7 @@ public class AreaScanner {
 
     private static void scan(MinecraftClient client) {
         if (client.world == null || client.player == null) return;
-        if (!ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map)) return;
+        if (!GameState.Server.isSpidersDen()) return;
 
         boolean found = false;
         for (Team team : client.world.getScoreboard().getTeams()) {

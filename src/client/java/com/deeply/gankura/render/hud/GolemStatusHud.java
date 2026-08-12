@@ -12,7 +12,7 @@ public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
         super("stats", 165, 10, 1.0f, 150, 36,
                 () -> ModConfig.INSTANCE.theEnd.showGolemStatusHud,
-                () -> ModConstants.MAP_THE_END.equals(GameState.Server.map) || ModConstants.MODE_COMBAT_3.equals(GameState.Server.mode));
+                () -> GameState.Server.isTheEnd());
     }
 
     @Override

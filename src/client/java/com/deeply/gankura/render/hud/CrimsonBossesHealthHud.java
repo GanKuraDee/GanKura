@@ -26,8 +26,7 @@ public class CrimsonBossesHealthHud extends HudElement {
     }
 
     private static boolean isAnyVisible() {
-        if (!ModConstants.MAP_CRIMSON_ISLE.equals(GameState.Server.map)
-                && !ModConstants.MODE_CRIMSON_ISLE.equals(GameState.Server.mode)) return false;
+        if (!GameState.Server.isCrimsonIsle()) return false;
         for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
             if (isBossEnabled(boss) && boss.getHealth().get() != null) return true;
         }

@@ -5,9 +5,10 @@ import net.minecraft.util.math.BlockPos;
 public class GameState {
 
     public static class Server {
+        // id/map はタブリストの "Server: " / "Area: " 行、gametype はサイドバーのタイトルから取得する。
+        // 取得元が毎tick読めるため、locraw のように参加時1回きりで取りこぼす心配がない
         public static String id = "Unknown";
         public static String gametype = "Unknown";
-        public static String mode = "Unknown";
         public static String map = "Unknown";
 
         public static long lastTimePacket = 0;
@@ -22,9 +23,31 @@ public class GameState {
         public static long lastWorldJoinTime = 0;
 
         public static void reset() {
-            id = "Unknown"; gametype = "Unknown"; mode = "Unknown"; map = "Unknown";
+            id = "Unknown"; gametype = "Unknown"; map = "Unknown";
             isClosing = false; closingTime = null;
             lastWorldJoinTime = System.currentTimeMillis();
+        }
+
+        // エリア判定はここに集約する。表示名(Area:行の値)が唯一の判定材料なので、
+        // Hypixel側の名称が変わった場合もModConstantsの定数1箇所を直せば済むようにしておく
+        public static boolean isSkyblock() {
+            return ModConstants.GAME_TYPE_SKYBLOCK.equals(gametype);
+        }
+
+        public static boolean isTheEnd() {
+            return ModConstants.MAP_THE_END.equals(map);
+        }
+
+        public static boolean isSpidersDen() {
+            return ModConstants.MAP_SPIDERS_DEN.equals(map);
+        }
+
+        public static boolean isCrimsonIsle() {
+            return ModConstants.MAP_CRIMSON_ISLE.equals(map);
+        }
+
+        public static boolean isSafari() {
+            return ModConstants.MAP_SAFARI.equals(map);
         }
     }
 

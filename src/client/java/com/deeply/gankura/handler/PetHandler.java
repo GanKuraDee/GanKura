@@ -35,7 +35,7 @@ public class PetHandler {
 
     // ★復活: チャットからのペット名・色・スキンの直接抽出ロジック
     public static void handleMessage(Text message) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
 
         // 1. Textオブジェクトから色情報(§)を保持した文字列を復元
         String formatted = toLegacyString(message);
@@ -84,7 +84,7 @@ public class PetHandler {
     }
 
     public static void processTabList(List<String> formattedLines, List<String> unformattedLines, MinecraftClient client) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (formattedLines.size() < 20) return; // ロード待ち
 
         // スキャン完了済みの場合は、エラー状態の時の再確認(1秒に1回)のみ行う
@@ -128,7 +128,7 @@ public class PetHandler {
     // "Pet: [Lvl X] {ペット名}" の行を探し、"Pet: " より後ろの部分だけをレベル表記ごとHUD表示に反映する
     // (ホバーだけでは切り替え先の情報を継続的に読み取れないため、クリックをトリガーとして読み取る)
     public static void processLoadoutsSlotClick(ItemStack stack) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (stack.isEmpty()) return;
 
         List<Text> tooltip = Screen.getTooltipFromItem(MinecraftClient.getInstance(), stack);
@@ -141,7 +141,7 @@ public class PetHandler {
     // "[Lvl X] {ペット名}" の行を読み取り、レベル表記まで含めてそのままHUD表示に反映する
     // (Loadoutsと違い名前だけに絞らず、行全体の色付き文字列をそのまま使うことでレベル部分の色も維持する)
     public static void processPetsMenuClick(ItemStack stack) {
-        if (!"SKYBLOCK".equals(GameState.Server.gametype)) return;
+        if (!GameState.Server.isSkyblock()) return;
         if (stack.isEmpty()) return;
 
         if (tryExtractPetNameAndLevelLine(stack.getName())) return;

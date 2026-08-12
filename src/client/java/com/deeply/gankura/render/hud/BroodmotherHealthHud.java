@@ -2,7 +2,6 @@ package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
-import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.HudElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +11,7 @@ public class BroodmotherHealthHud extends HudElement {
     public BroodmotherHealthHud() {
         super("broodmother_health", 10, 148, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showBroodmotherHealthHud,
-                () -> ModConstants.MAP_SPIDERS_DEN.equals(GameState.Server.map) && GameState.Broodmother.health != null);
+                () -> GameState.Server.isSpidersDen() && GameState.Broodmother.health != null);
     }
 
     @Override
