@@ -613,14 +613,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossTitle = true;
 
-        // Magma Boss アコーディオンの中にネストさせた Magma Glare 用アコーディオン
-        @Expose
-        @ConfigOption(name = "Magma Glare", desc = "Expands Magma Glare settings.")
-        @ConfigEditorAccordion(id = 41)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean magmaGlareSection = false;
-
     }
 
     // ==========================================

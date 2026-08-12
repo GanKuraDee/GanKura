@@ -81,6 +81,9 @@ public class EntityHealthScanner {
             for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
                 boss.setHealth().accept(null);
             }
+            for (CrimsonBossEntry follower : EntityHighlightManager.ASHFANG_FOLLOWERS) {
+                follower.setHealth().accept(null);
+            }
             GameState.MagmaBoss.healthLabel = null;
             GameState.MagmaBoss.inArena = false;
         }
@@ -91,11 +94,16 @@ public class EntityHealthScanner {
 
         // Determine which Crimson Isle bosses need HP scanning
         boolean[] scanCrimson = new boolean[EntityHighlightManager.CRIMSON_BOSSES.size()];
+        boolean[] scanFollower = new boolean[EntityHighlightManager.ASHFANG_FOLLOWERS.size()];
         boolean anyCrimsonScan = false;
         if (isCrimsonIsle) {
             for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                 scanCrimson[i] = EntityHighlightManager.CRIMSON_BOSSES.get(i).getIsDetected().get();
                 if (scanCrimson[i]) anyCrimsonScan = true;
+            }
+            for (int i = 0; i < EntityHighlightManager.ASHFANG_FOLLOWERS.size(); i++) {
+                scanFollower[i] = EntityHighlightManager.ASHFANG_FOLLOWERS.get(i).getIsDetected().get();
+                if (scanFollower[i]) anyCrimsonScan = true;
             }
         }
 
@@ -107,6 +115,7 @@ public class EntityHealthScanner {
         int foundBroodCount = 0;
         String foundSize = GameState.Arachne.size;
         String[] foundCrimsonHealth = new String[EntityHighlightManager.CRIMSON_BOSSES.size()];
+        String[] foundFollowerHealth = new String[EntityHighlightManager.ASHFANG_FOLLOWERS.size()];
 
         Box scanBox = client.player.getBoundingBox().expand(50.0);
         for (Entity entity : client.world.getEntitiesByClass(Entity.class, scanBox, e -> true)) {
@@ -145,6 +154,16 @@ public class EntityHealthScanner {
             }
 
             if (anyCrimsonScan) {
+                // minion 3種は名前がそのままネームタグに出るので、そのまま照合できる
+                for (int i = 0; i < EntityHighlightManager.ASHFANG_FOLLOWERS.size(); i++) {
+                    if (!scanFollower[i] || foundFollowerHealth[i] != null) continue;
+                    CrimsonBossEntry follower = EntityHighlightManager.ASHFANG_FOLLOWERS.get(i);
+                    if (ModConstants.containsIgnoreCase(nameStr, follower.nameTag())) {
+                        Matcher m = HEALTH_PATTERN.matcher(nameStr);
+                        if (m.find()) foundFollowerHealth[i] = m.group(1);
+                    }
+                }
+
                 for (int i = 0; i < EntityHighlightManager.CRIMSON_BOSSES.size(); i++) {
                     if (!scanCrimson[i] || foundCrimsonHealth[i] != null) continue;
                     CrimsonBossEntry boss = EntityHighlightManager.CRIMSON_BOSSES.get(i);
@@ -175,6 +194,10 @@ public class EntityHealthScanner {
                 // Magma Boss は scanMagmaBossScoreboard 側で更新済みのため上書きしない
                 if ("Magma Boss".equals(boss.nameTag())) continue;
                 if (scanCrimson[i]) boss.setHealth().accept(foundCrimsonHealth[i]);
+            }
+            for (int i = 0; i < EntityHighlightManager.ASHFANG_FOLLOWERS.size(); i++) {
+                CrimsonBossEntry follower = EntityHighlightManager.ASHFANG_FOLLOWERS.get(i);
+                if (scanFollower[i]) follower.setHealth().accept(foundFollowerHealth[i]);
             }
         }
     }

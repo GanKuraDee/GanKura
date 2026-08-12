@@ -25,11 +25,19 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.function.Predicate;
 
 public class EntityHighlightManager {
 
     // Magma Boss の戦闘エリア半径(ブロック)。ワールドテキストの基準座標 MAGMA_BOSS_POS を中心とする
+    // Magma Glare のネームタグに出る名前
+    private static final String MAGMA_GLARE_NAME = "Magma Glare";
+    // Magma Glare のネームタグを探す半径(ブロック)。個体が密集するため狭めにとる
+    private static final double GLARE_NAMETAG_RADIUS = 3.0;
+    // 「現在HP/最大HP」の抽出。EntityHealthScanner と同じ形式
+    private static final Pattern HEALTH_PATTERN = Pattern.compile("([\\d\\.,]+[kM]?/[\\d\\.,]+[kM]?)");
     private static final double MAGMA_ARENA_RADIUS = 60.0;
     // バニラで自然発生する MagmaCube の最大サイズ(1/2/4 のいずれか)。
     // Magma Boss 本体と Magma Glare はこれより大きいため、超えているものだけを候補にすれば
@@ -90,8 +98,8 @@ public class EntityHighlightManager {
             MobVisualTarget.ASHFANG_FOLLOWER::nameplate,
             () -> GameState.AshfangFollower.isDetected,
             d -> GameState.AshfangFollower.isDetected = d,
-            () -> null,
-            h -> {}),
+            () -> GameState.AshfangFollower.health,
+            h -> GameState.AshfangFollower.health = h),
         new CrimsonBossEntry("Ashfang Acolyte",
             0x5555FF, 0xFF5555FF,
             MobVisualTarget.ASHFANG_ACOLYTE::highlight,
@@ -99,8 +107,8 @@ public class EntityHighlightManager {
             MobVisualTarget.ASHFANG_ACOLYTE::nameplate,
             () -> GameState.AshfangAcolyte.isDetected,
             d -> GameState.AshfangAcolyte.isDetected = d,
-            () -> null,
-            h -> {}),
+            () -> GameState.AshfangAcolyte.health,
+            h -> GameState.AshfangAcolyte.health = h),
         new CrimsonBossEntry("Ashfang Underling",
             0xFF5555, 0xFFFF5555,
             MobVisualTarget.ASHFANG_UNDERLING::highlight,
@@ -108,8 +116,8 @@ public class EntityHighlightManager {
             MobVisualTarget.ASHFANG_UNDERLING::nameplate,
             () -> GameState.AshfangUnderling.isDetected,
             d -> GameState.AshfangUnderling.isDetected = d,
-            () -> null,
-            h -> {})
+            () -> GameState.AshfangUnderling.health,
+            h -> GameState.AshfangUnderling.health = h)
     );
 
     public static final List<CrimsonBossEntry> CRIMSON_BOSSES = List.of(
@@ -333,6 +341,50 @@ public class EntityHighlightManager {
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
         boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
 
+        // Ashfang: 本体は2体のBlazeで構成される。ネームタグに頼らず、スポーン地点周辺のBlazeで判定する。
+        // Follower/Acolyte/Underling も同じBlazeなので、本体を先に確定させてから
+        // minion 側がそれを掴まないようにする(逆順だと本体に minion のネームプレートが付く)
+        if (isCrimsonIsle) {
+            for (int i = 0; i < CRIMSON_BOSSES.size(); i++) {
+                CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
+                if (!"Ashfang".equals(boss.nameTag())) continue;
+
+                boolean glowBoss = boss.enableHighlight().get();
+                boolean plateBoss = boss.enableNameplate().get();
+                if (!glowBoss && !plateBoss) break;
+
+                Vec3d center = Vec3d.ofCenter(ModConstants.ASHFANG_POS);
+                Box area = new Box(
+                        center.x - ASHFANG_AREA_XZ, center.y - CRIMSON_AREA_Y, center.z - ASHFANG_AREA_XZ,
+                        center.x + ASHFANG_AREA_XZ, center.y + CRIMSON_AREA_Y, center.z + ASHFANG_AREA_XZ);
+                List<BlazeEntity> blazes = new ArrayList<>(client.world.getEntitiesByClass(BlazeEntity.class, area,
+                        e -> !crimsonBossEntities.containsKey(e)));
+                if (blazes.size() < ASHFANG_BLAZE_COUNT) break;
+                blazes.sort(Comparator.comparingDouble(e -> e.squaredDistanceTo(center)));
+
+                Entity plateTarget = null;
+                for (int n = 0; n < ASHFANG_BLAZE_COUNT; n++) {
+                    BlazeEntity blaze = blazes.get(n);
+                    if (glowBoss) highlightedEntities.add(blaze);
+                    crimsonBossEntities.put(blaze, boss);
+                    // 基準座標に近い順にソート済み。ネームプレートとTracerはどちらも先頭の1体に出す
+                    if (plateTarget == null) {
+                        plateTarget = blaze;
+                        ashfangTracerTarget = blaze;
+                        registerTracer(blaze, boss);
+                    }
+                }
+
+                if (plateBoss) {
+                    String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
+                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
+                }
+                bossFound[i] = true;
+                break;
+            }
+        }
+
+
         for (Entity entity : client.world.getEntities()) {
             Text customName = entity.getCustomName();
             if (customName == null) continue;
@@ -423,7 +475,7 @@ public class EntityHighlightManager {
                             registerTracer(visualTarget, follower);
                             if (follower.enableNameplate().get()) {
                                 String label = BossNameplateRenderer.colorCode(follower.tracerColorARGB()) + "§l" + follower.nameTag();
-                                nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel(label, null));
+                                nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel(label, follower.getHealth().get()));
                             }
                             followerFound[i] = true;
                         }
@@ -555,49 +607,6 @@ public class EntityHighlightManager {
             }
         }
 
-        // Ashfang: 本体は2体のBlazeで構成される。ネームタグに頼らず、スポーン地点周辺のBlazeで判定する。
-        // Follower/Acolyte/Underling も同じBlazeなので、直前のループで検出済みのものは除外したうえで
-        // 基準座標に近い2体を本体として採用する
-        if (isCrimsonIsle) {
-            for (int i = 0; i < CRIMSON_BOSSES.size(); i++) {
-                CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
-                if (!"Ashfang".equals(boss.nameTag())) continue;
-
-                boolean glowBoss = boss.enableHighlight().get();
-                boolean plateBoss = boss.enableNameplate().get();
-                if (!glowBoss && !plateBoss) break;
-
-                Vec3d center = Vec3d.ofCenter(ModConstants.ASHFANG_POS);
-                Box area = new Box(
-                        center.x - ASHFANG_AREA_XZ, center.y - CRIMSON_AREA_Y, center.z - ASHFANG_AREA_XZ,
-                        center.x + ASHFANG_AREA_XZ, center.y + CRIMSON_AREA_Y, center.z + ASHFANG_AREA_XZ);
-                List<BlazeEntity> blazes = new ArrayList<>(client.world.getEntitiesByClass(BlazeEntity.class, area,
-                        e -> !crimsonBossEntities.containsKey(e)));
-                if (blazes.size() < ASHFANG_BLAZE_COUNT) break;
-                blazes.sort(Comparator.comparingDouble(e -> e.squaredDistanceTo(center)));
-
-                Entity plateTarget = null;
-                for (int n = 0; n < ASHFANG_BLAZE_COUNT; n++) {
-                    BlazeEntity blaze = blazes.get(n);
-                    if (glowBoss) highlightedEntities.add(blaze);
-                    crimsonBossEntities.put(blaze, boss);
-                    // 基準座標に近い順にソート済み。ネームプレートとTracerはどちらも先頭の1体に出す
-                    if (plateTarget == null) {
-                        plateTarget = blaze;
-                        ashfangTracerTarget = blaze;
-                        registerTracer(blaze, boss);
-                    }
-                }
-
-                if (plateBoss) {
-                    String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
-                }
-                bossFound[i] = true;
-                break;
-            }
-        }
-
         // Magma Glare: Kill the Magmas フェーズ中は本体が存在しないので、エリア内の MagmaCubeEntity は
         // すべて分裂した個体。ただし同フェーズには無害な Unstable Magma も湧いており、
         // そちらはバニラ自然湧きサイズの小さい個体なのでサイズで振り分ける。
@@ -609,8 +618,11 @@ public class EntityHighlightManager {
                 if (glowGlare) highlightedEntities.add(cube);
                 magmaGlareEntities.add(cube);
                 registerTracer(cube, MobVisualTarget.MAGMA_GLARE);
-                // 即死級のダメージを与えてくるため、体力ではなく警告として目立たせる
-                if (plateGlare) nameplateEntities.put(cube, "§c§l! Magma Glare !");
+                // 即死級のダメージを与えてくるため、名前は警告の形で目立たせたうえで体力を添える
+                if (plateGlare) {
+                    nameplateEntities.put(cube,
+                            BossNameplateRenderer.buildLabel("§c§l! Magma Glare !", findNearbyHealth(client, cube)));
+                }
             }
         }
 
@@ -795,7 +807,8 @@ public class EntityHighlightManager {
                     namedEntity);
             if (closest != null) return closest;
         } else {
-            Entity closest = getClosestEntity(client.world.getEntitiesByClass(MobEntity.class, box, e -> true), namedEntity);
+            Entity closest = getClosestEntity(client.world.getEntitiesByClass(MobEntity.class, box,
+                    e -> !crimsonBossEntities.containsKey(e)), namedEntity);
             if (closest != null) return closest;
         }
 
@@ -847,5 +860,27 @@ public class EntityHighlightManager {
             case "Superior"  -> 0xFFFFFF55;
             default          -> 0xFFFF55FF;
         };
+    }
+
+    // Magma Glare は個体が多くネームタグ経由で検出していないため、体力だけを近くのネームタグから拾う。
+    // ネームタグには "Magma Glare" とそのまま出るので、それで絞れば
+    // 同フェーズに湧く Unstable Magma や本体のタグを拾うことはない
+    private static String findNearbyHealth(MinecraftClient client, Entity entity) {
+        Box box = entity.getBoundingBox().expand(GLARE_NAMETAG_RADIUS);
+        Entity closest = null;
+        double nearest = Double.MAX_VALUE;
+        for (Entity candidate : client.world.getEntitiesByClass(Entity.class, box, e -> e.getCustomName() != null)) {
+            String nameStr = candidate.getCustomName().getString();
+            if (!ModConstants.containsIgnoreCase(nameStr, MAGMA_GLARE_NAME)) continue;
+            if (!HEALTH_PATTERN.matcher(nameStr).find()) continue;
+            double dist = candidate.squaredDistanceTo(entity);
+            if (dist < nearest) {
+                nearest = dist;
+                closest = candidate;
+            }
+        }
+        if (closest == null) return null;
+        Matcher m = HEALTH_PATTERN.matcher(closest.getCustomName().getString());
+        return m.find() ? m.group(1) : null;
     }
 }

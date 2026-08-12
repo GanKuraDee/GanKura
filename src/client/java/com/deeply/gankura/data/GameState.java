@@ -192,17 +192,20 @@ public class GameState {
 
     public static class AshfangFollower {
         public static boolean isDetected = false;
-        public static void reset() { isDetected = false; }
+        public static String health = null;
+        public static void reset() { isDetected = false; health = null; }
     }
 
     public static class AshfangAcolyte {
         public static boolean isDetected = false;
-        public static void reset() { isDetected = false; }
+        public static String health = null;
+        public static void reset() { isDetected = false; health = null; }
     }
 
     public static class AshfangUnderling {
         public static boolean isDetected = false;
-        public static void reset() { isDetected = false; }
+        public static String health = null;
+        public static void reset() { isDetected = false; health = null; }
     }
 
     public static class MagmaBoss {
