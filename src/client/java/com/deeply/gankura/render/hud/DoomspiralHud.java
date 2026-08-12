@@ -33,15 +33,26 @@ public class DoomspiralHud extends HudElement {
 
     private static String candleLine(int lit, String status) {
         int total = ModConstants.DOOMSPIRAL_CANDLE_TOTAL;
-        // 湧いている間は Wumpa と同じく行全体を赤くする
-        if (GameState.Doomspiral.STATUS_SPAWNED.equals(status)) {
-            return "§cCandles: " + lit + "/" + total + " (" + status + ")";
+        // 状態が確定している間は Wumpa と同じく行全体をその色にする
+        String lineColor = lineColor(status);
+        if (lineColor != null) {
+            return lineColor + "Candles: " + lit + "/" + total + " (" + status + ")";
         }
 
         // 区切りの "/" は Wumpa Status と同じく灰色にする
         String value = "§e" + lit + "§7/§e" + total;
         if (status != null) value += " " + statusColor(status) + "(" + status + ")";
         return "§fCandles§7: " + value;
+    }
+
+    // 行全体を塗る状態。Spawning は儀式の途中なので、ステータス部分だけの色付けに留める
+    private static String lineColor(String status) {
+        return switch (status == null ? "" : status) {
+            case GameState.Doomspiral.STATUS_SPAWNED   -> "§c";
+            case GameState.Doomspiral.STATUS_CAPTURED  -> "§a";
+            case GameState.Doomspiral.STATUS_DESPAWNED -> "§7";
+            default -> null;
+        };
     }
 
     private static String statusColor(String status) {

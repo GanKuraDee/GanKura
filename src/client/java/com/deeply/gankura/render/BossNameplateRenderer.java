@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -24,7 +25,8 @@ public class BossNameplateRenderer {
     // 行の区切り
     private static final String LINE_SEPARATOR = "\n";
     // ネームプレートの基準GUIスケール。実際のGUIスケールでこの値を割った倍率で描画することで、
-    // GUIスケール設定を変えても画面上での大きさが変わらないようにする
+    // GUIスケール設定を変えても画面上での大きさが変わらないようにする。
+    // 設定のサイズ(既定1.0)はこの見え方に対する倍率として掛ける
     private static final double REFERENCE_GUI_SCALE = 4.0;
     // projectPointToScreen の戻り値は正規化デバイス座標。z > 1 はカメラの後方を意味する
     private static final double NDC_BEHIND_CAMERA_Z = 1.0;
@@ -38,7 +40,8 @@ public class BossNameplateRenderer {
         float screenWidth = client.getWindow().getGuiScaledWidth();
         float screenHeight = client.getWindow().getGuiScaledHeight();
         // GUIスケールの影響を打ち消し、設定を変えても常に同じ大きさで表示する
-        float textScale = (float) (REFERENCE_GUI_SCALE / client.getWindow().getGuiScale());
+        float textScale = (float) (REFERENCE_GUI_SCALE / client.getWindow().getGuiScale())
+                * ModConfig.INSTANCE.mobVisuals.nameplateScale;
 
         for (Map.Entry<Entity, String> entry : EntityHighlightManager.nameplateEntities.entrySet()) {
             Entity entity = entry.getKey();
@@ -73,20 +76,24 @@ public class BossNameplateRenderer {
 
     // 1行目に名前、2行目にHPを置いた表示文字列を組み立てる。
     // HPが未取得(スキャン直後など)の場合は名前のみを返す
-    public static String buildLabel(String coloredName, String rawHealth, boolean showHealth) {
-        if (!showHealth) return coloredName;
+    public static String buildLabel(String coloredName, String rawHealth) {
         String hp = formatHealth(rawHealth);
         return hp.isEmpty() ? coloredName : coloredName + LINE_SEPARATOR + hp;
     }
 
     // ハイライト色(ARGB)に対応する§カラーコードを求め、名前部分の色として使う
     public static String colorCode(int argb) {
+        // MobVisualTarget が持つ色をすべて網羅する。抜けがあると
+        // ネームプレートだけ白くなり、Highlight/Tracer と色が食い違う
         return switch (argb & 0xFFFFFF) {
             case 0x555555 -> "§8";
             case 0xAAAAAA -> "§7";
             case 0xFF5555 -> "§c";
             case 0xAA00AA -> "§5";
             case 0xFFAA00 -> "§6";
+            case 0x5555FF -> "§9";
+            case 0xFF55FF -> "§d";
+            case 0x55FFFF -> "§b";
             default       -> "§f";
         };
     }

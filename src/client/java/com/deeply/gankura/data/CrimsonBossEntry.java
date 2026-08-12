@@ -10,7 +10,6 @@ public record CrimsonBossEntry(
         Supplier<Boolean> enableHighlight,
         Supplier<Boolean> enableTracer,
         Supplier<Boolean> enableNameplate,
-        Supplier<Boolean> enableNameplateHealth,
         Supplier<Boolean> getIsDetected,
         Consumer<Boolean> setIsDetected,
         Supplier<String> getHealth,

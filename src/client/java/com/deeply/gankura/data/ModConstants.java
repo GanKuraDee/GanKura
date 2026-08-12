@@ -151,7 +151,7 @@ public class ModConstants {
     public static final String WUMPA_CAPTURED_MSG = "The cave opens up again";
 
     // Wumpaに敗れた後、戦闘エリアへ戻るための小さな穴。ウェイポイントとして目印を出す
-    public static final BlockPos WUMPA_REENTER_POS = new BlockPos(-94, 84, -64);
+    public static final BlockPos WUMPA_REENTER_POS = new BlockPos(-95, 84, -65);
 
     // Doomspiral の儀式。キャンドル4本をともすと出現する。
     // 本数はメッセージ後半の文面から確定させるので、途中を取りこぼしても次の1本で復帰できる
