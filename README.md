@@ -2,8 +2,8 @@
 GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses. 
 
 - **Commands**
-  - `/gankura` - Open the main settings screen
-  - `/gankura hud` - Open the HUD movement and scaling settings screen
+  - `/gankura` - Open the main settings screen.
+  - `/gankura hud` - Open the HUD movement and scaling settings screen.
 
 # Supported
 - **The End**
@@ -18,6 +18,9 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Mage Outlaw
   - Magma Boss
   - Ashfang
+- **Critter Safari**
+  - Wumpa
+  - Doomspiral
 
 # Features
 - **Bosses**
@@ -44,3 +47,5 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Loadouts Menu Keybind
   - Armor Menu Keybind
   - Equipment Menu Keybind
+  - Tree Felled Title
+  - Mob From Tree Title
