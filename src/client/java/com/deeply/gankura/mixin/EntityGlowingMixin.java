@@ -8,6 +8,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.Ravager;
+import net.minecraft.world.entity.monster.warden.Warden;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -73,6 +75,10 @@ public class EntityGlowingMixin {
                 cir.setReturnValue(0xFF5555); // ブルードマザー: 赤色
             } else if (entity instanceof EnderDragon) {
                 cir.setReturnValue(dragonColor(GameState.Dragon.type));
+            } else if (entity instanceof Ravager) {
+                cir.setReturnValue(0x55FFFF); // Wumpa: 水色
+            } else if (entity instanceof Warden) {
+                cir.setReturnValue(0xAA00AA); // Doomspiral: 紫
             } else {
                 cir.setReturnValue(0xFFFFFF);
             }

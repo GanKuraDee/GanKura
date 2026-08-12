@@ -1068,10 +1068,78 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
-        @ConfigOption(name = "Wumpa Spawn Title", desc = "Shows a title when Wumpa spawns in the Icy Biome.")
+        @ConfigOption(name = "Capture HUD", desc = "Shows which Icy Biome critters have been captured.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
+        public boolean showCritterCaptureHud = true;
+
+        @Expose
+        @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
+        @ConfigEditorAccordion(id = 72)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean wumpaFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Spawn Title", desc = "Shows a title when Wumpa spawns in the Icy Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
         public boolean enableWumpaSpawnTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Highlights Wumpa.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
+        public boolean enableWumpaHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on Wumpa.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
+        public boolean enableWumpaNameplate = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to Wumpa.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
+        public boolean enableWumpaTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Re-enter Waypoint", desc = "Marks the hole used to re-enter the Wumpa arena.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
+        public boolean enableWumpaWaypoint = true;
+
+        @Expose
+        @ConfigOption(name = "Doomspiral", desc = "Expands Doomspiral settings.")
+        @ConfigEditorAccordion(id = 73)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean doomspiralFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Ritual HUD", desc = "Shows how many candles have been lit.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 73)
+        public boolean showDoomspiralHud = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Highlights Doomspiral.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 73)
+        public boolean enableDoomspiralHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on Doomspiral.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 73)
+        public boolean enableDoomspiralNameplate = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to Doomspiral.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 73)
+        public boolean enableDoomspiralTracer = true;
     }
 
     public static class MiscCategory {

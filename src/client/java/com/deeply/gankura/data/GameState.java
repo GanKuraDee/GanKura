@@ -235,6 +235,69 @@ public class GameState {
         public static void reset() { cooldownEndAt = 0; queuedCommand = null; awaitingConfirmation = false; awaitingConfirmationSince = 0; }
     }
 
+    // Doomspiral (Haunted Biome) の儀式の進行状況
+    public static class Doomspiral {
+        public static final String STATUS_SPAWNING = "Spawning...";
+        public static final String STATUS_SPAWNED = "Spawned";
+        public static final String STATUS_CAPTURED = "Captured";
+        public static final String STATUS_DESPAWNED = "Despawned";
+
+        // ともしたキャンドルの数
+        public static int litCandles = 0;
+        // 4本ともした後の状態。儀式の途中は null
+        public static String status = null;
+        // Critter Capsule を当てた回数。湧き直すたびに数え直す
+        public static int capsuleHits = 0;
+
+        public static void reset() {
+            litCandles = 0;
+            status = null;
+            capsuleHits = 0;
+        }
+    }
+
+    // Critter Safari (Icy Biome) のキャプチャ進捗
+    public static class CritterSafari {
+        public static final String STATUS_SPAWNED = "Spawned";
+        public static final String STATUS_CAPTURED = "Captured";
+
+        // キャプチャ済みの Critter 名。8種すべて揃うと Wumpa がスポーンする
+        private static final java.util.Set<String> captured = new java.util.HashSet<>();
+        // Wumpa 自体の状態。8種そろう前は null
+        public static String wumpaStatus = null;
+        // Critter Capsule を当てた回数。湧き直すたびに数え直す
+        public static int wumpaCapsuleHits = 0;
+
+        public static void markCaptured(String critterName) {
+            captured.add(critterName);
+        }
+
+        // 複数人で狩っていると自分にキャプチャのメッセージが来ないことがあるため、
+        // Wumpa のスポーンが確認できた時点で8種そろったものとして扱う
+        public static void markAllCaptured() {
+            captured.addAll(ModConstants.ICY_BIOME_CRITTERS);
+        }
+
+        public static boolean isCaptured(String critterName) {
+            return captured.contains(critterName);
+        }
+
+        public static int capturedCount() {
+            return captured.size();
+        }
+
+        // Wumpa が湧いていて、まだキャプチャされていない状態か
+        public static boolean isWumpaSpawned() {
+            return STATUS_SPAWNED.equals(wumpaStatus);
+        }
+
+        public static void reset() {
+            captured.clear();
+            wumpaStatus = null;
+            wumpaCapsuleHits = 0;
+        }
+    }
+
     public static void resetAll() {
         Server.reset();
         Player.reset();
@@ -251,6 +314,8 @@ public class GameState {
         AshfangUnderling.reset();
         MagmaBoss.reset();
         CrimsonDrop.reset();
+        CritterSafari.reset();
+        Doomspiral.reset();
         // Warp のクールダウンは /warp 自体がワールド移動を伴うため、resetAll() の対象から除外する
     }
 }

@@ -24,6 +24,6 @@ public class WorldTextRenderMixin {
     private void onEmitGizmos(Frustum frustum, double camX, double camY, double camZ, float partialTicks, CallbackInfo ci) {
         Minecraft client = Minecraft.getInstance();
         WorldTextRenderer.render(client);
-        EntityTracerRenderer.emitGizmos(client);
+        EntityTracerRenderer.emitGizmos(client, partialTicks);
     }
 }

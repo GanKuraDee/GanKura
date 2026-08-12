@@ -16,13 +16,18 @@ import net.minecraft.world.phys.Vec3;
 
 public class EntityTracerRenderer {
 
-    public static void emitGizmos(Minecraft client) {
-        if (EntityHighlightManager.highlightedEntities.isEmpty()) return;
+    public static void emitGizmos(Minecraft client, float partialTicks) {
+        if (EntityHighlightManager.highlightedEntities.isEmpty()
+                && EntityHighlightManager.wumpaEntities.isEmpty()
+                && EntityHighlightManager.doomspiralEntities.isEmpty()) return;
         if (client.player == null) return;
         if (!GameState.Server.isSkyblock()) return;
 
-        Vec3 eyePos = client.gameRenderer.mainCamera().position();
-        Vec3 startPos = eyePos.add(client.player.getLookAngle().scale(0.2));
+        // 三人称ではカメラがプレイヤーの後方へ離れるため、カメラ位置を始点にすると
+        // 線が背後から伸びているように見える。視点に関係なくプレイヤーの目の位置を始点にし、
+        // 一人称でカメラ原点と重なって線が見えなくなる分だけ視線方向へずらす
+        Vec3 eyePos = client.player.getEyePosition(partialTicks);
+        Vec3 startPos = eyePos.add(client.player.getViewVector(partialTicks).scale(0.2));
 
         for (Entity entity : EntityHighlightManager.highlightedEntities) {
             int color;
@@ -66,11 +71,33 @@ public class EntityTracerRenderer {
                 continue; // 該当なし
             }
 
-            Vec3 entityCenter = entity.position().add(0, entity.getBbHeight() / 2.0, 0);
+            Vec3 entityCenter = entity.getPosition(partialTicks).add(0, entity.getBbHeight() / 2.0, 0);
             GizmoProperties props = Gizmos.addGizmo(
                 new LineGizmo(startPos, entityCenter, color, 4.0f)
             );
             props.setAlwaysOnTop();
+        }
+
+        // Wumpa は Highlight とは独立して Tracer を出せるよう、専用の集合から描画する
+        if (ModConfig.INSTANCE.foraging.enableWumpaTracer) {
+            for (Entity entity : EntityHighlightManager.wumpaEntities) {
+                Vec3 entityCenter = entity.getPosition(partialTicks).add(0, entity.getBbHeight() / 2.0, 0);
+                GizmoProperties props = Gizmos.addGizmo(
+                    new LineGizmo(startPos, entityCenter, 0xFF55FFFF, 4.0f)
+                );
+                props.setAlwaysOnTop();
+            }
+        }
+
+        // Doomspiral も同様に独立して描画する
+        if (ModConfig.INSTANCE.foraging.enableDoomspiralTracer) {
+            for (Entity entity : EntityHighlightManager.doomspiralEntities) {
+                Vec3 entityCenter = entity.getPosition(partialTicks).add(0, entity.getBbHeight() / 2.0, 0);
+                GizmoProperties props = Gizmos.addGizmo(
+                    new LineGizmo(startPos, entityCenter, 0xFFAA00AA, 4.0f)
+                );
+                props.setAlwaysOnTop();
+            }
         }
     }
 
