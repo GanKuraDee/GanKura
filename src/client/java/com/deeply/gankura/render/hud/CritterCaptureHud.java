@@ -51,13 +51,17 @@ public class CritterCaptureHud extends HudElement {
     }
 
     private static String countLine(int captured, int total, String status) {
-        // 湧いている間は行全体を赤くして目に留まりやすくする
-        if (GameState.CritterSafari.STATUS_SPAWNED.equals(status)) {
-            return "§cCaptured Critters: " + captured + "/" + total + " (" + status + ")";
+        // 状態が確定している間は行全体をその色にして目に留まりやすくする
+        String lineColor = lineColor(status);
+        if (lineColor != null) {
+            return lineColor + "Captured Critters: " + captured + "/" + total + " (" + status + ")";
         }
+        return "§fCaptured Critters§7: §e" + captured + "§7/§e" + total;
+    }
 
-        String line = "§fCaptured Critters§7: §e" + captured + "§7/§e" + total;
-        if (GameState.CritterSafari.STATUS_CAPTURED.equals(status)) line += " §a(" + status + ")";
-        return line;
+    private static String lineColor(String status) {
+        if (GameState.CritterSafari.STATUS_SPAWNED.equals(status)) return "§c";
+        if (GameState.CritterSafari.STATUS_CAPTURED.equals(status)) return "§a";
+        return null;
     }
 }

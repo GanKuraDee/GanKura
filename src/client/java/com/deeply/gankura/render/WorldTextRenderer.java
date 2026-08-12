@@ -17,6 +17,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.render.DrawStyle;
 import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
+import java.util.Map;
+
 public class WorldTextRenderer {
 
     public static void render(MinecraftClient client, float tickProgress) {
@@ -215,10 +217,10 @@ public class WorldTextRenderer {
         return regularBossStatus("Magma Boss", GameState.MagmaBoss.respawnEndTime, GameState.MagmaBoss.isDetected);
     }
 
+    // 対象と色は tick 側(EntityHighlightManager)で決まっているので、ここでは線を引くだけ。
+    // Highlight とは独立した集合を見るため、Highlight を切っていても Tracer 単独で使える
     private static void renderBossTracers(MinecraftClient client, float tickProgress) {
-        if (EntityHighlightManager.highlightedEntities.isEmpty()
-                && EntityHighlightManager.wumpaEntities.isEmpty()
-                && EntityHighlightManager.doomspiralEntities.isEmpty()) return;
+        if (EntityHighlightManager.tracerEntities.isEmpty()) return;
 
         PlayerEntity player = client.player;
         if (player == null) return;
@@ -229,72 +231,14 @@ public class WorldTextRenderer {
                 .add(0, player.getEyeHeight(player.getPose()), 0);
         Vec3d from = eyePos.add(player.getRotationVec(tickProgress).multiply(0.5));
 
-        for (Entity entity : EntityHighlightManager.highlightedEntities) {
-            int color;
-            if (entity instanceof IronGolemEntity) {
-                if (!ModConfig.INSTANCE.theEnd.enableGolemTracer) continue;
-                color = 0xFFFFAA00;
-            } else if (EntityHighlightManager.arachneEntities.contains(entity)) {
-                // Arachne は Broodmother と同じ SpiderEntity 型のため、instanceof 判定より先に判定する
-                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
-                color = 0xFFAA00AA;
-            } else if (EntityHighlightManager.arachneBroodEntities.contains(entity)) {
-                // Arachne's Brood も同じ SpiderEntity(CaveSpiderEntity) 系のため、instanceof 判定より先に判定する
-                if (!ModConfig.INSTANCE.spidersDen.enableArachneTracer) continue;
-                color = 0xFFFF55FF;
-            } else if (entity instanceof SpiderEntity) {
-                if (!ModConfig.INSTANCE.spidersDen.enableBroodmotherTracer) continue;
-                color = 0xFFFF5555;
-            } else if (entity instanceof EnderDragonEntity) {
-                if (!ModConfig.INSTANCE.theEnd.enableDragonTracer) continue;
-                color = 0xFF000000 | dragonTracerColor(GameState.Dragon.type);
-            } else if (entity instanceof MagmaCubeEntity
-                    && EntityHighlightManager.magmaGlareEntities.contains(entity)) {
-                if (!ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareTracer) continue;
-                color = 0xFFFF5555;
-            } else {
-                CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
-                if (boss == null || !boss.enableTracer().get()) continue;
-                // Bladesoul は Wither Skeleton のみにトレーサーを表示（本体は Glow のみ）
-                if ("Bladesoul".equals(boss.nameTag()) && !(entity instanceof WitherSkeletonEntity)) continue;
-                // Ashfang は2体のBlazeで構成される。Tracer は基準座標に近い1体のみ
-                if ("Ashfang".equals(boss.nameTag()) && entity != EntityHighlightManager.ashfangTracerTarget) continue;
-                color = boss.tracerColorARGB();
-            }
+        for (Map.Entry<Entity, Integer> entry : EntityHighlightManager.tracerEntities.entrySet()) {
+            Entity entity = entry.getKey();
+            if (entity.isRemoved()) continue;
 
             // エンティティの補間済み中心位置
             Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
-            GizmoDrawing.line(from, to, color, 4.0f).ignoreOcclusion();
-        }
-
-        // Wumpa は Highlight とは独立して Tracer を出せるよう、専用の集合から描画する
-        if (ModConfig.INSTANCE.foraging.enableWumpaTracer) {
-            for (Entity entity : EntityHighlightManager.wumpaEntities) {
-                Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
-                GizmoDrawing.line(from, to, 0xFF55FFFF, 4.0f).ignoreOcclusion();
-            }
-        }
-
-        // Doomspiral も同様に独立して描画する
-        if (ModConfig.INSTANCE.foraging.enableDoomspiralTracer) {
-            for (Entity entity : EntityHighlightManager.doomspiralEntities) {
-                Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
-                GizmoDrawing.line(from, to, 0xFFAA00AA, 4.0f).ignoreOcclusion();
-            }
+            GizmoDrawing.line(from, to, entry.getValue(), 4.0f).ignoreOcclusion();
         }
     }
 
-    private static int dragonTracerColor(String type) {
-        if (type == null) return 0xFF55FF;
-        return switch (type) {
-            case "Protector" -> 0x555555;
-            case "Old"       -> 0xAAAAAA;
-            case "Unstable"  -> 0xAA00AA;
-            case "Young"     -> 0xFFFFFF;
-            case "Strong"    -> 0xFF5555;
-            case "Wise"      -> 0x55FFFF;
-            case "Superior"  -> 0xFFFF55;
-            default          -> 0xFF55FF;
-        };
-    }
 }

@@ -31,10 +31,15 @@ public class ForagingHandler {
             // Wumpa のキャプチャ成功。洞窟が開く合図なので、湧いている状態から Captured へ進める
             if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.WUMPA_CAPTURED_MSG)) {
                 GameState.CritterSafari.wumpaStatus = GameState.CritterSafari.STATUS_CAPTURED;
+                if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
+                    if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
+                    announceCapsuleUsage(client, "§b§lWumpa", GameState.CritterSafari.wumpaCapsuleHits);
+                }
+                }
                 return;
             }
             if (handleCapsuleThrow(unformattedMsg)) return;
-            if (handleDoomspiral(unformattedMsg)) return;
+            if (handleDoomspiral(unformattedMsg, client)) return;
         }
 
         if (!ModConfig.INSTANCE.foraging.enableTreeMobTitle) return;
@@ -96,7 +101,7 @@ public class ForagingHandler {
 
     // Doomspiral の儀式の進行を追う。キャンドルの本数はメッセージの文面から確定させるので、
     // 途中のメッセージを見逃しても次の1本で正しい本数に復帰する
-    private static boolean handleDoomspiral(String unformattedMsg) {
+    private static boolean handleDoomspiral(String unformattedMsg, MinecraftClient client) {
         // Doomspiral も1回のSafari入場につき1体まで。湧いた後にキャンドルをともしても
         // 2体目にはならないので、儀式の進行はスポーン確定後は更新しない
         int candles = ModConstants.doomspiralCandleCount(unformattedMsg);
@@ -119,6 +124,11 @@ public class ForagingHandler {
 
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.DOOMSPIRAL_CAPTURED_MSG)) {
             GameState.Doomspiral.status = GameState.Doomspiral.STATUS_CAPTURED;
+            if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
+                if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
+                announceCapsuleUsage(client, "§5§lDoomspiral", GameState.Doomspiral.capsuleHits);
+            }
+            }
             return true;
         }
 
@@ -144,5 +154,14 @@ public class ForagingHandler {
             GameState.Doomspiral.capsuleHits++;
         }
         return true;
+    }
+
+    // キャプチャに何個 Critter Capsule を使ったかをチャットに残す。
+    // 投擲のメッセージは戦闘中に流れて埋もれるため、決着した時点で改めて出す
+    private static void announceCapsuleUsage(MinecraftClient client, String coloredName, int hits) {
+        String unit = hits == 1 ? "Critter Capsule" : "Critter Capsules";
+        MutableText message = Text.literal(
+                coloredName + " §fcaptured! Used §e" + hits + " §f" + unit + ".");
+        client.execute(() -> NotificationUtils.sendSystemChat(client, message));
     }
 }

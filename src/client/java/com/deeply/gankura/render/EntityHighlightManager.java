@@ -3,6 +3,7 @@ package com.deeply.gankura.render;
 import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.data.MobVisualTarget;
 import com.deeply.gankura.data.ModConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
@@ -59,11 +60,9 @@ public class EntityHighlightManager {
     public static final Set<Entity> arachneBroodEntities = new HashSet<>();
     // ネームプレート表示対象 → 表示文字列。Glowingとは独立して有効化できるよう別管理としている
     public static final Map<Entity, String> nameplateEntities = new LinkedHashMap<>();
-    // Wumpa は Highlight を切ったままでも Tracer だけ使えるようにしたいので、
-    // highlightedEntities とは別に追跡対象を保持する
-    public static final Set<Entity> wumpaEntities = new LinkedHashSet<>();
-    // Doomspiral も Wumpa と同様、Highlight とは独立して Tracer を出せるようにする
-    public static final Set<Entity> doomspiralEntities = new LinkedHashSet<>();
+    // Tracer 対象 → 線の色(ARGB)。Highlight とは独立して切り替えられるよう、
+    // highlightedEntities とは別に持つ
+    public static final Map<Entity, Integer> tracerEntities = new LinkedHashMap<>();
     // Ashfangの本体は2体のBlazeで構成されるが、Tracerは1本だけ出したいので、
     // 基準座標(ASHFANG_POS)に近い方の1体を描画対象として保持する
     public static Entity ashfangTracerTarget = null;
@@ -86,30 +85,27 @@ public class EntityHighlightManager {
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
         new CrimsonBossEntry("Ashfang Follower",
             0x555555, 0xFF555555,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangFollowerTracer,
-            () -> false,
-            () -> false,
+            MobVisualTarget.ASHFANG_FOLLOWER::highlight,
+            MobVisualTarget.ASHFANG_FOLLOWER::tracer,
+            MobVisualTarget.ASHFANG_FOLLOWER::nameplate,
             () -> GameState.AshfangFollower.isDetected,
             d -> GameState.AshfangFollower.isDetected = d,
             () -> null,
             h -> {}),
         new CrimsonBossEntry("Ashfang Acolyte",
             0x5555FF, 0xFF5555FF,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangAcolyteTracer,
-            () -> false,
-            () -> false,
+            MobVisualTarget.ASHFANG_ACOLYTE::highlight,
+            MobVisualTarget.ASHFANG_ACOLYTE::tracer,
+            MobVisualTarget.ASHFANG_ACOLYTE::nameplate,
             () -> GameState.AshfangAcolyte.isDetected,
             d -> GameState.AshfangAcolyte.isDetected = d,
             () -> null,
             h -> {}),
         new CrimsonBossEntry("Ashfang Underling",
             0xFF5555, 0xFFFF5555,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangUnderlingTracer,
-            () -> false,
-            () -> false,
+            MobVisualTarget.ASHFANG_UNDERLING::highlight,
+            MobVisualTarget.ASHFANG_UNDERLING::tracer,
+            MobVisualTarget.ASHFANG_UNDERLING::nameplate,
             () -> GameState.AshfangUnderling.isDetected,
             d -> GameState.AshfangUnderling.isDetected = d,
             () -> null,
@@ -119,50 +115,45 @@ public class EntityHighlightManager {
     public static final List<CrimsonBossEntry> CRIMSON_BOSSES = List.of(
         new CrimsonBossEntry("Bladesoul",
             0x555555, 0xFF555555,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBladesoulHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBladesoulTracer,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBladesoulNameplate,
-            () -> ModConfig.INSTANCE.crimsonIsle.showBladesoulNameplateHealth,
+            MobVisualTarget.BLADESOUL::highlight,
+            MobVisualTarget.BLADESOUL::tracer,
+            MobVisualTarget.BLADESOUL::nameplate,
             () -> GameState.Bladesoul.isDetected,
             d -> GameState.Bladesoul.isDetected = d,
             () -> GameState.Bladesoul.health,
             h -> GameState.Bladesoul.health = h),
         new CrimsonBossEntry("Barbarian Duke X",
             0xFF5555, 0xFFFF5555,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBarbarianHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBarbarianTracer,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableBarbarianNameplate,
-            () -> ModConfig.INSTANCE.crimsonIsle.showBarbarianNameplateHealth,
+            MobVisualTarget.BARBARIAN_DUKE_X::highlight,
+            MobVisualTarget.BARBARIAN_DUKE_X::tracer,
+            MobVisualTarget.BARBARIAN_DUKE_X::nameplate,
             () -> GameState.BarbarianDukeX.isDetected,
             d -> GameState.BarbarianDukeX.isDetected = d,
             () -> GameState.BarbarianDukeX.health,
             h -> GameState.BarbarianDukeX.health = h),
         new CrimsonBossEntry("Mage Outlaw",
             0xAA00AA, 0xFFAA00AA,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMageOutlawHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMageOutlawTracer,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMageOutlawNameplate,
-            () -> ModConfig.INSTANCE.crimsonIsle.showMageOutlawNameplateHealth,
+            MobVisualTarget.MAGE_OUTLAW::highlight,
+            MobVisualTarget.MAGE_OUTLAW::tracer,
+            MobVisualTarget.MAGE_OUTLAW::nameplate,
             () -> GameState.MageOutlaw.isDetected,
             d -> GameState.MageOutlaw.isDetected = d,
             () -> GameState.MageOutlaw.health,
             h -> GameState.MageOutlaw.health = h),
         new CrimsonBossEntry("Ashfang",
             0xAAAAAA, 0xFFAAAAAA,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangTracer,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableAshfangNameplate,
-            () -> ModConfig.INSTANCE.crimsonIsle.showAshfangNameplateHealth,
+            MobVisualTarget.ASHFANG::highlight,
+            MobVisualTarget.ASHFANG::tracer,
+            MobVisualTarget.ASHFANG::nameplate,
             () -> GameState.Ashfang.isDetected,
             d -> GameState.Ashfang.isDetected = d,
             () -> GameState.Ashfang.health,
             h -> GameState.Ashfang.health = h),
         new CrimsonBossEntry("Magma Boss",
             0xFFAA00, 0xFFFFAA00,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMagmaBossHighlight,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMagmaBossTracer,
-            () -> ModConfig.INSTANCE.crimsonIsle.enableMagmaBossNameplate,
-            () -> ModConfig.INSTANCE.crimsonIsle.showMagmaBossNameplateHealth,
+            MobVisualTarget.MAGMA_BOSS::highlight,
+            MobVisualTarget.MAGMA_BOSS::tracer,
+            MobVisualTarget.MAGMA_BOSS::nameplate,
             () -> GameState.MagmaBoss.isDetected,
             d -> GameState.MagmaBoss.isDetected = d,
             () -> GameState.MagmaBoss.health,
@@ -287,8 +278,7 @@ public class EntityHighlightManager {
         arachneEntities.clear();
         arachneBroodEntities.clear();
         nameplateEntities.clear();
-        wumpaEntities.clear();
-        doomspiralEntities.clear();
+        tracerEntities.clear();
         ashfangTracerTarget = null;
 
         if (client.world == null || client.player == null) {
@@ -304,35 +294,34 @@ public class EntityHighlightManager {
         // ネームプレートのみ有効な場合も探索は必要だが、Glowing対象には加えない
         boolean isTheEnd = GameState.Server.isTheEnd();
         boolean golemPresent = isTheEnd && ModConstants.STAGE_SUMMONED.equals(GameState.Golem.stage);
-        boolean glowGolem = golemPresent && theEnd.enableGolemHighlight;
-        boolean scanGolem = golemPresent && (theEnd.enableGolemHighlight || theEnd.enableGolemNameplate);
+        boolean glowGolem = golemPresent && MobVisualTarget.GOLEM.highlight();
+        boolean scanGolem = golemPresent && MobVisualTarget.GOLEM.anyEnabled();
         boolean isSpidersDen = GameState.Server.isSpidersDen();
         boolean broodmotherPresent = isSpidersDen && "Alive!".equals(GameState.Broodmother.stage);
-        boolean glowBroodmother = broodmotherPresent && spidersDen.enableBroodmotherHighlight;
-        boolean scanBroodmother = broodmotherPresent && (spidersDen.enableBroodmotherHighlight || spidersDen.enableBroodmotherNameplate);
+        boolean glowBroodmother = broodmotherPresent && MobVisualTarget.BROODMOTHER.highlight();
+        boolean scanBroodmother = broodmotherPresent && MobVisualTarget.BROODMOTHER.anyEnabled();
         // Sanctuary内かつ蜘蛛の巣を検知できている間のみスキャンする(スポーン前・撃破後は存在しないため)
         boolean arachnePresent = GameState.Arachne.inSanctuary && GameState.Arachne.cobwebDetected;
-        boolean glowArachne = arachnePresent && spidersDen.enableArachneHighlight;
-        boolean scanArachne = arachnePresent && (spidersDen.enableArachneHighlight || spidersDen.enableArachneNameplate);
+        boolean glowArachne = arachnePresent && MobVisualTarget.ARACHNE.highlight();
+        boolean scanArachne = arachnePresent && (MobVisualTarget.ARACHNE.anyEnabled() || MobVisualTarget.ARACHNE_BROOD.anyEnabled());
         boolean dragonPresent = isTheEnd && "Hatched".equals(GameState.Dragon.eggState);
-        boolean glowDragon = dragonPresent && theEnd.enableDragonHighlight;
-        boolean scanDragon = dragonPresent && (theEnd.enableDragonHighlight || theEnd.enableDragonNameplate);
+        boolean glowDragon = dragonPresent && MobVisualTarget.DRAGON.highlight();
+        boolean scanDragon = dragonPresent && MobVisualTarget.DRAGON.anyEnabled();
         boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
-        boolean scanCrimsonBosses = isCrimsonIsle && CRIMSON_BOSSES.stream().anyMatch(b -> b.enableHighlight().get() || b.enableNameplate().get());
+        boolean scanCrimsonBosses = isCrimsonIsle && CRIMSON_BOSSES.stream().anyMatch(b -> b.enableHighlight().get() || b.enableNameplate().get() || b.enableTracer().get());
         boolean scanMagmaGlare = isCrimsonIsle
                 && "Kill the Magmas".equals(GameState.MagmaBoss.spawnStatus)
-                && (ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareHighlight
-                        || ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareNameplate);
-        boolean scanAshfangFollowers = isCrimsonIsle && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get());
+                && MobVisualTarget.MAGMA_GLARE.anyEnabled();
+        boolean scanAshfangFollowers = isCrimsonIsle && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get() || f.enableNameplate().get());
 
         // Wumpa: Safari に出現するラヴェジャーは Wumpa しかいないため、型だけで本体と判定できる
         ModConfig.ForagingCategory foraging = ModConfig.INSTANCE.foraging;
         boolean isSafari = GameState.Server.isSafari();
-        boolean glowWumpa = isSafari && foraging.enableWumpaHighlight;
-        boolean scanWumpa = isSafari && (foraging.enableWumpaHighlight || foraging.enableWumpaNameplate || foraging.enableWumpaTracer);
+        boolean glowWumpa = isSafari && MobVisualTarget.WUMPA.highlight();
+        boolean scanWumpa = isSafari && MobVisualTarget.WUMPA.anyEnabled();
         // Doomspiral: Safari に出現するウォーデンは Doomspiral しかいないため、型だけで本体と判定できる
-        boolean glowDoomspiral = isSafari && foraging.enableDoomspiralHighlight;
-        boolean scanDoomspiral = isSafari && (foraging.enableDoomspiralHighlight || foraging.enableDoomspiralNameplate || foraging.enableDoomspiralTracer);
+        boolean glowDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.highlight();
+        boolean scanDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.anyEnabled();
 
         if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral) {
             if (!isCrimsonIsle) {
@@ -354,8 +343,9 @@ public class EntityHighlightManager {
                 Entity s = getClosestEntity(client.world.getEntitiesByClass(SpiderEntity.class, box, e -> true), entity);
                 if (s != null) {
                     if (glowBroodmother) highlightedEntities.add(s);
-                    if (spidersDen.enableBroodmotherNameplate) {
-                        nameplateEntities.put(s, BossNameplateRenderer.buildLabel("§c§lBroodmother", GameState.Broodmother.health, ModConfig.INSTANCE.spidersDen.showBroodmotherNameplateHealth));
+                    registerTracer(s, MobVisualTarget.BROODMOTHER);
+                    if (MobVisualTarget.BROODMOTHER.nameplate()) {
+                        nameplateEntities.put(s, BossNameplateRenderer.buildLabel("§c§lBroodmother", GameState.Broodmother.health));
                     }
                 }
             }
@@ -365,8 +355,9 @@ public class EntityHighlightManager {
                 if (visualTarget != null) {
                     if (glowArachne) highlightedEntities.add(visualTarget);
                     arachneEntities.add(visualTarget);
-                    if (spidersDen.enableArachneNameplate) {
-                        nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel("§5§lArachne", GameState.Arachne.health, ModConfig.INSTANCE.spidersDen.showArachneNameplateHealth));
+                    registerTracer(visualTarget, MobVisualTarget.ARACHNE);
+                    if (MobVisualTarget.ARACHNE.nameplate()) {
+                        nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel("§5§lArachne", GameState.Arachne.health));
                     }
                 }
             }
@@ -374,15 +365,22 @@ public class EntityHighlightManager {
             if (scanArachne && ModConstants.isArachneBroodName(nameStr)) {
                 Entity visualTarget = findVisualEntity(client, entity, "Arachne's Brood");
                 if (visualTarget != null) {
-                    if (glowArachne) highlightedEntities.add(visualTarget);
+                    if (MobVisualTarget.ARACHNE_BROOD.highlight()) highlightedEntities.add(visualTarget);
                     arachneBroodEntities.add(visualTarget);
+                    registerTracer(visualTarget, MobVisualTarget.ARACHNE_BROOD);
+                    if (MobVisualTarget.ARACHNE_BROOD.nameplate()) {
+                        nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel("§d§lArachne's Brood", null));
+                    }
                 }
             }
 
-            if (glowDragon && ModConstants.containsIgnoreCase(nameStr, "Dragon")) {
+            if (scanDragon && ModConstants.containsIgnoreCase(nameStr, "Dragon")) {
                 Box box = entity.getBoundingBox().expand(20.0);
                 Entity d = getClosestEntity(client.world.getEntitiesByClass(EnderDragonEntity.class, box, e -> true), entity);
-                if (d != null) highlightedEntities.add(d);
+                if (d != null) {
+                    if (glowDragon) highlightedEntities.add(d);
+                    registerTracer(d, MobVisualTarget.DRAGON, dragonTracerColor());
+                }
             }
 
             if (scanCrimsonBosses) {
@@ -390,7 +388,7 @@ public class EntityHighlightManager {
                     CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
                     boolean glowBoss = boss.enableHighlight().get();
                     boolean plateBoss = boss.enableNameplate().get();
-                    if (!glowBoss && !plateBoss) continue;
+                    if (!glowBoss && !plateBoss && !boss.enableTracer().get()) continue;
                     // Bladesoul / Ashfang / Magma Boss はネームタグではなくエンティティの構成で判定する(後述の専用ブロック)
                     if ("Bladesoul".equals(boss.nameTag())
                             || "Ashfang".equals(boss.nameTag())
@@ -400,9 +398,10 @@ public class EntityHighlightManager {
                         if (visualTarget != null) {
                             if (glowBoss) highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, boss);
+                            registerTracer(visualTarget, boss);
                             if (plateBoss) {
                                 String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                                nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get(), boss.enableNameplateHealth().get()));
+                                nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
                             }
                         }
 
@@ -414,12 +413,18 @@ public class EntityHighlightManager {
             if (scanAshfangFollowers) {
                 for (int i = 0; i < ASHFANG_FOLLOWERS.size(); i++) {
                     CrimsonBossEntry follower = ASHFANG_FOLLOWERS.get(i);
-                    if (!follower.enableHighlight().get() && !follower.enableTracer().get()) continue;
+                    if (!follower.enableHighlight().get() && !follower.enableTracer().get()
+                            && !follower.enableNameplate().get()) continue;
                     if (ModConstants.containsIgnoreCase(nameStr, follower.nameTag())) {
                         Entity visualTarget = findVisualEntity(client, entity, follower.nameTag());
                         if (visualTarget != null) {
                             if (follower.enableHighlight().get()) highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, follower);
+                            registerTracer(visualTarget, follower);
+                            if (follower.enableNameplate().get()) {
+                                String label = BossNameplateRenderer.colorCode(follower.tracerColorARGB()) + "§l" + follower.nameTag();
+                                nameplateEntities.put(visualTarget, BossNameplateRenderer.buildLabel(label, null));
+                            }
                             followerFound[i] = true;
                         }
                     }
@@ -435,10 +440,11 @@ public class EntityHighlightManager {
             for (Entity entity : client.world.getEntities()) {
                 if (!(entity instanceof IronGolemEntity)) continue;
                 if (glowGolem) highlightedEntities.add(entity);
+                registerTracer(entity, MobVisualTarget.GOLEM);
                 if (plateGolem == null) plateGolem = entity;
             }
-            if (theEnd.enableGolemNameplate && plateGolem != null) {
-                nameplateEntities.put(plateGolem, BossNameplateRenderer.buildLabel("§6§lGolem", GameState.Golem.health, ModConfig.INSTANCE.theEnd.showGolemNameplateHealth));
+            if (MobVisualTarget.GOLEM.nameplate() && plateGolem != null) {
+                nameplateEntities.put(plateGolem, BossNameplateRenderer.buildLabel("§6§lGolem", GameState.Golem.health));
             }
         }
 
@@ -447,11 +453,11 @@ public class EntityHighlightManager {
         if (scanWumpa) {
             for (Entity entity : client.world.getEntities()) {
                 if (!(entity instanceof RavagerEntity)) continue;
-                wumpaEntities.add(entity);
                 if (glowWumpa) highlightedEntities.add(entity);
-                if (foraging.enableWumpaNameplate) {
+                registerTracer(entity, MobVisualTarget.WUMPA);
+                if (MobVisualTarget.WUMPA.nameplate()) {
                     nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§b§lWumpa",
-                            capsuleLabel(GameState.CritterSafari.wumpaCapsuleHits), true));
+                            capsuleLabel(GameState.CritterSafari.wumpaCapsuleHits)));
                 }
             }
         }
@@ -460,11 +466,11 @@ public class EntityHighlightManager {
         if (scanDoomspiral) {
             for (Entity entity : client.world.getEntities()) {
                 if (!(entity instanceof WardenEntity)) continue;
-                doomspiralEntities.add(entity);
                 if (glowDoomspiral) highlightedEntities.add(entity);
-                if (foraging.enableDoomspiralNameplate) {
+                registerTracer(entity, MobVisualTarget.DOOMSPIRAL);
+                if (MobVisualTarget.DOOMSPIRAL.nameplate()) {
                     nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§5§lDoomspiral",
-                            capsuleLabel(GameState.Doomspiral.capsuleHits), true));
+                            capsuleLabel(GameState.Doomspiral.capsuleHits)));
                 }
             }
         }
@@ -477,12 +483,13 @@ public class EntityHighlightManager {
             for (Entity entity : client.world.getEntities()) {
                 if (!(entity instanceof EnderDragonEntity)) continue;
                 if (needGlowFallback) highlightedEntities.add(entity);
+                registerTracer(entity, MobVisualTarget.DRAGON, dragonTracerColor());
                 if (plateDragon == null) plateDragon = entity;
             }
-            if (theEnd.enableDragonNameplate && plateDragon != null) {
+            if (MobVisualTarget.DRAGON.nameplate() && plateDragon != null) {
                 String type = GameState.Dragon.type != null ? GameState.Dragon.type : "Ender";
                 String label = dragonColorCode(GameState.Dragon.type) + "§l" + type + " Dragon";
-                nameplateEntities.put(plateDragon, BossNameplateRenderer.buildLabel(label, GameState.Dragon.health, ModConfig.INSTANCE.theEnd.showDragonNameplateHealth));
+                nameplateEntities.put(plateDragon, BossNameplateRenderer.buildLabel(label, GameState.Dragon.health));
             }
         }
 
@@ -502,7 +509,7 @@ public class EntityHighlightManager {
 
                 boolean glowBoss = boss.enableHighlight().get();
                 boolean plateBoss = boss.enableNameplate().get();
-                if (!glowBoss && !plateBoss) break;
+                if (!glowBoss && !plateBoss && !boss.enableTracer().get()) break;
 
                 Vec3d center = Vec3d.ofCenter(ModConstants.BLADESOUL_POS);
                 Box area = new Box(
@@ -533,13 +540,16 @@ public class EntityHighlightManager {
                     crimsonBossEntities.put(skeleton, boss);
                     crimsonBossEntities.put(pairedBlaze, boss);
                     // ネームプレートとTracerは見た目の本体である Wither Skeleton 側に出す
-                    if (plateTarget == null) plateTarget = skeleton;
+                    if (plateTarget == null) {
+                        plateTarget = skeleton;
+                        registerTracer(skeleton, boss);
+                    }
                     bossFound[i] = true;
                 }
 
                 if (plateBoss && plateTarget != null) {
                     String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get(), boss.enableNameplateHealth().get()));
+                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
                 }
                 break;
             }
@@ -575,12 +585,13 @@ public class EntityHighlightManager {
                     if (plateTarget == null) {
                         plateTarget = blaze;
                         ashfangTracerTarget = blaze;
+                        registerTracer(blaze, boss);
                     }
                 }
 
                 if (plateBoss) {
                     String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get(), boss.enableNameplateHealth().get()));
+                    nameplateEntities.put(plateTarget, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
                 }
                 bossFound[i] = true;
                 break;
@@ -592,11 +603,12 @@ public class EntityHighlightManager {
         // そちらはバニラ自然湧きサイズの小さい個体なのでサイズで振り分ける。
         // ネームタグに依存しないので、個体数が多くても取りこぼさない
         if (scanMagmaGlare && GameState.MagmaBoss.inArena) {
-            boolean glowGlare = ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareHighlight;
-            boolean plateGlare = ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareNameplate;
+            boolean glowGlare = MobVisualTarget.MAGMA_GLARE.highlight();
+            boolean plateGlare = MobVisualTarget.MAGMA_GLARE.nameplate();
             for (MagmaCubeEntity cube : magmaCubesInArena(client, e -> e.getSize() > MAGMA_MAX_NATURAL_SIZE)) {
                 if (glowGlare) highlightedEntities.add(cube);
                 magmaGlareEntities.add(cube);
+                registerTracer(cube, MobVisualTarget.MAGMA_GLARE);
                 // 即死級のダメージを与えてくるため、体力ではなく警告として目立たせる
                 if (plateGlare) nameplateEntities.put(cube, "§c§l! Magma Glare !");
             }
@@ -619,7 +631,7 @@ public class EntityHighlightManager {
 
                     boolean glowBoss = boss.enableHighlight().get();
                     boolean plateBoss = boss.enableNameplate().get();
-                    if (!glowBoss && !plateBoss) break;
+                    if (!glowBoss && !plateBoss && !boss.enableTracer().get()) break;
 
                     // Final Stage 以外では本体が巨大なので、サイズでも絞り込む。
                     // Final Stage は本体が小さくなるためサイズ判定を使えない
@@ -645,9 +657,10 @@ public class EntityHighlightManager {
 
                     if (glowBoss) highlightedEntities.add(target);
                     crimsonBossEntities.put(target, boss);
+                    registerTracer(target, boss);
                     if (plateBoss) {
                         String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                        nameplateEntities.put(target, BossNameplateRenderer.buildLabel(label, boss.getHealth().get(), boss.enableNameplateHealth().get()));
+                        nameplateEntities.put(target, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
                     }
                     bossFound[i] = true;
                     break;
@@ -668,7 +681,7 @@ public class EntityHighlightManager {
                 boss.setIsDetected().accept(present);
 
                 // 「いない」と確定するまでの猶予を計測しつつ、最後に確定した状態をラッチする
-                boolean detectionEnabled = boss.enableHighlight().get() || boss.enableNameplate().get();
+                boolean detectionEnabled = boss.enableHighlight().get() || boss.enableNameplate().get() || boss.enableTracer().get();
                 if (present) {
                     absenceSince.remove(boss.nameTag());
                     killedConfirmedAt.remove(boss.nameTag());
@@ -724,16 +737,17 @@ public class EntityHighlightManager {
 
             boolean glowBoss = boss.enableHighlight().get();
             boolean plateBoss = boss.enableNameplate().get();
-            if (!glowBoss && !plateBoss) return;
+            if (!glowBoss && !plateBoss && !boss.enableTracer().get()) return;
 
             for (PlayerEntity player : client.world.getPlayers()) {
                 if (player == client.player || !matchesEntityName(player, entityName)) continue;
 
                 if (glowBoss) highlightedEntities.add(player);
                 crimsonBossEntities.put(player, boss);
+                registerTracer(player, boss);
                 if (plateBoss) {
                     String label = BossNameplateRenderer.colorCode(boss.tracerColorARGB()) + "§l" + boss.nameTag();
-                    nameplateEntities.put(player, BossNameplateRenderer.buildLabel(label, boss.getHealth().get(), boss.enableNameplateHealth().get()));
+                    nameplateEntities.put(player, BossNameplateRenderer.buildLabel(label, boss.getHealth().get()));
                 }
                 bossFound[i] = true;
                 return;
@@ -805,5 +819,33 @@ public class EntityHighlightManager {
     private static String capsuleLabel(int hits) {
         int shown = Math.min(hits, ModConstants.CAPSULE_MAX_THROWS);
         return ModConstants.RAW_HEALTH_PREFIX + "§e" + shown + "§7/§e" + ModConstants.CAPSULE_MAX_THROWS;
+    }
+
+    // Tracer は Highlight と独立して切り替えられる。対象に入っていれば線の色を登録する
+    private static void registerTracer(Entity entity, MobVisualTarget target) {
+        registerTracer(entity, target, target.tracerColorARGB());
+    }
+
+    private static void registerTracer(Entity entity, MobVisualTarget target, int colorARGB) {
+        if (entity != null && target.tracer()) tracerEntities.put(entity, colorARGB);
+    }
+
+    // Crimson 系はエントリ側の設定(= Mob Visuals のリスト)をそのまま使う
+    private static void registerTracer(Entity entity, CrimsonBossEntry boss) {
+        if (entity != null && boss.enableTracer().get()) tracerEntities.put(entity, boss.tracerColorARGB());
+    }
+
+    // Dragon だけは種類ごとに色が変わるため、Tracer の色もそこから作る
+    private static int dragonTracerColor() {
+        return switch (GameState.Dragon.type == null ? "" : GameState.Dragon.type) {
+            case "Protector" -> 0xFF555555;
+            case "Old"       -> 0xFFAAAAAA;
+            case "Unstable"  -> 0xFFAA00AA;
+            case "Young"     -> 0xFFFFFFFF;
+            case "Strong"    -> 0xFFFF5555;
+            case "Wise"      -> 0xFF55FFFF;
+            case "Superior"  -> 0xFFFFFF55;
+            default          -> 0xFFFF55FF;
+        };
     }
 }
