@@ -74,11 +74,14 @@ public class ModConfig extends Config {
         if (INSTANCE.spidersDen == null)  INSTANCE.spidersDen  = new SpidersDenCategory();
         if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
         if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
+        if (INSTANCE.mobVisuals == null) INSTANCE.mobVisuals = new MobVisualsCategory();
         INSTANCE.gui.openHudEditor = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().setScreen(new HudEditorScreen());
             });
         };
+        INSTANCE.mobVisuals.resetNameplateScale =
+                () -> INSTANCE.mobVisuals.nameplateScale = MobVisualsCategory.DEFAULT_NAMEPLATE_SCALE;
         INSTANCE.misc.resetHeldItemScale = () -> INSTANCE.misc.heldItemScale = 1.0f;
         INSTANCE.misc.resetHeldItemOffsetX = () -> INSTANCE.misc.heldItemOffsetX = 0.0f;
         INSTANCE.misc.resetHeldItemOffsetY = () -> INSTANCE.misc.heldItemOffsetY = 0.0f;
@@ -91,6 +94,10 @@ public class ModConfig extends Config {
         INSTANCE.theEnd.dragonSpawnAlerts = normalizeEnumList(INSTANCE.theEnd.dragonSpawnAlerts, DragonAlertType.defaults());
 
         // 起動時やエラー発生時に、確実に現在の設定をJSON形式でファイルに書き込んでおく
+        INSTANCE.mobVisuals.highlightTargets = normalizeEnumList(INSTANCE.mobVisuals.highlightTargets, MobVisualTarget.defaults());
+        INSTANCE.mobVisuals.tracerTargets = normalizeEnumList(INSTANCE.mobVisuals.tracerTargets, MobVisualTarget.defaults());
+        INSTANCE.mobVisuals.nameplateTargets = normalizeEnumList(INSTANCE.mobVisuals.nameplateTargets, MobVisualTarget.defaults());
+
         INSTANCE.saveNow();
     }
 
@@ -155,6 +162,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Foraging", desc = "Foraging features.")
     public ForagingCategory foraging = new ForagingCategory();
+
+    @Expose
+    @Category(name = "Mob Visuals", desc = "Which mobs get a highlight, tracer or nameplate.")
+    public MobVisualsCategory mobVisuals = new MobVisualsCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous features.")
@@ -292,68 +303,30 @@ public class ModConfig extends Config {
         public boolean golemChatFolder = false;
 
         @Expose
-        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows stage 4→5 duration.")
+        @ConfigOption(name = "Stage 4 Duration Message", desc = "Shows stage 4→5 duration.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showStage4Duration = true;
 
         @Expose
-        @ConfigOption(name = "DPS Chat", desc = "Shows DPS results in chat.")
+        @ConfigOption(name = "DPS Message", desc = "Shows DPS results in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showDpsChat = true;
 
         @Expose
-        @ConfigOption(name = "Loot Quality Chat", desc = "Shows loot quality in chat.")
+        @ConfigOption(name = "Loot Quality Message", desc = "Shows loot quality in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean showLootQualityChat = true;
 
         @Expose
-        @ConfigOption(name = "Day 30+ Alert Chat", desc = "Alerts on day 30+.")
+        @ConfigOption(name = "Day 30+ Alert Message", desc = "Alerts on day 30+.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 5)
         public boolean enableDay30Alert = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 6)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean golemHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Golem.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 6)
-        public boolean enableGolemHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Golem.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 6)
-        public boolean enableGolemTracer = true;
-
         // ---- Nameplate (id: 8) ----
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 8)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean golemNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Golem.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 8)
-        public boolean enableGolemNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 8)
-        public boolean showGolemNameplateHealth = true;
-
         // ========== Dragon section ==========
         @Expose
         @ConfigOption(name = "Dragon", desc = "Expands Dragon settings.")
@@ -426,55 +399,18 @@ public class ModConfig extends Config {
         public boolean dragonChatFolder = false;
 
         @Expose
-        @ConfigOption(name = "DPS Chat", desc = "Shows DPS results in chat.")
+        @ConfigOption(name = "DPS Message", desc = "Shows DPS results in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 13)
         public boolean showDragonDpsChat = true;
 
         @Expose
-        @ConfigOption(name = "Loot Quality Chat", desc = "Shows loot quality in chat.")
+        @ConfigOption(name = "Loot Quality Message", desc = "Shows loot quality in chat.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 13)
         public boolean showDragonLootQualityChat = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 14)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean dragonHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Dragon.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 14)
-        public boolean enableDragonHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Dragon.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 14)
-        public boolean enableDragonTracer = true;
-
         // ---- Nameplate (id: 16) ----
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 16)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean dragonNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Dragon.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 16)
-        public boolean enableDragonNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 16)
-        public boolean showDragonNameplateHealth = true;
     }
 
     // ==========================================
@@ -546,50 +482,12 @@ public class ModConfig extends Config {
         public boolean broodmotherChatFolder = false;
 
         @Expose
-        @ConfigOption(name = "Stage 4 Duration Chat", desc = "Shows stage 4→5 duration.")
+        @ConfigOption(name = "Stage 4 Duration Message", desc = "Shows stage 4→5 duration.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 1)
         public boolean showBroodmotherStage4Duration = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 4)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean broodmotherHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Broodmother.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4)
-        public boolean enableBroodmotherHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Broodmother.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 4)
-        public boolean enableBroodmotherTracer = true;
-
         // ---- Nameplate (id: 8) ----
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 8)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean broodmotherNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Broodmother.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 8)
-        public boolean enableBroodmotherNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 8)
-        public boolean showBroodmotherNameplateHealth = true;
-
         @Expose
         @ConfigOption(name = "Arachne", desc = "Expands Arachne settings.")
         @ConfigEditorAccordion(id = 5)
@@ -621,44 +519,7 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 6)
         public boolean showArachneWorldText = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 7)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
-        public boolean arachneHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Arachne.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 7)
-        public boolean enableArachneHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Arachne.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 7)
-        public boolean enableArachneTracer = true;
-
         // ---- Nameplate (id: 9) ----
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 9)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
-        public boolean arachneNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Arachne.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 9)
-        public boolean enableArachneNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 9)
-        public boolean showArachneNameplateHealth = true;
     }
 
     // ==========================================
@@ -721,44 +582,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 0)
         public boolean showBarbarianHealthHud = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 2)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean barbarianHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Barbarian Duke X.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
-        public boolean enableBarbarianHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Barbarian Duke X.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 2)
-        public boolean enableBarbarianTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 1)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean barbarianNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Barbarian Duke X.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
-        public boolean enableBarbarianNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 1)
-        public boolean showBarbarianNameplateHealth = true;
-
         // ---- Bladesoul (id: 10) ----
         @Expose
         @ConfigOption(name = "Bladesoul", desc = "Expands Bladesoul settings.")
@@ -771,44 +594,6 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 10)
         public boolean showBladesoulHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 12)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean bladesoulHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Bladesoul.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 12)
-        public boolean enableBladesoulHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Bladesoul.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 12)
-        public boolean enableBladesoulTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 11)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean bladesoulNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Bladesoul.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 11)
-        public boolean enableBladesoulNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 11)
-        public boolean showBladesoulNameplateHealth = true;
 
         // ---- Mage Outlaw (id: 20) ----
         @Expose
@@ -823,44 +608,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 20)
         public boolean showMageOutlawHealthHud = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 22)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 20)
-        public boolean mageOutlawHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Mage Outlaw.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 22)
-        public boolean enableMageOutlawHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Mage Outlaw.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 22)
-        public boolean enableMageOutlawTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 21)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 20)
-        public boolean mageOutlawNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Mage Outlaw.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 21)
-        public boolean enableMageOutlawNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 21)
-        public boolean showMageOutlawNameplateHealth = true;
-
         // ---- Ashfang (id: 30, 33) ----
         @Expose
         @ConfigOption(name = "Ashfang", desc = "Expands Ashfang settings.")
@@ -873,87 +620,6 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 30)
         public boolean showAshfangHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 32)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 30)
-        public boolean ashfangHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Ashfang.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 32)
-        public boolean enableAshfangHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Ashfang.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 32)
-        public boolean enableAshfangTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 31)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 30)
-        public boolean ashfangNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Ashfang.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 31)
-        public boolean enableAshfangNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 31)
-        public boolean showAshfangNameplateHealth = true;
-
-        @Expose
-        @ConfigOption(name = "Follower Highlight", desc = "Expands follower highlight settings.")
-        @ConfigEditorAccordion(id = 33)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 30)
-        public boolean ashfangFollowerHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Follower Glowing", desc = "Highlights Followers.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangFollowerHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Follower Tracer", desc = "Draws tracer to Followers.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangFollowerTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Acolyte Glowing", desc = "Highlights Acolytes.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangAcolyteHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Acolyte Tracer", desc = "Draws tracer to Acolytes.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangAcolyteTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Underling Glowing", desc = "Highlights Underlings.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangUnderlingHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Underling Tracer", desc = "Draws tracer to Underlings.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 33)
-        public boolean enableAshfangUnderlingTracer = true;
 
         // ---- Magma Boss (id: 40) ----
         @Expose
@@ -974,44 +640,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 40)
         public boolean enableMagmaBossSpawnTitle = true;
 
-        @Expose
-        @ConfigOption(name = "Boss Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 43)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean magmaBossHighlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Magma Boss.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 43)
-        public boolean enableMagmaBossHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Magma Boss.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 43)
-        public boolean enableMagmaBossTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 42)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean magmaBossNameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows a nameplate on Magma Boss.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 42)
-        public boolean enableMagmaBossNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Show Health", desc = "Adds a health line to the nameplate.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 42)
-        public boolean showMagmaBossNameplateHealth = true;
-
         // Magma Boss アコーディオンの中にネストさせた Magma Glare 用アコーディオン
         @Expose
         @ConfigOption(name = "Magma Glare", desc = "Expands Magma Glare settings.")
@@ -1020,23 +648,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 40)
         public boolean magmaGlareSection = false;
 
-        @Expose
-        @ConfigOption(name = "Glowing", desc = "Highlights Magma Glare during the Kill the Magmas phase.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 41)
-        public boolean enableMagmaGlareHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws tracer to Magma Glare during the Kill the Magmas phase.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 41)
-        public boolean enableMagmaGlareTracer = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Shows a warning label on Magma Glare.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 41)
-        public boolean enableMagmaGlareNameplate = true;
     }
 
     // ==========================================
@@ -1068,17 +679,17 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
-        @ConfigOption(name = "Capture HUD", desc = "Shows which Icy Biome critters have been captured.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 71)
-        public boolean showCritterCaptureHud = true;
-
-        @Expose
         @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
         @ConfigEditorAccordion(id = 72)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean wumpaFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Shows which Icy Biome critters have been captured.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 72)
+        public boolean showCritterCaptureHud = true;
 
         @Expose
         @ConfigOption(name = "Spawn Title", desc = "Shows a title when Wumpa spawns in the Icy Biome.")
@@ -1087,22 +698,10 @@ public class ModConfig extends Config {
         public boolean enableWumpaSpawnTitle = true;
 
         @Expose
-        @ConfigOption(name = "Highlight", desc = "Highlights Wumpa.")
+        @ConfigOption(name = "Capsule Usage Message", desc = "Posts how many Critter Capsules the capture took.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 72)
-        public boolean enableWumpaHighlight = true;
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on Wumpa.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 72)
-        public boolean enableWumpaNameplate = true;
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line to Wumpa.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 72)
-        public boolean enableWumpaTracer = true;
+        public boolean enableWumpaCapsuleMessage = true;
 
         @Expose
         @ConfigOption(name = "Re-enter Waypoint", desc = "Marks the hole used to re-enter the Wumpa arena.")
@@ -1118,28 +717,91 @@ public class ModConfig extends Config {
         public boolean doomspiralFolder = false;
 
         @Expose
-        @ConfigOption(name = "Ritual HUD", desc = "Shows how many candles have been lit.")
+        @ConfigOption(name = "Status HUD", desc = "Shows how many candles have been lit.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 73)
         public boolean showDoomspiralHud = true;
 
         @Expose
-        @ConfigOption(name = "Highlight", desc = "Highlights Doomspiral.")
+        @ConfigOption(name = "Capsule Usage Message", desc = "Posts how many Critter Capsules the capture took.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 73)
-        public boolean enableDoomspiralHighlight = true;
+        public boolean enableDoomspiralCapsuleMessage = true;
+
+    }
+
+    // ==========================================
+    // Mob Visuals: 3機能それぞれの対象モブ
+    // ==========================================
+    public static class MobVisualsCategory {
+        // ネームプレートの基準サイズ。1.0 でGUIスケール4相当の見え方になる
+        public static final float DEFAULT_NAMEPLATE_SCALE = 1.0f;
 
         @Expose
-        @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on Doomspiral.")
+        @ConfigOption(name = "Highlight", desc = "Expands highlight settings.")
+        @ConfigEditorAccordion(id = 80)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 73)
-        public boolean enableDoomspiralNameplate = true;
+        public boolean highlightFolder = false;
 
         @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line to Doomspiral.")
+        @ConfigOption(name = "Enable", desc = "Turns every highlight on or off.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 73)
-        public boolean enableDoomspiralTracer = true;
+        @ConfigAccordionId(id = 80)
+        public boolean enableHighlight = true;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to outline with a glow.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 80)
+        public List<MobVisualTarget> highlightTargets = new ArrayList<>(MobVisualTarget.defaults());
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Expands tracer settings.")
+        @ConfigEditorAccordion(id = 81)
+        @ConfigEditorBoolean
+        public boolean tracerFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns every tracer on or off.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 81)
+        public boolean enableTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to draw a line to.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 81)
+        public List<MobVisualTarget> tracerTargets = new ArrayList<>(MobVisualTarget.defaults());
+
+        @Expose
+        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
+        @ConfigEditorAccordion(id = 82)
+        @ConfigEditorBoolean
+        public boolean nameplateFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns every nameplate on or off.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 82)
+        public boolean enableNameplate = true;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show a nameplate on.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 82)
+        public List<MobVisualTarget> nameplateTargets = new ArrayList<>(MobVisualTarget.defaults());
+
+        @Expose
+        @ConfigOption(name = "Size", desc = "Changes nameplate text size.")
+        @ConfigEditorSlider(minValue = 0.25f, maxValue = 3.0f, minStep = 0.05f)
+        @ConfigAccordionId(id = 82)
+        public float nameplateScale = DEFAULT_NAMEPLATE_SCALE;
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Reset Size", desc = "Reset to default.")
+        @ConfigEditorButton(buttonText = "Reset")
+        @ConfigAccordionId(id = 82)
+        public transient Runnable resetNameplateScale = () -> nameplateScale = DEFAULT_NAMEPLATE_SCALE;
     }
 
     public static class MiscCategory {
