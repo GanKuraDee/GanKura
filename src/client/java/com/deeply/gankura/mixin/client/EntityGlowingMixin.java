@@ -7,6 +7,8 @@ import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
+import net.minecraft.entity.mob.RavagerEntity;
+import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -68,6 +70,14 @@ public class EntityGlowingMixin {
             }
             else if (entity instanceof EnderDragonEntity) {
                 cir.setReturnValue(dragonColor(GameState.Dragon.type));
+            }
+            else if (entity instanceof RavagerEntity) {
+                // Wumpa: 水色
+                cir.setReturnValue(0x55FFFF);
+            }
+            else if (entity instanceof WardenEntity) {
+                // Doomspiral: 紫
+                cir.setReturnValue(0xAA00AA);
             }
             else if (entity instanceof MagmaCubeEntity
                     && EntityHighlightManager.magmaGlareEntities.contains(entity)) {

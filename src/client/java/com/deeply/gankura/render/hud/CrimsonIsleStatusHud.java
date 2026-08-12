@@ -19,7 +19,7 @@ public class CrimsonIsleStatusHud extends HudElement {
     public void renderElement(DrawContext context, boolean isPreview) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         drawTextWithShadow(context, tr, "§c§lNether Boss Status", 0, 0, 0xFFFFFFFF);
-        int y = 14;
+        int y = 12;
         for (var boss : EntityHighlightManager.CRIMSON_BOSSES) {
             String status;
             // Magma Boss はエリア内にいる間だけサイドバーからフェーズも取れる

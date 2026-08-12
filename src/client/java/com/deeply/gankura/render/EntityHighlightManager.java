@@ -12,6 +12,8 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.RavagerEntity;
+import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
@@ -57,6 +59,11 @@ public class EntityHighlightManager {
     public static final Set<Entity> arachneBroodEntities = new HashSet<>();
     // ネームプレート表示対象 → 表示文字列。Glowingとは独立して有効化できるよう別管理としている
     public static final Map<Entity, String> nameplateEntities = new LinkedHashMap<>();
+    // Wumpa は Highlight を切ったままでも Tracer だけ使えるようにしたいので、
+    // highlightedEntities とは別に追跡対象を保持する
+    public static final Set<Entity> wumpaEntities = new LinkedHashSet<>();
+    // Doomspiral も Wumpa と同様、Highlight とは独立して Tracer を出せるようにする
+    public static final Set<Entity> doomspiralEntities = new LinkedHashSet<>();
     // Ashfangの本体は2体のBlazeで構成されるが、Tracerは1本だけ出したいので、
     // 基準座標(ASHFANG_POS)に近い方の1体を描画対象として保持する
     public static Entity ashfangTracerTarget = null;
@@ -280,6 +287,8 @@ public class EntityHighlightManager {
         arachneEntities.clear();
         arachneBroodEntities.clear();
         nameplateEntities.clear();
+        wumpaEntities.clear();
+        doomspiralEntities.clear();
         ashfangTracerTarget = null;
 
         if (client.world == null || client.player == null) {
@@ -316,7 +325,16 @@ public class EntityHighlightManager {
                         || ModConfig.INSTANCE.crimsonIsle.enableMagmaGlareNameplate);
         boolean scanAshfangFollowers = isCrimsonIsle && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get());
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers) {
+        // Wumpa: Safari に出現するラヴェジャーは Wumpa しかいないため、型だけで本体と判定できる
+        ModConfig.ForagingCategory foraging = ModConfig.INSTANCE.foraging;
+        boolean isSafari = GameState.Server.isSafari();
+        boolean glowWumpa = isSafari && foraging.enableWumpaHighlight;
+        boolean scanWumpa = isSafari && (foraging.enableWumpaHighlight || foraging.enableWumpaNameplate || foraging.enableWumpaTracer);
+        // Doomspiral: Safari に出現するウォーデンは Doomspiral しかいないため、型だけで本体と判定できる
+        boolean glowDoomspiral = isSafari && foraging.enableDoomspiralHighlight;
+        boolean scanDoomspiral = isSafari && (foraging.enableDoomspiralHighlight || foraging.enableDoomspiralNameplate || foraging.enableDoomspiralTracer);
+
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral) {
             if (!isCrimsonIsle) {
                 for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
             }
@@ -421,6 +439,33 @@ public class EntityHighlightManager {
             }
             if (theEnd.enableGolemNameplate && plateGolem != null) {
                 nameplateEntities.put(plateGolem, BossNameplateRenderer.buildLabel("§6§lGolem", GameState.Golem.health, ModConfig.INSTANCE.theEnd.showGolemNameplateHealth));
+            }
+        }
+
+        // Wumpa: Safari に出現するラヴェジャーは Wumpa のみなので、ネームタグを読まずに型だけで判定する。
+        // 同時に複数体が湧きうるため、Golem と違い見つかった全個体にネームプレートを付ける
+        if (scanWumpa) {
+            for (Entity entity : client.world.getEntities()) {
+                if (!(entity instanceof RavagerEntity)) continue;
+                wumpaEntities.add(entity);
+                if (glowWumpa) highlightedEntities.add(entity);
+                if (foraging.enableWumpaNameplate) {
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§b§lWumpa",
+                            capsuleLabel(GameState.CritterSafari.wumpaCapsuleHits), true));
+                }
+            }
+        }
+
+        // Doomspiral: Wumpa と同じく、Safari のウォーデンは Doomspiral のみなので型だけで判定する
+        if (scanDoomspiral) {
+            for (Entity entity : client.world.getEntities()) {
+                if (!(entity instanceof WardenEntity)) continue;
+                doomspiralEntities.add(entity);
+                if (glowDoomspiral) highlightedEntities.add(entity);
+                if (foraging.enableDoomspiralNameplate) {
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§5§lDoomspiral",
+                            capsuleLabel(GameState.Doomspiral.capsuleHits), true));
+                }
             }
         }
 
@@ -753,5 +798,12 @@ public class EntityHighlightManager {
             if (d < minDist) { minDist = d; closest = e; }
         }
         return closest;
+    }
+
+    // Critter Capsule を当てた回数。HPと同じ位置に出したいので、
+    // 数値パースを挟まず色付き文字列をそのまま描かせる印(RAW)を付ける
+    private static String capsuleLabel(int hits) {
+        int shown = Math.min(hits, ModConstants.CAPSULE_MAX_THROWS);
+        return ModConstants.RAW_HEALTH_PREFIX + "§e" + shown + "§7/§e" + ModConstants.CAPSULE_MAX_THROWS;
     }
 }

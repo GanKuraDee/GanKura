@@ -139,6 +139,69 @@ public class ModConstants {
     public static final Pattern TREE_MOB_FELL_PATTERN =
             Pattern.compile("A (.+?) fell from the Tree!", Pattern.CASE_INSENSITIVE);
 
+    // Critter Capsule を当てた回数の上限。20回以内に必ずキャプチャできる
+    public static final int CAPSULE_MAX_THROWS = 20;
+    // "You threw a Critter Capsule at the Wumpa!"
+    public static final Pattern CAPSULE_THROW_PATTERN =
+            Pattern.compile("You threw a Critter Capsule at the (.+?)!", Pattern.CASE_INSENSITIVE);
+    public static final String WUMPA_NAME = "Wumpa";
+    public static final String DOOMSPIRAL_NAME = "Doomspiral";
+
+    // Wumpa のキャプチャ成功の合図
+    public static final String WUMPA_CAPTURED_MSG = "The cave opens up again";
+
+    // Wumpaに敗れた後、戦闘エリアへ戻るための小さな穴。ウェイポイントとして目印を出す
+    public static final BlockPos WUMPA_REENTER_POS = new BlockPos(-94, 84, -64);
+
+    // Doomspiral の儀式。キャンドル4本をともすと出現する。
+    // 本数はメッセージ後半の文面から確定させるので、途中を取りこぼしても次の1本で復帰できる
+    public static final String DOOMSPIRAL_CANDLE_MSG = "You used the Soothing Incense to light the candle!";
+    private static final String[] DOOMSPIRAL_CANDLE_SUFFIXES = {
+            "You begin to feel uneasy.",
+            "Something is off about this place...",
+            "Are you sure you wish to continue?",
+            "The ground beneath your feet starts to shift..."
+    };
+    public static final int DOOMSPIRAL_CANDLE_TOTAL = DOOMSPIRAL_CANDLE_SUFFIXES.length;
+
+    // ともした本数(1〜4)。キャンドルのメッセージでなければ0
+    public static int doomspiralCandleCount(String msg) {
+        if (!containsIgnoreCase(msg, DOOMSPIRAL_CANDLE_MSG)) return 0;
+        for (int i = 0; i < DOOMSPIRAL_CANDLE_SUFFIXES.length; i++) {
+            if (containsIgnoreCase(msg, DOOMSPIRAL_CANDLE_SUFFIXES[i])) return i + 1;
+        }
+        return 0;
+    }
+
+    public static final String DOOMSPIRAL_SUMMON_MSG = "Your ritual summoned a Doomspiral into this world";
+    // 実際の文面は "The darkness in the Haunted Biome  fades away..." だが、
+    // 空白の数が揺れても拾えるよう前半だけを一致条件にする
+    public static final String DOOMSPIRAL_CAPTURED_MSG = "The darkness in the Haunted Biome";
+    public static final String DOOMSPIRAL_DESPAWN_MSG = "The Doomspiral retreats back underground";
+
+    // Icy Biome に出現する Critter(Wumpa を除く8種)。
+    // これらをすべてキャプチャすると Wumpa がスポーンする
+    public static final List<String> ICY_BIOME_CRITTERS = List.of(
+            "Strongarm", "Tepid", "Polaris", "Shuddersquid",
+            "Billygoat", "Mantis Shrimp", "Nozzlenose", "Troodon");
+
+    // "CAPTURE! You caught a Troodon and gained a Troodon Shard!"
+    // シャードが複数落ちると "gained 2x Troodon Shard!" のように個数表記へ変わるため、
+    // 獲得側の文面は個数・冠詞を問わず素通しにし、捕まえた側の名前だけを取る
+    public static final Pattern CRITTER_CAPTURE_PATTERN =
+            Pattern.compile("CAPTURE! You caught an? (.+?) and gained .+? Shard!", Pattern.CASE_INSENSITIVE);
+
+    // キャプチャ表示名から対象の Critter を引く。名前は ICY_BIOME_CRITTERS を唯一の定義とし、
+    // Hypixel 側の表記ゆれに備えて大文字小文字は無視する
+    public static String findIcyBiomeCritter(String name) {
+        if (name == null) return null;
+        String trimmed = name.trim();
+        for (String critter : ICY_BIOME_CRITTERS) {
+            if (critter.equalsIgnoreCase(trimmed)) return critter;
+        }
+        return null;
+    }
+
     // Critter Safari の Wumpa スポーン告知。
     // 全文は "You hear the sound of massive footsteps echoing through the Icy Biome... What could it be?" だが、
     // 末尾の煽り文が変わっても拾えるよう、核となる部分だけを一致条件にする

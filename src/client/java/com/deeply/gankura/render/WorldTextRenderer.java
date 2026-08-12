@@ -14,6 +14,7 @@ import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.render.DrawStyle;
 import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
 public class WorldTextRenderer {
@@ -24,7 +25,22 @@ public class WorldTextRenderer {
         renderGolemLocationText(client, client.player);
         renderCrimsonBossLocationTexts(client.player);
         renderArachneLocationText(client, client.player);
+        renderWumpaWaypoint();
         renderBossTracers(client, tickProgress);
+    }
+
+
+    // Wumpaに敗れた後、戦闘エリアへ戻る小さな穴の目印。
+    // Wumpaが湧いている間しか使い道がないので、その間だけ表示する
+    private static void renderWumpaWaypoint() {
+        if (!ModConfig.INSTANCE.foraging.enableWumpaWaypoint) return;
+        if (!GameState.Server.isSafari()) return;
+        if (!GameState.CritterSafari.isWumpaSpawned()) return;
+
+        BlockPos pos = ModConstants.WUMPA_REENTER_POS;
+        // 枠線ではなくブロック全体を塗りつぶす
+        GizmoDrawing.box(pos, DrawStyle.filled(0x8055FFFF)).ignoreOcclusion();
+        renderGizmoLabel("§fRe-enter", pos, 0xFFFFFFFF);
     }
 
     private static void renderGolemLocationText(MinecraftClient client, PlayerEntity player) {
@@ -200,7 +216,9 @@ public class WorldTextRenderer {
     }
 
     private static void renderBossTracers(MinecraftClient client, float tickProgress) {
-        if (EntityHighlightManager.highlightedEntities.isEmpty()) return;
+        if (EntityHighlightManager.highlightedEntities.isEmpty()
+                && EntityHighlightManager.wumpaEntities.isEmpty()
+                && EntityHighlightManager.doomspiralEntities.isEmpty()) return;
 
         PlayerEntity player = client.player;
         if (player == null) return;
@@ -247,6 +265,22 @@ public class WorldTextRenderer {
             // エンティティの補間済み中心位置
             Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
             GizmoDrawing.line(from, to, color, 4.0f).ignoreOcclusion();
+        }
+
+        // Wumpa は Highlight とは独立して Tracer を出せるよう、専用の集合から描画する
+        if (ModConfig.INSTANCE.foraging.enableWumpaTracer) {
+            for (Entity entity : EntityHighlightManager.wumpaEntities) {
+                Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
+                GizmoDrawing.line(from, to, 0xFF55FFFF, 4.0f).ignoreOcclusion();
+            }
+        }
+
+        // Doomspiral も同様に独立して描画する
+        if (ModConfig.INSTANCE.foraging.enableDoomspiralTracer) {
+            for (Entity entity : EntityHighlightManager.doomspiralEntities) {
+                Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
+                GizmoDrawing.line(from, to, 0xFFAA00AA, 4.0f).ignoreOcclusion();
+            }
         }
     }
 
