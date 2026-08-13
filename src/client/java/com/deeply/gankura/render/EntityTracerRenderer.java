@@ -1,6 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoProperties;
 import net.minecraft.gizmos.Gizmos;
@@ -20,10 +21,16 @@ public class EntityTracerRenderer {
         if (!GameState.Server.isSkyblock()) return;
 
         // 三人称ではカメラがプレイヤーの後方へ離れるため、カメラ位置を始点にすると
-        // 線が背後から伸びているように見える。視点に関係なくプレイヤーの目の位置を始点にし、
-        // 一人称でカメラ原点と重なって線が見えなくなる分だけ視線方向へずらす
-        Vec3 eyePos = client.player.getEyePosition(partialTicks);
-        Vec3 startPos = eyePos.add(client.player.getViewVector(partialTicks).scale(0.2));
+        // 線が背後から伸びているように見えるので、その場合だけプレイヤーの目の位置を使う。
+        //
+        // 一人称ではカメラ位置をそのまま始点にする。しゃがみ中のカメラは
+        // 目の高さへ毎フレーム少しずつ近づく形で補間されており、getEyePosition() の
+        // 高さとは一致しない。その差がそのまま線の向きのずれになるため、
+        // カメラを基準にすることで始点を画面中央に固定する。
+        // 始点がカメラ原点と重なって線が見えなくなる分だけ視線方向へずらす
+        Camera camera = client.gameRenderer.mainCamera();
+        Vec3 basePos = camera.isDetached() ? client.player.getEyePosition(partialTicks) : camera.position();
+        Vec3 startPos = basePos.add(client.player.getViewVector(partialTicks).scale(0.2));
 
         for (Map.Entry<Entity, Integer> entry : EntityHighlightManager.tracerEntities.entrySet()) {
             Entity entity = entry.getKey();

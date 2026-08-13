@@ -18,6 +18,9 @@ public class ModConstants {
     public static final String MAP_CRIMSON_ISLE = "Crimson Isle";
     // Critter Safari のエリア名はタブリスト上では "Safari" とだけ表示される
     public static final String MAP_SAFARI = "Safari";
+    // シュルカー(Hideon系)が敵として出現するエリア
+    public static final String MAP_MOONGLADE_MARSH = "Moonglade Marsh";
+    public static final String MAP_TORRHUS_CANYON = "Torrhus Canyon";
 
     // タブリスト上で現在地とサーバーIDを載せている行の接頭辞
     public static final String TAB_AREA_PREFIX = "Area:";
