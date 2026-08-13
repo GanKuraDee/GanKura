@@ -25,7 +25,11 @@ public enum MobVisualTarget {
     MAGMA_BOSS("§6Magma Boss", 0xFFAA00),
     MAGMA_GLARE("§cMagma Glare", 0xFF5555),
     WUMPA("§bWumpa", 0x55FFFF),
-    DOOMSPIRAL("§5Doomspiral", 0xAA00AA);
+    DOOMSPIRAL("§5Doomspiral", 0xAA00AA),
+    HIDEONLEAF("§aHideonleaf", 0x55FF55),
+    HIDEONSUN("§eHideonsun", 0xFFFF55),
+    HIDEONFLOOR("§aHideonfloor", 0x55FF55),
+    HIDEONWALL("§5Hideonwall", 0xAA00AA);
 
     private final String label;
     private final int glowColorRGB;
@@ -37,6 +41,11 @@ public enum MobVisualTarget {
 
     public String label() {
         return label;
+    }
+
+    /** 色コードを除いた表示名。ネームプレートのように色を別途付ける場合に使う */
+    public String plainLabel() {
+        return label.replaceAll("§.", "");
     }
 
     public int glowColorRGB() {

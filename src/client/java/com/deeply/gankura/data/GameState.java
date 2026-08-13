@@ -49,6 +49,14 @@ public class GameState {
         public static boolean isSafari() {
             return ModConstants.MAP_SAFARI.equals(map);
         }
+
+        public static boolean isMoongladeMarsh() {
+            return ModConstants.MAP_MOONGLADE_MARSH.equals(map);
+        }
+
+        public static boolean isTorrhusCanyon() {
+            return ModConstants.MAP_TORRHUS_CANYON.equals(map);
+        }
     }
 
     public static class Player {

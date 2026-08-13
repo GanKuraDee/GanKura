@@ -51,6 +51,13 @@ public class EntityGlowingMixin {
         // 私たちのハイライトリストに入っているエンティティなら...
         if (EntityHighlightManager.highlightedEntities.contains(entity)) {
 
+            // Shulker: エリアと体色で色が変わるため、走査時に決めた色をそのまま使う
+            Integer shulkerColor = EntityHighlightManager.shulkerColors.get(entity);
+            if (shulkerColor != null) {
+                cir.setReturnValue(shulkerColor);
+                return;
+            }
+
             // --- ボスごとに色を変更 ---
             if (entity instanceof IronGolemEntity) {
                 // ゴーレム: 金色

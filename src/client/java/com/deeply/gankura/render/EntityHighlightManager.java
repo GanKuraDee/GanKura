@@ -14,6 +14,8 @@ import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.RavagerEntity;
+import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.util.DyeColor;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
@@ -66,6 +68,8 @@ public class EntityHighlightManager {
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
     public static final Set<Entity> arachneEntities = new HashSet<>();
     public static final Set<Entity> arachneBroodEntities = new HashSet<>();
+    // シュルカー → 輪郭の色(RGB)。エリアと体色で色が変わるため、mixin 側から引けるよう保持する
+    public static final Map<Entity, Integer> shulkerColors = new HashMap<>();
     // ネームプレート表示対象 → 表示文字列。Glowingとは独立して有効化できるよう別管理としている
     public static final Map<Entity, String> nameplateEntities = new LinkedHashMap<>();
     // Tracer 対象 → 線の色(ARGB)。Highlight とは独立して切り替えられるよう、
@@ -89,6 +93,11 @@ public class EntityHighlightManager {
     private static final Map<String, Long> killedConfirmedAt = new HashMap<>();
     // Nether Boss のリスポーン間隔(CrimsonDropHandler のタイマーと同じ2分)
     private static final long RESPAWN_INTERVAL_MS = 2 * 60 * 1000L;
+
+    // シュルカー(Hideon系)の4種。探索が必要かどうかの判定にまとめて使う
+    public static final List<MobVisualTarget> SHULKER_TARGETS = List.of(
+            MobVisualTarget.HIDEONLEAF, MobVisualTarget.HIDEONSUN,
+            MobVisualTarget.HIDEONFLOOR, MobVisualTarget.HIDEONWALL);
 
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
         new CrimsonBossEntry("Ashfang Follower",
@@ -285,6 +294,7 @@ public class EntityHighlightManager {
         magmaGlareEntities.clear();
         arachneEntities.clear();
         arachneBroodEntities.clear();
+        shulkerColors.clear();
         nameplateEntities.clear();
         tracerEntities.clear();
         ashfangTracerTarget = null;
@@ -331,7 +341,13 @@ public class EntityHighlightManager {
         boolean glowDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.highlight();
         boolean scanDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.anyEnabled();
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral) {
+        // Shulker: Hideon 系が敵として出現する3エリアでのみ探索する
+        boolean isShulkerArea = GameState.Server.isMoongladeMarsh()
+                || GameState.Server.isTorrhusCanyon()
+                || isSafari;
+        boolean scanShulker = isShulkerArea && SHULKER_TARGETS.stream().anyMatch(MobVisualTarget::anyEnabled);
+
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker) {
             if (!isCrimsonIsle) {
                 for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
             }
@@ -525,6 +541,38 @@ public class EntityHighlightManager {
                             capsuleLabel(GameState.Doomspiral.capsuleHits)));
                 }
             }
+        }
+
+        // Shulker: ネームタグを読まず、エリアと体色から Hideon 系の呼び名と色を決める
+        if (scanShulker) {
+            Entity nearestShulker = null;
+            double nearestShulkerDistSqr = Double.MAX_VALUE;
+            MobVisualTarget nearestShulkerTarget = null;
+            for (Entity entity : client.world.getEntities()) {
+                if (!(entity instanceof ShulkerEntity shulker)) continue;
+                MobVisualTarget target = shulkerTarget(shulker);
+                if (target == null) continue;
+
+                if (target.highlight()) {
+                    highlightedEntities.add(entity);
+                    // 輪郭の色は呼び名ごとに変わるため、mixin から引けるよう控えておく
+                    shulkerColors.put(entity, target.glowColorRGB());
+                }
+                if (target.nameplate()) {
+                    String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                }
+                // Tracer は線が乱立しないよう、自分に最も近い1体だけに出す。
+                // Tracer が無効な種別は候補から外し、その1体のせいで線が消えないようにする
+                if (!target.tracer()) continue;
+                double distSqr = entity.squaredDistanceTo(client.player);
+                if (distSqr < nearestShulkerDistSqr) {
+                    nearestShulkerDistSqr = distSqr;
+                    nearestShulker = entity;
+                    nearestShulkerTarget = target;
+                }
+            }
+            if (nearestShulker != null) registerTracer(nearestShulker, nearestShulkerTarget);
         }
 
         // Dragonはネームタグ経由で取りこぼすことがあるため、EnderDragonEntity本体を直接探して補完する。
@@ -832,6 +880,25 @@ public class EntityHighlightManager {
     private static String capsuleLabel(int hits) {
         int shown = Math.min(hits, ModConstants.CAPSULE_MAX_THROWS);
         return ModConstants.RAW_HEALTH_PREFIX + "§e" + shown + "§7/§e" + ModConstants.CAPSULE_MAX_THROWS;
+    }
+
+
+    // Moonglade Marsh と Torrhus Canyon は体色を問わず1種類しかいない。
+    // Safari のみ体色で呼び名が分かれるため、そこだけ DyeColor を見る。
+    // 染色されていない個体(getColor() == null)や想定外の体色は対象外とする
+    private static MobVisualTarget shulkerTarget(ShulkerEntity shulker) {
+        if (GameState.Server.isMoongladeMarsh()) return MobVisualTarget.HIDEONLEAF;
+        if (GameState.Server.isTorrhusCanyon()) return MobVisualTarget.HIDEONSUN;
+        if (!GameState.Server.isSafari()) return null;
+
+        DyeColor color = shulker.getColor();
+        if (color == null) return null;
+        return switch (color) {
+            // Hypixel 側がどちらの緑/紫を使っていても拾えるよう、近い色をまとめて扱う
+            case GREEN, LIME -> MobVisualTarget.HIDEONFLOOR;
+            case PURPLE, MAGENTA -> MobVisualTarget.HIDEONWALL;
+            default -> null;
+        };
     }
 
     // Tracer は Highlight と独立して切り替えられる。対象に入っていれば線の色を登録する

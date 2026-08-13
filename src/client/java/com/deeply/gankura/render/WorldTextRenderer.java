@@ -5,6 +5,7 @@ import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.SpiderEntity;
@@ -225,11 +226,16 @@ public class WorldTextRenderer {
         PlayerEntity player = client.player;
         if (player == null) return;
 
-        // 目線から視線方向へ0.5ブロック前方にオフセット
-        // → 一人称時にカメラ原点と始点が重ならず画面中央から線が見える
-        Vec3d eyePos = player.getLerpedPos(tickProgress)
-                .add(0, player.getEyeHeight(player.getPose()), 0);
-        Vec3d from = eyePos.add(player.getRotationVec(tickProgress).multiply(0.5));
+        // 一人称ではカメラ位置をそのまま始点にする。しゃがみ中のカメラは
+        // 目の高さへ補間されながら近づくため、getEyeHeight(getPose()) で求めた
+        // 高さとは一致せず、その差が線の向きのずれになる。
+        // 三人称ではカメラが後方へ離れるため、従来どおり目の位置を使う。
+        // 始点がカメラ原点と重なって線が見えなくなる分だけ視線方向へずらす
+        Camera camera = client.gameRenderer.getCamera();
+        Vec3d basePos = camera.isThirdPerson()
+                ? player.getLerpedPos(tickProgress).add(0, player.getEyeHeight(player.getPose()), 0)
+                : camera.getCameraPos();
+        Vec3d from = basePos.add(player.getRotationVec(tickProgress).multiply(0.5));
 
         for (Map.Entry<Entity, Integer> entry : EntityHighlightManager.tracerEntities.entrySet()) {
             Entity entity = entry.getKey();
