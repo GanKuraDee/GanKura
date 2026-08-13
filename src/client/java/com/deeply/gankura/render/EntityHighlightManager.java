@@ -13,6 +13,8 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Ravager;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
 import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
@@ -67,6 +69,8 @@ public class EntityHighlightManager {
     public static final Set<Entity> magmaGlareEntities = new HashSet<>();
     public static final Set<Entity> arachneEntities = new HashSet<>();
     public static final Set<Entity> arachneBroodEntities = new HashSet<>();
+    // シュルカー → 輪郭の色(RGB)。エリアと体色で色が変わるため、mixin 側から引けるよう保持する
+    public static final Map<Entity, Integer> shulkerColors = new HashMap<>();
     // ネームプレート表示対象 → 表示文字列。Glowingとは独立して有効化できるよう別管理とし、
     // 毎tick作り直すことで削除済みエンティティの掃除を不要にしている
     public static final Map<Entity, String> nameplateEntities = new LinkedHashMap<>();
@@ -91,6 +95,11 @@ public class EntityHighlightManager {
     private static final Map<String, Long> killedConfirmedAt = new HashMap<>();
     // Nether Boss のリスポーン間隔(CrimsonDropHandler のタイマーと同じ2分)
     private static final long RESPAWN_INTERVAL_MS = 2 * 60 * 1000L;
+
+    // シュルカー(Hideon系)の4種。探索が必要かどうかの判定にまとめて使う
+    public static final List<MobVisualTarget> SHULKER_TARGETS = List.of(
+            MobVisualTarget.HIDEONLEAF, MobVisualTarget.HIDEONSUN,
+            MobVisualTarget.HIDEONFLOOR, MobVisualTarget.HIDEONWALL);
 
     // Ashfang のフォロワー3種（ハイライト・トレーサーの個別設定付き）
     public static final List<CrimsonBossEntry> ASHFANG_FOLLOWERS = List.of(
@@ -290,6 +299,7 @@ public class EntityHighlightManager {
         crimsonBossEntities.clear();
         magmaGlareEntities.clear();
         arachneBroodEntities.clear();
+        shulkerColors.clear();
         nameplateEntities.clear();
         tracerEntities.clear();
         ashfangTracerTarget = null;
@@ -341,12 +351,20 @@ public class EntityHighlightManager {
         boolean glowDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.highlight();
         boolean scanDoomspiral = isSafari && MobVisualTarget.DOOMSPIRAL.anyEnabled();
 
+        // Shulker: Hideon 系が敵として出現する3エリアでのみ探索する
+        boolean isShulkerArea = GameState.Server.isMoongladeMarsh()
+                || GameState.Server.isTorrhusCanyon()
+                || isSafari;
+        boolean scanShulker = isShulkerArea && SHULKER_TARGETS.stream().anyMatch(MobVisualTarget::anyEnabled);
+
         // 条件が無効になったカテゴリのエンティティを削除(Glowing対象かどうかで判定する)
         if (!glowGolem)       highlightedEntities.removeIf(e -> e instanceof IronGolem);
         if (!glowBroodmother) highlightedEntities.removeIf(e -> e instanceof Spider);
         if (!glowDragon)      highlightedEntities.removeIf(e -> e instanceof EnderDragon);
         if (!glowWumpa)       highlightedEntities.removeIf(e -> e instanceof Ravager);
         if (!glowDoomspiral)  highlightedEntities.removeIf(e -> e instanceof Warden);
+        // シュルカーはエリアと体色で対象が変わるため、毎 tick 作り直す
+        highlightedEntities.removeIf(e -> e instanceof Shulker);
         if (!glowArachne)     highlightedEntities.removeAll(arachneEntities);
         if (!scanArachne)     arachneEntities.clear();
 
@@ -359,7 +377,7 @@ public class EntityHighlightManager {
             for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
         }
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
         boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
@@ -550,6 +568,38 @@ public class EntityHighlightManager {
                             capsuleLabel(GameState.Doomspiral.capsuleHits)));
                 }
             }
+        }
+
+        // Shulker: ネームタグを読まず、エリアと体色から Hideon 系の呼び名と色を決める
+        if (scanShulker) {
+            Entity nearestShulker = null;
+            double nearestShulkerDistSqr = Double.MAX_VALUE;
+            MobVisualTarget nearestShulkerTarget = null;
+            for (Entity entity : client.level.entitiesForRendering()) {
+                if (!(entity instanceof Shulker shulker)) continue;
+                MobVisualTarget target = shulkerTarget(shulker);
+                if (target == null) continue;
+
+                if (target.highlight()) {
+                    highlightedEntities.add(entity);
+                    // 輪郭の色は呼び名ごとに変わるため、mixin から引けるよう控えておく
+                    shulkerColors.put(entity, target.glowColorRGB());
+                }
+                if (target.nameplate()) {
+                    String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                }
+                // Tracer は線が乱立しないよう、自分に最も近い1体だけに出す。
+                // Tracer が無効な種別は候補から外し、その1体のせいで線が消えないようにする
+                if (!target.tracer()) continue;
+                double distSqr = entity.distanceToSqr(client.player);
+                if (distSqr < nearestShulkerDistSqr) {
+                    nearestShulkerDistSqr = distSqr;
+                    nearestShulker = entity;
+                    nearestShulkerTarget = target;
+                }
+            }
+            if (nearestShulker != null) registerTracer(nearestShulker, nearestShulkerTarget);
         }
 
         // Dragonはネームタグ経由で取りこぼすことがあるため、EnderDragon本体を直接探して補完する。
@@ -863,6 +913,25 @@ public class EntityHighlightManager {
     private static String capsuleLabel(int hits) {
         int shown = Math.min(hits, ModConstants.CAPSULE_MAX_THROWS);
         return ModConstants.RAW_HEALTH_PREFIX + "§e" + shown + "§7/§e" + ModConstants.CAPSULE_MAX_THROWS;
+    }
+
+
+    // Moonglade Marsh と Torrhus Canyon は体色を問わず1種類しかいない。
+    // Safari のみ体色で呼び名が分かれるため、そこだけ DyeColor を見る。
+    // 染色されていない個体(getColor() == null)や想定外の体色は対象外とする
+    private static MobVisualTarget shulkerTarget(Shulker shulker) {
+        if (GameState.Server.isMoongladeMarsh()) return MobVisualTarget.HIDEONLEAF;
+        if (GameState.Server.isTorrhusCanyon()) return MobVisualTarget.HIDEONSUN;
+        if (!GameState.Server.isSafari()) return null;
+
+        DyeColor color = shulker.getColor();
+        if (color == null) return null;
+        return switch (color) {
+            // Hypixel 側がどちらの緑/紫を使っていても拾えるよう、近い色をまとめて扱う
+            case GREEN, LIME -> MobVisualTarget.HIDEONFLOOR;
+            case PURPLE, MAGENTA -> MobVisualTarget.HIDEONWALL;
+            default -> null;
+        };
     }
 
     // Tracer は Highlight と独立して切り替えられる。対象に入っていれば線の色を登録する

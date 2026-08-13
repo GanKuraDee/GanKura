@@ -94,6 +94,8 @@ public class BossNameplateRenderer {
             case 0x5555FF -> "§9";
             case 0xFF55FF -> "§d";
             case 0x55FFFF -> "§b";
+            case 0x55FF55 -> "§a";
+            case 0xFFFF55 -> "§e";
             default       -> "§f";
         };
     }

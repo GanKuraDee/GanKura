@@ -44,6 +44,13 @@ public class EntityGlowingMixin {
         Entity entity = (Entity) (Object) this;
 
         if (EntityHighlightManager.highlightedEntities.contains(entity)) {
+            // Shulker: エリアと体色で色が変わるため、走査時に決めた色をそのまま使う
+            Integer shulkerColor = EntityHighlightManager.shulkerColors.get(entity);
+            if (shulkerColor != null) {
+                cir.setReturnValue(shulkerColor);
+                return;
+            }
+
             // Crimson Isle ボス（Wither Skeleton 等を含む）
             CrimsonBossEntry boss = EntityHighlightManager.crimsonBossEntities.get(entity);
             if (boss != null) {
