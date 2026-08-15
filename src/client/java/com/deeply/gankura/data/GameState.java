@@ -58,6 +58,10 @@ public class GameState {
         public static boolean isTorrhusCanyon() {
             return ModConstants.MAP_TORRHUS_CANYON.equals(map);
         }
+
+        public static boolean isTorrhusHeights() {
+            return ModConstants.MAP_TORRHUS_HEIGHTS.equals(map);
+        }
     }
 
     public static class Player {

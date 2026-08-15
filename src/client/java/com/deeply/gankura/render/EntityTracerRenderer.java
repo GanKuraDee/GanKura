@@ -36,7 +36,7 @@ public class EntityTracerRenderer {
             Entity entity = entry.getKey();
             if (entity.isRemoved()) continue;
 
-            Vec3 entityCenter = entity.getPosition(partialTicks).add(0, entity.getBbHeight() / 2.0, 0);
+            Vec3 entityCenter = entity.getPosition(partialTicks).add(0, EntityHighlightManager.renderAnchorHeight(entity), 0);
             GizmoProperties props = Gizmos.addGizmo(
                 new LineGizmo(startPos, entityCenter, entry.getValue(), 4.0f)
             );

@@ -48,7 +48,7 @@ public class BossNameplateRenderer {
             if (entity.isRemoved()) continue;
 
             // 補間済み座標を使い、tick間でも滑らかにモブへ追従させる
-            Vec3 center = entity.getPosition(partialTicks).add(0, entity.getBbHeight() / 2.0, 0);
+            Vec3 center = entity.getPosition(partialTicks).add(0, EntityHighlightManager.renderAnchorHeight(entity), 0);
             // カメラと同じ位置だと投影が破綻するため除外する
             if (cameraPos.distanceToSqr(center) < 1.0E-4) continue;
 
@@ -83,7 +83,7 @@ public class BossNameplateRenderer {
 
     // ハイライト色(ARGB)に対応する§カラーコードを求め、名前部分の色として使う
     public static String colorCode(int argb) {
-        // MobVisualTarget が持つ色をすべて網羅する。抜けがあると
+        // MobVisual が持つ色をすべて網羅する。抜けがあると
         // ネームプレートだけ白くなり、Highlight/Tracer と色が食い違う
         return switch (argb & 0xFFFFFF) {
             case 0x555555 -> "§8";
@@ -96,6 +96,7 @@ public class BossNameplateRenderer {
             case 0x55FFFF -> "§b";
             case 0x55FF55 -> "§a";
             case 0xFFFF55 -> "§e";
+            case 0xFFFFFF -> "§f";
             default       -> "§f";
         };
     }

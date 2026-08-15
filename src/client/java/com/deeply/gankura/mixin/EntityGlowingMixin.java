@@ -44,10 +44,11 @@ public class EntityGlowingMixin {
         Entity entity = (Entity) (Object) this;
 
         if (EntityHighlightManager.highlightedEntities.contains(entity)) {
-            // Shulker: エリアと体色で色が変わるため、走査時に決めた色をそのまま使う
-            Integer shulkerColor = EntityHighlightManager.shulkerColors.get(entity);
-            if (shulkerColor != null) {
-                cir.setReturnValue(shulkerColor);
+            // 同じ型でもエリア・体色・変種で色が変わるモブ(Shulker やエリア固有モブ)は、
+            // 走査時に決めた色をそのまま使う
+            Integer customColor = EntityHighlightManager.customGlowColors.get(entity);
+            if (customColor != null) {
+                cir.setReturnValue(customColor);
                 return;
             }
 
