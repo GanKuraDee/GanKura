@@ -21,6 +21,8 @@ public class ModConstants {
     // シュルカー(Hideon系)が敵として出現するエリア
     public static final String MAP_MOONGLADE_MARSH = "Moonglade Marsh";
     public static final String MAP_TORRHUS_CANYON = "Torrhus Canyon";
+    // Torrhus Canyon の高所側。Tiki 系はこちらにも湧く
+    public static final String MAP_TORRHUS_HEIGHTS = "Torrhus Heights";
 
     // タブリスト上で現在地とサーバーIDを載せている行の接頭辞
     public static final String TAB_AREA_PREFIX = "Area:";
@@ -155,6 +157,18 @@ public class ModConstants {
 
     // Wumpaに敗れた後、戦闘エリアへ戻るための小さな穴。ウェイポイントとして目印を出す
     public static final BlockPos WUMPA_REENTER_POS = new BlockPos(-95, 84, -65);
+
+    // Tiki 系(Sneaky / Shrieky / Cheeky)のスポーン地点。3種とも同じ場所に湧く。
+    // 湧いていないと何も見えないため、目印として座標そのものを表示する
+    public static final List<BlockPos> TIKI_SPAWN_POSITIONS = List.of(
+            new BlockPos(-596, 128, 284), new BlockPos(-735, 128, 268), new BlockPos(-729, 143, 179),
+            new BlockPos(-731, 134, 153), new BlockPos(-600, 137, 153), new BlockPos(-614, 124, 281),
+            new BlockPos(-667, 133, 263), new BlockPos(-674, 143, 146), new BlockPos(-591, 139, 175),
+            new BlockPos(-661, 125, 245), new BlockPos(-687, 131, 219), new BlockPos(-573, 136, 184),
+            new BlockPos(-587, 152, 239), new BlockPos(-625, 133, 283), new BlockPos(-700, 132, 288),
+            new BlockPos(-714, 135, 290), new BlockPos(-742, 136, 231), new BlockPos(-637, 142, 161),
+            new BlockPos(-731, 130, 172), new BlockPos(-759, 125, 245), new BlockPos(-560, 144, 191),
+            new BlockPos(-544, 139, 208), new BlockPos(-545, 131, 213), new BlockPos(-603, 172, 231));
 
     // Doomspiral の儀式。キャンドル4本をともすと出現する。
     // 本数はメッセージ後半の文面から確定させるので、途中を取りこぼしても次の1本で復帰できる

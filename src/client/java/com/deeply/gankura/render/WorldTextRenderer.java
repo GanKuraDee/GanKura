@@ -29,6 +29,7 @@ public class WorldTextRenderer {
         renderCrimsonBossLocationTexts(client.player);
         renderArachneLocationText(client, client.player);
         renderWumpaWaypoint();
+        renderTikiWaypoints(client);
         renderBossTracers(client, tickProgress);
     }
 
@@ -44,6 +45,21 @@ public class WorldTextRenderer {
         // 枠線ではなくブロック全体を塗りつぶす
         GizmoDrawing.box(pos, DrawStyle.filled(0x8055FFFF)).ignoreOcclusion();
         renderGizmoLabel("§fRe-enter", pos, 0xFFFFFFFF);
+    }
+
+    // Tiki 系のスポーン地点。Tiki はここにあるオブジェを完成させないと出現しないため、
+    // 湧いているかどうかに関わらず常に目印を出す
+    private static void renderTikiWaypoints(MinecraftClient client) {
+        if (!ModConfig.INSTANCE.foraging.enableTikiWaypoints) return;
+        // Tiki 系は Torrhus Canyon と Torrhus Heights のどちらにも湧く
+        if (!GameState.Server.isTorrhusCanyon() && !GameState.Server.isTorrhusHeights()) return;
+        if (client.player == null) return;
+
+        for (BlockPos pos : ModConstants.TIKI_SPAWN_POSITIONS) {
+            // 枠線だと遠くで見えづらいので、Re-enter の目印と同じく塗りつぶしにする
+            GizmoDrawing.box(pos, DrawStyle.filled(0x80FFAA00)).ignoreOcclusion();
+            renderGizmoLabel("§6Tiki", pos, 0xFFFFAA00);
+        }
     }
 
     private static void renderGolemLocationText(MinecraftClient client, PlayerEntity player) {
@@ -242,7 +258,7 @@ public class WorldTextRenderer {
             if (entity.isRemoved()) continue;
 
             // エンティティの補間済み中心位置
-            Vec3d to = entity.getLerpedPos(tickProgress).add(0, entity.getHeight() / 2.0, 0);
+            Vec3d to = entity.getLerpedPos(tickProgress).add(0, EntityHighlightManager.renderAnchorHeight(entity), 0);
             GizmoDrawing.line(from, to, entry.getValue(), 4.0f).ignoreOcclusion();
         }
     }

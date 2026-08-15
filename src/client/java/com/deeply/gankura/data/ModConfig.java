@@ -78,11 +78,18 @@ public class ModConfig extends Config {
         INSTANCE.theEnd.trackedGolemDrops = normalizeEnumList(INSTANCE.theEnd.trackedGolemDrops, GolemRareDrop.defaults());
         INSTANCE.theEnd.trackedDragonDrops = normalizeEnumList(INSTANCE.theEnd.trackedDragonDrops, DragonRareDrop.defaults());
         INSTANCE.crimsonIsle.trackedCrimsonDrops = normalizeEnumList(INSTANCE.crimsonIsle.trackedCrimsonDrops, CrimsonRareDrop.defaults());
+        INSTANCE.crimsonIsle.crimsonHealthHudTargets = normalizeEnumList(INSTANCE.crimsonIsle.crimsonHealthHudTargets, CrimsonHealthHudTarget.defaults());
         INSTANCE.theEnd.dragonSpawnAlerts = normalizeEnumList(INSTANCE.theEnd.dragonSpawnAlerts, DragonAlertType.defaults());
 
-        INSTANCE.mobVisuals.highlightTargets = normalizeEnumList(INSTANCE.mobVisuals.highlightTargets, MobVisualTarget.defaults());
-        INSTANCE.mobVisuals.tracerTargets = normalizeEnumList(INSTANCE.mobVisuals.tracerTargets, MobVisualTarget.defaults());
-        INSTANCE.mobVisuals.nameplateTargets = normalizeEnumList(INSTANCE.mobVisuals.nameplateTargets, MobVisualTarget.defaults());
+        INSTANCE.mobVisuals.targetsTheEnd = normalizeEnumList(INSTANCE.mobVisuals.targetsTheEnd, List.of());
+        INSTANCE.mobVisuals.targetsSpidersDen = normalizeEnumList(INSTANCE.mobVisuals.targetsSpidersDen, List.of());
+        INSTANCE.mobVisuals.targetsCrimsonIsle = normalizeEnumList(INSTANCE.mobVisuals.targetsCrimsonIsle, List.of());
+        INSTANCE.mobVisuals.targetsSafariCavern = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariCavern, List.of());
+        INSTANCE.mobVisuals.targetsSafariForest = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariForest, List.of());
+        INSTANCE.mobVisuals.targetsSafariHaunted = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariHaunted, List.of());
+        INSTANCE.mobVisuals.targetsSafariIcy = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariIcy, List.of());
+        INSTANCE.mobVisuals.targetsMoongladeMarsh = normalizeEnumList(INSTANCE.mobVisuals.targetsMoongladeMarsh, List.of());
+        INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
 
         INSTANCE.saveNow();
     }
@@ -504,6 +511,16 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         public boolean showCrimsonIsleStatusHud = true;
 
+        @Expose
+        @ConfigOption(name = "HP HUD", desc = "Shows the boss HP HUD.")
+        @ConfigEditorBoolean
+        public boolean showCrimsonHealthHud = true;
+
+        @Expose
+        @ConfigOption(name = "HP HUD Bosses", desc = "Bosses shown on the HP HUD. The order sets which one wins when several are alive.")
+        @ConfigEditorDraggableList
+        public List<CrimsonHealthHudTarget> crimsonHealthHudTargets = new ArrayList<>(CrimsonHealthHudTarget.defaults());
+
         // ---- Rare Drop Settings (id: 5) ----
         @Expose
         @ConfigOption(name = "Rare Drop Settings", desc = "Expands rare drop settings.")
@@ -542,70 +559,12 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 6)
         public boolean showCrimsonIsleWorldText = true;
 
-        // ---- Barbarian Duke X (id: 0) ----
-        @Expose
-        @ConfigOption(name = "Barbarian Duke X", desc = "Expands Barbarian Duke X settings.")
-        @ConfigEditorAccordion(id = 0)
-        @ConfigEditorBoolean
-        public boolean barbarianSection = false;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean showBarbarianHealthHud = true;
-
-        // ---- Bladesoul (id: 10) ----
-        @Expose
-        @ConfigOption(name = "Bladesoul", desc = "Expands Bladesoul settings.")
-        @ConfigEditorAccordion(id = 10)
-        @ConfigEditorBoolean
-        public boolean bladesoulSection = false;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean showBladesoulHealthHud = true;
-
-        // ---- Mage Outlaw (id: 20) ----
-        @Expose
-        @ConfigOption(name = "Mage Outlaw", desc = "Expands Mage Outlaw settings.")
-        @ConfigEditorAccordion(id = 20)
-        @ConfigEditorBoolean
-        public boolean mageOutlawSection = false;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 20)
-        public boolean showMageOutlawHealthHud = true;
-
-        // ---- Ashfang (id: 30, 33) ----
-        @Expose
-        @ConfigOption(name = "Ashfang", desc = "Expands Ashfang settings.")
-        @ConfigEditorAccordion(id = 30)
-        @ConfigEditorBoolean
-        public boolean ashfangSection = false;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 30)
-        public boolean showAshfangHealthHud = true;
-
         // ---- Magma Boss (id: 40) ----
         @Expose
         @ConfigOption(name = "Magma Boss", desc = "Expands Magma Boss settings.")
         @ConfigEditorAccordion(id = 40)
         @ConfigEditorBoolean
         public boolean magmaBossSection = false;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 40)
-        public boolean showMagmaBossHealthHud = true;
 
         @Expose
         @ConfigOption(name = "Stage Status Title", desc = "Shows stage status title.")
@@ -636,6 +595,18 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean enableTreeMobTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon settings.")
+        @ConfigEditorAccordion(id = 74)
+        @ConfigEditorBoolean
+        public boolean torrhusCanyonFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Tiki Spawn Waypoints", desc = "Marks where Sneaky / Shrieky / Cheeky Tikis spawn.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 74)
+        public boolean enableTikiWaypoints = false;
 
         @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari settings.")
@@ -703,70 +674,147 @@ public class ModConfig extends Config {
         public static final float DEFAULT_NAMEPLATE_SCALE = 1.0f;
 
         @Expose
-        @ConfigOption(name = "Highlight", desc = "Expands highlight settings.")
-        @ConfigEditorAccordion(id = 80)
+        @ConfigOption(name = "Highlight", desc = "Outlines the target mobs with a glow.")
         @ConfigEditorBoolean
-        public boolean highlightFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Turns every highlight on or off.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 80)
         public boolean enableHighlight = true;
 
         @Expose
-        @ConfigOption(name = "Targets", desc = "Mobs to outline with a glow.")
-        @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 80)
-        public List<MobVisualTarget> highlightTargets = new ArrayList<>(MobVisualTarget.defaults());
-
-        @Expose
-        @ConfigOption(name = "Tracer", desc = "Expands tracer settings.")
-        @ConfigEditorAccordion(id = 81)
+        @ConfigOption(name = "Tracer", desc = "Draws a line to the target mobs.")
         @ConfigEditorBoolean
-        public boolean tracerFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Turns every tracer on or off.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 81)
         public boolean enableTracer = true;
 
         @Expose
-        @ConfigOption(name = "Targets", desc = "Mobs to draw a line to.")
-        @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 81)
-        public List<MobVisualTarget> tracerTargets = new ArrayList<>(MobVisualTarget.defaults());
-
-        @Expose
-        @ConfigOption(name = "Nameplate", desc = "Expands nameplate settings.")
-        @ConfigEditorAccordion(id = 82)
+        @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on the target mobs.")
         @ConfigEditorBoolean
-        public boolean nameplateFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Turns every nameplate on or off.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 82)
         public boolean enableNameplate = true;
 
         @Expose
-        @ConfigOption(name = "Targets", desc = "Mobs to show a nameplate on.")
-        @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 82)
-        public List<MobVisualTarget> nameplateTargets = new ArrayList<>(MobVisualTarget.defaults());
-
-        @Expose
-        @ConfigOption(name = "Size", desc = "Changes nameplate text size.")
+        @ConfigOption(name = "Nameplate Size", desc = "Changes nameplate text size.")
         @ConfigEditorSlider(minValue = 0.25f, maxValue = 3.0f, minStep = 0.05f)
-        @ConfigAccordionId(id = 82)
         public float nameplateScale = DEFAULT_NAMEPLATE_SCALE;
 
         // ボタンは保存対象外なので @Expose を付けず transient にする
-        @ConfigOption(name = "Reset Size", desc = "Reset to default.")
+        @ConfigOption(name = "Reset Nameplate Size", desc = "Reset to default.")
         @ConfigEditorButton(buttonText = "Reset")
-        @ConfigAccordionId(id = 82)
         public transient Runnable resetNameplateScale = () -> nameplateScale = DEFAULT_NAMEPLATE_SCALE;
+
+        @Expose
+        @ConfigOption(name = "The End", desc = "Expands The End targets.")
+        @ConfigEditorAccordion(id = 83)
+        @ConfigEditorBoolean
+        public boolean theEndFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 83)
+        public List<MobVisual.TheEnd> targetsTheEnd = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Spider's Den", desc = "Expands Spider's Den targets.")
+        @ConfigEditorAccordion(id = 84)
+        @ConfigEditorBoolean
+        public boolean spidersDenFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 84)
+        public List<MobVisual.SpidersDen> targetsSpidersDen = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Crimson Isle", desc = "Expands Crimson Isle targets.")
+        @ConfigEditorAccordion(id = 85)
+        @ConfigEditorBoolean
+        public boolean crimsonIsleFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 85)
+        public List<MobVisual.CrimsonIsle> targetsCrimsonIsle = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Moonglade Marsh", desc = "Expands Moonglade Marsh targets.")
+        @ConfigEditorAccordion(id = 87)
+        @ConfigEditorBoolean
+        public boolean moongladeMarshFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 87)
+        public List<MobVisual.MoongladeMarsh> targetsMoongladeMarsh = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon targets.")
+        @ConfigEditorAccordion(id = 88)
+        @ConfigEditorBoolean
+        public boolean torrhusCanyonFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 88)
+        public List<MobVisual.TorrhusCanyon> targetsTorrhusCanyon = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari areas.")
+        @ConfigEditorAccordion(id = 92)
+        @ConfigEditorBoolean
+        public boolean critterSafariFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Cavern", desc = "Expands Cavern targets.")
+        @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 86)
+        @ConfigEditorBoolean
+        public boolean safariCavernFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 86)
+        public List<MobVisual.SafariCavern> targetsSafariCavern = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Forest", desc = "Expands Forest targets.")
+        @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 89)
+        @ConfigEditorBoolean
+        public boolean safariForestFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 89)
+        public List<MobVisual.SafariForest> targetsSafariForest = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Haunted", desc = "Expands Haunted targets.")
+        @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 90)
+        @ConfigEditorBoolean
+        public boolean safariHauntedFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 90)
+        public List<MobVisual.SafariHaunted> targetsSafariHaunted = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Icy", desc = "Expands Icy targets.")
+        @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 91)
+        @ConfigEditorBoolean
+        public boolean safariIcyFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 91)
+        public List<MobVisual.SafariIcy> targetsSafariIcy = new ArrayList<>();
     }
 
     public static class MiscCategory {
