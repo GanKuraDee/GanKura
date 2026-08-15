@@ -73,6 +73,11 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
+
+	// LGPL は GPL 本文を参照する形になっているため、両方を同梱する
+	from("COPYING") {
+		rename { "${it}_${inputs.properties.archivesName}"}
+	}
 }
 
 // configure the maven publication
