@@ -1,6 +1,7 @@
 package com.deeply.gankura.render.hud;
 
 import com.deeply.gankura.data.CrimsonBossEntry;
+import com.deeply.gankura.data.CrimsonHealthHudTarget;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
@@ -20,28 +21,25 @@ public class CrimsonBossesHealthHud extends HudElement {
 
     private static boolean isAnyEnabled() {
         ModConfig.CrimsonIsleCategory c = ModConfig.INSTANCE.crimsonIsle;
-        return c.showBladesoulHealthHud || c.showBarbarianHealthHud
-                || c.showMageOutlawHealthHud || c.showAshfangHealthHud
-                || c.showMagmaBossHealthHud;
+        return c.showCrimsonHealthHud && !c.crimsonHealthHudTargets.isEmpty();
     }
 
     private static boolean isAnyVisible() {
-        if (!GameState.Server.isCrimsonIsle()) return false;
-        for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
-            if (isBossEnabled(boss) && boss.getHealth().get() != null) return true;
-        }
-        return false;
+        return GameState.Server.isCrimsonIsle() && firstVisibleBoss() != null;
     }
 
-    private static boolean isBossEnabled(CrimsonBossEntry boss) {
-        return switch (boss.nameTag()) {
-            case "Bladesoul"        -> ModConfig.INSTANCE.crimsonIsle.showBladesoulHealthHud;
-            case "Barbarian Duke X" -> ModConfig.INSTANCE.crimsonIsle.showBarbarianHealthHud;
-            case "Mage Outlaw"      -> ModConfig.INSTANCE.crimsonIsle.showMageOutlawHealthHud;
-            case "Ashfang"          -> ModConfig.INSTANCE.crimsonIsle.showAshfangHealthHud;
-            case "Magma Boss"       -> ModConfig.INSTANCE.crimsonIsle.showMagmaBossHealthHud;
-            default                 -> false;
-        };
+    // HUD には1体ぶんしか収まらないので、設定リストの並び順を優先順位として使い、
+    // 体力を取得できている最初のボスを表示する
+    private static CrimsonBossEntry firstVisibleBoss() {
+        if (!ModConfig.INSTANCE.crimsonIsle.showCrimsonHealthHud) return null;
+
+        for (CrimsonHealthHudTarget target : ModConfig.INSTANCE.crimsonIsle.crimsonHealthHudTargets) {
+            for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
+                if (!boss.nameTag().equals(target.nameTag())) continue;
+                if (boss.getHealth().get() != null) return boss;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -52,14 +50,11 @@ public class CrimsonBossesHealthHud extends HudElement {
             text(graphics, font, "§e30M§f/§a60M", 0, 12, 0xFFFFFFFF, true);
             return;
         }
-        for (CrimsonBossEntry boss : EntityHighlightManager.CRIMSON_BOSSES) {
-            if (!isBossEnabled(boss)) continue;
-            String raw = boss.getHealth().get();
-            if (raw == null) continue;
-            text(graphics, font, "§c§l" + titleOf(boss), 0, 0, 0xFFFFFFFF, true);
-            text(graphics, font, parseHealthString(raw), 0, 12, 0xFFFFFFFF, true);
-            return;
-        }
+        CrimsonBossEntry boss = firstVisibleBoss();
+        if (boss == null) return;
+
+        text(graphics, font, "§c§l" + titleOf(boss), 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, parseHealthString(boss.getHealth().get()), 0, 12, 0xFFFFFFFF, true);
     }
 
     // Magma Boss は分裂中(Kill the Magmas)だけタイトルが変わる

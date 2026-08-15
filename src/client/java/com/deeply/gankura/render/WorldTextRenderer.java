@@ -19,6 +19,7 @@ public class WorldTextRenderer {
         renderCrimsonBossLocationTexts();
         renderArachneLocationText();
         renderWumpaWaypoint();
+        renderTikiWaypoints(client);
     }
 
 
@@ -34,6 +35,22 @@ public class WorldTextRenderer {
         GizmoProperties box = Gizmos.cuboid(pos, GizmoStyle.fill(0x8055FFFF));
         box.setAlwaysOnTop();
         renderGizmoLabel("§fRe-enter", pos, 0xFFFFFFFF);
+    }
+
+    // Tiki 系のスポーン地点。Tiki はここにあるオブジェを完成させないと出現しないため、
+    // 湧いているかどうかに関わらず常に目印を出す
+    private static void renderTikiWaypoints(Minecraft client) {
+        if (!ModConfig.INSTANCE.foraging.enableTikiWaypoints) return;
+        // Tiki 系は Torrhus Canyon と Torrhus Heights のどちらにも湧く
+        if (!GameState.Server.isTorrhusCanyon() && !GameState.Server.isTorrhusHeights()) return;
+        if (client.player == null) return;
+
+        for (BlockPos pos : ModConstants.TIKI_SPAWN_POSITIONS) {
+            // 枠線だと遠くで見えづらいので、Re-enter の目印と同じく塗りつぶしにする
+            GizmoProperties box = Gizmos.cuboid(pos, GizmoStyle.fill(0x80FFAA00));
+            box.setAlwaysOnTop();
+            renderGizmoLabel("§6Tiki", pos, 0xFFFFAA00);
+        }
     }
 
     private static void renderGolemLocationText() {
