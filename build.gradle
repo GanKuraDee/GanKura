@@ -69,6 +69,11 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_$projectName"}
 	}
+
+	// LGPL は GPL 本文を参照する形になっているため、両方を同梱する
+	from("COPYING") {
+		rename { "${it}_$projectName"}
+	}
 }
 
 // configure the maven publication

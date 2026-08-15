@@ -49,3 +49,16 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Equipment Menu Keybind
   - Tree Felled Title
   - Mob From Tree Title
+
+## License
+
+GanKura is licensed under the
+[GNU Lesser General Public License v3.0 or later](LICENSE)
+([GPL v3](COPYING) is referenced by the LGPL and included alongside it).
+
+Bundled dependencies:
+
+- [MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig) - LGPL-3.0-or-later
+- [Kotlin standard library](https://github.com/JetBrains/kotlin) - Apache-2.0
+
+GanKura is an unofficial mod and is not affiliated with Hypixel or Mojang.
