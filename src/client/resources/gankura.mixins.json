@@ -16,6 +16,7 @@
 		"MouseAccessor",
 		"ArachneCrystalParticleMixin",
 		"InvisibugParticleMixin",
+		"FloorDropParticleMixin",
 		"ArmorStandHeadOnlyGlowMixin",
 		"PetsMenuClickMixin",
 		"LoadoutsClickMixin",

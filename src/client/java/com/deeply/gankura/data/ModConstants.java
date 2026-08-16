@@ -158,6 +158,15 @@ public class ModConstants {
     // Wumpaに敗れた後、戦闘エリアへ戻るための小さな穴。ウェイポイントとして目印を出す
     public static final BlockPos WUMPA_REENTER_POS = new BlockPos(-95, 84, -65);
 
+    // Critter Safari の Fairy Soul(SF-1〜SF-4)。4つのバイオームに1つずつある。
+    // 見た目が「名前なし・装備あり」のアーマースタンドで Gazer と同じ作りのため、
+    // モブとして拾ってしまわないよう座標で除外する
+    public static final List<BlockPos> SAFARI_FAIRY_SOUL_POSITIONS = List.of(
+            new BlockPos(5, 106, 18),      // SF-1 Forest
+            new BlockPos(-162, 60, 63),    // SF-2 Cavern
+            new BlockPos(-75, 40, -32),    // SF-3 Icy
+            new BlockPos(40, 63, -14));    // SF-4 Haunted
+
     // Tiki 系(Sneaky / Shrieky / Cheeky)のスポーン地点。3種とも同じ場所に湧く。
     // 湧いていないと何も見えないため、目印として座標そのものを表示する
     public static final List<BlockPos> TIKI_SPAWN_POSITIONS = List.of(

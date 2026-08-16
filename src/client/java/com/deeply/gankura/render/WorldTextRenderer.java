@@ -4,6 +4,8 @@ import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.handler.FloorDropHandler;
+import com.deeply.gankura.scanner.BeeNestScanner;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
@@ -22,6 +24,13 @@ import java.util.Map;
 
 public class WorldTextRenderer {
 
+    // Floor Drop の塗りつぶし色と、その上に出すラベルの色
+    private static final int FLOOR_DROP_COLOR = 0x8055FF55;
+    private static final int FLOOR_DROP_LABEL_COLOR = 0xFF55FF55;
+    // ミツバチの巣の塗りつぶし色と、その上に出すラベルの色
+    private static final int BEE_NEST_COLOR = 0x80FFFF55;
+    private static final int BEE_NEST_LABEL_COLOR = 0xFFFFFF55;
+
     public static void render(MinecraftClient client, float tickProgress) {
         if (client.player == null) return;
 
@@ -31,6 +40,28 @@ public class WorldTextRenderer {
         renderWumpaWaypoint();
         renderTikiWaypoints(client);
         renderBossTracers(client, tickProgress);
+        renderFloorDrops();
+        renderBeeNests();
+    }
+
+    // 地面に落ちている採取物。見つけた場所を塗りつぶし、Re-enter や Tiki と同じくラベルを添える
+    private static void renderFloorDrops() {
+        if (!FloorDropHandler.isActive()) return;
+
+        for (BlockPos pos : FloorDropHandler.positions()) {
+            GizmoDrawing.box(pos, DrawStyle.filled(FLOOR_DROP_COLOR)).ignoreOcclusion();
+            renderGizmoLabel("§aFloor Drop", pos, FLOOR_DROP_LABEL_COLOR);
+        }
+    }
+
+    // Forest Biome のミツバチの巣。Floor Drop と同じく塗りつぶしとラベルで示す
+    private static void renderBeeNests() {
+        if (!BeeNestScanner.isActive()) return;
+
+        for (BlockPos pos : BeeNestScanner.positions()) {
+            GizmoDrawing.box(pos, DrawStyle.filled(BEE_NEST_COLOR)).ignoreOcclusion();
+            renderGizmoLabel("§eBee Nest", pos, BEE_NEST_LABEL_COLOR);
+        }
     }
 
 

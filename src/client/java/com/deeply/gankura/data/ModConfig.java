@@ -615,6 +615,18 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
+        @ConfigOption(name = "Floor Drops", desc = "Marks the foraging drops lying on the ground.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableFloorDrops = true;
+
+        @Expose
+        @ConfigOption(name = "Bee Nest Waypoints", desc = "Marks the bee nests in the Forest Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableBeeNestWaypoints = true;
+
+        @Expose
         @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
         @ConfigEditorAccordion(id = 72)
         @ConfigEditorBoolean
