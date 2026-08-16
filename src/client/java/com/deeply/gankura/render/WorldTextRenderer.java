@@ -93,25 +93,33 @@ public class WorldTextRenderer {
         }
     }
 
+    // Stage 4/5 のときに、ワールド上テキストを出しているブロックと色。それ以外は null。
+    // Tracer からも同じ場所・同じ色を使えるよう切り出してある
+    public record GolemAnchor(BlockPos pos, int argb) {}
+
+    public static GolemAnchor golemAnchor() {
+        if (!GameState.Server.isTheEnd()) return null;
+        if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return null;
+
+        BlockPos basePos = GameState.Player.locationPos;
+        String stage = GameState.Golem.stage;
+        if (ModConstants.STAGE_AWAKENING.equals(stage)) {
+            return new GolemAnchor(basePos.add(0, 1, -2), 0xFFFFFFFF);
+        }
+        if (ModConstants.STAGE_SUMMONED.equals(stage)) {
+            return new GolemAnchor(basePos.add(0, 0, -2), 0xFFFF5555);
+        }
+        return null;
+    }
+
     private static void renderGolemLocationText(MinecraftClient client, PlayerEntity player) {
         if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
 
-        if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
+        GolemAnchor anchor = golemAnchor();
+        if (anchor == null) return;
 
-        String stage = GameState.Golem.stage;
-        boolean isStage4 = ModConstants.STAGE_AWAKENING.equals(stage);
-        boolean isStage5 = ModConstants.STAGE_SUMMONED.equals(stage);
-
-        if (!isStage4 && !isStage5) return;
-
-        BlockPos basePos = GameState.Player.locationPos;
-        BlockPos renderPos;
-        int textColor;
         String textToRender;
-
-        if (isStage4) {
-            renderPos = basePos.add(0, 1, -2);
-            textColor = 0xFFFFFFFF;
+        if (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             textToRender = "§f§lGOLEM";
             if (GameState.Golem.stage4StartTime > 0) {
                 long secs = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
@@ -119,30 +127,19 @@ public class WorldTextRenderer {
                 textToRender += String.format(" %s(%dm %ds)", col, secs / 60, secs % 60);
             }
         } else {
-            renderPos = basePos.add(0, 0, -2);
-            textColor = 0xFFFF5555;
-
             long timeSincePacket = System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis;
-            if (timeSincePacket > 1000) {
-                timeSincePacket = 1000;
-            }
-            double estimatedServerTime = GameState.Server.lastTimePacket + (timeSincePacket / 50.0);
-            double remainingTicks = GameState.Golem.stage5TargetTime - estimatedServerTime;
-
-            if (remainingTicks < 0) remainingTicks = 0;
+            double estimatedServerTime = GameState.Server.lastTimePacket + (Math.min(timeSincePacket, 1000) / 50.0);
+            double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - estimatedServerTime);
 
             if (remainingTicks > 0) {
                 textToRender = String.format("§c§lGOLEM §c(%.1fs)", remainingTicks / 20.0);
             } else {
-                if (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName)) {
-                    textToRender = "§c§lGOLEM §e(Soon)";
-                } else {
-                    textToRender = "§c§lGOLEM §c(Spawned)";
-                }
+                textToRender = (!GameState.Golem.hasRisen && !"None".equals(GameState.Player.locationName))
+                        ? "§c§lGOLEM §e(Soon)" : "§c§lGOLEM §c(Spawned)";
             }
         }
 
-        renderGizmoLabel(textToRender, renderPos, textColor);
+        renderGizmoLabel(textToRender, anchor.pos(), anchor.argb());
     }
 
     private static void renderArachneLocationText(MinecraftClient client, PlayerEntity player) {
@@ -268,10 +265,13 @@ public class WorldTextRenderer {
     // 対象と色は tick 側(EntityHighlightManager)で決まっているので、ここでは線を引くだけ。
     // Highlight とは独立した集合を見るため、Highlight を切っていても Tracer 単独で使える
     private static void renderBossTracers(MinecraftClient client, float tickProgress) {
-        if (EntityHighlightManager.tracerEntities.isEmpty()) return;
-
         PlayerEntity player = client.player;
         if (player == null) return;
+
+        // Stage 4/5 の End Stone Protector は、まだ湧いていないので指す相手のエンティティが無い。
+        // 代わりにワールド上へ出しているテキストと同じ位置・同じ色で線を引く
+        GolemAnchor golem = ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Tracer ? golemAnchor() : null;
+        if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null) return;
 
         // 一人称ではカメラ位置をそのまま始点にする。しゃがみ中のカメラは
         // 目の高さへ補間されながら近づくため、getEyeHeight(getPose()) で求めた
@@ -283,6 +283,10 @@ public class WorldTextRenderer {
                 ? player.getLerpedPos(tickProgress).add(0, player.getEyeHeight(player.getPose()), 0)
                 : camera.getCameraPos();
         Vec3d from = basePos.add(player.getRotationVec(tickProgress).multiply(0.5));
+
+        if (golem != null) {
+            GizmoDrawing.line(from, Vec3d.ofCenter(golem.pos()), golem.argb(), 4.0f).ignoreOcclusion();
+        }
 
         for (Map.Entry<Entity, Integer> entry : EntityHighlightManager.tracerEntities.entrySet()) {
             Entity entity = entry.getKey();

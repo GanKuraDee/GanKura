@@ -240,6 +240,12 @@ public class ModConfig extends Config {
         public boolean showGolemWorldLocation_Beacon = true;
 
         @Expose
+        @ConfigOption(name = "Show Tracer", desc = "Draws a line pointing at the 3D floating text.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 2)
+        public boolean showGolemWorldLocation_Tracer = true;
+
+        @Expose
         @ConfigOption(name = "Stage 4 Alert", desc = "Expands stage 4 alerts.")
         @ConfigEditorAccordion(id = 3)
         @ConfigEditorBoolean
