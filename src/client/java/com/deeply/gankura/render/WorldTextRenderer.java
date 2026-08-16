@@ -86,23 +86,38 @@ public class WorldTextRenderer {
         }
     }
 
-    private static void renderGolemLocationText() {
-        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
-        if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return;
+    // Stage 4/5 のときに、ワールド上テキストを出しているブロックと色。それ以外は null。
+    // Tracer からも同じ場所・同じ色を使えるよう切り出してある
+    public record GolemAnchor(BlockPos pos, int argb) {}
 
-        String stage = GameState.Golem.stage;
-        boolean isStage4 = ModConstants.STAGE_AWAKENING.equals(stage);
-        boolean isStage5 = ModConstants.STAGE_SUMMONED.equals(stage);
-
-        if (!isStage4 && !isStage5) return;
+    public static GolemAnchor golemAnchor() {
+        if (!GameState.Server.isTheEnd()) return null;
+        if (GameState.Player.locationPos == null || "None".equals(GameState.Player.locationName)) return null;
 
         BlockPos basePos = GameState.Player.locationPos;
-        BlockPos renderPos = isStage4 ? basePos.offset(0, 1, -2) : basePos.offset(0, 0, -2);
-        int textColor;
-        String textToRender;
+        String stage = GameState.Golem.stage;
+        if (ModConstants.STAGE_AWAKENING.equals(stage)) {
+            return new GolemAnchor(basePos.offset(0, 1, -2), 0xFFFFFFFF);
+        }
+        if (ModConstants.STAGE_SUMMONED.equals(stage)) {
+            return new GolemAnchor(basePos.offset(0, 0, -2), 0xFFFF5555);
+        }
+        return null;
+    }
 
-        if (isStage4) {
-            textColor = 0xFFFFFFFF;
+    // ワールド上テキストを描く位置。ブロックの中心から少し上
+    public static Vec3 labelPos(BlockPos renderPos) {
+        return new Vec3(renderPos.getX() + 0.5, renderPos.getY() + 1.5, renderPos.getZ() + 0.5);
+    }
+
+    private static void renderGolemLocationText() {
+        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
+
+        GolemAnchor anchor = golemAnchor();
+        if (anchor == null) return;
+
+        String textToRender;
+        if (ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             textToRender = "§f§lGOLEM";
             if (GameState.Golem.stage4StartTime > 0) {
                 long secs = (System.currentTimeMillis() - GameState.Golem.stage4StartTime) / 1000;
@@ -110,7 +125,6 @@ public class WorldTextRenderer {
                 textToRender += String.format(" %s(%dm %ds)", col, secs / 60, secs % 60);
             }
         } else {
-            textColor = 0xFFFF5555;
             long timeSincePacket = System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis;
             double estimatedServerTime = GameState.Server.lastTimePacket + (Math.min(timeSincePacket, 1000) / 50.0);
             double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - estimatedServerTime);
@@ -123,7 +137,7 @@ public class WorldTextRenderer {
             }
         }
 
-        renderGizmoLabel(textToRender, renderPos, textColor);
+        renderGizmoLabel(textToRender, anchor.pos(), anchor.argb());
     }
 
     private static void renderArachneLocationText() {
@@ -206,7 +220,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
-        Vec3 pos = new Vec3(renderPos.getX() + 0.5, renderPos.getY() + 1.5, renderPos.getZ() + 0.5);
+        Vec3 pos = labelPos(renderPos);
 
         // 距離に比例して拡大し、見かけの大きさを一定に保つ。
         // プレイヤーのtick座標を使うと20回/秒でしかスケールが更新されずカクつくため、
