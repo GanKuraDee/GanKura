@@ -3,6 +3,7 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.render.EntityHighlightManager;
+import com.deeply.gankura.scanner.BeeNestScanner;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,9 @@ public class NetworkHandler {
             // これを消さないとエリアを入り直しても前回のスキャン結果が残り、
             // Unknown ではなく Spawned/Killed から始まってしまう
             EntityHighlightManager.resetCrimsonBossTracking();
+            // 見つけていた Floor Drop はワールドが変わると意味を成さないので捨てる
+            FloorDropHandler.reset();
+            BeeNestScanner.reset();
             // 保存されていたSkyblock Equipmentを、レジストリアクセスが手に入ったこのタイミングで復元する
             EquipmentState.hydrate(handler.registryAccess());
         });

@@ -28,6 +28,8 @@ import net.minecraft.world.entity.monster.Ravager;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.entity.monster.warden.Warden;
@@ -124,15 +126,21 @@ public class EntityHighlightManager {
     // 型だけで判定するモブが、これらを別のモブとして二重に拾わないようにする
     private static final Set<Entity> nametagClaimedEntities = new HashSet<>();
 
-    // シュルカー系(Hideonfloor / Hideonwall)は、動き出すと見た目のブロックが
-    // 当たり判定のシルバーフィッシュを追いかける形になり、少し離れる。
-    // 同じ個体とみなす距離はそのぶん広めに取る
+    // Hideon 系のシュルカーが当たり判定として抱えているシルバーフィッシュ。
+    // 型だけで判定するモブが、これらを別のモブとして二重に拾わないようにする
+    private static final Set<Entity> shulkerClaimedEntities = new HashSet<>();
+
+    // 止まっている Hideonfloor / Hideonwall は、シュルカーと当たり判定が重なっている。
+    // 少しの遅れでずれることがあるので、同じ個体とみなす距離は余裕を持たせる
     private static final double SHULKER_COMPANION_RADIUS = 4.0;
 
     // Critter Safari は4つのバイオームに分かれており、この座標を中心に4象限で区切られている。
     //   Cavern  … x-  z+      Forest … x+ z+
     //   Icy     … x-  z-      Haunted … x+ z-
     // エリア名はどこも "Safari" なので、バイオームの区別はこの座標から求める
+    // Fairy Soul と同じものとみなす距離(ブロック)
+    private static final double FAIRY_SOUL_RADIUS = 3.0;
+
     private static final double SAFARI_CENTER_X = -50.0;
     private static final double SAFARI_CENTER_Z = 0.0;
 
@@ -273,7 +281,8 @@ public class EntityHighlightManager {
     public static final List<MobVisual> SAFARI_DISPLAY_TARGETS = List.of(
             SafariCavern.CHUCKWALLA, SafariCavern.FLITTER,
             SafariHaunted.DUPLICO, SafariHaunted.GIMMIEGOLD,
-            SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON, SafariForest.HIDEONFLOOR);
+            SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON,
+            SafariForest.HIDEONFLOOR, SafariHaunted.HIDEONWALL);
 
     // Critter Safari の、独自の見た目でエンティティ型からは判別できないモブ。ネームタグで判定する
     public static final List<MobVisual> SAFARI_NAMED_TARGETS = List.of(
@@ -522,6 +531,7 @@ public class EntityHighlightManager {
         highlightedEntities.removeAll(rebuiltVisuals);
         rebuiltVisuals.clear();
         nametagClaimedEntities.clear();
+        shulkerClaimedEntities.clear();
         renderAnchors.clear();
         headOnlyGlowEntities.clear();
         tracerEntities.clear();
@@ -580,7 +590,10 @@ public class EntityHighlightManager {
         boolean glowDoomspiral = isSafari && SafariHaunted.DOOMSPIRAL.highlight();
         boolean scanDoomspiral = isSafari && SafariHaunted.DOOMSPIRAL.anyEnabled();
 
-        boolean scanSafariTypes = isSafari && SAFARI_TYPE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        // 動いている Hideonfloor / Hideonwall はシュルカーが消えて当たり判定だけになり、
+        // この走査で拾うことになる。そのため Hideon 系の表示設定も条件に入れる
+        boolean scanSafariTypes = isSafari && (SAFARI_TYPE_TARGETS.stream().anyMatch(MobVisual::anyEnabled)
+                || SafariForest.HIDEONFLOOR.anyEnabled() || SafariHaunted.HIDEONWALL.anyEnabled());
         boolean scanSafariNamed = isSafari && SAFARI_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
 
         // Shulker: Hideon 系が敵として出現する3エリアでのみ探索する
@@ -951,6 +964,12 @@ public class EntityHighlightManager {
                             capsuleLabel(GameState.Doomspiral.capsuleHits)));
                 }
             }
+        }
+
+        // Hideon 系の当たり判定は、その表示設定に関わらず必ず結び付けておく。
+        // Hideon 系を消していても、余った当たり判定が Duplico として出てしまうため
+        if (GameState.Server.isSafari() && (scanShulker || scanSafariTypes)) {
+            claimShulkerHitboxes(client);
         }
 
         // Shulker: ネームタグを読まず、エリアと体色から Hideon 系の呼び名と色を決める
@@ -1441,6 +1460,8 @@ public class EntityHighlightManager {
         // 見た目がアーマースタンドのモブ。装備の無いものはネームタグ用の透明なスタンド
         if (entity instanceof ArmorStand stand) {
             if (stand.getCustomName() != null || !hasAnyEquipment(stand)) return null;
+            // Fairy Soul も名前なし・装備ありのアーマースタンドなので、ここで落とす
+            if (nearFairySoul(entity)) return null;
             if (inSafariHaunted(entity)) return SafariHaunted.GAZER;
             // Driftling はヘッドの中に透明なシルバーフィッシュを抱えている。
             // 同じ Cavern の Shyworm はスライムを抱えているので区別できる
@@ -1459,8 +1480,17 @@ public class EntityHighlightManager {
             if (entity instanceof Silverfish) {
                 if (hasHeadStandNear(client, entity)) return null;           // Driftling はスタンド側で判定済み
 
-                // シュルカーを伴うものは Hideonfloor / Hideonwall。動いている間は少し離れる
-                if (hasNearWithin(client, entity, Shulker.class, SHULKER_COMPANION_RADIUS)) return null;
+                // 止まっている間はシュルカーが見た目を担うので、当たり判定は拾わない
+                if (shulkerClaimedEntities.contains(entity)) return null;
+
+                // 動き出すとシュルカーと絵が消え、シュルカーボックスを持つ ItemDisplay に置き換わる。
+                // Duplico も「透明なシルバーフィッシュ + ItemDisplay」で作りが同じなので、
+                // 中身がシュルカーボックスかどうかで Hideon 系と分ける
+                if (hasShulkerBoxDisplayNear(client, entity)) {
+                    if (inSafariForest(entity)) return SafariForest.HIDEONFLOOR;
+                    if (inSafariHaunted(entity)) return SafariHaunted.HIDEONWALL;
+                    return null;
+                }
 
                 if (inSafariCavern(entity)) return SafariCavern.CHUCKWALLA;
                 if (inSafariHaunted(entity)) return SafariHaunted.DUPLICO;
@@ -1778,6 +1808,18 @@ public class EntityHighlightManager {
         return profile == null ? null : profile.name().orElse(null);
     }
 
+    // Critter Safari の Fairy Soul のそばにあるか。
+    // 表示上の位置が座標表と少しずれることがあるので、多少の余裕を見て判定する
+    private static boolean nearFairySoul(Entity entity) {
+        for (BlockPos soul : ModConstants.SAFARI_FAIRY_SOUL_POSITIONS) {
+            double dx = entity.getX() - (soul.getX() + 0.5);
+            double dy = entity.getY() - (soul.getY() + 0.5);
+            double dz = entity.getZ() - (soul.getZ() + 0.5);
+            if (dx * dx + dy * dy + dz * dz <= FAIRY_SOUL_RADIUS * FAIRY_SOUL_RADIUS) return true;
+        }
+        return false;
+    }
+
     // 対象がその呼び名のバイオームにいるか
     private static boolean inSafariBiome(Entity entity, MobVisual target) {
         if (target instanceof SafariCavern) return inSafariCavern(entity);
@@ -1795,6 +1837,18 @@ public class EntityHighlightManager {
         return entity.getX() > SAFARI_CENTER_X && entity.getZ() > SAFARI_CENTER_Z;
     }
 
+    // モブ以外(ブロックなど)も同じ区分けで Forest Biome を判定できるようにしておく
+    public static boolean inSafariForest(BlockPos pos) {
+        return pos.getX() > SAFARI_CENTER_X && pos.getZ() > SAFARI_CENTER_Z;
+    }
+
+    // Critter Safari は中心を境に4つのバイオームへ分かれている。
+    // その位置が、指定した座標(プレイヤー)と同じバイオームに入っているか
+    public static boolean inSameSafariBiome(BlockPos pos, double originX, double originZ) {
+        return (pos.getX() > SAFARI_CENTER_X) == (originX > SAFARI_CENTER_X)
+                && (pos.getZ() > SAFARI_CENTER_Z) == (originZ > SAFARI_CENTER_Z);
+    }
+
     private static boolean inSafariHaunted(Entity entity) {
         return entity.getX() > SAFARI_CENTER_X && entity.getZ() < SAFARI_CENTER_Z;
     }
@@ -1805,8 +1859,45 @@ public class EntityHighlightManager {
 
     // すぐ近くにある、指定した種類の最も近いエンティティ
     private static Entity nearestOfType(Minecraft client, Entity entity, Class<? extends Entity> type) {
-        AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
+        return nearestOfTypeWithin(client, entity, type, HITBOX_HEAD_RADIUS);
+    }
+
+    private static Entity nearestOfTypeWithin(Minecraft client, Entity entity, Class<? extends Entity> type, double radius) {
+        AABB box = entity.getBoundingBox().inflate(radius);
         return getClosestEntity(client.level.getEntitiesOfClass(type, box, e -> true), entity);
+    }
+
+    // すぐ近くに「シュルカーボックスを持つ ItemDisplay」があるか。
+    // 動いている Hideonfloor / Hideonwall の見た目がこれで、体色がそのまま箱の色になる
+    private static boolean hasShulkerBoxDisplayNear(Minecraft client, Entity entity) {
+        AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
+        for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
+            Display.ItemDisplay.ItemRenderState state = display.itemRenderState();
+            if (state == null) continue;
+            if (isShulkerBox(state.itemStack())) return true;
+        }
+        return false;
+    }
+
+    private static boolean isShulkerBox(ItemStack stack) {
+        return stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock;
+    }
+
+    // Hideon 系のシュルカーと、その当たり判定のシルバーフィッシュを結び付ける。
+    //
+    // 止まっている間は両者が重なっているが、動き出すとシュルカーが当たり判定を追いかける形になり
+    // 距離が開く。「近くにシュルカーが居るか」で見ていると、離れた隙に当たり判定が独り立ちして、
+    // 同じ Haunted で同じ透明シルバーフィッシュを使う Duplico として拾われてしまう。
+    // そこでシュルカー側を起点にし、一番近い当たり判定を1体だけ選んで覚えておく。
+    // 1体ずつしか結び付かないので、近くに本物の Duplico が居ても巻き添えにしない
+    private static void claimShulkerHitboxes(Minecraft client) {
+        for (Entity entity : client.level.entitiesForRendering()) {
+            if (!(entity instanceof Shulker shulker)) continue;
+            if (shulkerTarget(shulker) == null) continue;
+
+            Entity hitbox = nearestOfTypeWithin(client, entity, Silverfish.class, SHULKER_COMPANION_RADIUS);
+            if (hitbox != null && hitbox.isInvisible()) shulkerClaimedEntities.add(hitbox);
+        }
     }
 
     // すぐ近くに指定した種類のエンティティがあるか。
