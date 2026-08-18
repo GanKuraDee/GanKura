@@ -11,7 +11,7 @@ public class PetHud extends HudElement {
     private static final long LEVEL_UP_DISPLAY_MS = 5000;
 
     public PetHud() {
-        super("pet", 10, 10, 1.0f, 120, 24, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
+        super("pet", 10, 10, 1.0f, 200, 34, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
     }
 
     @Override
@@ -27,6 +27,12 @@ public class PetHud extends HudElement {
         }
 
         drawTextWithShadow(context, tr, "§e§lActive Pet", 0, 0, 0xFFFFFFFF);
-        drawTextWithShadow(context, tr, petText, 0, 12, 0xFFFFFFFF);
+
+        // 案内文は2行あるので、改行で分けて順に描く
+        int y = 12;
+        for (String line : petText.split("\n")) {
+            drawTextWithShadow(context, tr, line, 0, y, 0xFFFFFFFF);
+            y += 10;
+        }
     }
 }

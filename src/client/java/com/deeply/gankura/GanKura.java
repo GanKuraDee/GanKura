@@ -7,6 +7,7 @@ import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
+import com.deeply.gankura.handler.QuiverAlertHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
 import com.deeply.gankura.handler.WarpCooldownHandler;
 import com.deeply.gankura.render.EntityHighlightManager;
@@ -73,6 +74,8 @@ public class GanKura implements ClientModInitializer {
         ServerRestartHandler.register();
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
+        QuiverScanner.register();
+        QuiverAlertHandler.register();
         CrimsonDropHandler.register();
         EntityHighlightManager.register();
         WarpCooldownHandler.register();

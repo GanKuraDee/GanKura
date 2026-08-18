@@ -18,6 +18,7 @@
 		"InvisibugParticleMixin",
 		"FloorDropParticleMixin",
 		"ArmorStandHeadOnlyGlowMixin",
+		"HideDamageSplashMixin",
 		"PetsMenuClickMixin",
 		"LoadoutsClickMixin",
 		"LoadoutsContentSyncMixin",

@@ -79,6 +79,13 @@ public class GameState {
         public static String activePoison = "NONE";
         public static int activePoisonCount = 0;
 
+        // 矢筒で選んでいる矢と、その残り本数。矢が無いときは null
+        public static String quiverArrow = null;
+        public static int quiverArrowCount = 0;
+
+        // Ferocity。タブリストから読めていないときは -1
+        public static int ferocity = -1;
+
         public static boolean hasShownDropAlert = false;
         public static boolean isLootScanning = false;
 
@@ -88,6 +95,8 @@ public class GameState {
             hollowStack = 0; isHollowBold = false; fervorStack = 0; isFervorBold = false;
             auroraStack = 0; isAuroraBold = false; lastArmorStackUpdateTime = 0;
             activePoison = "NONE"; activePoisonCount = 0;
+            quiverArrow = null; quiverArrowCount = 0;
+            ferocity = -1;
             hasShownDropAlert = false; isLootScanning = false;
         }
     }

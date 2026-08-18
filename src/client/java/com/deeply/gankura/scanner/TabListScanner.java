@@ -67,6 +67,7 @@ public class TabListScanner {
         // ★各専門のハンドラー(担当者)にリストを渡して処理を任せる (単一責任の原則)
         // エリア/サーバーIDは他のハンドラーの判定条件になるため、必ず先に更新する
         LocationScanner.processTabList(unformattedLines);
+        FerocityScanner.processTabList(unformattedLines);
         GolemHandler.processTabList(unformattedLines, client);
         BroodmotherHandler.processTabList(unformattedLines);
         DragonHandler.processTabList(unformattedLines, client);
