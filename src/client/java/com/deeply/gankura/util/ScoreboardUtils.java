@@ -60,7 +60,7 @@ public class ScoreboardUtils {
 
     // Style で表現された装飾を § コードに戻す。
     // Hypixelは文字列内に直接 § を埋め込む場合もあるが、その分はそのまま残るので両方に対応できる
-    private static String toLegacyString(Component text) {
+    public static String toLegacyString(Component text) {
         StringBuilder sb = new StringBuilder();
         text.visit((Style style, String part) -> {
             TextColor color = style.getColor();

@@ -190,15 +190,6 @@ public class ModConfig extends Config {
     // ==========================================
     // ★ 新しくGUIカテゴリの中身を追加
     public static class GuiCategory {
-        // 自分で置いたウェイポイントの一覧。MoulConfig では表を出せないので専用の画面を開く
-        @ConfigOption(name = "Custom Waypoints", desc = "Opens the waypoint list of the area you are in.")
-        @ConfigEditorButton(buttonText = "Open")
-        public transient Runnable openWaypointScreen = () -> {
-            Minecraft.getInstance().execute(() -> {
-                Minecraft.getInstance().gui.setScreen(new WaypointScreen(Minecraft.getInstance().gui.screen()));
-            });
-        };
-
         // ボタンには @Expose は付けず、代わりに transient を付けます！
         @ConfigOption(name = "Edit GUI Locations", desc = "Opens HUD editor.")
         @ConfigEditorButton(buttonText = "Open")
@@ -206,6 +197,15 @@ public class ModConfig extends Config {
             // ボタンが押されたら、マイクラの画面をHudEditorScreenに切り替える
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().gui.setScreen(new HudEditorScreen());
+            });
+        };
+
+        // 自分で置いたウェイポイントの一覧。MoulConfig では表を出せないので専用の画面を開く
+        @ConfigOption(name = "Custom Waypoints", desc = "Opens the waypoint list of the area you are in.")
+        @ConfigEditorButton(buttonText = "Open")
+        public transient Runnable openWaypointScreen = () -> {
+            Minecraft.getInstance().execute(() -> {
+                Minecraft.getInstance().gui.setScreen(new WaypointScreen(Minecraft.getInstance().gui.screen()));
             });
         };
     }
@@ -947,6 +947,45 @@ public class ModConfig extends Config {
         public boolean showArmorStackHud = true;
 
         @Expose
+        @ConfigOption(name = "Ferocity HUD", desc = "Shows ferocity. Hidden while it cannot be read.\n"
+                + "§eNeeds the Ferocity Stats Widget.\n"
+                + "§e(/widget -> Stats Widget -> Enable Ferocity)")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showFerocityHud = false;
+
+        @Expose
+        @ConfigOption(name = "Quiver HUD", desc = "Shows selected arrow and how many are left.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean showQuiverHud = true;
+
+        @Expose
+        @ConfigOption(name = "Yaw and Pitch HUD", desc = "Expands yaw and pitch HUD settings.")
+        @ConfigEditorAccordion(id = 54)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean yawPitchHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows where you are looking.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 54)
+        public boolean showYawPitchHud = false;
+
+        @Expose
+        @ConfigOption(name = "Yaw Precision", desc = "Sets decimals shown for yaw.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        @ConfigAccordionId(id = 54)
+        public int yawPrecision = 4;
+
+        @Expose
+        @ConfigOption(name = "Pitch Precision", desc = "Sets decimals shown for pitch.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        @ConfigAccordionId(id = 54)
+        public int pitchPrecision = 4;
+
+        @Expose
         @ConfigOption(name = "Keybind Settings", desc = "Expands menu keybind settings.")
         @ConfigEditorAccordion(id = 59)
         @ConfigEditorBoolean
@@ -1241,6 +1280,16 @@ public class ModConfig extends Config {
         @ConfigEditorButton(buttonText = "Reset")
         @ConfigAccordionId(id = 53)
         public transient Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
+
+        @Expose
+        @ConfigOption(name = "Hide Damage Splash", desc = "Hides the damage numbers popping off mobs.")
+        @ConfigEditorBoolean
+        public boolean hideDamageSplash = false;
+
+        @Expose
+        @ConfigOption(name = "Low Quiver Alert", desc = "Warns with a title and sound at 50 and 10 arrows left.")
+        @ConfigEditorBoolean
+        public boolean enableQuiverAlert = true;
 
         @Expose
         @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
