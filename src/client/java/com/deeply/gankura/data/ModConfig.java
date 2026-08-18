@@ -1,6 +1,7 @@
 package com.deeply.gankura.data;
 
 import com.deeply.gankura.render.HudEditorScreen;
+import com.deeply.gankura.gui.WaypointScreen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -75,6 +76,11 @@ public class ModConfig extends Config {
         if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
         if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
         if (INSTANCE.mobVisuals == null) INSTANCE.mobVisuals = new MobVisualsCategory();
+        INSTANCE.gui.openWaypointScreen = () -> {
+            Minecraft.getInstance().execute(() -> {
+                Minecraft.getInstance().gui.setScreen(new WaypointScreen(Minecraft.getInstance().gui.screen()));
+            });
+        };
         INSTANCE.gui.openHudEditor = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().gui.setScreen(new HudEditorScreen());
@@ -184,6 +190,15 @@ public class ModConfig extends Config {
     // ==========================================
     // ★ 新しくGUIカテゴリの中身を追加
     public static class GuiCategory {
+        // 自分で置いたウェイポイントの一覧。MoulConfig では表を出せないので専用の画面を開く
+        @ConfigOption(name = "Custom Waypoints", desc = "Opens the waypoint list of the area you are in.")
+        @ConfigEditorButton(buttonText = "Open")
+        public transient Runnable openWaypointScreen = () -> {
+            Minecraft.getInstance().execute(() -> {
+                Minecraft.getInstance().gui.setScreen(new WaypointScreen(Minecraft.getInstance().gui.screen()));
+            });
+        };
+
         // ボタンには @Expose は付けず、代わりに transient を付けます！
         @ConfigOption(name = "Edit GUI Locations", desc = "Opens HUD editor.")
         @ConfigEditorButton(buttonText = "Open")
