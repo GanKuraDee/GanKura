@@ -5,6 +5,9 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.scanner.BeeNestScanner;
+import com.deeply.gankura.waypoint.Waypoint;
+import com.deeply.gankura.waypoint.WaypointData;
+import com.deeply.gankura.waypoint.WaypointManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoProperties;
 import net.minecraft.gizmos.GizmoStyle;
@@ -21,6 +24,10 @@ public class WorldTextRenderer {
     // ミツバチの巣の塗りつぶし色と、その上に出すラベルの色
     private static final int BEE_NEST_COLOR = 0x80FFFF55;
     private static final int BEE_NEST_LABEL_COLOR = 0xFFFFFF55;
+    // 自分で置いたウェイポイントの線の太さと、名前の色。表示を打ち切る距離(ブロック)
+    private static final float WAYPOINT_LINE_WIDTH = 2.0F;
+    private static final int WAYPOINT_LABEL_COLOR = 0xFFFFFFFF;
+    private static final double WAYPOINT_MAX_DISTANCE = 384.0;
 
     public static void render(Minecraft client) {
         if (client.player == null) return;
@@ -31,6 +38,49 @@ public class WorldTextRenderer {
         renderTikiWaypoints(client);
         renderFloorDrops();
         renderBeeNests();
+        renderCustomWaypoints(client);
+    }
+
+    // 自分で置いたウェイポイント。今いるエリアに登録されているものだけを出す
+    private static void renderCustomWaypoints(Minecraft client) {
+        if (!GameState.Server.isSkyblock()) return;
+
+        WaypointManager manager = WaypointManager.getInstance();
+        WaypointData data = manager.data();
+        if (!data.enabled) return;
+
+        String area = WaypointManager.currentArea();
+        java.util.List<Waypoint> waypoints = manager.waypoints(area);
+        if (waypoints.isEmpty()) return;
+
+        Vec3 cameraPos = client.gameRenderer.getMainCamera().position();
+
+        for (Waypoint waypoint : waypoints) {
+            if (!waypoint.isEnabled()) continue;
+            if (!manager.isGroupEnabled(area, waypoint.getGroup())) continue;
+
+            BlockPos pos = waypoint.pos();
+            // 遠すぎるものは点にしかならないので描かない
+            if (cameraPos.distanceToSqr(Vec3.atCenterOf(pos))
+                    > WAYPOINT_MAX_DISTANCE * WAYPOINT_MAX_DISTANCE) continue;
+
+            GizmoProperties box = Gizmos.cuboid(pos, waypointStyle(waypoint));
+            box.setAlwaysOnTop();
+
+            if (data.showNames && !waypoint.getName().isBlank()) {
+                renderGizmoLabel(waypoint.getName(), pos, WAYPOINT_LABEL_COLOR);
+            }
+        }
+    }
+
+    // 枠線だけ・塗りつぶしだけ・両方の3種類を Gizmo の指定へ移す
+    private static GizmoStyle waypointStyle(Waypoint waypoint) {
+        int outline = 0xFF000000 | waypoint.getColor();
+        int fill = (waypoint.getFillAlpha() << 24) | waypoint.getColor();
+
+        if (!waypoint.getStyle().hasFill()) return GizmoStyle.stroke(outline, WAYPOINT_LINE_WIDTH);
+        if (!waypoint.getStyle().hasOutline()) return GizmoStyle.fill(fill);
+        return GizmoStyle.strokeAndFill(outline, WAYPOINT_LINE_WIDTH, fill);
     }
 
     // 地面に落ちている採取物。見つけた場所を塗りつぶし、Re-enter や Tiki と同じくラベルを添える
