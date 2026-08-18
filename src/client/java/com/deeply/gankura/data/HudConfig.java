@@ -60,6 +60,9 @@ public class HudConfig {
         ELEMENTS.add(new TpsHud());
         ELEMENTS.add(new EquipmentHud());
         ELEMENTS.add(new GearHud());
+        ELEMENTS.add(new YawPitchHud());
+        ELEMENTS.add(new QuiverHud());
+        ELEMENTS.add(new FerocityHud());
     }
 
     public static void load() {

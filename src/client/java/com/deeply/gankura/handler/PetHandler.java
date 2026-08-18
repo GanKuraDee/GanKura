@@ -17,6 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PetHandler {
+
+    // タブリストのペットウィジェットが無いと読めないので、出し方を案内する。
+    // 改行で区切り、HUD側で行ごとに描く
+    public static final String MISSING_WIDGET_MESSAGE =
+            "§cMissing Pet Widget!\n§c(/widget -> Enable Pet Widget)";
     public static boolean hasScannedTabList = false;
     private static int widgetCheckTicker = 0;
 
@@ -89,7 +94,7 @@ public class PetHandler {
 
         // スキャン完了済みの場合は、エラー状態の時の再確認(1秒に1回)のみ行う
         if (hasScannedTabList) {
-            if ("§cRequired Enable Pet Tab Widget!".equals(GameState.Player.activePetName)) {
+            if (MISSING_WIDGET_MESSAGE.equals(GameState.Player.activePetName)) {
                 if (widgetCheckTicker++ < 20) return;
                 widgetCheckTicker = 0;
             } else {
@@ -117,7 +122,7 @@ public class PetHandler {
         }
 
         if (System.currentTimeMillis() - GameState.Server.lastWorldJoinTime > 5000) {
-            GameState.Player.activePetName = "§cRequired Enable Pet Tab Widget!";
+            GameState.Player.activePetName = MISSING_WIDGET_MESSAGE;
             hasScannedTabList = true;
         } else {
             GameState.Player.activePetName = "§8Scanning...";
