@@ -1,6 +1,8 @@
 package com.deeply.gankura.util;
 
 import com.deeply.gankura.data.ModConstants;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,9 @@ public class DevHooks {
     // ワールド描画のたびに呼ぶもの。一時的な機能が自分で登録する
     private static final List<Consumer<Minecraft>> WORLD_RENDERERS = new ArrayList<>();
 
+    // /gankura の下にぶら下げるサブコマンド。一時的な機能が自分で登録する
+    private static final List<Consumer<LiteralArgumentBuilder<FabricClientCommandSource>>> SUBCOMMANDS = new ArrayList<>();
+
     public static void load() {
         try {
             Class.forName(ENTRYPOINT).getMethod("register").invoke(null);
@@ -35,6 +40,16 @@ public class DevHooks {
 
     public static void onWorldRender(Consumer<Minecraft> renderer) {
         WORLD_RENDERERS.add(renderer);
+    }
+
+    public static void onBuildCommand(Consumer<LiteralArgumentBuilder<FabricClientCommandSource>> builder) {
+        SUBCOMMANDS.add(builder);
+    }
+
+    public static void buildCommand(LiteralArgumentBuilder<FabricClientCommandSource> command) {
+        for (Consumer<LiteralArgumentBuilder<FabricClientCommandSource>> builder : SUBCOMMANDS) {
+            builder.accept(command);
+        }
     }
 
     public static void renderWorld(Minecraft client) {

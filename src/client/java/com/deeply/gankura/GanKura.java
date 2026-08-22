@@ -118,7 +118,7 @@ public class GanKura implements ClientModInitializer {
 
         // コマンドの登録
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> {
-            dispatcher.register(ClientCommands.literal("gankura")
+            LiteralArgumentBuilder<FabricClientCommandSource> gankura = ClientCommands.literal("gankura")
                     // /gankura (引数なし) -> 設定画面の予約チケットをON
                     .executes(context -> {
                         openConfigNextTick = true;
@@ -131,12 +131,11 @@ public class GanKura implements ClientModInitializer {
                                 return 1;
                             })
                     )
-                    .then(waypointCommand())
-                    // 【一時的な機能】NPC型モブの照合先を調べるための一覧
-                    .then(ClientCommands.literal("debug")
-                            .then(ClientCommands.literal("players")
-                                    .executes(GanKura::debugPlayers)))
-            );
+                    .then(waypointCommand());
+
+            // 開発中の一時的な機能。配布ビルドでは何も足されない
+            DevHooks.buildCommand(gankura);
+            dispatcher.register(gankura);
 
             // ウェイポイントは出し入れの回数が多いので、短い別名も用意しておく
             dispatcher.register(ClientCommands.literal("gkw")
@@ -249,34 +248,6 @@ public class GanKura implements ClientModInitializer {
                 .append(Component.literal(" at "))
                 .append(waypointPos(pos.getX(), pos.getY(), pos.getZ()))
                 .append(Component.literal("."))));
-        return 1;
-    }
-
-    // 【一時的な機能】デバッグ表示に出すプレイヤーの数
-    private static final int DEBUG_PLAYER_LIMIT = 5;
-
-    // 【一時的な機能】近くのプレイヤーエンティティを、その名前と距離順で並べる。
-    // NPC型のモブは画面に出る表示名と実体の名前が違うので、照合先を調べるために使う
-    private static int debugPlayers(CommandContext<FabricClientCommandSource> context) {
-        Minecraft client = Minecraft.getInstance();
-        if (client.level == null || client.player == null) return 0;
-
-        List<net.minecraft.world.entity.player.Player> players =
-                new java.util.ArrayList<>(client.level.players());
-        players.remove(client.player);
-        players.sort(java.util.Comparator.comparingDouble(p -> p.distanceToSqr(client.player)));
-
-        // 全部出すとチャットが流れてしまうので、近い順に少しだけ出す
-        int total = players.size();
-        if (players.size() > DEBUG_PLAYER_LIMIT) players = players.subList(0, DEBUG_PLAYER_LIMIT);
-
-        context.getSource().sendFeedback(waypointPrefixed(
-                Component.literal("Player entities: " + players.size() + " / " + total)));
-        for (net.minecraft.world.entity.player.Player player : players) {
-            double distance = Math.sqrt(player.distanceToSqr(client.player));
-            context.getSource().sendFeedback(Component.literal(
-                    String.format("§7- §f%s §7(%.0fm)", player.getName().getString(), distance)));
-        }
         return 1;
     }
 
