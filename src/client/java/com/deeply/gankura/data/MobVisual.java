@@ -43,6 +43,7 @@ public interface MobVisual {
         if (target instanceof TheEnd) return GameState.Server.isTheEnd();
         if (target instanceof SpidersDen) return GameState.Server.isSpidersDen();
         if (target instanceof CrimsonIsle) return GameState.Server.isCrimsonIsle();
+        if (target instanceof CrystalHollows) return GameState.Server.isCrystalHollows();
         if (target instanceof MoongladeMarsh) return GameState.Server.isMoongladeMarsh();
         if (target instanceof TorrhusCanyon) {
             return GameState.Server.isTorrhusCanyon() || GameState.Server.isTorrhusHeights();
@@ -51,17 +52,37 @@ public interface MobVisual {
         return GameState.Server.isSafari();
     }
 
+    /**
+     * キャプチャ済みとして表示から外すか。
+     * Critter Safari は1種につき1体捕まえれば済むので、終わった種は消せるようにしている。
+     * 対象は Critter Safari の4バイオームのモブだけで、他エリアのモブには効かない
+     */
+    private static boolean hiddenAsCaptured(MobVisual target) {
+        if (!ModConfig.INSTANCE.mobVisuals.hideCapturedCritters) return false;
+        if (target instanceof TheEnd || target instanceof SpidersDen
+                || target instanceof CrimsonIsle || target instanceof CrystalHollows
+                || target instanceof MoongladeMarsh || target instanceof TorrhusCanyon) {
+            return false;
+        }
+        return GameState.CritterSafari.isCaptured(target.plainLabel());
+    }
+
     // 対象リストに載っていて、今いるエリアのモブで、かつその機能の全体トグルが入っていれば表示する
     default boolean highlight() {
-        return ModConfig.INSTANCE.mobVisuals.enableHighlight && inOwnArea(this) && targets().contains(this);
+        return ModConfig.INSTANCE.mobVisuals.enableHighlight && shown(this);
     }
 
     default boolean tracer() {
-        return ModConfig.INSTANCE.mobVisuals.enableTracer && inOwnArea(this) && targets().contains(this);
+        return ModConfig.INSTANCE.mobVisuals.enableTracer && shown(this);
     }
 
     default boolean nameplate() {
-        return ModConfig.INSTANCE.mobVisuals.enableNameplate && inOwnArea(this) && targets().contains(this);
+        return ModConfig.INSTANCE.mobVisuals.enableNameplate && shown(this);
+    }
+
+    // 機能の全体トグル以外の、3機能に共通する表示条件
+    private static boolean shown(MobVisual target) {
+        return inOwnArea(target) && target.targets().contains(target) && !hiddenAsCaptured(target);
     }
 
     /** どれか1つでも有効なら、そのモブを探す必要がある */
@@ -148,7 +169,8 @@ public interface MobVisual {
         ASHFANG_ACOLYTE("§9Ashfang Acolyte", 0x5555FF),
         ASHFANG_UNDERLING("§cAshfang Underling", 0xFF5555),
         MAGMA_BOSS("§6Magma Boss", 0xFFAA00),
-        MAGMA_GLARE("§cMagma Glare", 0xFF5555);
+        MAGMA_GLARE("§cMagma Glare", 0xFF5555),
+        MATCHO("§bMatcho", 0x55FFFF);
 
         private final String label;
         private final int glowColorRGB;
@@ -171,6 +193,39 @@ public interface MobVisual {
         @Override
         public List<CrimsonIsle> targets() {
             return ModConfig.INSTANCE.mobVisuals.targetsCrimsonIsle;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    /** Crystal Hollows のモブ */
+    enum CrystalHollows implements MobVisual {
+        BOSS_CORLEONE("§dBoss Corleone", 0xFF55FF);
+
+        private final String label;
+        private final int glowColorRGB;
+
+        CrystalHollows(String label, int glowColorRGB) {
+            this.label = label;
+            this.glowColorRGB = glowColorRGB;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+
+        @Override
+        public int glowColorRGB() {
+            return glowColorRGB;
+        }
+
+        @Override
+        public List<CrystalHollows> targets() {
+            return ModConfig.INSTANCE.mobVisuals.targetsCrystalHollows;
         }
 
         @Override

@@ -14,7 +14,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class CrimsonBossesHealthHud extends HudElement {
 
     public CrimsonBossesHealthHud() {
-        super("crimson_bosses_health", 305, 228, 1.0f, 185, 24,
+        super("crimson_bosses_health", 230, 238, 1.0f, 185, 24,
                 CrimsonBossesHealthHud::isAnyEnabled,
                 CrimsonBossesHealthHud::isAnyVisible);
     }

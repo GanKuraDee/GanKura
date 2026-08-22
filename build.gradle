@@ -23,6 +23,12 @@ loom {
 
 }
 
+// 開発中の一時的な機能。手元で試すときだけ -PdevFeatures を付ける。
+// 付けずにビルドすると配布用の jar には入らない
+if (!project.hasProperty('devFeatures')) {
+	sourceSets.client.java.exclude 'com/deeply/gankura/dev/**'
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"

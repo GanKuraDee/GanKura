@@ -5,6 +5,7 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.scanner.BeeNestScanner;
+import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.waypoint.Waypoint;
 import com.deeply.gankura.waypoint.WaypointData;
 import com.deeply.gankura.waypoint.WaypointManager;
@@ -39,6 +40,8 @@ public class WorldTextRenderer {
         renderFloorDrops();
         renderBeeNests();
         renderCustomWaypoints(client);
+        // 開発中の一時的な機能。配布ビルドでは何も登録されていない
+        DevHooks.renderWorld(client);
     }
 
     // 自分で置いたウェイポイント。今いるエリアに登録されているものだけを出す
@@ -269,7 +272,7 @@ public class WorldTextRenderer {
         renderGizmoLabel(nameText + " " + status, renderPos, argbColor);
     }
 
-    private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
+    public static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
         Vec3 pos = labelPos(renderPos);
 
         // 距離に比例して拡大し、見かけの大きさを一定に保つ。

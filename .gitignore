@@ -38,3 +38,7 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# 開発用の一時的な機能(コミットしない)
+
+src/client/java/com/deeply/gankura/dev/

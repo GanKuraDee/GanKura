@@ -104,6 +104,7 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsTheEnd = normalizeEnumList(INSTANCE.mobVisuals.targetsTheEnd, List.of());
         INSTANCE.mobVisuals.targetsSpidersDen = normalizeEnumList(INSTANCE.mobVisuals.targetsSpidersDen, List.of());
         INSTANCE.mobVisuals.targetsCrimsonIsle = normalizeEnumList(INSTANCE.mobVisuals.targetsCrimsonIsle, List.of());
+        INSTANCE.mobVisuals.targetsCrystalHollows = normalizeEnumList(INSTANCE.mobVisuals.targetsCrystalHollows, List.of());
         INSTANCE.mobVisuals.targetsSafariCavern = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariCavern, List.of());
         INSTANCE.mobVisuals.targetsSafariForest = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariForest, List.of());
         INSTANCE.mobVisuals.targetsSafariHaunted = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariHaunted, List.of());
@@ -171,6 +172,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Crimson Isle", desc = "Crimson Isle bosses.")
     public CrimsonIsleCategory crimsonIsle = new CrimsonIsleCategory();
+
+    @Expose
+    @Category(name = "Crystal Hollows", desc = "Crystal Hollows features.")
+    public CrystalHollowsCategory crystalHollows = new CrystalHollowsCategory();
 
     @Expose
     @Category(name = "Foraging", desc = "Foraging features.")
@@ -663,6 +668,12 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
+        @ConfigOption(name = "Captured Critters HUD", desc = "Lists every Critter Safari critter and marks the ones already captured.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean showCapturedCrittersHud = true;
+
+        @Expose
         @ConfigOption(name = "Floor Drops", desc = "Marks the foraging drops lying on the ground.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
@@ -675,17 +686,23 @@ public class ModConfig extends Config {
         public boolean enableBeeNestWaypoints = true;
 
         @Expose
+        @ConfigOption(name = "Fish Highlight", desc = "Highlights the fish you can feed to Scrappy.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableSafariFishHighlight = false;
+
+        @Expose
+        @ConfigOption(name = "Rockmite Mound Highlight", desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableRockmiteMoundHighlight = true;
+
+        @Expose
         @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
         @ConfigEditorAccordion(id = 72)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean wumpaFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Status HUD", desc = "Shows which Icy Biome critters have been captured.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 72)
-        public boolean showCritterCaptureHud = true;
 
         @Expose
         @ConfigOption(name = "Spawn Title", desc = "Shows a title when Wumpa spawns in the Icy Biome.")
@@ -713,17 +730,32 @@ public class ModConfig extends Config {
         public boolean doomspiralFolder = false;
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Shows how many candles have been lit.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 73)
-        public boolean showDoomspiralHud = true;
-
-        @Expose
         @ConfigOption(name = "Capsule Usage Message", desc = "Posts how many Critter Capsules the capture took.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 73)
         public boolean enableDoomspiralCapsuleMessage = true;
 
+        @Expose
+        @ConfigOption(name = "Macaw", desc = "Expands Macaw settings.")
+        @ConfigEditorAccordion(id = 75)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean macawFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Spawn Title", desc = "Shows a title when two Macaws are attracted to the Birdfeeder.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 75)
+        public boolean enableMacawSpawnTitle = true;
+
+    }
+
+    public static class CrystalHollowsCategory {
+
+        @Expose
+        @ConfigOption(name = "Boss Corleone Spawn Title", desc = "Shows a title when Boss Corleone shows up nearby.")
+        @ConfigEditorBoolean
+        public boolean enableCorleoneSpawnTitle = true;
     }
 
     // ==========================================
@@ -744,6 +776,11 @@ public class ModConfig extends Config {
         public boolean enableTracer = true;
 
         @Expose
+        @ConfigOption(name = "Tracer Target", desc = "Nearest: only the closest mob of each kind.\nAll: every mob found.")
+        @ConfigEditorDropdown
+        public TracerMode tracerMode = TracerMode.NEAREST;
+
+        @Expose
         @ConfigOption(name = "Nameplate", desc = "Shows a nameplate on the target mobs.")
         @ConfigEditorBoolean
         public boolean enableNameplate = true;
@@ -759,6 +796,16 @@ public class ModConfig extends Config {
         public transient Runnable resetNameplateScale = () -> nameplateScale = DEFAULT_NAMEPLATE_SCALE;
 
         @Expose
+        @ConfigOption(name = "Nameplate Health", desc = "Shows the mob's health under its name.")
+        @ConfigEditorBoolean
+        public boolean showNameplateHealth = true;
+
+        @Expose
+        @ConfigOption(name = "Nameplate Capsule Count", desc = "Shows how many Critter Capsules have been thrown, under the mob's name.\nOnly Wumpa and Doomspiral have this.")
+        @ConfigEditorBoolean
+        public boolean showNameplateCapsule = true;
+
+        @Expose
         @ConfigOption(name = "The End", desc = "Expands The End targets.")
         @ConfigEditorAccordion(id = 83)
         @ConfigEditorBoolean
@@ -769,6 +816,17 @@ public class ModConfig extends Config {
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 83)
         public List<MobVisual.TheEnd> targetsTheEnd = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every The End mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 83)
+        public transient Runnable enableAllTheEnd = () -> setAll(targetsTheEnd, MobVisual.TheEnd.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 83)
+        public transient Runnable disableAllTheEnd = () -> targetsTheEnd.clear();
 
         @Expose
         @ConfigOption(name = "Spider's Den", desc = "Expands Spider's Den targets.")
@@ -782,6 +840,17 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 84)
         public List<MobVisual.SpidersDen> targetsSpidersDen = new ArrayList<>();
 
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Spider's Den mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 84)
+        public transient Runnable enableAllSpidersDen = () -> setAll(targetsSpidersDen, MobVisual.SpidersDen.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 84)
+        public transient Runnable disableAllSpidersDen = () -> targetsSpidersDen.clear();
+
         @Expose
         @ConfigOption(name = "Crimson Isle", desc = "Expands Crimson Isle targets.")
         @ConfigEditorAccordion(id = 85)
@@ -793,6 +862,40 @@ public class ModConfig extends Config {
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 85)
         public List<MobVisual.CrimsonIsle> targetsCrimsonIsle = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Crimson Isle mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 85)
+        public transient Runnable enableAllCrimsonIsle = () -> setAll(targetsCrimsonIsle, MobVisual.CrimsonIsle.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 85)
+        public transient Runnable disableAllCrimsonIsle = () -> targetsCrimsonIsle.clear();
+
+        @Expose
+        @ConfigOption(name = "Crystal Hollows", desc = "Expands Crystal Hollows targets.")
+        @ConfigEditorAccordion(id = 93)
+        @ConfigEditorBoolean
+        public boolean crystalHollowsFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 93)
+        public List<MobVisual.CrystalHollows> targetsCrystalHollows = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Crystal Hollows mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 93)
+        public transient Runnable enableAllCrystalHollows = () -> setAll(targetsCrystalHollows, MobVisual.CrystalHollows.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 93)
+        public transient Runnable disableAllCrystalHollows = () -> targetsCrystalHollows.clear();
 
         @Expose
         @ConfigOption(name = "Moonglade Marsh", desc = "Expands Moonglade Marsh targets.")
@@ -806,6 +909,17 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 87)
         public List<MobVisual.MoongladeMarsh> targetsMoongladeMarsh = new ArrayList<>();
 
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Moonglade Marsh mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 87)
+        public transient Runnable enableAllMoongladeMarsh = () -> setAll(targetsMoongladeMarsh, MobVisual.MoongladeMarsh.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 87)
+        public transient Runnable disableAllMoongladeMarsh = () -> targetsMoongladeMarsh.clear();
+
         @Expose
         @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon targets.")
         @ConfigEditorAccordion(id = 88)
@@ -818,11 +932,28 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 88)
         public List<MobVisual.TorrhusCanyon> targetsTorrhusCanyon = new ArrayList<>();
 
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Torrhus Canyon mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 88)
+        public transient Runnable enableAllTorrhusCanyon = () -> setAll(targetsTorrhusCanyon, MobVisual.TorrhusCanyon.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 88)
+        public transient Runnable disableAllTorrhusCanyon = () -> targetsTorrhusCanyon.clear();
+
         @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari areas.")
         @ConfigEditorAccordion(id = 92)
         @ConfigEditorBoolean
         public boolean critterSafariFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Captured Critters", desc = "Drops critters already captured from Highlight, Tracer and Nameplate.\nThe Captured Critters HUD keeps showing them.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 92)
+        public boolean hideCapturedCritters = false;
 
         @Expose
         @ConfigOption(name = "Cavern", desc = "Expands Cavern targets.")
@@ -837,6 +968,17 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 86)
         public List<MobVisual.SafariCavern> targetsSafariCavern = new ArrayList<>();
 
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Cavern mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 86)
+        public transient Runnable enableAllSafariCavern = () -> setAll(targetsSafariCavern, MobVisual.SafariCavern.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 86)
+        public transient Runnable disableAllSafariCavern = () -> targetsSafariCavern.clear();
+
         @Expose
         @ConfigOption(name = "Forest", desc = "Expands Forest targets.")
         @ConfigAccordionId(id = 92)
@@ -849,6 +991,17 @@ public class ModConfig extends Config {
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 89)
         public List<MobVisual.SafariForest> targetsSafariForest = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Forest mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 89)
+        public transient Runnable enableAllSafariForest = () -> setAll(targetsSafariForest, MobVisual.SafariForest.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 89)
+        public transient Runnable disableAllSafariForest = () -> targetsSafariForest.clear();
 
         @Expose
         @ConfigOption(name = "Haunted", desc = "Expands Haunted targets.")
@@ -863,6 +1016,17 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 90)
         public List<MobVisual.SafariHaunted> targetsSafariHaunted = new ArrayList<>();
 
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Haunted mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 90)
+        public transient Runnable enableAllSafariHaunted = () -> setAll(targetsSafariHaunted, MobVisual.SafariHaunted.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 90)
+        public transient Runnable disableAllSafariHaunted = () -> targetsSafariHaunted.clear();
+
         @Expose
         @ConfigOption(name = "Icy", desc = "Expands Icy targets.")
         @ConfigAccordionId(id = 92)
@@ -875,6 +1039,42 @@ public class ModConfig extends Config {
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 91)
         public List<MobVisual.SafariIcy> targetsSafariIcy = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Icy mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 91)
+        public transient Runnable enableAllSafariIcy = () -> setAll(targetsSafariIcy, MobVisual.SafariIcy.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 91)
+        public transient Runnable disableAllSafariIcy = () -> targetsSafariIcy.clear();
+
+        /** Tracer をどのモブに出すか。表示名はそのまま設定画面の選択肢になる */
+        public enum TracerMode {
+            NEAREST("Nearest"),
+            ALL("All");
+
+            private final String label;
+
+            TracerMode(String label) {
+                this.label = label;
+            }
+
+            @Override
+            public String toString() {
+                return label;
+            }
+        }
+
+        // ドラッグリストは設定画面が同じインスタンスを見ているため、
+        // 新しいリストに差し替えず、中身だけ入れ替える
+        private static <T> void setAll(List<T> list, T[] values) {
+            list.clear();
+            list.addAll(java.util.Arrays.asList(values));
+        }
+
     }
 
     public static class MiscCategory {
@@ -923,6 +1123,31 @@ public class ModConfig extends Config {
         public HudOrientation gearHudOrientation = HudOrientation.HORIZONTAL;
 
         @Expose
+        @ConfigOption(name = "Yaw and Pitch HUD", desc = "Expands yaw and pitch HUD settings.")
+        @ConfigEditorAccordion(id = 54)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 50)
+        public boolean yawPitchHudFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows where you are looking.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 54)
+        public boolean showYawPitchHud = false;
+
+        @Expose
+        @ConfigOption(name = "Yaw Precision", desc = "Sets decimals shown for yaw.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        @ConfigAccordionId(id = 54)
+        public int yawPrecision = 4;
+
+        @Expose
+        @ConfigOption(name = "Pitch Precision", desc = "Sets decimals shown for pitch.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+        @ConfigAccordionId(id = 54)
+        public int pitchPrecision = 4;
+
+        @Expose
         @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
@@ -959,31 +1184,6 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 50)
         public boolean showQuiverHud = true;
-
-        @Expose
-        @ConfigOption(name = "Yaw and Pitch HUD", desc = "Expands yaw and pitch HUD settings.")
-        @ConfigEditorAccordion(id = 54)
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
-        public boolean yawPitchHudFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Enable", desc = "Shows where you are looking.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 54)
-        public boolean showYawPitchHud = false;
-
-        @Expose
-        @ConfigOption(name = "Yaw Precision", desc = "Sets decimals shown for yaw.")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-        @ConfigAccordionId(id = 54)
-        public int yawPrecision = 4;
-
-        @Expose
-        @ConfigOption(name = "Pitch Precision", desc = "Sets decimals shown for pitch.")
-        @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
-        @ConfigAccordionId(id = 54)
-        public int pitchPrecision = 4;
 
         @Expose
         @ConfigOption(name = "Keybind Settings", desc = "Expands menu keybind settings.")

@@ -2,6 +2,8 @@ package com.deeply.gankura.render;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import com.deeply.gankura.data.HudCategory;
+
 import java.util.function.Supplier;
 
 public abstract class HudElement {
@@ -12,6 +14,8 @@ public abstract class HudElement {
     public final int defaultX, defaultY;
     public final float defaultScale;
     public int width, height;
+    // どの場面で出るHUDか。移動画面の絞り込みに使う。登録時に HudConfig が設定する
+    public HudCategory category = HudCategory.GENERAL;
 
     private final Supplier<Boolean> enabledSupplier;
     private final Supplier<Boolean> visibilityCondition;
