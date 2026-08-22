@@ -26,7 +26,7 @@ public class HudConfig {
     // 座標の保存形式。画面左上からの絶対座標 + 描画時クランプ形式。
     // これが一致しない設定ファイルは互換性がないものとして破棄する
     private static final String FORMAT_VERSION_KEY = "formatVersion";
-    private static final String FORMAT_VERSION = "9";
+    private static final String FORMAT_VERSION = "10";
 
     public static final List<HudElement> ELEMENTS = new ArrayList<>();
 
@@ -35,34 +35,48 @@ public class HudConfig {
         load();
     }
 
-    // ★神クラスの解体により、追加がたったの1行で可能に！
+    // 追加は1行。分類は登録時にまとめて付けるので、HUD 側は何も持たなくてよい
     private static void initElements() {
-        ELEMENTS.add(new GolemStatusHud());
-        ELEMENTS.add(new GolemLootTrackerHud());
-        ELEMENTS.add(new GolemHealthHud());
-        ELEMENTS.add(new DragonStatusHud());
-        ELEMENTS.add(new DragonLootTrackerHud()); // ここでバグも修正！
-        ELEMENTS.add(new DragonHealthHud());
-        ELEMENTS.add(new BroodmotherStatusHud());
-        ELEMENTS.add(new BroodmotherHealthHud());
-        ELEMENTS.add(new ArachneStatusHud());
-        ELEMENTS.add(new ArachneHealthHud());
-        ELEMENTS.add(new CrimsonIsleStatusHud());
-        ELEMENTS.add(new CrimsonLootTrackerHud());
-        ELEMENTS.add(new CrimsonBossesHealthHud());
-        ELEMENTS.add(new CritterCaptureHud());
-        ELEMENTS.add(new DoomspiralHud());
+        register(HudCategory.THE_END,
+                new GolemStatusHud(),
+                new GolemLootTrackerHud(),
+                new GolemHealthHud(),
+                new DragonStatusHud(),
+                new DragonLootTrackerHud(),
+                new DragonHealthHud());
 
-        ELEMENTS.add(new PetHud());
-        ELEMENTS.add(new ArmorStackHud());
-        ELEMENTS.add(new DayHud());
-        ELEMENTS.add(new WarpCooldownHud());
-        ELEMENTS.add(new TpsHud());
-        ELEMENTS.add(new EquipmentHud());
-        ELEMENTS.add(new GearHud());
-        ELEMENTS.add(new YawPitchHud());
-        ELEMENTS.add(new QuiverHud());
-        ELEMENTS.add(new FerocityHud());
+        register(HudCategory.SPIDERS_DEN,
+                new BroodmotherStatusHud(),
+                new BroodmotherHealthHud(),
+                new ArachneStatusHud(),
+                new ArachneHealthHud());
+
+        register(HudCategory.CRIMSON_ISLE,
+                new CrimsonIsleStatusHud(),
+                new CrimsonLootTrackerHud(),
+                new CrimsonBossesHealthHud());
+
+        register(HudCategory.CRITTER_SAFARI,
+                new CapturedCrittersHud());
+
+        register(HudCategory.GENERAL,
+                new PetHud(),
+                new ArmorStackHud(),
+                new DayHud(),
+                new WarpCooldownHud(),
+                new TpsHud(),
+                new EquipmentHud(),
+                new GearHud(),
+                new YawPitchHud(),
+                new QuiverHud(),
+                new FerocityHud());
+    }
+
+    private static void register(HudCategory category, HudElement... elements) {
+        for (HudElement element : elements) {
+            element.category = category;
+            ELEMENTS.add(element);
+        }
     }
 
     public static void load() {

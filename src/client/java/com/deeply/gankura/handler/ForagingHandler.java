@@ -27,10 +27,12 @@ public class ForagingHandler {
         // 他エリアで同じ文言が流れても反応させない
         if (GameState.Server.isSafari()) {
             if (handleWumpaSpawn(unformattedMsg, client)) return;
+            if (handleMacawSpawn(unformattedMsg, client)) return;
             if (handleCritterCapture(unformattedMsg)) return;
             // Wumpa のキャプチャ成功。洞窟が開く合図なので、湧いている状態から Captured へ進める
             if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.WUMPA_CAPTURED_MSG)) {
                 GameState.CritterSafari.wumpaStatus = GameState.CritterSafari.STATUS_CAPTURED;
+                GameState.CritterSafari.markCaptured(ModConstants.WUMPA_NAME);
                 if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
                     if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
                     announceCapsuleUsage(client, "§b§lWumpa", GameState.CritterSafari.wumpaCapsuleHits);
@@ -77,22 +79,38 @@ public class ForagingHandler {
         return true;
     }
 
+    // Macaw は Birdfeeder に寄ってきたメッセージでしか分からないので、見逃さないようタイトルで知らせる
+    private static boolean handleMacawSpawn(String unformattedMsg, Minecraft client) {
+        if (!ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.MACAW_ATTRACTED_MSG)) return false;
+
+        if (ModConfig.INSTANCE.foraging.enableMacawSpawnTitle) {
+            MutableComponent title = Component.literal("MACAWS ATTRACTED!")
+                    .withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
+            MutableComponent subtitle = Component.literal("Forest Biome")
+                    .withStyle(ChatFormatting.YELLOW);
+            client.execute(() -> NotificationUtils.showTitle(client, title, subtitle));
+        }
+        return true;
+    }
+
     // Icy Biome の Critter を8種すべてキャプチャすると Wumpa が湧くため、進捗を記録してHUDに出す。
     // 他バイオームのCritterも同じ文面でキャプチャされるので、8種に一致するものだけ拾う
     private static boolean handleCritterCapture(String unformattedMsg) {
-        Matcher matcher = ModConstants.CRITTER_CAPTURE_PATTERN.matcher(unformattedMsg);
-        if (!matcher.find()) return false;
+        String captured = ModConstants.findCapturedCritter(unformattedMsg);
+        if (captured == null) return false;
 
-        String critter = ModConstants.findIcyBiomeCritter(matcher.group(1));
+        // チェックリストは全バイオームの Critter が対象なので、名前をそのまま記録する
+        GameState.CritterSafari.markCaptured(captured);
+
+        String critter = ModConstants.findIcyBiomeCritter(captured);
         if (critter == null) return true;
 
         // Wumpa は1回のSafari入場につき1体しか湧かない。湧いた後もCritter自体は捕まえ続けられるが、
         // それを数え直すと 8/8 (Spawned) の表示が 1/8 に巻き戻ってしまうため、以降は進捗を触らない
         if (GameState.CritterSafari.wumpaStatus != null) return true;
 
-        GameState.CritterSafari.markCaptured(critter);
         // 8種そろった時点で Wumpa が湧く。足音のメッセージを待たずに状態を進める
-        if (GameState.CritterSafari.capturedCount() >= ModConstants.ICY_BIOME_CRITTERS.size()) {
+        if (GameState.CritterSafari.icyCapturedCount() >= ModConstants.ICY_BIOME_CRITTERS.size()) {
             GameState.CritterSafari.wumpaStatus = GameState.CritterSafari.STATUS_SPAWNED;
             GameState.CritterSafari.wumpaCapsuleHits = 0;
         }
@@ -124,6 +142,7 @@ public class ForagingHandler {
 
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.DOOMSPIRAL_CAPTURED_MSG)) {
             GameState.Doomspiral.status = GameState.Doomspiral.STATUS_CAPTURED;
+            GameState.CritterSafari.markCaptured(ModConstants.DOOMSPIRAL_NAME);
             if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
                 if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
                 announceCapsuleUsage(client, "§5§lDoomspiral", GameState.Doomspiral.capsuleHits);

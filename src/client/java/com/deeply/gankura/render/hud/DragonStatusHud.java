@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 
 public class DragonStatusHud extends HudElement {
     public DragonStatusHud() {
-        super("dragon", 165, 118, 1.0f, 150, 50,
+        super("dragon", 230, 132, 1.0f, 150, 50,
                 () -> ModConfig.INSTANCE.theEnd.showDragonStatusHud,
                 () -> GameState.Server.isTheEnd());
     }

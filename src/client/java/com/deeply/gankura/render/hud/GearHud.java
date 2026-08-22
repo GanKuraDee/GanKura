@@ -23,7 +23,7 @@ public class GearHud extends HudElement {
     private static final int DEFAULT_SLOTS = 4;
 
     public GearHud() {
-        super("gear", 10, 103, 1.0f, SLOT_SIZE * DEFAULT_SLOTS, SLOT_SIZE,
+        super("gear", 10, 131, 1.0f, SLOT_SIZE * DEFAULT_SLOTS, SLOT_SIZE,
                 () -> ModConfig.INSTANCE.misc.showGearHud, () -> true);
     }
 

@@ -5,6 +5,9 @@ import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.MobVisual.CrimsonIsle;
+import com.deeply.gankura.data.MobVisual.CrystalHollows;
+import com.deeply.gankura.handler.CorleoneHandler;
+import net.minecraft.client.player.AbstractClientPlayer;
 import com.deeply.gankura.data.MobVisual.MoongladeMarsh;
 import com.deeply.gankura.data.MobVisual.SafariCavern;
 import com.deeply.gankura.data.MobVisual.SafariForest;
@@ -31,6 +34,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import com.mojang.authlib.properties.Property;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
@@ -49,6 +53,7 @@ import net.minecraft.world.entity.monster.Endermite;
 import net.minecraft.world.entity.monster.zombie.Drowned;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.dolphin.Dolphin;
+import net.minecraft.world.entity.animal.fish.AbstractFish;
 import net.minecraft.world.entity.animal.fish.Cod;
 import net.minecraft.world.entity.animal.fish.Pufferfish;
 import net.minecraft.world.entity.animal.fish.Salmon;
@@ -177,6 +182,17 @@ public class EntityHighlightManager {
     // ネームタグ(ArmorStand)より追跡範囲が広く、遠距離でも存在を判定できる(画面上の表示名とは異なる名前)
     private static final String BARBARIAN_ENTITY_NAME = "DukeBarb";
     private static final String MAGE_OUTLAW_ENTITY_NAME = "Mage Outlaw";
+    // Matcho もプレイヤーエンティティ型。ボスと違い複数体いるが、探し方は同じ
+    private static final String MATCHO_ENTITY_NAME = "Matcho";
+    // Critter Safari の Hideyho もプレイヤーエンティティ型。実体名がそのまま呼び名になっている
+    private static final String HIDEYHO_ENTITY_NAME = "Hideyho";
+    // Torrhus Canyon の Grizzly Bear も同じく、実体名がそのまま呼び名になっている
+    private static final String GRIZZLY_BEAR_ENTITY_NAME = "Grizzly Bear";
+    // Crystal Hollows の Boss Corleone もプレイヤーエンティティ型だが、
+    // 実体名(Team Treasurite)・スコアボードのチーム・装備がどれも他の Treasurite 系と共通で、
+    // 個体ごとに違うのはスキンだけ。テクスチャのパス末尾(スキンのハッシュ)で見分ける。
+    // Hypixel 側でスキンが差し替えられた場合は、この値も更新が必要
+    private static final String CORLEONE_SKIN_HASH = "3c37b434bbb65fe5838afced8301604126214b2a";
 
     public static final Set<Entity> highlightedEntities = new HashSet<>();
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
@@ -186,6 +202,15 @@ public class EntityHighlightManager {
     // エンティティ → 輪郭の色(RGB)。同じ型でもエリアや体色・変種で呼び名(=色)が変わるモブ用に、
     // 走査時に決めた色を mixin 側から引けるよう保持する
     public static final Map<Entity, Integer> customGlowColors = new HashMap<>();
+
+    // Scrappy に与える魚のハイライト色。水色で、Critter の色とは役割を分けている
+    private static final int SAFARI_FISH_GLOW_COLOR = 0x55FFFF;
+
+    // Rockmite Mound のハイライト色と、その見た目に使われているスキンのテクスチャ。
+    // 色は移植元の Skyblocker と同じ明るい水色
+    private static final int ROCKMITE_MOUND_GLOW_COLOR = 0x3AB3DA;
+    private static final String ROCKMITE_MOUND_TEXTURE =
+            "5dbaab74d1acd0abe9d04abe9928725de5d4495fcb63b647228caf6944c20800";
     // ネームプレート表示対象 → 表示文字列。Glowingとは独立して有効化できるよう別管理とし、
     // 毎tick作り直すことで削除済みエンティティの掃除を不要にしている
     public static final Map<Entity, String> nameplateEntities = new LinkedHashMap<>();
@@ -284,9 +309,25 @@ public class EntityHighlightManager {
             SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON,
             SafariForest.HIDEONFLOOR, SafariHaunted.HIDEONWALL);
 
-    // Critter Safari の、独自の見た目でエンティティ型からは判別できないモブ。ネームタグで判定する
+    // Critter Safari の、独自の見た目でエンティティ型からは判別できないモブ。ネームタグで判定する。
+    // 本命は SAFARI_NAMED_PLAYER_TARGETS の実体名照合で、こちらはその取りこぼし用の保険
     public static final List<MobVisual> SAFARI_NAMED_TARGETS = List.of(
             SafariHaunted.HIDEYHO);
+
+    // Critter Safari の、プレイヤーエンティティ型(NPC)のモブ。
+    // ネームタグ(ArmorStand)より読み込み範囲が広いので、実体名で直接探す
+    public static final List<MobVisual> SAFARI_NAMED_PLAYER_TARGETS = List.of(
+            SafariHaunted.HIDEYHO);
+
+    // Crimson Isle の、ネームタグでしか判別できないモブ。
+    // Matcho はプレイヤー型(NPC)で、エンティティ型では他の NPC と区別できない
+    public static final List<MobVisual> CRIMSON_NAMED_TARGETS = List.of(
+            CrimsonIsle.MATCHO);
+
+    // Crystal Hollows の、ネームタグでしか判別できないモブ。
+    // Boss Corleone はプレイヤー型(NPC)で、エンティティ型では他の NPC と区別できない
+    public static final List<MobVisual> CRYSTAL_NAMED_TARGETS = List.of(
+            CrystalHollows.BOSS_CORLEONE);
 
     // Moonglade Marsh の、ネームタグでしか判別できないモブ。
     // Stag Beetle と Woodlouse は同じ見た目の作りで、型では絞り込めない
@@ -298,11 +339,18 @@ public class EntityHighlightManager {
             TorrhusCanyon.SNEAKY_TIKI, TorrhusCanyon.SHRIEKY_TIKI, TorrhusCanyon.CHEEKY_TIKI);
 
     // Torrhus Canyon の、ネームタグでしか判別できないモブ。
-    // Grizzly Bear はプレイヤー型。Tiki 系は節ごとに固有のプロフィールを持つ skull を使っているが、
-    // 種類ごとの skull がすべて出そろっているか確かめきれないため、名前で判定する
+    // Tiki 系は節ごとに固有のプロフィールを持つ skull を使っているが、
+    // 種類ごとの skull がすべて出そろっているか確かめきれないため、名前で判定する。
+    // Grizzly Bear の本命は CANYON_NAMED_PLAYER_TARGETS の実体名照合で、
+    // ここに残しているのはその取りこぼし用の保険
     public static final List<MobVisual> CANYON_NAMED_TARGETS = List.of(
             TorrhusCanyon.GRIZZLY_BEAR,
             TorrhusCanyon.SNEAKY_TIKI, TorrhusCanyon.SHRIEKY_TIKI, TorrhusCanyon.CHEEKY_TIKI);
+
+    // Torrhus Canyon の、プレイヤーエンティティ型(NPC)のモブ。
+    // ネームタグ(ArmorStand)より読み込み範囲が広いので、実体名で直接探す
+    public static final List<MobVisual> CANYON_NAMED_PLAYER_TARGETS = List.of(
+            TorrhusCanyon.GRIZZLY_BEAR);
 
     // Torrhus Canyon の、marker のアーマースタンドに素の skull を被せて作られたモブ。
     // 節ごとに透明なスライムが当たり判定として付いていて、ヘッドの scale で呼び名が分かれる
@@ -612,6 +660,12 @@ public class EntityHighlightManager {
         // 装飾として置かれたアーマースタンドとは作りが違うため、ネームタグを読まずに判定できる
         boolean scanCanyonHeads = GameState.Server.isTorrhusCanyon()
                 && CANYON_HEAD_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean isCrystalHollows = GameState.Server.isCrystalHollows();
+        // Boss Corleone の存在判定はスポーン通知にも使うため、
+        // Mob Visuals で対象から外していても Crystal Hollows にいる間は常に走らせる
+        boolean scanCrystalNamed = isCrystalHollows;
+        boolean scanCrimsonNamed = isCrimsonIsle
+                && CRIMSON_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanMarshNamed = GameState.Server.isMoongladeMarsh()
                 && MARSH_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         // Torrhus Canyon には同じ型のモブが多数いてエンティティ型では絞れないため、
@@ -651,9 +705,13 @@ public class EntityHighlightManager {
             for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
         }
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanSafariTypes && !scanSafariNamed) return;
+        if (!isCrystalHollows) CorleoneHandler.reset();
+
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanSafariTypes && !scanSafariNamed) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
+        // Boss Corleone を見つけたか。ネームタグ経由とプレイヤー名照合のどちらで見つけても立てる
+        boolean corleoneFound = false;
         boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
 
         // Ashfang: 本体は2体のBlazeで構成される。ネームタグに頼らず、スポーン地点周辺のBlazeで判定する。
@@ -770,7 +828,8 @@ public class EntityHighlightManager {
                     if (!inSafariBiome(client.player, target)) continue;
                     if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
 
-                    // Hideyho は NPC(プレイヤー型)なので、アーマースタンドではなくプレイヤーを探す
+                    // Hideyho は NPC(プレイヤー型)なので、アーマースタンドではなくプレイヤーを探す。
+                    // 本命は detectNamedPlayerMobs の実体名照合で、ここはその取りこぼし用の保険
                     Entity visualTarget = target == SafariHaunted.HIDEYHO
                             ? nearestPlayerNear(client, entity)
                             : nametagVisual(client, entity);
@@ -780,6 +839,55 @@ public class EntityHighlightManager {
                     if (visualTarget != null) {
                         // 当たり判定を借りているだけのモブもいるので、型判定側で拾い直さないよう控える
                         nametagClaimedEntities.add(visualTarget);
+                        if (target.highlight()) registerHighlight(visualTarget, target);
+                    }
+                    registerTracer(visual, target);
+                    if (target.nameplate()) {
+                        String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                    }
+                    break;
+                }
+            }
+
+            // Crystal Hollows のネームタグ判定モブ
+            if (scanCrystalNamed) {
+                for (MobVisual target : CRYSTAL_NAMED_TARGETS) {
+                    if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
+
+                    // 存在の判定はスポーン通知にも使うので、表示設定より先に立てる
+                    if (target == CrystalHollows.BOSS_CORLEONE) corleoneFound = true;
+                    if (!target.anyEnabled()) break;
+
+                    // 本命は detectNamedPlayerMobs のプレイヤー名照合。
+                    // ここはその取りこぼし用の保険で、ネームタグの近くのプレイヤーを本体とみなす
+                    Entity visualTarget = nearestPlayerNear(client, entity);
+                    Entity visual = visualTarget != null ? visualTarget : entity;
+                    if (visualTarget != null) {
+                        if (target.highlight()) registerHighlight(visualTarget, target);
+                    }
+                    registerTracer(visual, target);
+                    if (target.nameplate()) {
+                        String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                    }
+                    break;
+                }
+            }
+
+            // Crimson Isle のネームタグ判定モブ
+            if (scanCrimsonNamed) {
+                for (MobVisual target : CRIMSON_NAMED_TARGETS) {
+                    if (!target.anyEnabled()) continue;
+                    if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
+
+                    // 本命は detectCrimsonNamedMobs のプレイヤー名照合。
+                    // ここはその取りこぼし用の保険で、ネームタグの近くのプレイヤーを本体とみなす
+                    Entity visualTarget = nearestPlayerNear(client, entity);
+                    // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
+                    // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
+                    Entity visual = visualTarget != null ? visualTarget : entity;
+                    if (visualTarget != null) {
                         if (target.highlight()) registerHighlight(visualTarget, target);
                     }
                     registerTracer(visual, target);
@@ -947,7 +1055,7 @@ public class EntityHighlightManager {
                 if (glowWumpa) highlightedEntities.add(entity);
                 registerTracer(entity, SafariIcy.WUMPA);
                 if (SafariIcy.WUMPA.nameplate()) {
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§b§lWumpa",
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildCapsuleLabel("§b§lWumpa",
                             capsuleLabel(GameState.CritterSafari.wumpaCapsuleHits)));
                 }
             }
@@ -960,7 +1068,7 @@ public class EntityHighlightManager {
                 if (glowDoomspiral) highlightedEntities.add(entity);
                 registerTracer(entity, SafariHaunted.DOOMSPIRAL);
                 if (SafariHaunted.DOOMSPIRAL.nameplate()) {
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel("§5§lDoomspiral",
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildCapsuleLabel("§5§lDoomspiral",
                             capsuleLabel(GameState.Doomspiral.capsuleHits)));
                 }
             }
@@ -1142,6 +1250,23 @@ public class EntityHighlightManager {
         if (isCrimsonIsle) {
             detectPlayerBoss(client, "Barbarian Duke X", BARBARIAN_ENTITY_NAME, bossFound);
             detectPlayerBoss(client, "Mage Outlaw", MAGE_OUTLAW_ENTITY_NAME, bossFound);
+            detectCrimsonNamedMobs(client);
+        }
+
+        // Boss Corleone も同じくプレイヤーの名前で直接探す
+        if (scanCrystalNamed) {
+            if (detectNamedPlayerMobs(client, CRYSTAL_NAMED_TARGETS)) corleoneFound = true;
+        }
+
+        // Hideyho も同じくプレイヤーの名前で直接探す。
+        // ネームタグ経由だと、ネームタグが届かない距離で見失ってしまう
+        if (scanSafariNamed) {
+            detectNamedPlayerMobs(client, SAFARI_NAMED_PLAYER_TARGETS);
+        }
+
+        // Grizzly Bear も同じ
+        if (scanCanyonNamed) {
+            detectNamedPlayerMobs(client, CANYON_NAMED_PLAYER_TARGETS);
         }
 
         // Bladesoul: Blaze + Wither Skeleton の合体構成。ネームタグに頼らず、スポーン地点周辺で
@@ -1303,6 +1428,39 @@ public class EntityHighlightManager {
                 ASHFANG_FOLLOWERS.get(i).setIsDetected().accept(followerFound[i]);
             }
         }
+
+        // Scrappy に与える魚をハイライトする。Critter として使われている魚は除く。
+        // Mob Visuals とは別の機能なので、線もネームプレートも出さずハイライトだけにする
+        if (isSafari && ModConfig.INSTANCE.foraging.enableSafariFishHighlight) {
+            for (Entity entity : client.level.entitiesForRendering()) {
+                if (!(entity instanceof AbstractFish)) continue;
+                // 透明な個体は別のモブの当たり判定。ネームタグ経由で確定しているものも同じ
+                if (entity.isInvisible() || nametagClaimedEntities.contains(entity)) continue;
+                // Critter として使われている魚は Mob Visuals の担当なので触らない
+                if (safariTarget(client, entity) != null) continue;
+
+                highlightedEntities.add(entity);
+                customGlowColors.put(entity, SAFARI_FISH_GLOW_COLOR);
+            }
+        }
+
+        // Rockmite Mound: Cavern Biome に隠れている Rockmite の巣。
+        // Mob Visuals とは別の機能なので、ここもハイライトだけにする
+        if (isSafari && ModConfig.INSTANCE.foraging.enableRockmiteMoundHighlight
+                && inSafariCavern(client.player)) {
+            for (Entity entity : client.level.entitiesForRendering()) {
+                if (!(entity instanceof Display.ItemDisplay display)) continue;
+                if (!inSafariCavern(entity)) continue;
+
+                Display.ItemDisplay.ItemRenderState state = display.itemRenderState();
+                if (state == null || !isRockmiteMound(state.itemStack())) continue;
+
+                highlightedEntities.add(entity);
+                customGlowColors.put(entity, ROCKMITE_MOUND_GLOW_COLOR);
+            }
+        }
+
+        if (isCrystalHollows) CorleoneHandler.update(client, corleoneFound);
     }
 
     // DragonStatusHud と同じ配色ルール(ネームプレートの名前部分に使う)
@@ -1327,6 +1485,63 @@ public class EntityHighlightManager {
         double dz = blaze.getZ() - skeleton.getZ();
         double dy = Math.abs(blaze.getY() - skeleton.getY());
         return dx * dx + dz * dz <= BLADESOUL_PAIR_XZ * BLADESOUL_PAIR_XZ && dy <= BLADESOUL_PAIR_Y;
+    }
+
+    // Crimson Isle のネームタグ判定モブのうち、プレイヤーエンティティ型のもの。
+    // ネームタグ(アーマースタンド)より読み込み範囲が広いので、Barbarian Duke X / Mage Outlaw と
+    // 同じくプレイヤーの名前で直接探す。ボスと違って複数体いるため、一致したものはすべて登録する
+    private static void detectCrimsonNamedMobs(Minecraft client) {
+        detectNamedPlayerMobs(client, CRIMSON_NAMED_TARGETS);
+    }
+
+    // プレイヤーエンティティ型のモブを、プレイヤーの名前で探して登録する。
+    // 戻り値は1体でも見つかったかどうか。スポーン通知に使うため、表示設定とは切り離して返す
+    private static boolean detectNamedPlayerMobs(Minecraft client, List<MobVisual> candidates) {
+        boolean found = false;
+
+        for (MobVisual target : candidates) {
+
+            if (!canDetectNamedPlayerMob(client, target)) continue;
+
+            for (Player player : client.level.players()) {
+                if (player == client.player || !matchesNamedPlayerMob(target, player)) continue;
+
+                found = true;
+                if (target.highlight()) registerHighlight(player, target);
+                registerTracer(player, target);
+                if (target.nameplate()) {
+                    String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                    nameplateEntities.put(player, BossNameplateRenderer.buildLabel(label, null));
+                }
+            }
+        }
+
+        return found;
+    }
+
+    // プレイヤーエンティティ型モブを探してよい場所にいるか。
+    // Critter Safari は1つのサーバーの中でバイオームが分かれているため、
+    // そのバイオームにいる時だけ探す。それ以外のモブは場所を問わない
+    private static boolean canDetectNamedPlayerMob(Minecraft client, MobVisual target) {
+        if (!SAFARI_NAMED_PLAYER_TARGETS.contains(target)) return true;
+        return inSafariBiome(client.player, target);
+    }
+
+    // プレイヤーエンティティ型モブの見分け方。実体名が一意ならそれで照合する。
+    // 実体名が他と共通で使えないモブだけ、やむを得ず別の手がかりを使う
+    private static boolean matchesNamedPlayerMob(MobVisual target, Entity player) {
+        if (target == CrimsonIsle.MATCHO) return matchesEntityName(player, MATCHO_ENTITY_NAME);
+        if (target == SafariHaunted.HIDEYHO) return matchesEntityName(player, HIDEYHO_ENTITY_NAME);
+        if (target == TorrhusCanyon.GRIZZLY_BEAR) return matchesEntityName(player, GRIZZLY_BEAR_ENTITY_NAME);
+        if (target == CrystalHollows.BOSS_CORLEONE) return matchesSkin(player, CORLEONE_SKIN_HASH);
+        return false;
+    }
+
+    // スキンで見分ける。テクスチャのパス末尾がスキンごとに固有の値になる。
+    // 読み込みが済むまでは既定のスキンが返るため、その間は一致しない
+    private static boolean matchesSkin(Entity entity, String skinHash) {
+        if (!(entity instanceof AbstractClientPlayer player)) return false;
+        return player.getSkin().body().texturePath().toString().endsWith(skinHash);
     }
 
     // 読み込み済みのプレイヤーから、名前が一致するもの(=ボス本体)を探して登録する
@@ -1429,7 +1644,6 @@ public class EntityHighlightManager {
         int shown = Math.min(hits, ModConstants.CAPSULE_MAX_THROWS);
         return ModConstants.RAW_HEALTH_PREFIX + "§e" + shown + "§7/§e" + ModConstants.CAPSULE_MAX_THROWS;
     }
-
 
     // Moonglade Marsh と Torrhus Canyon は体色を問わず1種類しかいない。
     // Safari のみ体色で呼び名が分かれるため、そこだけ DyeColor を見る。
@@ -1879,6 +2093,28 @@ public class EntityHighlightManager {
         return false;
     }
 
+    // Rockmite Mound かどうか。見た目は決まったスキンなので、そのテクスチャで見分ける
+    private static boolean isRockmiteMound(ItemStack stack) {
+        ResolvableProfile profile = stack.get(DataComponents.PROFILE);
+        if (profile == null) return false;
+
+        for (Property property : profile.partialProfile().properties().get("textures")) {
+            if (property == null) continue;
+            if (decodeSkinTexture(property.value()).contains(ROCKMITE_MOUND_TEXTURE)) return true;
+        }
+        return false;
+    }
+
+    // スキンの情報は Base64 で包んだ JSON。テクスチャのURLだけ見たいので素の文字列に戻す
+    private static String decodeSkinTexture(String value) {
+        try {
+            return new String(java.util.Base64.getDecoder().decode(value),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return "";
+        }
+    }
+
     private static boolean isShulkerBox(ItemStack stack) {
         return stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock;
     }
@@ -1956,7 +2192,8 @@ public class EntityHighlightManager {
     // ネームタグから本体を探す。見た目の作り方がモブごとに違うので、そこだけ振り分ける
     private static Entity canyonNamedVisual(Minecraft client, Entity nameTag, MobVisual target) {
         AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
-        // Grizzly Bear は Barbarian Duke X などと同じプレイヤー型のモブ
+        // Grizzly Bear は Barbarian Duke X などと同じプレイヤー型のモブ。
+        // 本命は detectNamedPlayerMobs の実体名照合で、ここはその取りこぼし用の保険
         if (target == TorrhusCanyon.GRIZZLY_BEAR) return nearestPlayerNear(client, nameTag);
         // Ant / Queen Ant / Tiki 系は Water Snake と同じく、skull を被せたアーマースタンドで見た目を作る
         return headStandUnderNameTag(client.level.getEntitiesOfClass(ArmorStand.class, box,
@@ -2033,20 +2270,27 @@ public class EntityHighlightManager {
     }
 
     private static void registerTracer(Entity entity, MobVisual target, int colorARGB) {
-        if (target.tracer()) registerNearestTracer(entity, target, colorARGB);
+        if (target.tracer()) addTracer(entity, target, colorARGB);
     }
 
     // Crimson 系はエントリ側の設定(= Mob Visuals のリスト)をそのまま使う
     private static void registerTracer(Entity entity, CrimsonBossEntry boss) {
-        if (boss.enableTracer().get()) registerNearestTracer(entity, boss.nameTag(), boss.tracerColorARGB());
+        if (boss.enableTracer().get()) addTracer(entity, boss.nameTag(), boss.tracerColorARGB());
     }
 
-    // 線が乱立しないよう、同じモブ(key)の中では自分に最も近い1体だけに Tracer を出す。
-    // 走査順は検出方法ごとにばらばらなので、より近い個体が来たら差し替える形で絞り込む
-    private static void registerNearestTracer(Entity entity, Object key, int colorARGB) {
+    // Tracer の対象を登録する。既定では線が乱立しないよう、同じモブ(key)の中では
+    // 自分に最も近い1体だけに絞る。走査順は検出方法ごとにばらばらなので、
+    // より近い個体が来たら差し替える形で絞り込む。
+    // 設定が All のときは絞り込まず、見つかったモブすべてに線を引く
+    private static void addTracer(Entity entity, Object key, int colorARGB) {
         if (entity == null) return;
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
+
+        if (ModConfig.INSTANCE.mobVisuals.tracerMode == ModConfig.MobVisualsCategory.TracerMode.ALL) {
+            tracerEntities.put(entity, colorARGB);
+            return;
+        }
 
         Entity current = tracerNearest.get(key);
         if (current != null) {

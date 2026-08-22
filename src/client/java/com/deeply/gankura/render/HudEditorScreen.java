@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.data.HudCategory;
 import com.deeply.gankura.data.HudConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -8,7 +9,21 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HudEditorScreen extends Screen {
+
+    // タブの見た目。画面下に1列で並べる
+    private static final int TAB_HEIGHT = 20;
+    private static final int TAB_GAP = 4;
+    private static final int TAB_MAX_WIDTH = 100;
+    private static final int TAB_ROW_BOTTOM_OFFSET = 55;
+
+    // 絞り込んでいるカテゴリ。null はすべて表示
+    private HudCategory selectedCategory = null;
+    private final List<HudCategory> tabCategories = new ArrayList<>();
+    private final List<Button> tabButtons = new ArrayList<>();
 
     private HudElement draggingElement = null;
     private int dragOffsetX = 0;
@@ -26,11 +41,13 @@ public class HudEditorScreen extends Screen {
                 button -> HudConfig.resetToDefault()
         ).bounds(this.width / 2 - 75, this.height - 30, 150, 20).build());
 
+        addCategoryTabs();
+
         // Minecraft 26.1.x では Screen に mouseScrolled がないため Fabric API で登録する
         ScreenMouseEvents.beforeMouseScroll(this).register((screen, mouseX, mouseY, h, v) -> {
             float scroll = (float) v * 0.1f;
             for (HudElement element : HudConfig.ELEMENTS) {
-                if (element.isEnabled() && element.isHovering(mouseX, mouseY, this.width, this.height)) {
+                if (isEditable(element) && element.isHovering(mouseX, mouseY, this.width, this.height)) {
                     element.scale = Math.max(0.5f, Math.min(3.0f, element.scale + scroll));
                     break;
                 }
@@ -49,7 +66,7 @@ public class HudEditorScreen extends Screen {
         graphics.fill(0, 0, this.width, this.height, 0xA0000000);
 
         for (HudElement element : HudConfig.ELEMENTS) {
-            if (!element.isEnabled()) continue;
+            if (!isEditable(element)) continue;
 
             boolean isHovering = element.isHovering(mouseX, mouseY, this.width, this.height);
             boolean isDraggingThis = (draggingElement == element);
@@ -89,7 +106,7 @@ public class HudEditorScreen extends Screen {
 
         if (button == 0) {
             for (HudElement element : HudConfig.ELEMENTS) {
-                if (element.isEnabled() && element.isHovering(mouseX, mouseY, this.width, this.height)) {
+                if (isEditable(element) && element.isHovering(mouseX, mouseY, this.width, this.height)) {
                     draggingElement = element;
                     // 画面外に出ていたHUDは寄せた位置から掴めるよう、描画位置を基準にオフセットを取る
                     dragOffsetX = (int)mouseX - element.renderX(this.width);
@@ -119,6 +136,48 @@ public class HudEditorScreen extends Screen {
             return true;
         }
         return super.mouseDragged(event, dx, dy);
+    }
+
+
+    // 実際のゲーム中に同時に出ないHUDは、既定位置が重なっていても画面上でぶつからない。
+    // 並びをカテゴリ単位で確かめられるよう、下のタブで絞り込めるようにする
+    private void addCategoryTabs() {
+        tabCategories.clear();
+        tabButtons.clear();
+        tabCategories.add(null);
+        tabCategories.addAll(List.of(HudCategory.values()));
+
+        int count = tabCategories.size();
+        int tabWidth = Math.min(TAB_MAX_WIDTH, (this.width - TAB_GAP * (count + 1)) / count);
+        int totalWidth = tabWidth * count + TAB_GAP * (count - 1);
+        int x = (this.width - totalWidth) / 2;
+
+        for (HudCategory category : tabCategories) {
+            Button button = Button.builder(tabLabel(category), b -> selectCategory(category))
+                    .bounds(x, this.height - TAB_ROW_BOTTOM_OFFSET, tabWidth, TAB_HEIGHT).build();
+            this.addRenderableWidget(button);
+            tabButtons.add(button);
+            x += tabWidth + TAB_GAP;
+        }
+    }
+
+    private void selectCategory(HudCategory category) {
+        selectedCategory = category;
+        for (int i = 0; i < tabButtons.size(); i++) {
+            tabButtons.get(i).setMessage(tabLabel(tabCategories.get(i)));
+        }
+    }
+
+    // 選んでいるタブは括弧で囲って分かるようにする
+    private Component tabLabel(HudCategory category) {
+        String name = category == null ? "All" : category.label();
+        return Component.literal(category == selectedCategory ? "[" + name + "]" : name);
+    }
+
+    // 移動画面で触れるHUDか。絞り込み中はそのカテゴリのものだけを扱う
+    private boolean isEditable(HudElement element) {
+        if (!element.isEnabled()) return false;
+        return selectedCategory == null || element.category == selectedCategory;
     }
 
     @Override
