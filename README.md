@@ -76,31 +76,32 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
 <summary>Mob Visuals</summary>
   
   - Display highlights, tracers, and nameplates on selected mobs.
-- ![Mob Visuals 1](https://cdn.modrinth.com/data/cached_images/cedfcc59352699485521d31dd54cea2fdc8c0bf5.png)
-- ![Mob Visuals 2](https://cdn.modrinth.com/data/cached_images/492e5e063322ab0882b7efb41fc43e0836a90fdc.png)
+![Mob Visuals 1](https://cdn.modrinth.com/data/cached_images/cedfcc59352699485521d31dd54cea2fdc8c0bf5.png)
+![Mob Visuals 2](https://cdn.modrinth.com/data/cached_images/492e5e063322ab0882b7efb41fc43e0836a90fdc.png)
 </details>
 
 <details>
 <summary>Custom Waypoints</summary>
   
-- Add at my position / Add empty: Add Waypoint to your current location / coordinates x:0,y:0,z:0
-  - **Area:**
-    - '<, >' -> Switch between areas where you have created Waypoints.
-  - **Group:** 
-    - '+' -> Add a Group 
-    - '<, >' -> Switch between the groups you have created
-    - '✎' -> Rename current group
-    - '✖' -> Remove current group
-  - **Waypoint:**
-    - Name -> Name of Waypoint to display in the world
-    - X, Y, Z -> Coordinates of Waypoint
-    - Color -> Settings the color and fill opacity of the Waypoint
-    - Style:
-      - Both -> Outline and Fill
-      - Outline -> Displays only Outline
-      - Fill -> Displays only Fill
-    - '⇄' -> Move selected Waypoint to another group
-    - '✖' -> Remove selected Waypoint
-- ![Custom Waypoints 1](https://cdn.modrinth.com/data/cached_images/8b39be6a666a8a36f4844bc7f39bdd618cea4f0f.png)
-- ![Custom Waypoints 2](https://cdn.modrinth.com/data/cached_images/c9685eeb75c9bd7a20cb900d570b24ac5010febe.png)
+- **Add at my position / Add empty:**
+  - Add Waypoint to your current location / coordinates x:0,y:0,z:0
+- **Area:**
+  - '<, >' -> Switch between areas where you have created Waypoints.
+- **Group:** 
+  - '+' -> Add a Group 
+  - '<, >' -> Switch between the groups you have created
+  - '✎' -> Rename current group
+  - '✖' -> Remove current group
+- **Waypoint:**
+  - Name -> Name of Waypoint to display in the world
+  - X, Y, Z -> Coordinates of Waypoint
+  - Color -> Settings the color and fill opacity of the Waypoint
+  - Style:
+    - Both -> Outline and Fill
+    - Outline -> Displays only Outline
+    - Fill -> Displays only Fill
+  - '⇄' -> Move selected Waypoint to another group
+  - '✖' -> Remove selected Waypoint
+![Custom Waypoints 1](https://cdn.modrinth.com/data/cached_images/8b39be6a666a8a36f4844bc7f39bdd618cea4f0f.png)
+![Custom Waypoints 2](https://cdn.modrinth.com/data/cached_images/c9685eeb75c9bd7a20cb900d570b24ac5010febe.png)
 </details>
