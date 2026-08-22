@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
-        super("stats", 165, 10, 1.0f, 150, 36,
+        super("stats", 230, 10, 1.0f, 150, 36,
                 () -> ModConfig.INSTANCE.theEnd.showGolemStatusHud,
                 () -> GameState.Server.isTheEnd());
     }

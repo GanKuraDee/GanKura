@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class CrimsonLootTrackerHud extends HudElement {
     public CrimsonLootTrackerHud() {
-        super("crimson_loot_tracker", 305, 84, 1.0f, 185, 144,
+        super("crimson_loot_tracker", 230, 90, 1.0f, 185, 144,
                 () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonLootTrackerHud,
                 () -> GameState.Server.isCrimsonIsle());
     }

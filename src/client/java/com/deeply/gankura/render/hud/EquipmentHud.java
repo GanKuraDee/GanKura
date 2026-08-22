@@ -19,7 +19,7 @@ public class EquipmentHud extends HudElement {
     private static final int SLOT_SIZE = 18;
 
     public EquipmentHud() {
-        super("equipment", 10, 82, 1.0f, SLOT_SIZE * SLOTS.length, SLOT_SIZE,
+        super("equipment", 10, 110, 1.0f, SLOT_SIZE * SLOTS.length, SLOT_SIZE,
                 () -> ModConfig.INSTANCE.misc.showEquipmentHud, () -> true);
     }
 

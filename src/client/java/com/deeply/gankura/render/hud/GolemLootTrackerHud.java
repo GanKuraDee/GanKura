@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class GolemLootTrackerHud extends HudElement {
     public GolemLootTrackerHud() {
-        super("tracker", 165, 46, 1.0f, 150, 50,
+        super("tracker", 230, 50, 1.0f, 150, 50,
                 () -> ModConfig.INSTANCE.theEnd.showLootTrackerHud,
                 () -> GameState.Server.isTheEnd());
     }

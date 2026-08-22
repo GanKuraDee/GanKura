@@ -12,7 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 // 最大HPが得られないため「現在HPのみ」を表示し、割合による色分けは行わない。
 public class DragonHealthHud extends HudElement {
     public DragonHealthHud() {
-        super("dragon_health", 165, 202, 1.0f, 120, 24,
+        super("dragon_health", 230, 226, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.theEnd.showDragonHealthHud,
                 () -> (GameState.Server.isTheEnd())
                         && GameState.Dragon.health != null);

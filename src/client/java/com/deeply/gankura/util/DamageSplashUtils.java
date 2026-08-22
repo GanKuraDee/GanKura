@@ -11,15 +11,10 @@ public final class DamageSplashUtils {
     // 例: 1,234 / ✧5231⚔ / 892✷。先頭の記号とダメージ種別の記号は付いたり付かなかったりする
     private static final Pattern DAMAGE_PATTERN = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)");
 
-    // 湧いてから時間が経ったものはダメージ表示ではない。
-    // ダメージ表示はすぐ消えるので、長く残っているなら別物(モブの名前など)と判断する
-    private static final int MAX_AGE_TICKS = 300;
-
     private DamageSplashUtils() {
     }
 
     public static boolean isDamageSplash(ArmorStandEntity stand) {
-        if (stand.age > MAX_AGE_TICKS) return false;
         if (!stand.hasCustomName()) return false;
         if (!stand.isAlive()) return false;
 

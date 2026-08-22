@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class BroodmotherHealthHud extends HudElement {
     public BroodmotherHealthHud() {
-        super("broodmother_health", 10, 148, 1.0f, 120, 24,
+        super("broodmother_health", 230, 38, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showBroodmotherHealthHud,
                 () -> GameState.Server.isSpidersDen() && GameState.Broodmother.health != null);
     }

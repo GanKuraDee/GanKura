@@ -46,6 +46,10 @@ public class GameState {
             return ModConstants.MAP_CRIMSON_ISLE.equals(map);
         }
 
+        public static boolean isCrystalHollows() {
+            return ModConstants.MAP_CRYSTAL_HOLLOWS.equals(map);
+        }
+
         public static boolean isSafari() {
             return ModConstants.MAP_SAFARI.equals(map);
         }
@@ -229,6 +233,12 @@ public class GameState {
         public static void reset() { isDetected = false; health = null; }
     }
 
+    public static class Corleone {
+        // Boss Corleone を今見つけているか。スポーン通知の出し分けに使う
+        public static boolean isDetected = false;
+        public static void reset() { isDetected = false; }
+    }
+
     public static class MagmaBoss {
         public static boolean isDetected = false;
         public static String health = null;
@@ -284,7 +294,8 @@ public class GameState {
         public static final String STATUS_SPAWNED = "Spawned";
         public static final String STATUS_CAPTURED = "Captured";
 
-        // キャプチャ済みの Critter 名。8種すべて揃うと Wumpa がスポーンする
+        // キャプチャ済みの Critter 名。バイオームを問わず全 Critter を覚える。
+        // Hypixel 側の表記ゆれに備えて小文字で持つ
         private static final java.util.Set<String> captured = new java.util.HashSet<>();
         // Wumpa 自体の状態。8種そろう前は null
         public static String wumpaStatus = null;
@@ -292,21 +303,31 @@ public class GameState {
         public static int wumpaCapsuleHits = 0;
 
         public static void markCaptured(String critterName) {
-            captured.add(critterName);
+            captured.add(capturedKey(critterName));
         }
 
         // 複数人で狩っていると自分にキャプチャのメッセージが来ないことがあるため、
         // Wumpa のスポーンが確認できた時点で8種そろったものとして扱う
         public static void markAllCaptured() {
-            captured.addAll(ModConstants.ICY_BIOME_CRITTERS);
+            for (String critter : ModConstants.ICY_BIOME_CRITTERS) markCaptured(critter);
         }
 
         public static boolean isCaptured(String critterName) {
-            return captured.contains(critterName);
+            return captured.contains(capturedKey(critterName));
         }
 
-        public static int capturedCount() {
-            return captured.size();
+        // Wumpa の湧き判定に使う、Icy Biome の8種のうちキャプチャ済みの数。
+        // 他バイオームの Critter も同じ集合に入れているため、数え上げは8種に絞る
+        public static int icyCapturedCount() {
+            int count = 0;
+            for (String critter : ModConstants.ICY_BIOME_CRITTERS) {
+                if (isCaptured(critter)) count++;
+            }
+            return count;
+        }
+
+        private static String capturedKey(String critterName) {
+            return critterName.trim().toLowerCase(java.util.Locale.ROOT);
         }
 
         // Wumpa が湧いていて、まだキャプチャされていない状態か
@@ -336,6 +357,7 @@ public class GameState {
         AshfangAcolyte.reset();
         AshfangUnderling.reset();
         MagmaBoss.reset();
+        Corleone.reset();
         CrimsonDrop.reset();
         CritterSafari.reset();
         Doomspiral.reset();

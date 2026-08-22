@@ -2,6 +2,7 @@ package com.deeply.gankura.data;
 
 import net.minecraft.util.math.BlockPos;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ModConstants {
@@ -16,6 +17,7 @@ public class ModConstants {
     public static final String MAP_THE_END = "The End";
     public static final String MAP_SPIDERS_DEN = "Spider's Den";
     public static final String MAP_CRIMSON_ISLE = "Crimson Isle";
+    public static final String MAP_CRYSTAL_HOLLOWS = "Crystal Hollows";
     // Critter Safari のエリア名はタブリスト上では "Safari" とだけ表示される
     public static final String MAP_SAFARI = "Safari";
     // シュルカー(Hideon系)が敵として出現するエリア
@@ -152,6 +154,9 @@ public class ModConstants {
     public static final String WUMPA_NAME = "Wumpa";
     public static final String DOOMSPIRAL_NAME = "Doomspiral";
 
+    // Forest Biome の Legendary Critter。Birdfeeder に寄ってきた時のメッセージでしか分からない
+    public static final String MACAW_ATTRACTED_MSG = "Two Macaws were attracted to the Birdfeeder!";
+
     // Wumpa のキャプチャ成功の合図
     public static final String WUMPA_CAPTURED_MSG = "The cave opens up again";
 
@@ -216,6 +221,25 @@ public class ModConstants {
     // 獲得側の文面は個数・冠詞を問わず素通しにし、捕まえた側の名前だけを取る
     public static final Pattern CRITTER_CAPTURE_PATTERN =
             Pattern.compile("CAPTURE! You caught an? (.+?) and gained .+? Shard!", Pattern.CASE_INSENSITIVE);
+
+    // "CAPTURE! You found the Hideyho, and as a reward it gave you 4x Hideyho Shard!"
+    // 隠れている Critter は「捕まえた」ではなく「見つけた」の文面になる。
+    // シャードの個数は落ちた数で変わるため、獲得側は個数を問わず素通しにする
+    public static final Pattern CRITTER_FOUND_PATTERN =
+            Pattern.compile("CAPTURE! You found the (.+?), and as a reward it gave you .+? Shard!",
+                    Pattern.CASE_INSENSITIVE);
+
+    // キャプチャのメッセージから Critter の呼び名を取る。文面は捕まえ方によって2通りある。
+    // どちらにも当てはまらなければ null
+    public static String findCapturedCritter(String message) {
+        Matcher matcher = CRITTER_CAPTURE_PATTERN.matcher(message);
+        if (matcher.find()) return matcher.group(1).trim();
+
+        matcher = CRITTER_FOUND_PATTERN.matcher(message);
+        if (matcher.find()) return matcher.group(1).trim();
+
+        return null;
+    }
 
     // キャプチャ表示名から対象の Critter を引く。名前は ICY_BIOME_CRITTERS を唯一の定義とし、
     // Hypixel 側の表記ゆれに備えて大文字小文字は無視する

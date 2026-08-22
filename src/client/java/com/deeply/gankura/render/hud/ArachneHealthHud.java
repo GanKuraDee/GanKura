@@ -9,7 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class ArachneHealthHud extends HudElement {
     public ArachneHealthHud() {
-        super("arachne_health", 10, 208, 1.0f, 120, 24,
+        super("arachne_health", 230, 106, 1.0f, 120, 24,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneHealthHud,
                 () -> GameState.Arachne.inSanctuary && (GameState.Arachne.health != null || GameState.Arachne.broodCount > 0));
     }
