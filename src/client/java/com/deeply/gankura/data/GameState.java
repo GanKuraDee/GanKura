@@ -107,6 +107,10 @@ public class GameState {
         public static String quiverArrow = null;
         public static int quiverArrowCount = 0;
 
+        // 釣り竿に付けている餌と、その残数。付けていないときは null
+        public static String fishingBait = null;
+        public static int fishingBaitCount = 0;
+
         // Ferocity。タブリストから読めていないときは -1
         public static int ferocity = -1;
 
@@ -120,6 +124,7 @@ public class GameState {
             auroraStack = 0; isAuroraBold = false; lastArmorStackUpdateTime = 0;
             activePoison = "NONE"; activePoisonCount = 0;
             quiverArrow = null; quiverArrowCount = 0;
+            fishingBait = null; fishingBaitCount = 0;
             ferocity = -1;
             hasShownDropAlert = false; isLootScanning = false;
         }

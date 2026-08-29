@@ -68,7 +68,7 @@ public class ForagingHandler {
         Matcher matcher = ModConstants.COCOON_CAUGHT_PATTERN.matcher(unformattedMsg);
         if (!matcher.find()) return false;
 
-        if (ModConfig.INSTANCE.foraging.enableCocoonCatchTitle) {
+        if (ModConfig.INSTANCE.misc.enableCocoonCatchTitle) {
             String mobName = matcher.group(1).trim();
             MutableText title = Text.literal(mobName)
                     .formatted(Formatting.GREEN, Formatting.BOLD);

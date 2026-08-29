@@ -47,6 +47,7 @@ public class NetworkHandler {
             PetHandler.handleMessage(message);
             CrimsonDropHandler.handleMessage(unformattedMsg);
             WarpCooldownHandler.handleMessage(unformattedMsg);
+            GoldenFishHandler.handleMessage(unformattedMsg, client);
             ArachneHandler.handleMessage(unformattedMsg, client);
             ForagingHandler.handleMessage(unformattedMsg, client);
             // 釣り上げの文言。短縮形に差し替えたときは、元のメッセージを出さない

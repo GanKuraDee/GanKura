@@ -97,6 +97,7 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsMoongladeMarsh = normalizeEnumList(INSTANCE.mobVisuals.targetsMoongladeMarsh, List.of());
         INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
         INSTANCE.mobVisuals.targetsLotusAtoll = normalizeEnumList(INSTANCE.mobVisuals.targetsLotusAtoll, List.of());
+        INSTANCE.fishing.sharedHotspotPerks = normalizeEnumList(INSTANCE.fishing.sharedHotspotPerks, HotspotPerk.defaults());
 
         INSTANCE.saveNow();
     }
@@ -593,12 +594,6 @@ public class ModConfig extends Config {
         public boolean enableTreeMobTitle = true;
 
         @Expose
-        @ConfigOption(name = "Cocoon Catch Title", desc = "Shows a title when you cocoon a mob.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 70)
-        public boolean enableCocoonCatchTitle = true;
-
-        @Expose
         @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon settings.")
         @ConfigEditorAccordion(id = 74)
         @ConfigEditorBoolean
@@ -712,6 +707,40 @@ public class ModConfig extends Config {
     // ==========================================
     public static class FishingCategory {
         @Expose
+        @ConfigOption(name = "Shorten Catch Message", desc = "Replaces the long sea creature catch message\n"
+                + "with a short one.")
+        @ConfigEditorBoolean
+        public boolean shortenSeaCreatureMessage = false;
+
+        @Expose
+        @ConfigOption(name = "Bite Countdown HUD", desc = "Shows how long until something bites while fishing.")
+        @ConfigEditorBoolean
+        public boolean showBiteCountdownHud = false;
+
+        @Expose
+        @ConfigOption(name = "Bait HUD", desc = "Shows the bait on the rod and how much is left.")
+        @ConfigEditorBoolean
+        public boolean showBaitHud = true;
+
+        @Expose
+        @ConfigOption(name = "Low Bait Alert", desc = "Expands low bait alert settings.")
+        @ConfigEditorAccordion(id = 101)
+        @ConfigEditorBoolean
+        public boolean baitLowAlertFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows a title when the bait on the rod is running out.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 101)
+        public boolean showBaitLowAlert = false;
+
+        @Expose
+        @ConfigOption(name = "Threshold", desc = "How much bait is left when the alert shows.")
+        @ConfigEditorSlider(minValue = 1f, maxValue = 64f, minStep = 1f)
+        @ConfigAccordionId(id = 101)
+        public int baitLowThreshold = 16;
+
+        @Expose
         @ConfigOption(name = "Cast Timer", desc = "Expands cast timer settings.")
         @ConfigEditorAccordion(id = 57)
         @ConfigEditorBoolean
@@ -731,15 +760,133 @@ public class ModConfig extends Config {
         public boolean castTimerOnLiquidTouch = true;
 
         @Expose
-        @ConfigOption(name = "Bite Countdown HUD", desc = "Shows how long until something bites while fishing.")
+        @ConfigOption(name = "Hotspot", desc = "Expands hotspot settings.")
+        @ConfigEditorAccordion(id = 100)
         @ConfigEditorBoolean
-        public boolean showBiteCountdownHud = false;
+        public boolean hotspotFolder = false;
 
         @Expose
-        @ConfigOption(name = "Shorten Catch Message", desc = "Replaces the long sea creature catch message\n"
-                + "with a short one.")
+        @ConfigOption(name = "Radar Guess", desc = "Expands Hotspot Radar guess settings.")
+        @ConfigEditorAccordion(id = 96)
         @ConfigEditorBoolean
-        public boolean shortenSeaCreatureMessage = false;
+        @ConfigAccordionId(id = 100)
+        public boolean hotspotGuessFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Reads the Hotspot Radar trail and marks where\n"
+                + "the hotspot should be.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 96)
+        public boolean showHotspotGuess = false;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to the guessed hotspot.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 96)
+        public boolean showHotspotTracer = false;
+
+        @Expose
+        @ConfigOption(name = "Gone Title", desc = "Shows a title when the hotspot you are fishing in\n"
+                + "disappears.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 100)
+        public boolean showHotspotGoneTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Circle", desc = "Expands hotspot circle settings.")
+        @ConfigEditorAccordion(id = 98)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 100)
+        public boolean hotspotCircleFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Draws the hotspot edge as a circle.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 98)
+        public boolean showHotspotCircle = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Particles", desc = "Hides the particles Hypixel draws around the hotspot.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 98)
+        public boolean hideHotspotParticles = true;
+
+        @Expose
+        @ConfigOption(name = "Share", desc = "Expands hotspot sharing settings.")
+        @ConfigEditorAccordion(id = 99)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 100)
+        public boolean hotspotShareFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Sends the coordinates in chat when you stand in a hotspot\n"
+                + "with one of the perks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 99)
+        public boolean shareHotspot = false;
+
+        @Expose
+        @ConfigOption(name = "Perks", desc = "Hotspot perks worth sharing.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 99)
+        public List<HotspotPerk> sharedHotspotPerks = new ArrayList<>(HotspotPerk.defaults());
+
+        @Expose
+        @ConfigOption(name = "Channel", desc = "Where the coordinates are sent.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 99)
+        public HotspotShareChannel hotspotShareChannel = HotspotShareChannel.PARTY;
+
+        @Expose
+        @ConfigOption(name = "Golden Fish", desc = "Expands Golden Fish settings.")
+        @ConfigEditorAccordion(id = 97)
+        @ConfigEditorBoolean
+        public boolean goldenFishFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Tracks the Golden Fish on the Crimson Isle.\n"
+                + "Everything below needs this on.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 97)
+        public boolean showGoldenFishTimer = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight", desc = "Outlines the Golden Fish once it surfaces.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 97)
+        public boolean highlightGoldenFish = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to the Golden Fish once it surfaces.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 97)
+        public boolean tracerGoldenFish = true;
+
+        @Expose
+        @ConfigOption(name = "Throw Rod Warning", desc = "Warns before the spawn window is lost\n"
+                + "because the rod has not been thrown.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 97)
+        public boolean warnGoldenFishRod = true;
+
+        @Expose
+        @ConfigOption(name = "Throw Rod Warning Time", desc = "Seconds left when the warning shows.")
+        @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 5f)
+        @ConfigAccordionId(id = 97)
+        public int goldenFishRodWarningSeconds = 20;
+
+        @Expose
+        @ConfigOption(name = "Goldfin Shard Level", desc = "Cuts 30 seconds off the spawn window per level.\n"
+                + "Read from the Attribute Menu when it is opened.")
+        @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 1f)
+        @ConfigAccordionId(id = 97)
+        public int goldfinShardLevel = 0;
+
+        // Attribute Menu を一度でも読めたか。
+        // レベル0と「未確認」を見分けるために持つ。
+        // スライダーを手で動かしても確認済みにはならないので、設定画面には出さない
+        @Expose
+        public boolean goldfinShardRead = false;
     }
 
     public static class MobVisualsCategory {
@@ -1519,6 +1666,11 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Hide Damage Splash", desc = "Hides the damage numbers popping off mobs.")
         @ConfigEditorBoolean
         public boolean hideDamageSplash = false;
+
+        @Expose
+        @ConfigOption(name = "Cocoon Catch Title", desc = "Shows a title when you cocoon a mob.")
+        @ConfigEditorBoolean
+        public boolean enableCocoonCatchTitle = true;
 
         @Expose
         @ConfigOption(name = "Low Quiver Alert", desc = "Warns with a title and sound at 50 and 10 arrows left.")

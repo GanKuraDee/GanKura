@@ -13,16 +13,18 @@ import java.util.List;
 
 public class HudEditorScreen extends Screen {
 
-    // タブの見た目。画面下に1列で並べる
+    // カテゴリの選択。横に並べると増えたときに画面下を埋めてしまうので、
+    // 左右の矢印で送る1つのボタンにしている
     private static final int TAB_HEIGHT = 20;
     private static final int TAB_GAP = 4;
-    private static final int TAB_MAX_WIDTH = 100;
+    private static final int TAB_WIDTH = 140;
+    private static final int TAB_ARROW_WIDTH = 20;
     private static final int TAB_ROW_BOTTOM_OFFSET = 55;
 
-    // 絞り込んでいるカテゴリ。null はすべて表示
-    private HudCategory selectedCategory = null;
+    // 選べるカテゴリ。先頭の null はすべて表示
     private final List<HudCategory> tabCategories = new ArrayList<>();
-    private final List<ButtonWidget> tabButtons = new ArrayList<>();
+    private int categoryIndex = 0;
+    private ButtonWidget categoryButton;
 
     private HudElement draggingElement = null;
     private int dragOffsetX = 0;
@@ -137,41 +139,50 @@ public class HudEditorScreen extends Screen {
     // 並びをカテゴリ単位で確かめられるよう、下のタブで絞り込めるようにする
     private void addCategoryTabs() {
         tabCategories.clear();
-        tabButtons.clear();
         tabCategories.add(null);
         tabCategories.addAll(List.of(HudCategory.values()));
+        categoryIndex = Math.min(categoryIndex, tabCategories.size() - 1);
 
-        int count = tabCategories.size();
-        int tabWidth = Math.min(TAB_MAX_WIDTH, (this.width - TAB_GAP * (count + 1)) / count);
-        int totalWidth = tabWidth * count + TAB_GAP * (count - 1);
+        int totalWidth = TAB_WIDTH + (TAB_ARROW_WIDTH + TAB_GAP) * 2;
         int x = (this.width - totalWidth) / 2;
+        int y = this.height - TAB_ROW_BOTTOM_OFFSET;
 
-        for (HudCategory category : tabCategories) {
-            ButtonWidget button = ButtonWidget.builder(tabLabel(category), b -> selectCategory(category))
-                    .dimensions(x, this.height - TAB_ROW_BOTTOM_OFFSET, tabWidth, TAB_HEIGHT).build();
-            this.addDrawableChild(button);
-            tabButtons.add(button);
-            x += tabWidth + TAB_GAP;
-        }
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("<"), b -> cycleCategory(-1))
+                .dimensions(x, y, TAB_ARROW_WIDTH, TAB_HEIGHT).build());
+
+        // 真ん中を押しても送れるようにしておく
+        categoryButton = ButtonWidget.builder(tabLabel(), b -> cycleCategory(1))
+                .dimensions(x + TAB_ARROW_WIDTH + TAB_GAP, y, TAB_WIDTH, TAB_HEIGHT).build();
+        this.addDrawableChild(categoryButton);
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal(">"), b -> cycleCategory(1))
+                .dimensions(x + TAB_ARROW_WIDTH + TAB_GAP + TAB_WIDTH + TAB_GAP, y,
+                        TAB_ARROW_WIDTH, TAB_HEIGHT).build());
     }
 
-    private void selectCategory(HudCategory category) {
-        selectedCategory = category;
-        for (int i = 0; i < tabButtons.size(); i++) {
-            tabButtons.get(i).setMessage(tabLabel(tabCategories.get(i)));
-        }
+    // 端まで行ったら反対側へ回る
+    private void cycleCategory(int step) {
+        int size = tabCategories.size();
+        categoryIndex = ((categoryIndex + step) % size + size) % size;
+        categoryButton.setMessage(tabLabel());
     }
 
-    // 選んでいるタブは括弧で囲って分かるようにする
-    private Text tabLabel(HudCategory category) {
+    // 何件中の何件目か分かるよう、名前に番号を添える
+    private Text tabLabel() {
+        HudCategory category = selectedCategory();
         String name = category == null ? "All" : category.label();
-        return Text.literal(category == selectedCategory ? "[" + name + "]" : name);
+        return Text.literal(name + " §7(" + (categoryIndex + 1) + "/" + tabCategories.size() + ")");
+    }
+
+    private HudCategory selectedCategory() {
+        return tabCategories.isEmpty() ? null : tabCategories.get(categoryIndex);
     }
 
     // 移動画面で触れるHUDか。絞り込み中はそのカテゴリのものだけを扱う
     private boolean isEditable(HudElement element) {
         if (!element.isEnabled()) return false;
-        return selectedCategory == null || element.category == selectedCategory;
+        HudCategory category = selectedCategory();
+        return category == null || element.category == category;
     }
 
     @Override

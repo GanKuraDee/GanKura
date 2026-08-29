@@ -9,6 +9,9 @@ import net.minecraft.client.MinecraftClient;
 
 public class WarpCooldownHandler {
     private static final long COOLDOWN_MS = 3000L;
+    // 行き先が見つからなかったときの文言。
+    // これが出たらワープ自体が起きていないので、待つ必要がない
+    private static final String UNKNOWN_DESTINATION = "Unknown destination!";
     // 無効なWarp名などサーバーが「Warping...」以外(エラーメッセージ等)を返した場合に、
     // 確認待ち状態のまま固まってしまわないようにするためのタイムアウト
     private static final long CONFIRMATION_TIMEOUT_MS = 3000L;
@@ -35,6 +38,16 @@ public class WarpCooldownHandler {
 
     // NetworkHandler のチャットディスパッチャーから呼ばれる
     public static void handleMessage(String unformattedMsg) {
+        if (GameState.Warp.awaitingConfirmation
+                && ModConstants.containsIgnoreCase(unformattedMsg, UNKNOWN_DESTINATION)) {
+            // ワープしていないので、確認待ちをその場で打ち切る。
+            // キューが残っていれば次の tick で送れるよう、
+            // クールダウンは「たった今終わった」ことにして onTick に拾わせる
+            GameState.Warp.awaitingConfirmation = false;
+            GameState.Warp.cooldownEndAt = System.currentTimeMillis();
+            return;
+        }
+
         if (GameState.Warp.awaitingConfirmation && ModConstants.containsIgnoreCase(unformattedMsg, "warping")) {
             GameState.Warp.awaitingConfirmation = false;
             GameState.Warp.cooldownEndAt = System.currentTimeMillis() + COOLDOWN_MS;

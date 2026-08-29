@@ -4,6 +4,7 @@ import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +24,9 @@ import java.util.regex.Pattern;
 //   - Armor Sets / Equipment Sets: 5行目(0-index 4)の9列がそれぞれの切り替えボタン
 // 実際のクリックはonMouseClickを直接呼び出すことで、左クリックした場合と完全に同じ経路(サーバーへの
 // パケット送信、LoadoutsClickMixin/LoadoutsContentSyncMixinによるPet/Equipment Hud更新)を通す。
+// ただしバニラのクリックは「アイテムを拾う」予測を手元で先に進めるため、そのままだと
+// アイテムが一瞬カーソルに乗って見える。これらのメニューはHypixel側の押しボタンで、
+// 手元の予測はサーバーの返事で必ず上書きされるので、送った直後に見た目を戻している。
 // 割り当てたキーはバニラでは「ホバー中スロットをホットバーへスワップ」に使われる場合があるため、
 // ここで消費して意図しないスワップが発生しないようにする。
 @Mixin(HandledScreen.class)
@@ -55,7 +59,14 @@ public abstract class MenuSetKeybindMixin {
         Slot slot = handler.slots.get(slotIndex);
         if (slot == null || !slot.hasStack()) return;
 
+        ItemStack cursor = handler.getCursorStack().copy();
+        ItemStack clicked = slot.getStack().copy();
+
         onMouseClick(slot, slotIndex, 0, SlotActionType.PICKUP);
+
+        // 送るものは送った上で、拾った扱いになった手元の見た目だけ元に戻す
+        handler.setCursorStack(cursor);
+        slot.setStack(clicked);
         cir.setReturnValue(true);
     }
 

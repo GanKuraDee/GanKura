@@ -5,6 +5,10 @@ import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.CrimsonDropHandler;
 import com.deeply.gankura.handler.FishingBobberTracker;
 import com.deeply.gankura.handler.FloorDropHandler;
+import com.deeply.gankura.handler.GoldenFishHandler;
+import com.deeply.gankura.handler.HotspotAlertHandler;
+import com.deeply.gankura.handler.HotspotAreaHandler;
+import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
@@ -32,6 +36,7 @@ import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -76,10 +81,16 @@ public class GanKura implements ClientModInitializer {
         ArmorStackHandler.register();
         ArrowPoisonScanner.register();
         QuiverScanner.register();
+        GoldfinShardScanner.register();
+        BaitScanner.register();
         QuiverAlertHandler.register();
         CrimsonDropHandler.register();
         EntityHighlightManager.register();
         WarpCooldownHandler.register();
+        HotspotAlertHandler.register();
+        HotspotAreaHandler.register();
+        GoldenFishHandler.register();
+        HotspotRadarHandler.register();
         EquipmentScanner.register();
         ArachneHandler.register();
         MenuOpenKeybindHandler.register();
@@ -130,6 +141,7 @@ public class GanKura implements ClientModInitializer {
                             })
                     )
                     .then(waypointCommand())
+                    .then(shareHotspotCommand())
             );
 
             // ウェイポイントは出し入れの回数が多いので、短い別名も用意しておく
@@ -174,6 +186,16 @@ public class GanKura implements ClientModInitializer {
     }
 
     // /gankura waypoint ... : 画面を開く / その場に追加 / 一覧 / 表示のON・OFF
+    // チャットに出した共有ボタン専用。手で打つことは想定していない
+    private static LiteralArgumentBuilder<FabricClientCommandSource> shareHotspotCommand() {
+        return ClientCommandManager.literal("sharehotspot")
+                .then(ClientCommandManager.argument("id", IntegerArgumentType.integer())
+                        .executes(context -> {
+                            HotspotAreaHandler.share(IntegerArgumentType.getInteger(context, "id"));
+                            return 1;
+                        }));
+    }
+
     private static LiteralArgumentBuilder<FabricClientCommandSource> waypointCommand() {
         return ClientCommandManager.literal("waypoint")
                 .executes(context -> {

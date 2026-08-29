@@ -3,6 +3,8 @@ package com.deeply.gankura.render;
 import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.FishingBobberTracker;
+import com.deeply.gankura.handler.HotspotAreaHandler;
+import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
@@ -45,6 +47,17 @@ public class WorldTextRenderer {
     private static final int WAYPOINT_LABEL_COLOR = 0xFFFFFFFF;
     private static final double WAYPOINT_MAX_DISTANCE = 384.0;
 
+    // Hotspot の範囲を示す円の太さ・分割数と、描くのをやめる距離(ブロック)。
+    // 色は効果の種類ごとに変わるので HotspotAreaHandler が持つ
+    private static final float HOTSPOT_CIRCLE_WIDTH = 2.0f;
+    private static final int HOTSPOT_CIRCLE_SEGMENTS = 64;
+    private static final double HOTSPOT_CIRCLE_MAX_DISTANCE = 128.0;
+
+    // Hotspot Radar の推測地点に使う色と太さ
+    public static final int HOTSPOT_COLOR = 0xFFFF55FF;
+    private static final int HOTSPOT_FILL_COLOR = 0x40FF55FF;
+    private static final float HOTSPOT_LINE_WIDTH = 3.0f;
+
     public static void render(MinecraftClient client, float tickProgress) {
         if (client.player == null) return;
 
@@ -58,6 +71,52 @@ public class WorldTextRenderer {
         renderBeeNests();
         renderCustomWaypoints(client);
         renderCastTimer(client);
+        renderHotspotGuess(client);
+        renderHotspotCircles(client);
+    }
+
+    /**
+     * Hotspot の範囲を円で示す。
+     *
+     * 円の描画は無いので、短い線をつないで多角形にする。
+     * 分割数を十分に取れば、見た目は円と区別が付かない
+     */
+    private static void renderHotspotCircles(MinecraftClient client) {
+        for (HotspotAreaHandler.Circle circle : HotspotAreaHandler.circles()) {
+            if (client.player.getEntityPos().distanceTo(circle.center()) > HOTSPOT_CIRCLE_MAX_DISTANCE) continue;
+
+            renderCircle(circle.center(), circle.radius(), circle.argb());
+        }
+    }
+
+    private static void renderCircle(Vec3d center, double radius, int argb) {
+        Vec3d previous = null;
+        for (int i = 0; i <= HOTSPOT_CIRCLE_SEGMENTS; i++) {
+            double angle = Math.TAU * i / HOTSPOT_CIRCLE_SEGMENTS;
+            Vec3d point = center.add(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+
+            if (previous != null) drawSegment(previous, point, argb);
+            previous = point;
+        }
+    }
+
+    private static void drawSegment(Vec3d from, Vec3d to, int argb) {
+            GizmoDrawing.line(from, to, argb, HOTSPOT_CIRCLE_WIDTH).ignoreOcclusion();
+    }
+
+    // Hotspot Radar から推測した場所に印を出す
+    private static void renderHotspotGuess(MinecraftClient client) {
+        Vec3d guess = HotspotRadarHandler.guess();
+        if (guess == null) return;
+
+        int distance = (int) Math.round(client.player.getEntityPos().distanceTo(guess));
+        // この描画は1行分なので、改行せずに並べる
+        renderGizmoLabelAt("§d§lHOTSPOT §e" + distance + "m", guess.add(0, 1.5, 0), HOTSPOT_COLOR);
+
+        // 推測なので、居場所が分かるようブロック1つ分の枠も出す
+        GizmoDrawing.box(BlockPos.ofFloored(guess),
+                DrawStyle.filledAndStroked(HOTSPOT_COLOR, HOTSPOT_LINE_WIDTH, HOTSPOT_FILL_COLOR))
+                .ignoreOcclusion();
     }
 
     // 投げている浮きの上に、投げてからの経過秒を出す
@@ -350,7 +409,9 @@ public class WorldTextRenderer {
         // Stage 4/5 の End Stone Protector は、まだ湧いていないので指す相手のエンティティが無い。
         // 代わりにワールド上へ出しているテキストと同じ位置・同じ色で線を引く
         GolemAnchor golem = ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Tracer ? golemAnchor() : null;
-        if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null) return;
+        boolean hasHotspot = ModConfig.INSTANCE.fishing.showHotspotTracer
+                && HotspotRadarHandler.guess() != null;
+        if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null && !hasHotspot) return;
 
         // 一人称ではカメラ位置をそのまま始点にする。しゃがみ中のカメラは
         // 目の高さへ補間されながら近づくため、getEyeHeight(getPose()) で求めた
@@ -362,6 +423,12 @@ public class WorldTextRenderer {
                 ? player.getLerpedPos(tickProgress).add(0, player.getEyeHeight(player.getPose()), 0)
                 : camera.getCameraPos();
         Vec3d from = basePos.add(player.getRotationVec(tickProgress).multiply(0.5));
+
+        // Hotspot Radar の推測地点も、指す相手のエンティティが無いので位置で線を引く
+        Vec3d hotspot = ModConfig.INSTANCE.fishing.showHotspotTracer ? HotspotRadarHandler.guess() : null;
+        if (hotspot != null) {
+            GizmoDrawing.line(from, hotspot.add(0, 1.5, 0), HOTSPOT_COLOR, 4.0f).ignoreOcclusion();
+        }
 
         if (golem != null) {
             GizmoDrawing.line(from, Vec3d.ofCenter(golem.pos()), golem.argb(), 4.0f).ignoreOcclusion();
