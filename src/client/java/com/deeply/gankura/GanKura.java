@@ -3,6 +3,7 @@ package com.deeply.gankura;
 import com.deeply.gankura.handler.ArachneHandler;
 import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.CrimsonDropHandler;
+import com.deeply.gankura.handler.FishingBobberTracker;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
@@ -85,6 +86,7 @@ public class GanKura implements ClientModInitializer {
         MenuOpenKeybindHandler.register();
         FloorDropHandler.register();
         BeeNestScanner.register();
+        FishingBobberTracker.register();
         // 開発中の一時的な機能。配布ビルドには入っていないので、あるときだけ読み込む
         DevHooks.load();
 

@@ -1,6 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.handler.FishingBobberTracker;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
@@ -14,6 +15,7 @@ import net.minecraft.gizmos.GizmoProperties;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.TextGizmo;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.gizmos.Gizmos; // 26.1.2 での新しい描画クラス
 
@@ -25,6 +27,10 @@ public class WorldTextRenderer {
     // ミツバチの巣の塗りつぶし色と、その上に出すラベルの色
     private static final int BEE_NEST_COLOR = 0x80FFFF55;
     private static final int BEE_NEST_LABEL_COLOR = 0xFFFFFF55;
+    // 投げてからの経過秒を浮きの上に出すときの、高さ(ブロック)と色。
+    // Hypixel が浮きのすぐ上に出しているカウントダウンと重ならないよう、その上に出す
+    private static final double CAST_TIMER_LABEL_HEIGHT = 1.2;
+    private static final int CAST_TIMER_LABEL_COLOR = 0xFF55FF55;
     // 自分で置いたウェイポイントの線の太さと、名前の色。表示を打ち切る距離(ブロック)
     private static final float WAYPOINT_LINE_WIDTH = 2.0F;
     private static final int WAYPOINT_LABEL_COLOR = 0xFFFFFFFF;
@@ -40,8 +46,23 @@ public class WorldTextRenderer {
         renderFloorDrops();
         renderBeeNests();
         renderCustomWaypoints(client);
+        renderCastTimer(client);
         // 開発中の一時的な機能。配布ビルドでは何も登録されていない
         DevHooks.renderWorld(client);
+    }
+
+    // 投げている浮きの上に、投げてからの経過秒を出す
+    private static void renderCastTimer(Minecraft client) {
+        if (!ModConfig.INSTANCE.fishing.showCastTimer) return;
+
+        FishingHook hook = FishingBobberTracker.bobber(client);
+        if (hook == null) return;
+
+        double seconds = FishingBobberTracker.elapsedSeconds();
+        if (seconds < 0) return;
+
+        Vec3 pos = hook.position().add(0, CAST_TIMER_LABEL_HEIGHT, 0);
+        renderGizmoLabelAt(String.format("%.1fs", seconds), pos, CAST_TIMER_LABEL_COLOR);
     }
 
     // 自分で置いたウェイポイント。今いるエリアに登録されているものだけを出す
@@ -273,8 +294,11 @@ public class WorldTextRenderer {
     }
 
     public static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
-        Vec3 pos = labelPos(renderPos);
+        renderGizmoLabelAt(text, labelPos(renderPos), argbColor);
+    }
 
+    // 動くものに付けるラベル。位置は呼び出し側が決める
+    public static void renderGizmoLabelAt(String text, Vec3 pos, int argbColor) {
         // 距離に比例して拡大し、見かけの大きさを一定に保つ。
         // プレイヤーのtick座標を使うと20回/秒でしかスケールが更新されずカクつくため、
         // フレームごとに補間されるカメラ座標を基準にする

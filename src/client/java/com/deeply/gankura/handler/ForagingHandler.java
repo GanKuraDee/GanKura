@@ -23,6 +23,9 @@ public class ForagingHandler {
             return;
         }
 
+        // Cocooning はエリアを問わず使えるので、Critter Safari の判定より先に見る
+        if (handleCocoonCatch(unformattedMsg, client)) return;
+
         // Wumpa と Critter のキャプチャは Critter Safari 限定。
         // 他エリアで同じ文言が流れても反応させない
         if (GameState.Server.isSafari()) {
@@ -57,6 +60,23 @@ public class ForagingHandler {
         MutableComponent subtitle = Component.literal("Fell from the Tree!")
                 .withStyle(ChatFormatting.YELLOW);
         client.execute(() -> NotificationUtils.showTitle(client, title, subtitle));
+    }
+
+    // Cocooning でモブを捕まえた合図。何を捕まえたかが重要なので、
+    // モブ名をタイトル本体に、状況説明をサブタイトルに出す
+    private static boolean handleCocoonCatch(String unformattedMsg, Minecraft client) {
+        Matcher matcher = ModConstants.COCOON_CAUGHT_PATTERN.matcher(unformattedMsg);
+        if (!matcher.find()) return false;
+
+        if (ModConfig.INSTANCE.foraging.enableCocoonCatchTitle) {
+            String mobName = matcher.group(1).trim();
+            MutableComponent title = Component.literal(mobName)
+                    .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);
+            MutableComponent subtitle = Component.literal("Cocooned!")
+                    .withStyle(ChatFormatting.YELLOW);
+            client.execute(() -> NotificationUtils.showTitle(client, title, subtitle));
+        }
+        return true;
     }
 
     // Wumpa のスポーンは足音のメッセージでしか分からないので、見逃さないようタイトルで知らせる

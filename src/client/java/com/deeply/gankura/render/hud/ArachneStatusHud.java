@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
-        super("arachne_status", 230, 66, 1.0f, 270, 36,
+        super("arachne_status", 230, 66, 1.0f, 270, 48,
                 () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
                 () -> GameState.Server.isSpidersDen());
     }
@@ -70,12 +70,22 @@ public class ArachneStatusHud extends HudElement {
         text(graphics, font, "§5§lArachne Status", 0, 0, 0xFFFFFFFF, true);
         text(graphics, font, "Altar: " + status, 0, 12, 0xFFFFFFFF, true);
 
+        int line = 24;
         // Small/Bigはカウントダウン開始メッセージの時点で確定しているため、Spawned確定を待たず表示する
         if (isPreview) {
-            text(graphics, font, "Size: §aSmall", 0, 24, 0xFFFFFFFF, true);
+            text(graphics, font, "Size: §aSmall", 0, line, 0xFFFFFFFF, true);
+            line += 12;
         } else if (GameState.Arachne.size != null) {
             String sizeColor = "Big".equals(GameState.Arachne.size) ? "§c" : "§a";
-            text(graphics, font, "Size: " + sizeColor + GameState.Arachne.size, 0, 24, 0xFFFFFFFF, true);
+            text(graphics, font, "Size: " + sizeColor + GameState.Arachne.size, 0, line, 0xFFFFFFFF, true);
+            line += 12;
+        }
+
+        // 分裂後の残数。本体の HP はネームプレート側に出るので、ここには出さない
+        if (isPreview) {
+            text(graphics, font, "§dBrood: §e4", 0, line, 0xFFFFFFFF, true);
+        } else if (GameState.Arachne.broodCount > 0) {
+            text(graphics, font, "§dBrood: §e" + GameState.Arachne.broodCount, 0, line, 0xFFFFFFFF, true);
         }
     }
 }

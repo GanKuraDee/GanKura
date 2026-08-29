@@ -23,9 +23,19 @@ loom {
 
 }
 
-// 開発中の一時的な機能。手元で試すときだけ -PdevFeatures を付ける。
-// 付けずにビルドすると配布用の jar には入らない
-if (!project.hasProperty('devFeatures')) {
+// 開発中の一時的な機能 (com.deeply.gankura.dev)。
+// jar を作るときだけソースから外し、IDE のビルドや runClient では入れる。
+// これで IntelliJ から起動したときはそのまま使えて、配布用の jar には入らない。
+// 明示的に入れたいときは -PdevFeatures、明示的に外したいときは -PnoDevFeatures を付ける
+def jarTaskNames = ['build', 'jar', 'assemble', 'publish']
+def buildingJar = gradle.startParameter.taskNames.any { taskName ->
+	def lower = taskName.toLowerCase()
+	jarTaskNames.any { lower.contains(it) }
+}
+def includeDevFeatures = project.hasProperty('devFeatures') ||
+		(!project.hasProperty('noDevFeatures') && !buildingJar)
+
+if (!includeDevFeatures) {
 	sourceSets.client.java.exclude 'com/deeply/gankura/dev/**'
 }
 

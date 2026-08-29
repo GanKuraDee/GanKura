@@ -25,6 +25,9 @@ public class DevHooks {
     // ワールド描画のたびに呼ぶもの。一時的な機能が自分で登録する
     private static final List<Consumer<Minecraft>> WORLD_RENDERERS = new ArrayList<>();
 
+    // Sea Creature を見つけたときに呼ぶもの。一時的な機能が自分で登録する
+    private static final List<Consumer<String>> SEA_CREATURE_LISTENERS = new ArrayList<>();
+
     // /gankura の下にぶら下げるサブコマンド。一時的な機能が自分で登録する
     private static final List<Consumer<LiteralArgumentBuilder<FabricClientCommandSource>>> SUBCOMMANDS = new ArrayList<>();
 
@@ -40,6 +43,17 @@ public class DevHooks {
 
     public static void onWorldRender(Consumer<Minecraft> renderer) {
         WORLD_RENDERERS.add(renderer);
+    }
+
+    public static void onSeaCreatureFound(Consumer<String> listener) {
+        SEA_CREATURE_LISTENERS.add(listener);
+    }
+
+    // Mob Visuals に登録している Sea Creature を1体見つけるたびに呼ばれる
+    public static void seaCreatureFound(String name) {
+        for (Consumer<String> listener : SEA_CREATURE_LISTENERS) {
+            listener.accept(name);
+        }
     }
 
     public static void onBuildCommand(Consumer<LiteralArgumentBuilder<FabricClientCommandSource>> builder) {

@@ -113,7 +113,7 @@ public class BossNameplateRenderer {
         };
     }
 
-    // HP HUD (CrimsonBossHealthHud) と同じ配色ルールで残量に応じて色分けする
+    // 残量に応じて色分けする。廃止した HP HUD と同じ配色ルール
     private static String formatHealth(String raw) {
         if (raw == null || raw.isEmpty()) return "";
         // Magma Boss のみ、サイドバー由来の色コード込み文字列がそのまま入る
