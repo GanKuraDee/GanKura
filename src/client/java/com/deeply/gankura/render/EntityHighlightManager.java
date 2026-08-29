@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
@@ -7,7 +8,19 @@ import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.MobVisual.CrimsonIsle;
 import com.deeply.gankura.data.MobVisual.CrystalHollows;
 import com.deeply.gankura.handler.CorleoneHandler;
+// 26.2: EntityType の定数は EntityTypes へ移動
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.Guardian;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.cow.MushroomCow;
+import net.minecraft.world.entity.animal.squid.Squid;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.ElderGuardian;
+import net.minecraft.world.entity.monster.breeze.Breeze;
 import net.minecraft.client.player.AbstractClientPlayer;
+import com.deeply.gankura.data.MobVisual.LotusAtoll;
 import com.deeply.gankura.data.MobVisual.MoongladeMarsh;
 import com.deeply.gankura.data.MobVisual.SafariCavern;
 import com.deeply.gankura.data.MobVisual.SafariForest;
@@ -24,6 +37,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.cubemob.Slime;
 import net.minecraft.world.entity.monster.Blaze;
@@ -48,6 +63,7 @@ import net.minecraft.world.entity.animal.polarbear.PolarBear;
 import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.sniffer.Sniffer;
 import net.minecraft.world.entity.monster.Endermite;
 import net.minecraft.world.entity.monster.zombie.Drowned;
@@ -86,16 +102,72 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.function.Predicate;
+import net.minecraft.world.entity.animal.frog.FrogVariants;
 
+/**
+ * Mob Visuals の本体判定。
+ *
+ * Hypixel のモブは「見た目のエンティティ」と「当たり判定のモブ」が別々のことが多く、
+ * ネームタグもまた別のアーマースタンドになっている。
+ * そのため「どのエンティティを、どのモブとみなすか」の決め方がモブごとに違う。
+ * 手掛かりは次の6通りで、上にあるものほど確実。
+ *
+ * <p>1. ヘッドのスキン ({@link #HEAD_SKIN_TARGETS})
+ * <br>skull のテクスチャIDで種まで決まる。エリアにも位置関係にも依らない。
+ * <ul>
+ *   <li>Sea Creature … Titanoboa / Blue Ringed Octopus / Giant Isopod / Wiki Tiki
+ *       / Fiery Scuttler / Water Hydra(ゾンビ本体が被っている)
+ *   <li>Torrhus Canyon … Ant / Queen Ant / Water Snake / Sneaky・Shrieky・Cheeky Tiki
+ *   <li>Critter Safari … Gazer / Driftling / Shyworm / Chuckwalla / Flitter
+ *       / Gimmiegold / Mantis Shrimp / Troodon
+ *   <li>Moonglade Marsh … Stag Beetle / Woodlouse
+ *       (2種で skull が同じなので、本体の特定だけに使い、種の別はネームタグで決める)
+ * </ul>
+ *
+ * <p>2. 実体名 ({@link #matchesNamedPlayerMob})
+ * <br>プレイヤーエンティティ型(NPC)のモブ。表示名ではなく実体名で照合する。
+ * ネームタグより読み込み範囲が広いので、遠くからでも見つかる。
+ * <ul>
+ *   <li>Sea Creature … Alligator / Yeti / Phantom Fisher / Grim Reaper
+ *       / Great White Shark / Abyssal Miner / Ragnarok
+ *   <li>その他 … Grizzly Bear / Hideyho / Matcho / Barbarian Duke X / Mage Outlaw
+ *   <li>Boss Corleone だけは実体名が使えないので、代わりにスキンで照合する
+ * </ul>
+ *
+ * <p>3. エンティティの構成
+ * <br>乗り物と乗り手、あるいは重なった組み合わせで決まるもの。
+ * <br>The Loch Emperor(ガーディアン+スケルトン) / Frog Prince(スライム+カエル)
+ * / Ragnarok(骸骨の馬+プレイヤー型) / Bladesoul / Ashfang / Magma Boss
+ *
+ * <p>4. エンティティ型(+エリア / 変種 / 大きさ)
+ * <br>そのエリアにその型のモブが1種しかいないと言い切れるもの。
+ * <br>Critter Safari の大半、Moonglade Marsh と Torrhus Canyon のエリア動物、
+ * Silkbreeze / Thunder / Lord Jawbus / Reindrake / Puddle Jumper / Nessie など
+ *
+ * <p>5. ネームタグの名前 + 本体の型 ({@link #seaCreatureVisual})
+ * <br>バニラと同じ型で、型だけでは断定できないもの。名前で種を決めてから型で本体を探す。
+ * <br>Sea Creature 11種 … Mithril Grubber / Water Worm / Poisoned Water Worm
+ * / Flaming Worm / Oasis Sheep / Oasis Rabbit / Carrot King / Agarimoo
+ * / Lava Blaze / Lava Pigman / Plhlegblast
+ *
+ * <p>6. ネームタグの名前のみ
+ * <br>Broodmother / Arachne / Arachne's Brood / Dragon
+ * / Ashfang Follower・Acolyte・Underling / Honeybuzz / Pollendart
+ *
+ * <p>1 と 2 の面々はネームタグも読むが、種の確定には使わない。
+ * どちらもネームタグより遠くまで届くので、ネームタグがあるのに見つからないのは
+ * Hypixel 側で差し替えられたときだけ。その場合は {@link #reportMissingVisual} で知らせる。
+ * 「ネームタグの下にいるものを、確認せずそのモブとみなす」処理は置かない。
+ */
 public class EntityHighlightManager {
 
-    // Magma Boss の戦闘エリア半径(ブロック)。ワールドテキストの基準座標 MAGMA_BOSS_POS を中心とする
     // Magma Glare のネームタグに出る名前
     private static final String MAGMA_GLARE_NAME = "Magma Glare";
     // Magma Glare のネームタグを探す半径(ブロック)。個体が密集するため狭めにとる
     private static final double GLARE_NAMETAG_RADIUS = 3.0;
     // 「現在HP/最大HP」の抽出。EntityHealthScanner と同じ形式
     private static final Pattern HEALTH_PATTERN = Pattern.compile("([\\d\\.,]+[kM]?/[\\d\\.,]+[kM]?)");
+    // Magma Boss の戦闘エリア半径(ブロック)。ワールドテキストの基準座標 MAGMA_BOSS_POS を中心とする
     private static final double MAGMA_ARENA_RADIUS = 60.0;
     // バニラで自然発生する MagmaCube の最大サイズ(1/2/4 のいずれか)。
     // Magma Boss 本体と Magma Glare はこれより大きいため、超えているものだけを候補にすれば
@@ -117,10 +189,11 @@ public class EntityHighlightManager {
 
     // Invisibug を探す半径(ブロック)。CRIT パーティクルは本体のすぐ近くに出る
     private static final double INVISIBUG_RADIUS = 5.0;
-    // Torrhus Canyon のヘッド系モブは、ヘッドの scale と当たり判定の大きさが呼び名ごとに決まっている。
-    // 実測値は Ant 0.40 / Queen Ant 0.60 / Water Snake 1.00 なので、その中間で切る
-    private static final float CANYON_ANT_MAX_SCALE = 0.5f;
-    private static final float CANYON_QUEEN_ANT_MAX_SCALE = 0.8f;
+    // Lotus Atoll のカエルで、Critter として扱う大きさの上限。
+    // Lotum と Atoll Croaker はバニラ相当の 0.50、
+    // Sea Creature の Frog Prince は 1.00、Puddle Jumper は 2.00
+    private static final float LOTUM_MAX_WIDTH = 0.7f;
+
     // Moonglade Marsh のファントム3種は同じ Phantom 型だが、scale 属性で大きさが変えてあり
     // 当たり判定にもそれが出る。実測値は Phanpyre 0.36 / Phanflare 0.90(バニラ相当)。
     // Dreadwing はさらに大きいので、実測値の中間と、余裕を見た値で切る
@@ -130,6 +203,28 @@ public class EntityHighlightManager {
     // ネームタグ経由でモブの一部と確定したエンティティ。
     // 型だけで判定するモブが、これらを別のモブとして二重に拾わないようにする
     private static final Set<Entity> nametagClaimedEntities = new HashSet<>();
+    // Sea Creature のタイトルはフェードなしで出す。単位は tick
+    private static final int SEA_CREATURE_TITLE_FADE = 0;
+    private static final int SEA_CREATURE_TITLE_STAY = 70;
+    // 自分で釣ったときの文言で出したタイトルが、エンティティの検知と重なりうる時間(ミリ秒)
+    private static final long SEA_CREATURE_CATCH_ECHO_MS = 5000;
+    // Double Hook で2匹まとめて釣れたときに、名前の後ろに付ける。
+    // モブの色に埋もれないよう赤で出す
+    private static final String SEA_CREATURE_DOUBLE_HOOK_SUFFIX = " §c§lx2";
+    // 自分で釣り上げてタイトルを出した Sea Creature と、その時刻。
+    // エンティティ側の重複を、釣れた匹数ぶんだけ抑えるために使う
+    private static MobVisual caughtSeaCreature;
+    private static long caughtSeaCreatureMillis;
+    // まだ控えていないエンティティの数。Double Hook なら2匹湧く
+    private static int caughtSeaCreaturePending;
+    // タイトルに添える音の大きさと高さ。SkyHanni の Rare Sea Creatures アラートと同じ
+    private static final float SEA_CREATURE_SOUND_VOLUME = 1.0f;
+    private static final float SEA_CREATURE_SOUND_PITCH = 1.0f;
+    // この tick で既に表示を付けた、複数エンティティで1体を成す Sea Creature の部品。
+    // 別の経路から同じ個体の別の部品に行き着いても、二重に出さないために使う
+    private static final Set<Entity> seaCreaturePartsShown = new HashSet<>();
+    // タイトルで知らせ済みの Sea Creature。同じ個体で何度も出さないために覚えておく
+    private static final Set<Entity> announcedSeaCreatures = new HashSet<>();
 
     // Hideon 系のシュルカーが当たり判定として抱えているシルバーフィッシュ。
     // 型だけで判定するモブが、これらを別のモブとして二重に拾わないようにする
@@ -143,15 +238,15 @@ public class EntityHighlightManager {
     //   Cavern  … x-  z+      Forest … x+ z+
     //   Icy     … x-  z-      Haunted … x+ z-
     // エリア名はどこも "Safari" なので、バイオームの区別はこの座標から求める
-    // Fairy Soul と同じものとみなす距離(ブロック)
-    private static final double FAIRY_SOUL_RADIUS = 3.0;
-
     private static final double SAFARI_CENTER_X = -50.0;
     private static final double SAFARI_CENTER_Z = 0.0;
 
     // Display(アイテム/ブロック表示)の表示位置。
     // Display は原点がそのまま見た目の中心になるため、足元からの補正は要らない
     private static final double DISPLAY_ANCHOR = 0.0;
+    // ただしブロックを映しているものは、原点がブロックの底になる。
+    // そのままだと足元に寄ってしまうので、ブロックの中ほどまで上げる
+    private static final double BLOCK_DISPLAY_ANCHOR = 0.5;
     // 当たり判定のモブから、見た目を担うヘッドを探す距離(ブロック)。
     // これが見つかる当たり判定は「別のモブの一部」なので、それ自体をモブとして扱わない
     private static final double HITBOX_HEAD_RADIUS = 1.5;
@@ -171,6 +266,9 @@ public class EntityHighlightManager {
     private static final double HEAD_CHAIN_SEARCH_RADIUS = 8.0;
     // ヘッドどうしがつながっているとみなす距離(ブロック)
     private static final double HEAD_CHAIN_GAP = 2.5;
+    // 1体を成すヘッドを、見つけた1つから探し集める半径(ブロック)。
+    // Titanoboa は長く伸びるので、ネームタグ起点のときより広めに取る
+    private static final double HEAD_PARTS_SEARCH_RADIUS = 24.0;
     // ネットワークスレッドから溜まるパーティクル座標の上限。
     // 取りこぼしても本体は出し続けるので、次のパーティクルで拾える
     private static final int MAX_PENDING_CRIT_PARTICLES = 256;
@@ -193,6 +291,22 @@ public class EntityHighlightManager {
     // 個体ごとに違うのはスキンだけ。テクスチャのパス末尾(スキンのハッシュ)で見分ける。
     // Hypixel 側でスキンが差し替えられた場合は、この値も更新が必要
     private static final String CORLEONE_SKIN_HASH = "3c37b434bbb65fe5838afced8301604126214b2a";
+
+    // プレイヤーエンティティ型モブの実体名。探す経路が2つあるので、名前はここにまとめる。
+    // Sea Creature は表示名がそのまま実体名なので載せない。
+    // Boss Corleone だけは実体名が使えず、スキンで見分ける
+    private static final Map<MobVisual, String> NAMED_PLAYER_ENTITY_NAMES = Map.of(
+            CrimsonIsle.BARBARIAN_DUKE_X, BARBARIAN_ENTITY_NAME,
+            CrimsonIsle.MAGE_OUTLAW, MAGE_OUTLAW_ENTITY_NAME,
+            CrimsonIsle.MATCHO, MATCHO_ENTITY_NAME,
+            SafariHaunted.HIDEYHO, HIDEYHO_ENTITY_NAME,
+            TorrhusCanyon.GRIZZLY_BEAR, GRIZZLY_BEAR_ENTITY_NAME);
+
+    // Crimson Isle のボスのうち、プレイヤーエンティティ型のもの。
+    // こちらは CrimsonBossEntry 側から引くため、ボス名を鍵にする
+    private static final Map<String, MobVisual> PLAYER_BOSS_TARGETS = Map.of(
+            "Barbarian Duke X", CrimsonIsle.BARBARIAN_DUKE_X,
+            "Mage Outlaw", CrimsonIsle.MAGE_OUTLAW);
 
     public static final Set<Entity> highlightedEntities = new HashSet<>();
     public static final Map<Entity, CrimsonBossEntry> crimsonBossEntities = new HashMap<>();
@@ -233,6 +347,13 @@ public class EntityHighlightManager {
     // Display のように当たり判定を持たないものは、対になるエンティティから実測して入れる
     public static final Map<Entity, Double> renderAnchors = new HashMap<>();
 
+    // 体力が書いてあるネームタグ。ネームプレートに体力を出すのに使う。
+    // 本体の判定には使わないので、取り違えても表示がずれるだけ
+    private static final List<Entity> healthNameTags = new ArrayList<>();
+    // 本体からネームタグを探す半径(ブロック)。
+    // Titanoboa のように長いモブでも届くよう広めに取る
+    private static final double HEALTH_NAMETAG_RADIUS = 12.0;
+
     // 型では判別できない「見た目」側のエンティティ(ヘッドのアーマースタンド、NPC など)。
     // 型による一括削除ができないため、ここに控えて毎 tick 作り直す。
     // これを忘れると、設定で対象から外した後もハイライトが残り続けてしまう
@@ -266,11 +387,13 @@ public class EntityHighlightManager {
     private static final long RESPAWN_INTERVAL_MS = 2 * 60 * 1000L;
 
     // シュルカー(Hideon系)の4種。探索が必要かどうかの判定にまとめて使う
+    // 判定: 4 型 + 体色
     public static final List<MobVisual> SHULKER_TARGETS = List.of(
             MoongladeMarsh.HIDEONLEAF, TorrhusCanyon.HIDEONSUN,
             SafariForest.HIDEONFLOOR, SafariHaunted.HIDEONWALL);
 
     // Moonglade Marsh / Torrhus Canyon の固有モブ。探索が必要かどうかの判定にまとめて使う
+    // 判定: 4 型 + エリア
     public static final List<MobVisual> AREA_ANIMAL_TARGETS = List.of(
             MoongladeMarsh.CORALOT, MoongladeMarsh.MOSSYBIT,
             MoongladeMarsh.COD, MoongladeMarsh.SALMON, MoongladeMarsh.JOYDIVE,
@@ -278,6 +401,8 @@ public class EntityHighlightManager {
             MoongladeMarsh.BIRRIES, MoongladeMarsh.BAMBULEAF, MoongladeMarsh.MOCHIBEAR,
             MoongladeMarsh.PHANPYRE, MoongladeMarsh.PHANFLARE, MoongladeMarsh.DREADWING,
             MoongladeMarsh.HEWVER, MoongladeMarsh.HONEYHOG, MoongladeMarsh.HONEYMITE,
+            // Nessie は大人のスニッファー。Hewver と同じ型なのでここで一緒に走査する
+            MobVisual.SeaCreature.NESSIE,
             MoongladeMarsh.MURKBAT, MoongladeMarsh.TIDETOT, MoongladeMarsh.CHILL,
             MoongladeMarsh.AZURE, MoongladeMarsh.VERDANT,
             TorrhusCanyon.BLUE_JAY, TorrhusCanyon.DUSTYBIT,
@@ -286,10 +411,13 @@ public class EntityHighlightManager {
             TorrhusCanyon.GROUNDHOG, TorrhusCanyon.HIVETHIEF, TorrhusCanyon.MOUNTAIN_GOAT,
             TorrhusCanyon.PUCK, TorrhusCanyon.BEEHEEMOTH,
             TorrhusCanyon.EMBER, TorrhusCanyon.SOLAR, TorrhusCanyon.TIMIL,
-            TorrhusCanyon.PARCHED);
+            TorrhusCanyon.PARCHED,
+            LotusAtoll.LOTUSFISH, LotusAtoll.LOTUM, LotusAtoll.TEWTIL,
+            LotusAtoll.FLIPFLOPPER, LotusAtoll.SEASHINE);
 
     // Critter Safari の、エンティティ型で判別できるモブ。
     // Wumpa / Doomspiral / Hideon 系はネームプレートの中身が違うので専用の処理を持っており、ここには含めない
+    // 判定: 1 スキン / 4 型 + バイオーム
     public static final List<MobVisual> SAFARI_TYPE_TARGETS = List.of(
             SafariCavern.ROCKMITE, SafariCavern.SCRAPPY, SafariCavern.SNOOZLE, SafariCavern.GEMZIE,
             SafariForest.FOXTROT, SafariForest.BLUEBIRD, SafariForest.HONEYBUG, SafariForest.TREEFROG,
@@ -303,6 +431,7 @@ public class EntityHighlightManager {
             SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON, SafariCavern.SHYWORM);
 
     // 見た目がブロック表示(Display)のモブ。透明な当たり判定から見つけて差し替える
+    // 表示の差し替え先(判定ではない)
     public static final List<MobVisual> SAFARI_DISPLAY_TARGETS = List.of(
             SafariCavern.CHUCKWALLA, SafariCavern.FLITTER,
             SafariHaunted.DUPLICO, SafariHaunted.GIMMIEGOLD,
@@ -311,57 +440,308 @@ public class EntityHighlightManager {
 
     // Critter Safari の、独自の見た目でエンティティ型からは判別できないモブ。ネームタグで判定する。
     // 本命は SAFARI_NAMED_PLAYER_TARGETS の実体名照合で、こちらはその取りこぼし用の保険
+    // 判定: 2 実体名
     public static final List<MobVisual> SAFARI_NAMED_TARGETS = List.of(
             SafariHaunted.HIDEYHO);
 
     // Critter Safari の、プレイヤーエンティティ型(NPC)のモブ。
     // ネームタグ(ArmorStand)より読み込み範囲が広いので、実体名で直接探す
+    // 判定: 2 実体名
     public static final List<MobVisual> SAFARI_NAMED_PLAYER_TARGETS = List.of(
             SafariHaunted.HIDEYHO);
 
     // Crimson Isle の、ネームタグでしか判別できないモブ。
     // Matcho はプレイヤー型(NPC)で、エンティティ型では他の NPC と区別できない
+    // 判定: 2 実体名
     public static final List<MobVisual> CRIMSON_NAMED_TARGETS = List.of(
             CrimsonIsle.MATCHO);
 
     // Crystal Hollows の、ネームタグでしか判別できないモブ。
     // Boss Corleone はプレイヤー型(NPC)で、エンティティ型では他の NPC と区別できない
+    // 判定: 2 実体名(Boss Corleone はスキン)
     public static final List<MobVisual> CRYSTAL_NAMED_TARGETS = List.of(
             CrystalHollows.BOSS_CORLEONE);
 
     // Moonglade Marsh の、ネームタグでしか判別できないモブ。
     // Stag Beetle と Woodlouse は同じ見た目の作りで、型では絞り込めない
+    // 判定: 1 スキンで本体を探し、種はネームタグの名前
     public static final List<MobVisual> MARSH_NAMED_TARGETS = List.of(
             MoongladeMarsh.STAG_BEETLE, MoongladeMarsh.WOODLOUSE);
 
+    // Stag Beetle と Woodlouse の見た目に使われている skull。2種で共通なので、
+    // 種の区別はネームタグに任せ、これは本体を特定するためだけに使う
+    private static final String MARSH_BUG_HEAD_SKIN =
+            "e08fc1ae87a7035d32b0b0da58de4801463aaf8b238618024aacb0c515ae3bba";
+
+    // 釣りで湧く Sea Creature の全種。探索が必要かどうかの判定にまとめて使う。
+    // 判定の手掛かりは種ごとに違うので、クラスの説明を参照
+    public static final List<MobVisual> SEA_CREATURE_TARGETS =
+            List.of((MobVisual[]) MobVisual.SeaCreature.values());
+
+    // Sea Creature のうち、プレイヤーエンティティ型(カスタムスキンのNPC)のもの。
+    // ネームタグ(アーマースタンド)より読み込み範囲が広いので、実体名で直接探す
+    // 判定: 2 実体名
+    public static final List<MobVisual> SEA_CREATURE_PLAYER_TARGETS = List.of(
+            MobVisual.SeaCreature.ALLIGATOR, MobVisual.SeaCreature.YETI,
+            MobVisual.SeaCreature.PHANTOM_FISHER, MobVisual.SeaCreature.GRIM_REAPER,
+            MobVisual.SeaCreature.GREAT_WHITE_SHARK, MobVisual.SeaCreature.ABYSSAL_MINER,
+            MobVisual.SeaCreature.RAGNAROK);
+
+    // 見た目に使っている skull のテクスチャと、そのモブ。
+    // 当たり判定が同じ形の面々を、これで見分ける。
+    // Sea Creature だけでなく、Torrhus Canyon の Tiki 系もここで引く。
+    // Titanoboa は頭と胴体で skull が違う。胴体の節はすべて同じ skull を使っている。
+    // 残りはヘッド１つで一体なので、連なりはたどらない。
+    // Water Hydra だけはアーマースタンドではなく、ゾンビ本体が被っている
+    // Map.of は10組までなので、足し続けられる ofEntries で作る
+    // 判定: 1 ヘッドのスキン
+    private static final Map<String, MobVisual> HEAD_SKIN_TARGETS = Map.ofEntries(
+            Map.entry("645f2c0bbfe3b8b19b7452072db69a5f59da38ff61415545156e5701e1be756d",
+                    MobVisual.SeaCreature.TITANOBOA),
+            Map.entry("b82086882b25e9e914362f2048c285c18c8d698a336f7e83f0a1964c760b11",
+                    MobVisual.SeaCreature.TITANOBOA),
+            Map.entry("b2b6074d0c9d6b89a494cf4f74158282a64ee23ba8a0725633ad70932ada1a8f",
+                    MobVisual.SeaCreature.BLUE_RINGED_OCTOPUS),
+            Map.entry("3fcb203b029aac4958407daf4072a01a353105162373ce7e559c669d78325bcb",
+                    MobVisual.SeaCreature.GIANT_ISOPOD),
+            Map.entry("f3c802e580bfefc18c4af94cceb82968b5b4aeab0d832346a633a7473a41dfac",
+                    MobVisual.SeaCreature.WIKI_TIKI),
+            Map.entry("e64331c8fb750f9043334320c94580e7896955695156d80689e5d0a6c60a10e7",
+                    MobVisual.SeaCreature.WIKI_TIKI),
+            Map.entry("9122f7a19b3197766b381fb36bfeb6f442d62509e44cc7847c75c8e8c387225a",
+                    MobVisual.SeaCreature.WIKI_TIKI),
+            Map.entry("c5fd6b9a59ec5b97db8bdc158fbd5f91ef7b317b859fcebe6d09e7bd80eaca9d",
+                    MobVisual.SeaCreature.WIKI_TIKI),
+            Map.entry("55b194025806687642e2bc239895d646a6d8c193d9253b61bfce908f6ce1b84a",
+                    MobVisual.SeaCreature.FIERY_SCUTTLER),
+            Map.entry("6d6bcd3bea0dff1f45d808e7a8550f95106af41b6d8d18a0793e19c9255ae845",
+                    MobVisual.SeaCreature.WATER_HYDRA),
+            // Tiki 系は節ごとに違う skull を使っており、種ごとに面々が違う
+            Map.entry("f62bef8ca58d83766c7e26f9fb4fe06c11b93542a9c10f36f460a3b427748223",
+                    TorrhusCanyon.SHRIEKY_TIKI),
+            Map.entry("7a267c2699e38062ea4baedbfa4bb80a631048f7c8d2ee4c460f40036b084b2b",
+                    TorrhusCanyon.SHRIEKY_TIKI),
+            Map.entry("419773998a0b85ffebde5ff925ea4c9b9e007436b0eb9a43afd2d3b367d241f6",
+                    TorrhusCanyon.SHRIEKY_TIKI),
+            Map.entry("28bdbd87b64e049562c986bb4c5b1336d92e68431260a9e0e8f3338d302b9761",
+                    TorrhusCanyon.SNEAKY_TIKI),
+            Map.entry("b89f1cb02d4acd71940d9e6c29fe75ce3b15d291d9e383030b59e068b5f5a135",
+                    TorrhusCanyon.SNEAKY_TIKI),
+            Map.entry("3eac8820104cc421e0392142dc7c79eb84bd2be8f8155c29d72f5fc58d4ee953",
+                    TorrhusCanyon.SNEAKY_TIKI),
+            Map.entry("bb19e5b72167db517ff8b9e2dd0735996641bdb6b6267a758ad2864022023cb7",
+                    TorrhusCanyon.CHEEKY_TIKI),
+            Map.entry("dfe6925f85cf02d2f8b501291d26aa5f4f6a136de0e974c2e9e3c20633ae9202",
+                    TorrhusCanyon.CHEEKY_TIKI),
+            Map.entry("247da91d9d4dd57bad2678baf648e4d9dd4b9f454a606962ceaac11ed00dea9f",
+                    TorrhusCanyon.CHEEKY_TIKI),
+            // Ant 系はヘッド１つ。Water Snake は頭と胴体で skull が違う
+            Map.entry("88a51208885548fbbe08271148db3691f59e275a8d723be094b44d34ccfd9c85",
+                    TorrhusCanyon.ANT),
+            Map.entry("321fcf90d9090de8fd720cb2817a4dfdc2283e828fd44f8bfdc7ff9a8505cc",
+                    TorrhusCanyon.QUEEN_ANT),
+            Map.entry("1b06d15155c60d0f0f267be05c8436c5a1e764a8c8aca236bb37223f49d9a1d0",
+                    TorrhusCanyon.WATER_SNAKE),
+            Map.entry("23a0d55ad300e4f8870e754fb06db58c7f15fc292026edc79ea7e4ef3cc808cb",
+                    TorrhusCanyon.WATER_SNAKE),
+            Map.entry("407b3c3d2c3fe259d69207a14ca5cd99713c7096ba122bb40326f3489e5d0d6c",
+                    SafariHaunted.GAZER),
+            // 見た目を skull を被せた Display で作っている面々
+            Map.entry("8b329e108ac28b0bec8d47b7cdce253df1db80b46052b5915d963e1bcbab0db4",
+                    SafariHaunted.GIMMIEGOLD),
+            Map.entry("9924c105aa431dabd47952dc1dddd6f751f883423f4db1487d9bacc2cfe99c7a",
+                    SafariIcy.MANTIS_SHRIMP),
+            Map.entry("53de4135a3b19a2187029c86a0020e58c907c7bdd4e37b7643f120e16a0aa9ab",
+                    SafariIcy.TROODON),
+            Map.entry("f4c4f8e5fce1ec2d299cb8a395792ecddc497a1d8af86faaa5e20373016c7225",
+                    SafariCavern.DRIFTLING),
+            // Shyworm は頭と胴体で skull が違う
+            Map.entry("b4287b8a0a642dac535a6ee29459efd17d5cee1eb359e436bc8e7abba3da14b7",
+                    SafariCavern.SHYWORM),
+            Map.entry("a684e00e7394cb0c84c082e4dbc7c7e91ea67f6bc718a1aace7f99596b65d422",
+                    SafariCavern.SHYWORM),
+            Map.entry("fc63cd0d480971a7beae5fd503e5d51658cd906330843cbad92018f5b98b4fe5",
+                    SafariCavern.CHUCKWALLA),
+            Map.entry("a89a76deedd42b410344100df2fa79b6eeac7e6f287745d656179368340ffade",
+                    SafariCavern.FLITTER));
+
+    // 被っているスキンから引いた結果を覚えておく。
+    // 毎 tick 見るので、base64 の展開を繰り返さないようにする。
+    // 見つからなかったことも覚えるので、空の Optional で持つ
+    private static final Map<String, Optional<MobVisual>> HEAD_SKIN_CACHE = new HashMap<>();
+    // 覚えておくスキンの上限。見たことのないスキンが増え続けても溢れないようにする
+    private static final int MAX_HEAD_SKIN_CACHE = 512;
+
+    // 見た目を、ヘッドを被せたアーマースタンドの連なりで作っている Sea Creature。
+    // 当たり判定は別にある透明なモブだが、見た目とは大きさが合わないので触らない。
+    // ヘッド１つで一体の種は入れない。
+    // スキン照合が周囲の同じヘッドを集めるので、2体湧いたときに1体としてまとめられてしまう
+    // 表示の作り(判定ではない)
+    public static final List<MobVisual> HEAD_BODY_TARGETS = List.of(
+            MobVisual.SeaCreature.TITANOBOA, MobVisual.SeaCreature.WIKI_TIKI);
+
+    // 連なりをたどらず、登録済みのスキンを被ったヘッドだけを集める Sea Creature。
+    // Titanoboa は長く伸びるので、連なりをたどると節の間隔で切れうる。
+    // 頭と胴体の skull が分かっているので、スキン照合だけで全身を集められる。
+    // Wiki Tiki のように積み上がっているだけの種は、連なりで個体を分けられるのでここに入れない
+    // 表示の作り(判定ではない)
+    private static final List<MobVisual> HEAD_SKIN_GROUPED_TARGETS = List.of(
+            MobVisual.SeaCreature.TITANOBOA);
+
+    // 複数のヘッドで1体を成すモブの、頭にあたる skull。
+    // 胴体の節と見分けて、Tracer とネームプレートを頭に出すために使う
+    // 表示の作り(判定ではない)
+    private static final Map<MobVisual, String> HEAD_ANCHOR_SKINS = Map.of(
+            MobVisual.SeaCreature.TITANOBOA,
+            "645f2c0bbfe3b8b19b7452072db69a5f59da38ff61415545156e5701e1be756d",
+            TorrhusCanyon.WATER_SNAKE,
+            "1b06d15155c60d0f0f267be05c8436c5a1e764a8c8aca236bb37223f49d9a1d0",
+            SafariCavern.SHYWORM,
+            "b4287b8a0a642dac535a6ee29459efd17d5cee1eb359e436bc8e7abba3da14b7");
+
+    // ヘッドのスキンで見分ける Sea Creature。
+    // スキンはネームタグより遠くまで届くので、
+    // ネームタグがあるのに登録済みのスキンが1つも見つからないのは、
+    // Hypixel 側で差し替えられたときだけ
+    private static final Set<MobVisual> HEAD_SKIN_SPECIES = new HashSet<>(HEAD_SKIN_TARGETS.values());
+    // スキンが見つからないことをすでに知らせたネームタグ。
+    // 同じネームタグで毎 tick 出さないために覚えておく。
+    // エンティティが消えれば勝手に落ちるよう、弱参照で持つ
+    private static final Set<Entity> missingVisualReported =
+            Collections.newSetFromMap(new WeakHashMap<>());
+    // スキンが見つからないネームタグを、いつから見ているか。
+    // 同じく弱参照で持つ
+    private static final Map<Entity, MissingWindow> missingVisualWindows = new WeakHashMap<>();
+    // 知らせるまでに待つ時間(ミリ秒)。
+    // ラグでヘッドがまだ届いていないだけのときに反応しないようにする
+    private static final long MISSING_VISUAL_GRACE_MS = 3000;
+    // この時間だけ途切れたら、間で見つかっていたとみなして数え直す(ミリ秒)
+    private static final long MISSING_VISUAL_GAP_MS = 500;
+
+    // Sea Creature のうち、ネームタグを待たずにエンティティ型だけで判別してよいもの。
+    // Special タブの面々は、バニラ相当の同じ型のモブと取り違える恐れがあるため入れない。
+    // それらはネームタグを見つけてから、その直下の該当型を本体にする(seaCreatureVisual)
+    // 判定: 4 型 + エリア
+    public static final List<MobVisual> SEA_CREATURE_TYPE_TARGETS = List.of(
+            MobVisual.SeaCreature.SILKBREEZE, MobVisual.SeaCreature.THUNDER,
+            MobVisual.SeaCreature.LORD_JAWBUS, MobVisual.SeaCreature.REINDRAKE,
+            MobVisual.SeaCreature.THE_LOCH_EMPEROR, MobVisual.SeaCreature.TITANOBOA,
+            MobVisual.SeaCreature.BLUE_RINGED_OCTOPUS, MobVisual.SeaCreature.PUDDLE_JUMPER,
+            MobVisual.SeaCreature.FROG_PRINCE, MobVisual.SeaCreature.GIANT_ISOPOD,
+            MobVisual.SeaCreature.WIKI_TIKI, MobVisual.SeaCreature.FIERY_SCUTTLER,
+            MobVisual.SeaCreature.WATER_HYDRA);
+
+    // Sea Creature の名を含むが、その Sea Creature ではないネームタグ。
+    // Wiki Tiki は戦闘中に "Wiki Tiki Laser Totem" を湧かせる。
+    // 名前に本体の名が丸ごと入っているので、単語単位の照合では弾けない
+    private static final Pattern SEA_CREATURE_DECOYS = Pattern.compile("(?i)Wiki Tiki Laser Totem");
+
+    // ネームタグは "[Lv100] Water Hydra 500k/500k❤" のような形。名前部分を単語単位で照合する。
+    // "Water Worm" は "Poisoned Water Worm" の一部なので、長い名前から先に照合する
+    private static final Map<MobVisual, Pattern> SEA_CREATURE_PATTERNS = new LinkedHashMap<>();
+    static {
+        List<MobVisual> ordered = new ArrayList<>(SEA_CREATURE_TARGETS);
+        ordered.sort(Comparator.comparingInt((MobVisual target) -> target.plainLabel().length()).reversed());
+        for (MobVisual target : ordered) {
+            // エリア動物として型で判別できる種は、ネームタグを待たない。
+            // 両方で拾うと同じ個体を二重に扱うことになる
+            if (AREA_ANIMAL_TARGETS.contains(target)) continue;
+
+            SEA_CREATURE_PATTERNS.put(target,
+                    Pattern.compile("(?i)(?<![A-Za-z])" + Pattern.quote(target.plainLabel()) + "(?![A-Za-z])"));
+        }
+    }
+
     // ヘッドが複数積み重なって1体を成すモブ。まとめて1体として扱う
+    // 表示の作り(判定ではない)
     public static final List<MobVisual> HEAD_CHAIN_TARGETS = List.of(
             TorrhusCanyon.SNEAKY_TIKI, TorrhusCanyon.SHRIEKY_TIKI, TorrhusCanyon.CHEEKY_TIKI);
 
-    // Torrhus Canyon の、ネームタグでしか判別できないモブ。
-    // Tiki 系は節ごとに固有のプロフィールを持つ skull を使っているが、
-    // 種類ごとの skull がすべて出そろっているか確かめきれないため、名前で判定する。
+    // Torrhus Canyon の、ネームタグから引くモブ。
+    // ヘッド系の表示はスキン側に移したので、ここに残しているのは
+    // スキンが見つからないときに知らせるため。
     // Grizzly Bear の本命は CANYON_NAMED_PLAYER_TARGETS の実体名照合で、
     // ここに残しているのはその取りこぼし用の保険
+    // 判定には使わない。差し替えを知らせるためだけ
     public static final List<MobVisual> CANYON_NAMED_TARGETS = List.of(
             TorrhusCanyon.GRIZZLY_BEAR,
+            TorrhusCanyon.ANT, TorrhusCanyon.QUEEN_ANT, TorrhusCanyon.WATER_SNAKE,
             TorrhusCanyon.SNEAKY_TIKI, TorrhusCanyon.SHRIEKY_TIKI, TorrhusCanyon.CHEEKY_TIKI);
 
     // Torrhus Canyon の、プレイヤーエンティティ型(NPC)のモブ。
     // ネームタグ(ArmorStand)より読み込み範囲が広いので、実体名で直接探す
+    // 判定: 2 実体名
     public static final List<MobVisual> CANYON_NAMED_PLAYER_TARGETS = List.of(
             TorrhusCanyon.GRIZZLY_BEAR);
 
-    // Torrhus Canyon の、marker のアーマースタンドに素の skull を被せて作られたモブ。
-    // 節ごとに透明なスライムが当たり判定として付いていて、ヘッドの scale で呼び名が分かれる
+    // Torrhus Canyon の、skull を被せたアーマースタンドで見た目を作っているモブ。
+    // 節ごとに透明なスライムが当たり判定として付いているが、見分けにはスキンを使う
+    // 判定: 1 ヘッドのスキン
     public static final List<MobVisual> CANYON_HEAD_TARGETS = List.of(
             TorrhusCanyon.ANT, TorrhusCanyon.QUEEN_ANT, TorrhusCanyon.WATER_SNAKE);
 
+    // ヘッドのスキンで見分ける Torrhus Canyon のモブ。
+    // 表示はスキン側の走査で行うので、ネームタグは知らせるためだけに使う
+    // 判定: 1 ヘッドのスキン
+    private static final List<MobVisual> CANYON_SKIN_TARGETS = new ArrayList<>(CANYON_HEAD_TARGETS);
+    static {
+        CANYON_SKIN_TARGETS.addAll(HEAD_CHAIN_TARGETS);
+    }
+
+    // ヘッドのスキンで見分ける Critter Safari のモブ。
+    // Gazer はアーマースタンドが、残りは見た目の Display が skull を被っている
+    // 判定: 1 ヘッドのスキン
+    private static final List<MobVisual> SAFARI_SKIN_TARGETS = List.of(
+            SafariHaunted.GAZER, SafariHaunted.GIMMIEGOLD,
+            SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON,
+            SafariCavern.DRIFTLING, SafariCavern.SHYWORM,
+            SafariCavern.CHUCKWALLA, SafariCavern.FLITTER);
+
+    // 型で判定するモブを、ネームタグの名前から引く表。
+    // 判定には使わず、近くに実物がいないことを知らせるためだけに使う。
+    // スキンや実体名で判定する面々は専用の経路があるので除く
+    private static final Map<String, MobVisual> TYPE_NAMED_TARGETS = new HashMap<>();
+    static {
+        List<MobVisual> typed = new ArrayList<>(AREA_ANIMAL_TARGETS);
+        typed.addAll(SAFARI_TYPE_TARGETS);
+        typed.addAll(SEA_CREATURE_TYPE_TARGETS);
+        typed.addAll(SHULKER_TARGETS);
+        for (MobVisual target : typed) {
+            if (SAFARI_SKIN_TARGETS.contains(target)) continue;
+            if (CANYON_SKIN_TARGETS.contains(target)) continue;
+            if (HEAD_SKIN_SPECIES.contains(target)) continue;
+            if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) continue;
+
+            TYPE_NAMED_TARGETS.put(target.plainLabel().toLowerCase(Locale.ROOT), target);
+        }
+    }
+
+    // ネームタグの先頭に付く "[Lv58] " などの括弧
+    private static final Pattern NAMETAG_PREFIX = Pattern.compile("^(?:\\[[^\\]]*\\]\\s*)+");
+
+    // Critter Safari の、ネームタグから引くモブ。
+    // スキンで見分ける面々の表示は型側の走査に任せているので、
+    // ここではスキンが見つからないときに知らせるために使う。
+    // "Gazer" のように短い名前があるので、長い名前から先に照合する
+    private static final Map<MobVisual, Pattern> SAFARI_NAMED_PATTERNS = new LinkedHashMap<>();
+    static {
+        List<MobVisual> ordered = new ArrayList<>(SAFARI_NAMED_TARGETS);
+        ordered.addAll(SAFARI_SKIN_TARGETS);
+        ordered.sort(Comparator.comparingInt((MobVisual target) -> target.plainLabel().length()).reversed());
+        for (MobVisual target : ordered) {
+            SAFARI_NAMED_PATTERNS.put(target,
+                    Pattern.compile("(?i)(?<![A-Za-z])" + Pattern.quote(target.plainLabel()) + "(?![A-Za-z])"));
+        }
+    }
+
     // ネームタグは "[Lv58] Parched 25,000/25,000❤" のような形。名前部分を単語単位で照合する。
-    // 単純な部分一致だと「Ant」が「Giant Isopod」に引っかかってしまうため、前後が英字でないことを条件にする
+    // 単純な部分一致だと「Ant」が「Giant Isopod」に引っかかってしまうため、前後が英字でないことを条件にする。
+    // "Ant" は "Queen Ant" の一部でもあるので、長い名前から先に照合する
     private static final Map<MobVisual, Pattern> CANYON_NAMED_PATTERNS = new LinkedHashMap<>();
     static {
-        for (MobVisual target : CANYON_NAMED_TARGETS) {
+        List<MobVisual> ordered = new ArrayList<>(CANYON_NAMED_TARGETS);
+        ordered.sort(Comparator.comparingInt((MobVisual target) -> target.plainLabel().length()).reversed());
+        for (MobVisual target : ordered) {
             CANYON_NAMED_PATTERNS.put(target,
                     Pattern.compile("(?i)(?<![A-Za-z])" + Pattern.quote(target.plainLabel()) + "(?![A-Za-z])"));
         }
@@ -370,6 +750,7 @@ public class EntityHighlightManager {
     // Torrhus Canyon のハチのうち Honeybuzz と Pollendart。
     // 同じ大きさの Bee 型で見分けが付かないため、ネームタグの名前で振り分ける
     // (Beeheemoth はミニボス級に大きいので大きさで判別でき、こちらには含めない)
+    // 判定: 6 ネームタグの名前のみ
     public static final List<MobVisual> CANYON_BEE_TARGETS = List.of(
             TorrhusCanyon.HONEYBUZZ, TorrhusCanyon.POLLENDART);
 
@@ -579,6 +960,10 @@ public class EntityHighlightManager {
         highlightedEntities.removeAll(rebuiltVisuals);
         rebuiltVisuals.clear();
         nametagClaimedEntities.clear();
+        healthNameTags.clear();
+        seaCreaturePartsShown.clear();
+        // 知らせ済みの記録は消えた個体だけ捨てる。生きている間は出し直さない
+        announcedSeaCreatures.removeIf(Entity::isRemoved);
         shulkerClaimedEntities.clear();
         renderAnchors.clear();
         headOnlyGlowEntities.clear();
@@ -642,7 +1027,9 @@ public class EntityHighlightManager {
         // この走査で拾うことになる。そのため Hideon 系の表示設定も条件に入れる
         boolean scanSafariTypes = isSafari && (SAFARI_TYPE_TARGETS.stream().anyMatch(MobVisual::anyEnabled)
                 || SafariForest.HIDEONFLOOR.anyEnabled() || SafariHaunted.HIDEONWALL.anyEnabled());
-        boolean scanSafariNamed = isSafari && SAFARI_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean scanSafariNamed = isSafari
+                && (SAFARI_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled)
+                        || SAFARI_SKIN_TARGETS.stream().anyMatch(MobVisual::anyEnabled));
 
         // Shulker: Hideon 系が敵として出現する3エリアでのみ探索する
         boolean isShulkerArea = GameState.Server.isMoongladeMarsh()
@@ -652,14 +1039,16 @@ public class EntityHighlightManager {
 
         // Moonglade Marsh / Torrhus Canyon では、該当するエンティティ型がこれらの固有モブしか
         // 存在しないため、ネームタグを読まずに型(一部は変種)だけで判定できる
-        boolean isAreaAnimalArea = GameState.Server.isMoongladeMarsh() || GameState.Server.isTorrhusCanyon();
+        boolean isAreaAnimalArea = GameState.Server.isMoongladeMarsh()
+                || GameState.Server.isTorrhusCanyon() || GameState.Server.isLotusAtoll();
         boolean scanAreaAnimals = isAreaAnimalArea && AREA_ANIMAL_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanCanyonBees = GameState.Server.isTorrhusCanyon()
                 && CANYON_BEE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         // Torrhus Canyon のヘッド系モブは marker のアーマースタンドと透明なスライムの組で作られていて、
         // 装飾として置かれたアーマースタンドとは作りが違うため、ネームタグを読まずに判定できる
         boolean scanCanyonHeads = GameState.Server.isTorrhusCanyon()
-                && CANYON_HEAD_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+                && (CANYON_HEAD_TARGETS.stream().anyMatch(MobVisual::anyEnabled)
+                        || HEAD_CHAIN_TARGETS.stream().anyMatch(MobVisual::anyEnabled));
         boolean isCrystalHollows = GameState.Server.isCrystalHollows();
         // Boss Corleone の存在判定はスポーン通知にも使うため、
         // Mob Visuals で対象から外していても Crystal Hollows にいる間は常に走らせる
@@ -668,6 +1057,11 @@ public class EntityHighlightManager {
                 && CRIMSON_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanMarshNamed = GameState.Server.isMoongladeMarsh()
                 && MARSH_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        // Sea Creature は釣れる場所が決まっているので、対象の絞り込み(anyEnabled)が
+        // そのままエリアの絞り込みになる
+        boolean scanSeaCreatures = SEA_CREATURE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean scanSeaCreatureTypes = SEA_CREATURE_TYPE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean scanSeaCreaturePlayers = SEA_CREATURE_PLAYER_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         // Torrhus Canyon には同じ型のモブが多数いてエンティティ型では絞れないため、
         // これらはネームタグで判定する
         boolean scanCanyonNamed = GameState.Server.isTorrhusCanyon()
@@ -691,6 +1085,8 @@ public class EntityHighlightManager {
         highlightedEntities.removeIf(e -> e instanceof Shulker);
         // エリア固有モブもエリアと変種で対象が変わるため、同じく毎 tick 作り直す
         highlightedEntities.removeIf(EntityHighlightManager::isAreaAnimalEntity);
+        // Sea Creature もエリアと設定で対象が変わるため、同じく毎 tick 作り直す
+        highlightedEntities.removeIf(EntityHighlightManager::isSeaCreatureTypeEntity);
         // Invisibug も設定で対象が変わるため、毎 tick 作り直す
         highlightedEntities.removeAll(invisibugEntities);
         if (!glowArachne)     highlightedEntities.removeAll(arachneEntities);
@@ -707,7 +1103,7 @@ public class EntityHighlightManager {
 
         if (!isCrystalHollows) CorleoneHandler.reset();
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanSafariTypes && !scanSafariNamed) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanSafariTypes && !scanSafariNamed && !scanSeaCreatures && !scanSeaCreatureTypes && !scanSeaCreaturePlayers) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
         // Boss Corleone を見つけたか。ネームタグ経由とプレイヤー名照合のどちらで見つけても立てる
@@ -762,6 +1158,9 @@ public class EntityHighlightManager {
             if (customName == null) continue;
             String nameStr = customName.getString();
 
+            // ネームプレートに体力を出すため、体力付きのネームタグを控えておく
+            if (HEALTH_PATTERN.matcher(nameStr).find()) healthNameTags.add(entity);
+
             if (scanBroodmother && ModConstants.containsIgnoreCase(nameStr, "Broodmother")) {
                 AABB searchBox = entity.getBoundingBox().inflate(8.0);
                 List<Spider> spiders = client.level.getEntitiesOfClass(Spider.class, searchBox, e -> true);
@@ -771,6 +1170,8 @@ public class EntityHighlightManager {
                 Entity broodmotherVisual = closest != null ? closest : entity;
                 if (closest != null) {
                     if (glowBroodmother) highlightedEntities.add(closest);
+                } else {
+                    reportMissingBody(client, entity, SpidersDen.BROODMOTHER);
                 }
                 registerTracer(broodmotherVisual, SpidersDen.BROODMOTHER);
                 if (SpidersDen.BROODMOTHER.nameplate()) {
@@ -786,6 +1187,8 @@ public class EntityHighlightManager {
                 if (visualTarget != null) {
                     if (glowArachne) highlightedEntities.add(visualTarget);
                     arachneEntities.add(visualTarget);
+                } else {
+                    reportMissingBody(client, entity, SpidersDen.ARACHNE);
                 }
                 registerTracer(arachneVisual, SpidersDen.ARACHNE);
                 if (SpidersDen.ARACHNE.nameplate()) {
@@ -801,6 +1204,8 @@ public class EntityHighlightManager {
                 if (visualTarget != null) {
                     if (SpidersDen.ARACHNE_BROOD.highlight()) highlightedEntities.add(visualTarget);
                     arachneBroodEntities.add(visualTarget);
+                } else {
+                    reportMissingBody(client, entity, SpidersDen.ARACHNE_BROOD);
                 }
                 registerTracer(broodVisual, SpidersDen.ARACHNE_BROOD);
                 if (SpidersDen.ARACHNE_BROOD.nameplate()) {
@@ -816,35 +1221,51 @@ public class EntityHighlightManager {
                 // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
                 if (closest != null) {
                     if (glowDragon) highlightedEntities.add(closest);
+                } else {
+                    reportMissingBody(client, entity, TheEnd.DRAGON);
                 }
                 registerTracer(closest != null ? closest : entity, TheEnd.DRAGON, dragonTracerColor());
             }
 
+            // 型で判定するモブ。ネームタグは判定に使わないが、
+            // 名前が分かっているのに近くに実物がいなければ、作りが変わったとみる
+            MobVisual typeNamed = TYPE_NAMED_TARGETS.get(nameTagSpecies(nameStr).toLowerCase(Locale.ROOT));
+            if (typeNamed != null && typeNamed.anyEnabled()
+                    && !hasTypeTargetNear(client, entity, typeNamed)) {
+                reportMissingBody(client, entity, typeNamed);
+            }
+
             // Critter Safari のネームタグ判定モブ
             if (scanSafariNamed) {
-                for (MobVisual target : SAFARI_NAMED_TARGETS) {
+                for (Map.Entry<MobVisual, Pattern> safariEntry : SAFARI_NAMED_PATTERNS.entrySet()) {
+                    MobVisual target = safariEntry.getKey();
                     if (!target.anyEnabled()) continue;
                     // 自分がいるバイオームのモブだけを対象にする
                     if (!inSafariBiome(client.player, target)) continue;
-                    if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
+                    if (!safariEntry.getValue().matcher(nameStr).find()) continue;
 
-                    // Hideyho は NPC(プレイヤー型)なので、アーマースタンドではなくプレイヤーを探す。
-                    // 本命は detectNamedPlayerMobs の実体名照合で、ここはその取りこぼし用の保険
-                    Entity visualTarget = target == SafariHaunted.HIDEYHO
-                            ? nearestPlayerNear(client, entity)
-                            : nametagVisual(client, entity);
-                    // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
-                    // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
-                    Entity visual = visualTarget != null ? visualTarget : entity;
-                    if (visualTarget != null) {
-                        // 当たり判定を借りているだけのモブもいるので、型判定側で拾い直さないよう控える
-                        nametagClaimedEntities.add(visualTarget);
-                        if (target.highlight()) registerHighlight(visualTarget, target);
+                    // スキンで見分ける種は、表示は型側の走査に任せる。
+                    // ネームタグが届いているならスキンも届いているので、
+                    // 見つからないときだけ差し替えを知らせる
+                    if (SAFARI_SKIN_TARGETS.contains(target)) {
+                        if (!hasSafariSkinNear(client, entity, target)) {
+                            reportMissingHeadSkin(client, entity, target);
+                        }
+                        break;
                     }
-                    registerTracer(visual, target);
+
+                    // 実体名照合が本命で、そちらはネームタグより遠くまで届く。
+                    // 見つかっているならそちらに任せ、ここでは何もしない
+                    if (hasNamedPlayerMob(client, target)) break;
+
+                    // 見つからないのは実体名が変わったとき。知らせたうえで、
+                    // 座標さえあれば描ける Tracer とネームプレートはネームタグに出す
+                    reportMissingNamedPlayer(client, entity, target);
+                    registerTracer(entity, target);
                     if (target.nameplate()) {
                         String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                        nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                     }
                     break;
                 }
@@ -859,17 +1280,18 @@ public class EntityHighlightManager {
                     if (target == CrystalHollows.BOSS_CORLEONE) corleoneFound = true;
                     if (!target.anyEnabled()) break;
 
-                    // 本命は detectNamedPlayerMobs のプレイヤー名照合。
-                    // ここはその取りこぼし用の保険で、ネームタグの近くのプレイヤーを本体とみなす
-                    Entity visualTarget = nearestPlayerNear(client, entity);
-                    Entity visual = visualTarget != null ? visualTarget : entity;
-                    if (visualTarget != null) {
-                        if (target.highlight()) registerHighlight(visualTarget, target);
-                    }
-                    registerTracer(visual, target);
+                    // 実体名照合が本命で、そちらはネームタグより遠くまで届く。
+                    // 見つかっているならそちらに任せ、ここでは何もしない
+                    if (hasNamedPlayerMob(client, target)) break;
+
+                    // 見つからないのは実体名が変わったとき。知らせたうえで、
+                    // 座標さえあれば描ける Tracer とネームプレートはネームタグに出す
+                    reportMissingNamedPlayer(client, entity, target);
+                    registerTracer(entity, target);
                     if (target.nameplate()) {
                         String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                        nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                     }
                     break;
                 }
@@ -881,19 +1303,18 @@ public class EntityHighlightManager {
                     if (!target.anyEnabled()) continue;
                     if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
 
-                    // 本命は detectCrimsonNamedMobs のプレイヤー名照合。
-                    // ここはその取りこぼし用の保険で、ネームタグの近くのプレイヤーを本体とみなす
-                    Entity visualTarget = nearestPlayerNear(client, entity);
-                    // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
-                    // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
-                    Entity visual = visualTarget != null ? visualTarget : entity;
-                    if (visualTarget != null) {
-                        if (target.highlight()) registerHighlight(visualTarget, target);
-                    }
-                    registerTracer(visual, target);
+                    // 実体名照合が本命で、そちらはネームタグより遠くまで届く。
+                    // 見つかっているならそちらに任せ、ここでは何もしない
+                    if (hasNamedPlayerMob(client, target)) break;
+
+                    // 見つからないのは実体名が変わったとき。知らせたうえで、
+                    // 座標さえあれば描ける Tracer とネームプレートはネームタグに出す
+                    reportMissingNamedPlayer(client, entity, target);
+                    registerTracer(entity, target);
                     if (target.nameplate()) {
                         String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                        nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                     }
                     break;
                 }
@@ -905,17 +1326,66 @@ public class EntityHighlightManager {
                     if (!target.anyEnabled()) continue;
                     if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
 
-                    Entity visualTarget = nametagVisual(client, entity);
+                    // 見た目は決まった skull を被せたアーマースタンド。
+                    // 「ネームタグの下にいる何か」を本体とみなす保険は置かない
+                    Entity visualTarget = headStandWithSkinUnderNameTag(client, entity, MARSH_BUG_HEAD_SKIN);
                     // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
                     // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
                     Entity visual = visualTarget != null ? visualTarget : entity;
                     if (visualTarget != null) {
                         if (target.highlight()) registerHighlight(visualTarget, target);
+                    } else {
+                        // ネームタグが届いているならヘッドも届いている。
+                        // 見つからないのはスキンが変わったときなので、その場で知らせる
+                        reportMissingHeadSkin(client, entity, target);
                     }
                     registerTracer(visual, target);
                     if (target.nameplate()) {
                         String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(visual, target)));
+                    }
+                    break;
+                }
+            }
+
+            // Sea Creature。どのエリアでも湧くので、ネームタグの名前だけで判定する。
+            // 本体の名を含む別のモブは、照合に入る前に弾く
+            if (scanSeaCreatures && !SEA_CREATURE_DECOYS.matcher(nameStr).find()) {
+                for (Map.Entry<MobVisual, Pattern> seaEntry : SEA_CREATURE_PATTERNS.entrySet()) {
+                    MobVisual target = seaEntry.getKey();
+                    if (!target.anyEnabled()) continue;
+                    if (!seaEntry.getValue().matcher(nameStr).find()) continue;
+
+                    // プレイヤーエンティティ型が実体名で見つかっているなら、そちらに任せる
+                    if (SEA_CREATURE_PLAYER_TARGETS.contains(target)
+                            && hasNamedPlayerMob(client, target)) break;
+
+                    Entity visualTarget = seaCreatureVisual(client, entity, target);
+                    if (visualTarget != null) {
+                        applySeaCreatureVisuals(client, target, visualTarget);
+                    } else {
+                        // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
+                        // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
+                        registerTracer(entity, target);
+                        if (target.nameplate()) {
+                            String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+                            nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
+                        }
+                        announceSeaCreature(client, target, entity);
+
+                        // スキンで見分ける種は、ネームタグが届いているならヘッドも届いている。
+                        // 見つからないのはスキンが変わったときなので、その場で知らせる
+                        if (HEAD_SKIN_SPECIES.contains(target)) {
+                            reportMissingHeadSkin(client, entity, target);
+                        } else if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) {
+                            reportMissingNamedPlayer(client, entity, target);
+                        } else {
+                            // 残りはネームタグの名前で種を決め、その型のモブを本体とする。
+                            // 型が変われば見つからなくなるので知らせる
+                            reportMissingBody(client, entity, target);
+                        }
                     }
                     break;
                 }
@@ -923,28 +1393,34 @@ public class EntityHighlightManager {
 
             // Torrhus Canyon のネームタグ判定モブ。本体の探し方だけが種類ごとに違う
             if (scanCanyonNamed) {
-                for (MobVisual target : CANYON_NAMED_TARGETS) {
+                for (Map.Entry<MobVisual, Pattern> canyonEntry : CANYON_NAMED_PATTERNS.entrySet()) {
+                    MobVisual target = canyonEntry.getKey();
                     if (!target.anyEnabled()) continue;
-                    if (!CANYON_NAMED_PATTERNS.get(target).matcher(nameStr).find()) continue;
+                    if (!canyonEntry.getValue().matcher(nameStr).find()) continue;
 
-                    // Tiki 系はヘッドが縦に積み重なって1体を成す。連なったヘッドをまとめて扱い、
-                    // ネームプレートは1つだけ出す
-                    if (HEAD_CHAIN_TARGETS.contains(target)) {
-                        applyHeadChain(client, entity, target, HEAD_CHAIN_SEARCH_RADIUS);
+                    // ヘッド系はスキンで見分けられるので、表示は canyonHeads 側に任せる。
+                    // ネームタグが届いているならヘッドも届いているので、
+                    // 見つからないときだけスキンの差し替えを知らせる
+                    if (CANYON_SKIN_TARGETS.contains(target)) {
+                        if (skinnedHeadUnderNameTag(client, entity, target) == null) {
+                            reportMissingHeadSkin(client, entity, target);
+                        }
                         break;
                     }
 
-                    Entity visualTarget = canyonNamedVisual(client, entity, target);
-                    // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
-                    // ネームタグ自体を対象にして、座標さえあれば描ける Tracer とネームプレートは出す
-                    Entity visual = visualTarget != null ? visualTarget : entity;
-                    if (visualTarget != null) {
-                        if (target.highlight()) registerHighlight(visualTarget, target);
-                    }
-                    registerTracer(visual, target);
+                    // 残るのは Grizzly Bear だけで、Barbarian Duke X などと同じプレイヤー型のモブ。
+                    // 実体名照合が本命で、そちらはネームタグより遠くまで届く。
+                    // 見つかっているならそちらに任せ、ここでは何もしない
+                    if (hasNamedPlayerMob(client, target)) break;
+
+                    // 見つからないのは実体名が変わったとき。知らせたうえで、
+                    // 座標さえあれば描ける Tracer とネームプレートはネームタグに出す
+                    reportMissingNamedPlayer(client, entity, target);
+                    registerTracer(entity, target);
                     if (target.nameplate()) {
                         String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                        nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label, null));
+                        nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                     }
                     break;
                 }
@@ -964,12 +1440,14 @@ public class EntityHighlightManager {
                     if (bee != null) {
                         canyonBeeNames.put(bee, target);
                     } else {
+                        reportMissingBody(client, entity, target);
                         // 本体がまだ届いていない場合は、ネームタグ自体を対象にして
                         // 座標さえあれば描ける Tracer とネームプレートだけ出す
                         registerTracer(entity, target);
                         if (target.nameplate()) {
                             String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                            nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                            nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                         }
                     }
                     break;
@@ -987,12 +1465,19 @@ public class EntityHighlightManager {
                             || "Magma Boss".equals(boss.nameTag())) continue;
                     if (ModConstants.containsIgnoreCase(nameStr, boss.nameTag())) {
                         Entity visualTarget = findVisualEntity(client, entity, boss.nameTag());
+                        // Barbarian Duke X と Mage Outlaw は実体名で探すので、
+                        // ネームタグがあるのに見つからないのは実体名が変わったとき
+                        if (visualTarget == null && playerBossEntityName(boss.nameTag()) != null) {
+                            reportMissingNamedPlayer(client, entity, boss.nameTag());
+                        }
                         // 本体はネームタグより手前でしか届かないことがある。見つからない場合は
                         // ネームタグ自体を対象にして、Tracer とネームプレートだけでも出す
                         Entity bossVisual = visualTarget != null ? visualTarget : entity;
                         if (visualTarget != null) {
                             if (glowBoss) highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, boss);
+                        } else if (playerBossEntityName(boss.nameTag()) == null) {
+                            reportMissingBody(client, entity, boss.nameTag());
                         }
                         registerTracer(bossVisual, boss);
                         if (plateBoss) {
@@ -1016,6 +1501,8 @@ public class EntityHighlightManager {
                         if (visualTarget != null) {
                             if (follower.enableHighlight().get()) highlightedEntities.add(visualTarget);
                             crimsonBossEntities.put(visualTarget, follower);
+                        } else {
+                            reportMissingBody(client, entity, follower.nameTag());
                         }
                         registerTracer(followerVisual, follower);
                         if (follower.enableNameplate().get()) {
@@ -1099,7 +1586,8 @@ public class EntityHighlightManager {
                 registerTracer(entity, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                 }
             }
         }
@@ -1119,8 +1607,24 @@ public class EntityHighlightManager {
                 registerTracer(entity, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                 }
+                // Nessie のように、ここで拾う Sea Creature もいる。
+                // タイトルはその種のときだけ出る(announceSeaCreature)
+                announceSeaCreature(client, target, entity);
+            }
+        }
+
+        // エンティティ型が分かっている Sea Creature。エリアで絞ってから型で決める
+        if (scanSeaCreatureTypes) {
+            for (Entity entity : client.level.entitiesForRendering()) {
+                // ネームタグ経由で別のモブと確定しているものは飛ばす
+                if (nametagClaimedEntities.contains(entity)) continue;
+                MobVisual target = seaCreatureTypeTarget(entity);
+                if (target == null || !target.anyEnabled()) continue;
+
+                applySeaCreatureVisuals(client, target, entity);
             }
         }
 
@@ -1139,7 +1643,8 @@ public class EntityHighlightManager {
                 registerTracer(bee, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(bee, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(bee, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(bee, target)));
                 }
             }
         }
@@ -1179,7 +1684,8 @@ public class EntityHighlightManager {
                 registerTracer(entity, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                 }
             }
         }
@@ -1194,7 +1700,8 @@ public class EntityHighlightManager {
                 MobVisual target = canyonHeadTarget(client, entity);
                 if (target == null) continue;
 
-                if (target == TorrhusCanyon.WATER_SNAKE) {
+                // Water Snake と Tiki 系は、ヘッドの連なりで1体を成す
+                if (target == TorrhusCanyon.WATER_SNAKE || HEAD_CHAIN_TARGETS.contains(target)) {
                     // 連なりの一部として処理済みなら、同じ個体を何度も処理しない
                     if (!chained.contains(entity)) {
                         chained.addAll(applyHeadChain(client, entity, target, HEAD_CHAIN_SEARCH_RADIUS));
@@ -1206,7 +1713,8 @@ public class EntityHighlightManager {
                 registerTracer(entity, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                 }
             }
         }
@@ -1223,7 +1731,8 @@ public class EntityHighlightManager {
                 registerTracer(entity, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(entity, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(entity, target)));
                 }
             }
         }
@@ -1267,6 +1776,11 @@ public class EntityHighlightManager {
         // Grizzly Bear も同じ
         if (scanCanyonNamed) {
             detectNamedPlayerMobs(client, CANYON_NAMED_PLAYER_TARGETS);
+        }
+
+        // Sea Creature のプレイヤー型も同じく実体名で直接探す
+        if (scanSeaCreaturePlayers) {
+            detectNamedPlayerMobs(client, SEA_CREATURE_PLAYER_TARGETS);
         }
 
         // Bladesoul: Blaze + Wither Skeleton の合体構成。ネームタグに頼らず、スポーン地点周辺で
@@ -1507,16 +2021,30 @@ public class EntityHighlightManager {
                 if (player == client.player || !matchesNamedPlayerMob(target, player)) continue;
 
                 found = true;
-                if (target.highlight()) registerHighlight(player, target);
+                if (target.highlight()) {
+                    registerHighlight(player, target);
+                    // 乗っている土台も見えているので、本体と一緒に光らせる。
+                    // Tracer とネームプレートは、上に乗っている本体の側だけに出す
+                    Entity mount = mountedNamedPlayerBase(target, player);
+                    if (mount != null) registerHighlight(mount, target);
+                }
                 registerTracer(player, target);
                 if (target.nameplate()) {
                     String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-                    nameplateEntities.put(player, BossNameplateRenderer.buildLabel(label, null));
+                    nameplateEntities.put(player, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(player, target)));
                 }
+                announceSeaCreature(client, target, player);
             }
         }
 
         return found;
+    }
+
+    // プレイヤーエンティティ型モブが乗っている土台。乗っていなければ null。
+    // Ragnarok は骸骨の馬に乗った姿で１体を成す
+    private static Entity mountedNamedPlayerBase(MobVisual target, Entity player) {
+        return target == MobVisual.SeaCreature.RAGNAROK ? player.getVehicle() : null;
     }
 
     // プレイヤーエンティティ型モブを探してよい場所にいるか。
@@ -1530,11 +2058,34 @@ public class EntityHighlightManager {
     // プレイヤーエンティティ型モブの見分け方。実体名が一意ならそれで照合する。
     // 実体名が他と共通で使えないモブだけ、やむを得ず別の手がかりを使う
     private static boolean matchesNamedPlayerMob(MobVisual target, Entity player) {
-        if (target == CrimsonIsle.MATCHO) return matchesEntityName(player, MATCHO_ENTITY_NAME);
-        if (target == SafariHaunted.HIDEYHO) return matchesEntityName(player, HIDEYHO_ENTITY_NAME);
-        if (target == TorrhusCanyon.GRIZZLY_BEAR) return matchesEntityName(player, GRIZZLY_BEAR_ENTITY_NAME);
+        // 実体名で照合するモブは、同じ名前の実プレイヤーがいると取り違えてしまう。
+        // Boss Corleone だけはスキンで見分けるので、この確認は要らない
+        if (target != CrystalHollows.BOSS_CORLEONE && !isFakePlayer(player)) return false;
+
         if (target == CrystalHollows.BOSS_CORLEONE) return matchesSkin(player, CORLEONE_SKIN_HASH);
-        return false;
+
+        String entityName = namedPlayerEntityName(target);
+        return entityName != null && matchesEntityNameExactly(player, entityName);
+    }
+
+    // プレイヤーエンティティ型モブの実体名。実体名では探せないものは null
+    private static String namedPlayerEntityName(MobVisual target) {
+        String name = NAMED_PLAYER_ENTITY_NAMES.get(target);
+        if (name != null) return name;
+
+        // Sea Creature のプレイヤー型は、実体名が表示名そのままになっている
+        return target instanceof MobVisual.SeaCreature ? target.plainLabel() : null;
+    }
+
+    /**
+     * 見た目だけプレイヤーの、実在しないプレイヤーか。
+     *
+     * 実プレイヤーの UUID は版が 4 で、Hypixel が作る NPC はそれ以外になる。
+     * タブリストの有無で見ると、湧いた直後の一瞬だけ載っている間を実プレイヤーと
+     * 取り違えて表示が遅れるため、その場で確定する UUID の版で見る
+     */
+    private static boolean isFakePlayer(Entity player) {
+        return player.getUUID().version() != 4;
     }
 
     // スキンで見分ける。テクスチャのパス末尾がスキンごとに固有の値になる。
@@ -1571,17 +2122,20 @@ public class EntityHighlightManager {
     }
 
     // Hypixel側の名前は末尾に空白が入ることがあるため、trim + 大文字小文字無視 + 部分一致で照合する
+    // 実体名がその呼び名そのものか。部分一致だと、その語を含む名前の実プレイヤーを
+    // 掴んでしまうため、実体名を確認できているモブはこちらで見る
+    private static boolean matchesEntityNameExactly(Entity entity, String expected) {
+        return entity.getName().getString().trim().equalsIgnoreCase(expected);
+    }
+
     private static boolean matchesEntityName(Entity entity, String expected) {
         return ModConstants.containsIgnoreCase(entity.getName().getString().trim(), expected);
     }
 
     // プレイヤーエンティティ型ボスの照合名。該当しないボスは null
     private static String playerBossEntityName(String bossName) {
-        return switch (bossName) {
-            case "Barbarian Duke X" -> BARBARIAN_ENTITY_NAME;
-            case "Mage Outlaw"      -> MAGE_OUTLAW_ENTITY_NAME;
-            default                 -> null;
-        };
+        MobVisual target = PLAYER_BOSS_TARGETS.get(bossName);
+        return target == null ? null : namedPlayerEntityName(target);
     }
 
     private static Entity findVisualEntity(Minecraft client, Entity namedEntity, String bossName) {
@@ -1653,7 +2207,13 @@ public class EntityHighlightManager {
         if (GameState.Server.isTorrhusCanyon()) return TorrhusCanyon.HIDEONSUN;
         if (!GameState.Server.isSafari()) return null;
 
-        DyeColor color = shulker.getColor();
+        return safariShulkerColorTarget(shulker.getColor());
+    }
+
+    // Critter Safari の Hideon 系を色から引く。
+    // 止まっているときはシュルカーの体色、
+    // 動いているときはシュルカーボックスの色で、どちらも同じ色になる
+    private static MobVisual safariShulkerColorTarget(DyeColor color) {
         if (color == null) return null;
         return switch (color) {
             // Hypixel 側がどちらの緑/紫を使っていても拾えるよう、近い色をまとめて扱う
@@ -1674,19 +2234,11 @@ public class EntityHighlightManager {
         // 見た目がアーマースタンドのモブ。装備の無いものはネームタグ用の透明なスタンド
         if (entity instanceof ArmorStand stand) {
             if (stand.getCustomName() != null || !hasAnyEquipment(stand)) return null;
-            // Fairy Soul も名前なし・装備ありのアーマースタンドなので、ここで落とす
-            if (nearFairySoul(entity)) return null;
-            if (inSafariHaunted(entity)) return SafariHaunted.GAZER;
-            // Driftling はヘッドの中に透明なシルバーフィッシュを抱えている。
-            // 同じ Cavern の Shyworm はスライムを抱えているので区別できる
-            if (inSafariCavern(entity) && hasNear(client, entity, Silverfish.class)) {
-                return SafariCavern.DRIFTLING;
-            }
-            // Shyworm はヘッドが連なった1体。抱えているのはスライムなので Driftling と区別できる
-            if (inSafariCavern(entity) && hasNear(client, entity, Slime.class)) {
-                return SafariCavern.SHYWORM;
-            }
-            return null;
+
+            // 被っている skull だけで種まで決まる。
+            // Fairy Soul も名前なし・装備ありのアーマースタンドだが、skull が違うので自然に外れる
+            MobVisual bySkin = headSkinTarget(entity);
+            return SAFARI_SKIN_TARGETS.contains(bySkin) ? bySkin : null;
         }
 
         // 透明なものは別のモブの当たり判定。型といるバイオームで呼び名が決まる
@@ -1700,27 +2252,30 @@ public class EntityHighlightManager {
                 // 動き出すとシュルカーと絵が消え、シュルカーボックスを持つ ItemDisplay に置き換わる。
                 // Duplico も「透明なシルバーフィッシュ + ItemDisplay」で作りが同じなので、
                 // 中身がシュルカーボックスかどうかで Hideon 系と分ける
-                if (hasShulkerBoxDisplayNear(client, entity)) {
-                    if (inSafariForest(entity)) return SafariForest.HIDEONFLOOR;
-                    if (inSafariHaunted(entity)) return SafariHaunted.HIDEONWALL;
-                    return null;
+                ShulkerBoxBlock shulkerBox = shulkerBoxDisplayNear(client, entity);
+                if (shulkerBox != null) {
+                    // 箱の色は止まっているときの体色と同じなので、そこから種を決める
+                    return safariShulkerColorTarget(shulkerBox.getColor());
                 }
 
-                if (inSafariCavern(entity)) return SafariCavern.CHUCKWALLA;
+                // 見た目の Display に被せた skull で種が決まる。
+                // Duplico だけはバニラのブロックに化けるので skull が無く、バイオームで決める
+                MobVisual bySkin = safariDisplaySkinTarget(client, entity);
+                if (bySkin != null) return bySkin;
+
                 if (inSafariHaunted(entity)) return SafariHaunted.DUPLICO;
-                if (inSafariIcy(entity)) return SafariIcy.TROODON;
                 // Forest で透明なシルバーフィッシュを使うのは Hideonfloor だけ。
                 // 動いてシュルカーを見失っても、見た目のブロックを対象にできる
                 if (inSafariForest(entity)) return SafariForest.HIDEONFLOOR;
                 return null;
             }
             if (entity instanceof Bat) {
-                return inSafariCavern(entity) ? SafariCavern.FLITTER : null;
+                // 見た目の Display に被せた skull で、バイオームを見なくても種が決まる
+                return safariDisplaySkinTarget(client, entity);
             }
             if (entity instanceof TropicalFish) {
-                if (inSafariHaunted(entity)) return SafariHaunted.GIMMIEGOLD;
-                if (inSafariIcy(entity)) return SafariIcy.MANTIS_SHRIMP;
-                return null;
+                // 見た目の Display に被せた skull で、バイオームを見なくても種が決まる
+                return safariDisplaySkinTarget(client, entity);
             }
             // Shyworm(スライム)など、見た目を別で拾うものはここでは扱わない
             return null;
@@ -1765,10 +2320,34 @@ public class EntityHighlightManager {
     // 呼び出し元で Moonglade Marsh / Torrhus Canyon のどちらかであることを保証している。
     // カエル・オウム・アルマジロはエリア内に1種しかいないため型だけで確定でき、
     // ウーパールーパーのみ Torrhus Canyon に2種いるので変種で振り分ける
+    /**
+     * Lotus Atoll の Critter。どれもバニラ相当の大きさで、型で見分けられる。
+     *
+     * カエルだけは同じ大きさの Sea Creature (Atoll Croaker) がいるので、
+     * 体色で見分ける。Lotum はオレンジ、Atoll Croaker は緑
+     */
+    private static MobVisual lotusAtollTarget(Entity entity) {
+        if (entity instanceof TropicalFish) return LotusAtoll.LOTUSFISH;
+        if (entity instanceof Turtle) return LotusAtoll.TEWTIL;
+        if (entity instanceof Dolphin) return LotusAtoll.FLIPFLOPPER;
+        if (entity instanceof GlowSquid) return LotusAtoll.SEASHINE;
+
+        if (entity instanceof Frog frog) {
+            // 大きいカエルは Sea Creature の Puddle Jumper / Frog Prince。
+            // Frog Prince も緑だが、色を見る前にここで外れる
+            if (frog.getBbWidth() > LOTUM_MAX_WIDTH) return null;
+            // 残る 0.50 のカエルは Lotum(オレンジ)と Atoll Croaker(緑)の2択
+            return frog.getVariant().is(FrogVariants.COLD) ? null : LotusAtoll.LOTUM;
+        }
+        return null;
+    }
+
     private static MobVisual areaAnimalTarget(Entity entity) {
         // 透明なものは、別のモブの当たり判定か、モブ以外の見た目のために置かれたエンティティ。
         // Critter を捕まえる Lasso の先端は透明なコウモリで、そのままだと Murkbat になってしまう
         if (entity.isInvisible()) return null;
+
+        if (GameState.Server.isLotusAtoll()) return lotusAtollTarget(entity);
 
         boolean marsh = GameState.Server.isMoongladeMarsh();
         if (entity instanceof Frog) return marsh ? MoongladeMarsh.MOSSYBIT : TorrhusCanyon.DUSTYBIT;
@@ -1793,7 +2372,10 @@ public class EntityHighlightManager {
             if (entity instanceof Turtle) return MoongladeMarsh.SHELLWISE;
             if (entity instanceof Pufferfish) return MoongladeMarsh.SPIKE;
             if (entity instanceof Tadpole) return MoongladeMarsh.BIRRIES;
-            if (entity instanceof Sniffer) return MoongladeMarsh.HEWVER;
+            // Hewver は子どものスニッファーで、大人は Sea Creature の Nessie
+            if (entity instanceof Sniffer sniffer) {
+                return sniffer.isBaby() ? MoongladeMarsh.HEWVER : MobVisual.SeaCreature.NESSIE;
+            }
             if (entity instanceof Hoglin) return MoongladeMarsh.HONEYHOG;
             if (entity instanceof Endermite) return MoongladeMarsh.HONEYMITE;
             if (entity instanceof Bat) return MoongladeMarsh.MURKBAT;
@@ -1818,7 +2400,10 @@ public class EntityHighlightManager {
         }
 
         // 以降は Torrhus Canyon にしか出現しない型
-        if (entity instanceof Rabbit) return TorrhusCanyon.BUNBUN;
+        // EVIL 変種は Sea Creature の Carrot King なので、Bunbun からは外す
+        if (entity instanceof Rabbit rabbit) {
+            return rabbit.getVariant() == Rabbit.Variant.EVIL ? null : TorrhusCanyon.BUNBUN;
+        }
         if (entity instanceof Creaking) return TorrhusCanyon.DRYBARK;
         if (entity instanceof Fox) return TorrhusCanyon.FIREFOX;
         if (entity instanceof Hoglin) return TorrhusCanyon.GROUNDHOG;
@@ -1922,7 +2507,11 @@ public class EntityHighlightManager {
         Double measured = renderAnchors.get(entity);
         if (measured != null) return measured;
 
-        // Display は当たり判定を持たないので、原点をそのまま表示位置にする
+        // Display は当たり判定を持たないので、原点をそのまま表示位置にする。
+        // ブロックを映しているものだけは、原点が底なので中ほどまで上げる
+        if (entity instanceof Display.ItemDisplay item) {
+            return displayItem(item).getItem() instanceof BlockItem ? BLOCK_DISPLAY_ANCHOR : DISPLAY_ANCHOR;
+        }
         if (entity instanceof Display) return DISPLAY_ANCHOR;
 
         if (entity instanceof ArmorStand stand && !stand.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
@@ -1938,17 +2527,16 @@ public class EntityHighlightManager {
     // ネームプレートは重ならないよう、エンティティIDが最も小さいヘッド1つだけに出す。
     // 同じモブに複数のネームタグが付いていても、代表が同じになるので二重に出ない
     private static List<Entity> applyHeadChain(Minecraft client, Entity nameTag, MobVisual target, double searchRadius) {
-        List<Entity> heads = connectedHeadStands(client, nameTag, searchRadius);
+        List<Entity> heads = connectedHeadStands(client, nameTag, target, searchRadius);
         if (heads.isEmpty()) return heads;
 
         for (Entity head : heads) {
             if (target.highlight()) registerHighlight(head, target);
         }
 
-        // 表示位置が飛ばないよう、代表は毎 tick 同じヘッドになるように選ぶ。
-        // エンティティIDは湧いた順に振られるので、ID順に並べた真ん中がモブの中ほどにあたる
+        // 頭の skull が分かっている種は頭に、それ以外は体の真ん中に出す
         heads.sort(Comparator.comparingInt(Entity::getId));
-        Entity representative = heads.get(heads.size() / 2);
+        Entity representative = headBodyAnchor(target, heads);
 
         // Tracer をヘッドごとに登録すると、自分に最も近いヘッドが入れ替わるたびに
         // 線の行き先が上のヘッドと真ん中のヘッドの間で飛んでしまう。
@@ -1956,7 +2544,8 @@ public class EntityHighlightManager {
         registerTracer(representative, target);
         if (target.nameplate()) {
             String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
-            nameplateEntities.put(representative, BossNameplateRenderer.buildLabel(label, null));
+            nameplateEntities.put(representative, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(representative, target)));
         }
         return heads;
     }
@@ -1997,41 +2586,12 @@ public class EntityHighlightManager {
         customGlowColors.put(visual, target.glowColorRGB());
     }
 
-    // Torrhus Canyon のヘッド系モブ。見た目は marker のアーマースタンドに被せた skull で、
-    // 節ごとに透明なスライムが当たり判定として付いている。
-    // 装飾として置かれているアーマースタンドは marker でなくスライムも伴わないため、これで区別できる
+    // Torrhus Canyon のヘッド系モブ。見た目は skull を被せたアーマースタンドで、
+    // 被っている skull のスキンだけで種まで決まる
     private static MobVisual canyonHeadTarget(Minecraft client, Entity entity) {
-        if (!(entity instanceof ArmorStand stand)) return null;
-        if (!stand.isMarker() || stand.getCustomName() != null) return null;
-
-        ItemStack head = stand.getItemBySlot(EquipmentSlot.HEAD);
-        if (head.isEmpty()) return null;
-        // Tiki 系は節ごとに固有のプロフィールを持つ skull を使っているので、素の skull だけを拾う
-        if (headProfileName(head) != null) return null;
-        if (!hasNear(client, entity, Slime.class)) return null;
-
-        float scale = stand.getScale();
-        if (scale < CANYON_ANT_MAX_SCALE) return TorrhusCanyon.ANT;
-        if (scale < CANYON_QUEEN_ANT_MAX_SCALE) return TorrhusCanyon.QUEEN_ANT;
-        return TorrhusCanyon.WATER_SNAKE;
-    }
-
-    // skull に設定されたプロフィール名。素のプレイヤーヘッドなら null
-    private static String headProfileName(ItemStack head) {
-        ResolvableProfile profile = head.get(DataComponents.PROFILE);
-        return profile == null ? null : profile.name().orElse(null);
-    }
-
-    // Critter Safari の Fairy Soul のそばにあるか。
-    // 表示上の位置が座標表と少しずれることがあるので、多少の余裕を見て判定する
-    private static boolean nearFairySoul(Entity entity) {
-        for (BlockPos soul : ModConstants.SAFARI_FAIRY_SOUL_POSITIONS) {
-            double dx = entity.getX() - (soul.getX() + 0.5);
-            double dy = entity.getY() - (soul.getY() + 0.5);
-            double dz = entity.getZ() - (soul.getZ() + 0.5);
-            if (dx * dx + dy * dy + dz * dz <= FAIRY_SOUL_RADIUS * FAIRY_SOUL_RADIUS) return true;
-        }
-        return false;
+        MobVisual bySkin = headSkinTarget(entity);
+        if (bySkin == null) return null;
+        return CANYON_SKIN_TARGETS.contains(bySkin) ? bySkin : null;
     }
 
     // 対象がその呼び名のバイオームにいるか
@@ -2083,14 +2643,21 @@ public class EntityHighlightManager {
 
     // すぐ近くに「シュルカーボックスを持つ ItemDisplay」があるか。
     // 動いている Hideonfloor / Hideonwall の見た目がこれで、体色がそのまま箱の色になる
-    private static boolean hasShulkerBoxDisplayNear(Minecraft client, Entity entity) {
+    private static ShulkerBoxBlock shulkerBoxDisplayNear(Minecraft client, Entity entity) {
         AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
         for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
-            Display.ItemDisplay.ItemRenderState state = display.itemRenderState();
-            if (state == null) continue;
-            if (isShulkerBox(state.itemStack())) return true;
+            if (displayItem(display).getItem() instanceof BlockItem item
+                    && item.getBlock() instanceof ShulkerBoxBlock shulkerBox) {
+                return shulkerBox;
+            }
         }
-        return false;
+        return null;
+    }
+
+    // Display が映しているアイテム。まだ届いていなければ空
+    private static ItemStack displayItem(Display.ItemDisplay display) {
+        Display.ItemDisplay.ItemRenderState state = display.itemRenderState();
+        return state == null ? ItemStack.EMPTY : state.itemStack();
     }
 
     // Rockmite Mound かどうか。見た目は決まったスキンなので、そのテクスチャで見分ける
@@ -2115,9 +2682,6 @@ public class EntityHighlightManager {
         }
     }
 
-    private static boolean isShulkerBox(ItemStack stack) {
-        return stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock;
-    }
 
     // Hideon 系のシュルカーと、その当たり判定のシルバーフィッシュを結び付ける。
     //
@@ -2157,28 +2721,13 @@ public class EntityHighlightManager {
     }
 
     // プレイヤー型のモブ(Grizzly Bear や Hideyho など)の本体を探す
-    private static Entity nearestPlayerNear(Minecraft client, Entity nameTag) {
-        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
-        return getClosestEntity(client.level.getEntitiesOfClass(Player.class, box, e -> e != client.player), nameTag);
-    }
-
-    // ネームタグの近くから本体を探す。Hypixel は実体を通常のモブで作ることも、
-    // skull を被せたアーマースタンドで作ることもあるので、その両方を候補にする
-    private static Entity nametagVisual(Minecraft client, Entity nameTag) {
-        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
-
-        // 見た目は「何かを装備したアーマースタンド」か「ブロック/アイテムの Display」。
-        // どのスロットで見た目を作っているかはモブによって違うので、スロットは限定しない。
-        // 当たり判定のモブを光らせると見えないエンティティが光ってしまうため、そちらへは切り替えない
-        Entity stand = headStandUnderNameTag(client.level.getEntitiesOfClass(ArmorStand.class, box,
-                EntityHighlightManager::hasAnyEquipment), nameTag);
-        if (stand != null) return stand;
-
-        Entity display = headStandUnderNameTag(client.level.getEntitiesOfClass(Display.class, box, e -> true), nameTag);
-        if (display != null) return display;
-
-        // ネームタグ自身が見た目を兼ねている場合もある
-        return nameTag instanceof ArmorStand named && hasAnyEquipment(named) ? nameTag : null;
+    // 実体名で照合できるプレイヤーエンティティ型モブが、どこかに見つかるか。
+    // detectNamedPlayerMobs と同じ照合を使うので、これが偽なら表示も出ない
+    private static boolean hasNamedPlayerMob(Minecraft client, MobVisual target) {
+        for (Player player : client.level.players()) {
+            if (player != client.player && matchesNamedPlayerMob(target, player)) return true;
+        }
+        return false;
     }
 
     // アーマースタンドが何かを装備しているか。装備が無いものはネームタグ用の透明なスタンド
@@ -2189,29 +2738,21 @@ public class EntityHighlightManager {
         return false;
     }
 
-    // ネームタグから本体を探す。見た目の作り方がモブごとに違うので、そこだけ振り分ける
-    private static Entity canyonNamedVisual(Minecraft client, Entity nameTag, MobVisual target) {
-        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
-        // Grizzly Bear は Barbarian Duke X などと同じプレイヤー型のモブ。
-        // 本命は detectNamedPlayerMobs の実体名照合で、ここはその取りこぼし用の保険
-        if (target == TorrhusCanyon.GRIZZLY_BEAR) return nearestPlayerNear(client, nameTag);
-        // Ant / Queen Ant / Tiki 系は Water Snake と同じく、skull を被せたアーマースタンドで見た目を作る
-        return headStandUnderNameTag(client.level.getEntitiesOfClass(ArmorStand.class, box,
-                    e -> e.getCustomName() == null && !e.getItemBySlot(EquipmentSlot.HEAD).isEmpty()), nameTag);
-    }
-
     // ネームタグの周りから、連なったヘッドを集める。
     // ヘッドは「頭に skull を被せた名前なしのアーマースタンド」で、当たり判定は別のモブが持っている。
     // glow は描画モデルに沿うため、見た目どおりの輪郭にするにはこのアーマースタンドを光らせる
-    private static List<Entity> connectedHeadStands(Minecraft client, Entity nameTag, double searchRadius) {
-        AABB box = nameTag.getBoundingBox().inflate(searchRadius);
+    private static List<Entity> connectedHeadStands(Minecraft client, Entity anchor, MobVisual target,
+                                                    double searchRadius) {
+        AABB box = anchor.getBoundingBox().inflate(searchRadius);
+        // その種のスキンを被ったヘッドだけを候補にする。
+        // これで別のヘッドモブ(Ant や Tiki 系)を巻き込まない
         List<ArmorStand> candidates = new ArrayList<>(client.level.getEntitiesOfClass(ArmorStand.class, box,
-                e -> e.getCustomName() == null && !e.getItemBySlot(EquipmentSlot.HEAD).isEmpty()));
+                e -> headSkinTarget(e) == target));
 
-        // 半径内をすべて拾うと、近くにいる別のヘッドモブ(Ant や Tiki 系)まで巻き込む。
-        // ネームタグに最も近い節を起点にして、隣り合う節だけをたどって集める
+        // 同じ種が近くに2体湧くこともあるので、
+        // 起点に最も近い節から、隣り合う節だけをたどって集める
         List<Entity> heads = new ArrayList<>();
-        Entity start = headStandUnderNameTag(candidates, nameTag);
+        Entity start = headStandUnderNameTag(candidates, anchor);
         if (start == null) return heads;
         heads.add(start);
         candidates.remove(start);
@@ -2232,6 +2773,41 @@ public class EntityHighlightManager {
         return heads;
     }
 
+    /**
+     * ネームプレートに出す体力。読めなければ null。
+     *
+     * 体力はネームタグの文言にしかないので、本体の近くから探す。
+     * 隣の個体を掴まないよう、同じ呼び名のネームタグだけを見る。
+     * Critter Safari のモブは体力を出さない
+     */
+    private static String nameplateHealth(Entity visual, MobVisual target) {
+        if (healthNameTags.isEmpty() || isSafariTarget(target)) return null;
+
+        String label = target.plainLabel();
+        Entity best = null;
+        double bestDistance = HEALTH_NAMETAG_RADIUS * HEALTH_NAMETAG_RADIUS;
+        String health = null;
+        for (Entity nameTag : healthNameTags) {
+            double distance = nameTag.distanceToSqr(visual);
+            if (distance > bestDistance) continue;
+
+            // 控えた後にネームタグが消えることもあるので、都度確かめる
+            Component name = nameTag.getCustomName();
+            if (name == null || !ModConstants.containsIgnoreCase(name.getString(), label)) continue;
+
+            bestDistance = distance;
+            best = nameTag;
+            health = healthFromNameTag(name.getString());
+        }
+        return best == null ? null : health;
+    }
+
+    // Critter Safari の呼び名か
+    private static boolean isSafariTarget(MobVisual target) {
+        return target instanceof SafariCavern || target instanceof SafariForest
+                || target instanceof SafariHaunted || target instanceof SafariIcy;
+    }
+
     // ネームタグの文字列から「現在HP/最大HP」を取り出す
     private static String healthFromNameTag(String nameStr) {
         Matcher matcher = HEALTH_PATTERN.matcher(nameStr);
@@ -2241,6 +2817,530 @@ public class EntityHighlightManager {
     // Beeheemoth かどうか。他の2種のハチはバニラサイズなので、大きさだけで見分けられる
     private static boolean isBeeheemoth(Entity entity) {
         return entity.getBbHeight() >= BEEHEEMOTH_MIN_HEIGHT;
+    }
+
+    /**
+     * Mob Visuals に登録している Sea Creature を見つけたら、名前をタイトルで知らせる。
+     *
+     * 検出の経路は3通り(ネームタグ・エンティティ型・実体名)あり、同じ個体が複数の経路で
+     * 見つかることも毎tick見つかることもあるので、一度出した個体は覚えておいて出し直さない。
+     */
+    private static void announceSeaCreature(Minecraft client, MobVisual target, Entity entity) {
+        if (!(target instanceof MobVisual.SeaCreature)) return;
+        if (entity == null || !announcedSeaCreatures.add(entity)) return;
+
+        showSeaCreatureTitle(client, target);
+    }
+
+    /**
+     * 自分が釣り上げた Sea Creature を知らせる。チャットの文言から呼ばれる。
+     *
+     * 自分で釣った場合は、少し遅れて同じモブがエンティティとしても見つかる。
+     * その匹数ぶんだけ後から取り消せるよう、種と時刻と残りの数を控えておく
+     *
+     * @param doubleHook 一度に2匹釣れたか
+     */
+    public static void showSeaCreatureCatchTitle(Minecraft client, MobVisual target, boolean doubleHook) {
+        caughtSeaCreature = target;
+        caughtSeaCreatureMillis = System.currentTimeMillis();
+        caughtSeaCreaturePending = doubleHook ? 2 : 1;
+        showSeaCreatureTitle(client, target, true, doubleHook ? SEA_CREATURE_DOUBLE_HOOK_SUFFIX : "");
+    }
+
+    /** 見つけた Sea Creature を知らせる。エンティティの検知から呼ばれる */
+    public static void showSeaCreatureTitle(Minecraft client, MobVisual target) {
+        showSeaCreatureTitle(client, target, false, "");
+    }
+
+    private static void showSeaCreatureTitle(Minecraft client, MobVisual target, boolean fromCatch, String suffix) {
+        if (!ModConfig.INSTANCE.mobVisuals.enableSeaCreatureTitle) return;
+
+        // 自分で釣った分は、チャットの文言で既に知らせている。
+        // 引換券のように釣れた匹数ぶんだけ使うので、
+        // その間に他の人が釣った同じ種はそのまま知らせる
+        if (!fromCatch && target == caughtSeaCreature && caughtSeaCreaturePending > 0
+                && System.currentTimeMillis() - caughtSeaCreatureMillis < SEA_CREATURE_CATCH_ECHO_MS) {
+            caughtSeaCreaturePending--;
+            return;
+        }
+
+        // 匹数は色を変えて挟むので、その後ろの "!" はモブの色に戻す
+        String color = BossNameplateRenderer.colorCode(target.tracerColorARGB());
+        String text = color + "§l" + target.plainLabel() + suffix + color + "§l!";
+        // このタイトルだけはフェードを挟まず、出た瞬間に読めるようにする
+        client.execute(() -> {
+            NotificationUtils.showTitle(client, Component.literal(text), null,
+                    SEA_CREATURE_TITLE_FADE, SEA_CREATURE_TITLE_STAY, SEA_CREATURE_TITLE_FADE);
+            NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP,
+                    SEA_CREATURE_SOUND_VOLUME, SEA_CREATURE_SOUND_PITCH);
+        });
+    }
+
+    /**
+     * ネームタグから Sea Creature の本体を探す。
+     *
+     * 本体の型が分かっているものは、その型のうちネームタグの直下にいる個体を本体とする。
+     * これらは同じエリアに同じ型の別のモブがいて型だけでは決められないが、
+     * ネームタグと組にすれば「どのモブか」を確定できる。
+     * 型が分からないものは、ヘッドや Display で見た目を作っている前提の共通処理に任せる。
+     */
+    private static Entity seaCreatureVisual(Minecraft client, Entity nameTag, MobVisual target) {
+        // プレイヤーエンティティ型は実体名照合が本命。
+        // ネームタグからは探さず、見つからないことを合図として使う
+        if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) return null;
+
+        // スキンで見分ける種は、そのスキンを被ったヘッドだけを本体とする。
+        // 「ネームタグの下にいる何か」を本体とみなす保険は置かない。
+        // 見つからないことを、スキン差し替えの合図として使いたいため
+        if (HEAD_SKIN_SPECIES.contains(target)) return skinnedHeadUnderNameTag(client, nameTag, target);
+
+        Class<? extends Entity> bodyType = seaCreatureBodyType(target);
+        if (bodyType == null) return null;
+
+        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
+        Predicate<Entity> filter = body -> !body.isInvisible() && seaCreatureBodyMatches(target, body);
+        return headStandUnderNameTag(client.level.getEntitiesOfClass(bodyType, box, filter), nameTag);
+    }
+
+    // ネームタグの下から、その Sea Creature のスキンを被ったヘッドを探す。
+    // Water Hydra のようにモブ本体が被っていることもあるので、見るのは LivingEntity
+    private static Entity skinnedHeadUnderNameTag(Minecraft client, Entity nameTag, MobVisual target) {
+        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
+        return headStandUnderNameTag(client.level.getEntitiesOfClass(LivingEntity.class, box,
+                wearer -> headSkinTarget(wearer) == target), nameTag);
+    }
+
+    /**
+     * ネームタグから種の名前を取り出す。
+     *
+     * "[Lv58] Parched 25,000/25,000❤" なら "Parched" になる。
+     * 形が違って引けなくても、知らせないだけなので害はない
+     */
+    private static String nameTagSpecies(String nameStr) {
+        String text = NAMETAG_PREFIX.matcher(nameStr).replaceAll("");
+        Matcher health = HEALTH_PATTERN.matcher(text);
+        if (health.find()) text = text.substring(0, health.start());
+
+        // 末尾の❤ や記号を落とす
+        int end = text.length();
+        while (end > 0 && !Character.isLetterOrDigit(text.charAt(end - 1))) end--;
+        return text.substring(0, end).trim();
+    }
+
+    // 型で判定する走査のどれかが、ネームタグの近くで同じ呼び名に行き着くか
+    private static boolean hasTypeTargetNear(Minecraft client, Entity nameTag, MobVisual target) {
+        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
+        for (Entity nearby : client.level.getEntitiesOfClass(Entity.class, box, e -> true)) {
+            if (typeTargetOf(client, nearby) == target) return true;
+        }
+        return false;
+    }
+
+    // 型で判定する走査を、ひと通り試す。
+    // どれもエリアで絞っているので、場違いなら null が返る
+    private static MobVisual typeTargetOf(Minecraft client, Entity entity) {
+        MobVisual target = areaAnimalTarget(entity);
+        if (target != null) return target;
+
+        if (entity instanceof Shulker shulker) {
+            target = shulkerTarget(shulker);
+            if (target != null) return target;
+        }
+
+        target = safariTarget(client, entity);
+        return target != null ? target : seaCreatureTypeTarget(entity);
+    }
+
+    // ネームタグの下に、その Critter Safari モブの skull が見つかるか。
+    // Gazer / Driftling / Shyworm はアーマースタンドが、残りは見た目の Display が被っている
+    private static boolean hasSafariSkinNear(Minecraft client, Entity nameTag, MobVisual target) {
+        if (skinnedHeadUnderNameTag(client, nameTag, target) != null) return true;
+
+        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
+        for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
+            if (itemSkinTarget(displayItem(display)) == target) return true;
+        }
+        return false;
+    }
+
+    // ネームタグの下から、その skull を被ったヘッドを探す。
+    // 同じ skull を使う種が複数あるときは、種の区別はネームタグの名前に任せる
+    private static Entity headStandWithSkinUnderNameTag(Minecraft client, Entity nameTag, String skinId) {
+        AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
+        return headStandUnderNameTag(client.level.getEntitiesOfClass(LivingEntity.class, box,
+                wearer -> matchesHeadSkin(wearer, skinId)), nameTag);
+    }
+
+    // ネームタグから本体を探すときに見る型。分かっていないものは null
+    private static Class<? extends Entity> seaCreatureBodyType(MobVisual target) {
+        if (!(target instanceof MobVisual.SeaCreature seaCreature)) return null;
+        return switch (seaCreature) {
+            case THE_LOCH_EMPEROR -> Guardian.class;
+            // Lotus Atoll のカエルは2種。乗り物の有無で見分ける(seaCreatureBodyMatches)
+            case PUDDLE_JUMPER, FROG_PRINCE -> Frog.class;
+            case SILKBREEZE -> Breeze.class;
+            case THUNDER -> ElderGuardian.class;
+            case LORD_JAWBUS -> IronGolem.class;
+            case REINDRAKE -> EnderDragon.class;
+            case MITHRIL_GRUBBER, WATER_WORM, FLAMING_WORM -> Silverfish.class;
+            case OASIS_SHEEP -> Sheep.class;
+            case OASIS_RABBIT, CARROT_KING -> Rabbit.class;
+            case AGARIMOO -> MushroomCow.class;
+            case POISONED_WATER_WORM -> Endermite.class;
+            case LAVA_BLAZE -> Blaze.class;
+            case LAVA_PIGMAN -> ZombifiedPiglin.class;
+            case PLHLEGBLAST -> Squid.class;
+            default -> null;
+        };
+    }
+
+    // 同じ型の中でさらに絞る必要があるものだけ、ここで振り分ける
+    private static boolean seaCreatureBodyMatches(MobVisual target, Entity entity) {
+        if (target == MobVisual.SeaCreature.CARROT_KING) {
+            return entity instanceof Rabbit rabbit && rabbit.getVariant() == Rabbit.Variant.EVIL;
+        }
+        if (target == MobVisual.SeaCreature.OASIS_RABBIT) {
+            return entity instanceof Rabbit rabbit && rabbit.getVariant() != Rabbit.Variant.EVIL;
+        }
+        // GlowSquid はイカの派生型なので、素のイカだけを本体とみなす
+        if (target == MobVisual.SeaCreature.PLHLEGBLAST) return !(entity instanceof GlowSquid);
+        // The Loch Emperor はスケルトンを乗せたガーディアンだけが本体
+        if (target == MobVisual.SeaCreature.THE_LOCH_EMPEROR) return isLochEmperorBody(entity);
+        // Frog Prince はスライムに乗ったカエル。Puddle Jumper は何にも乗っていない
+        if (target == MobVisual.SeaCreature.FROG_PRINCE) return entity.getVehicle() != null;
+        if (target == MobVisual.SeaCreature.PUDDLE_JUMPER) return entity.getVehicle() == null;
+        return true;
+    }
+
+    /**
+     * エンティティ型が分かっている Sea Creature を、型(と一部は変種)から引く。
+     *
+     * 同じ型のモブが他のエリアにもいるので、まず釣れるエリアかどうかで絞ってから型を見る。
+     * ここで扱うのは、そのエリアにその型のモブが1種しかいないと言い切れるものだけ。
+     * Special タブの面々はバニラ相当の同じ型のモブと紛れる恐れがあるため、
+     * ネームタグを見つけてから本体を探す seaCreatureVisual 側に任せる。
+     */
+    private static MobVisual seaCreatureTypeTarget(Entity entity) {
+        // 当たり判定が透明で型では分けられない面々は、被っているヘッドのスキンで見分ける。
+        // アーマースタンド自体は透明でも、被せた skull は描画されるので、
+        // 透明を弾くより先に見る
+        // スキンで決まるのは Sea Creature とは限らない。
+        // Tiki 系ならここでは扱わず、canyonHeadTarget 側に任せる
+        MobVisual bySkin = headSkinTarget(entity);
+        if (bySkin != null) return bySkin instanceof MobVisual.SeaCreature ? bySkin : null;
+
+        // 残りは見た目のあるモブ。透明なものは別のモブの当たり判定か、飾りのエンティティ
+        if (entity.isInvisible()) return null;
+
+        if (GameState.Server.isCrimsonIsle()) {
+            if (entity instanceof ElderGuardian) return MobVisual.SeaCreature.THUNDER;
+            if (entity instanceof IronGolem) return MobVisual.SeaCreature.LORD_JAWBUS;
+            return null;
+        }
+        if (GameState.Server.isTorrhusCanyon()) {
+            return entity instanceof Breeze ? MobVisual.SeaCreature.SILKBREEZE : null;
+        }
+        if (GameState.Server.isJerrysWorkshop()) {
+            return entity instanceof EnderDragon ? MobVisual.SeaCreature.REINDRAKE : null;
+        }
+        if (GameState.Server.isLotusAtoll()) {
+            if (!(entity instanceof Frog frog)) return null;
+            // 小さいカエルは Critter の Lotum と Sea Creature の Atoll Croaker。
+            // どちらもここでは扱わない
+            if (frog.getBbWidth() <= LOTUM_MAX_WIDTH) return null;
+            // Frog Prince は土台のスライムに乗ったカエル。Puddle Jumper は乗っていない
+            return frog.getVehicle() != null
+                    ? MobVisual.SeaCreature.FROG_PRINCE : MobVisual.SeaCreature.PUDDLE_JUMPER;
+        }
+        if (GameState.Server.isMoongladeMarsh()) {
+            // The Loch Emperor はガーディアンの上にスケルトンが乗った組で1体を成す。
+            // 土台のガーディアンだけを本体として扱い、上のスケルトンは別のモブにしない
+            return isLochEmperorBody(entity) ? MobVisual.SeaCreature.THE_LOCH_EMPEROR : null;
+        }
+        return null;
+    }
+
+    /**
+     * 見つけた Sea Creature に Highlight / Tracer / ネームプレート / タイトルを付ける。
+     *
+     * The Loch Emperor だけはガーディアンの上にスケルトンが乗った組で1体を成すので、
+     * 両方を光らせたうえで、Tracer とネームプレートは目線に近い上のスケルトンに付ける。
+     */
+    private static void applySeaCreatureVisuals(Minecraft client, MobVisual target, Entity body) {
+        Entity visual = body;
+        // 当たり判定そのものを光らせてよいか。見た目が別のエンティティにあるなら光らせない
+        boolean highlightBody = true;
+
+        if (HEAD_BODY_TARGETS.contains(target)) {
+            List<Entity> heads = headBodyParts(client, target, body);
+
+            // どのヘッドからたどっても同じ顔ぶれになるので、1つでも表示済みなら同じ個体。
+            // 経路(スキン照合とネームタグ)が違うヘッドに行き着いても、ネームプレートは1つで済む
+            for (Entity head : heads) {
+                if (seaCreaturePartsShown.contains(head)) return;
+            }
+            seaCreaturePartsShown.addAll(heads);
+
+            if (!heads.isEmpty()) {
+                highlightBody = false;
+                for (Entity head : heads) {
+                    if (target.highlight()) registerHighlight(head, target);
+                    // 型判定側で拾い直さないよう、この個体は取られたものとして控える
+                    nametagClaimedEntities.add(head);
+                }
+                heads.sort(Comparator.comparingInt(Entity::getId));
+                visual = headBodyAnchor(target, heads);
+            }
+        }
+
+        if (target == MobVisual.SeaCreature.FROG_PRINCE) {
+            // 土台のスライムも見えているので、カエルと一緒に光らせる。
+            // ネームプレートと Tracer は、上に乗っているカエルの側に出す
+            Entity mount = body.getVehicle();
+            if (mount != null) {
+                if (target.highlight()) registerHighlight(mount, target);
+                // 型判定側で拾い直さないよう、この個体は取られたものとして控える
+                nametagClaimedEntities.add(mount);
+            }
+        }
+
+        if (target == MobVisual.SeaCreature.THE_LOCH_EMPEROR) {
+            Entity rider = lochEmperorRider(body);
+            if (rider != null) {
+                visual = rider;
+                // 土台のガーディアンも光らせる
+                if (target.highlight()) registerHighlight(body, target);
+                // 型判定側で拾い直さないよう、この個体は取られたものとして控える
+                nametagClaimedEntities.add(body);
+            }
+        }
+
+        nametagClaimedEntities.add(visual);
+        if (highlightBody && target.highlight()) registerHighlight(visual, target);
+        registerTracer(visual, target);
+        if (target.nameplate()) {
+            String label = BossNameplateRenderer.colorCode(target.tracerColorARGB()) + "§l" + target.plainLabel();
+            nameplateEntities.put(visual, BossNameplateRenderer.buildLabel(label,
+                            nameplateHealth(visual, target)));
+        }
+        announceSeaCreature(client, target, visual);
+    }
+
+    /**
+     * 登録済みのヘッドスキンが見つからなかった Sea Creature を知らせる。
+     *
+     * スキンはネームタグより遠くまで届くので、
+     * ネームタグがあるのに見つからないのは Hypixel 側で差し替えられたときだけ。
+     * ただしラグでネームタグだけ先に届くことがあるので、
+     * 見つからない状態が続いてから初めて知らせる。
+     * 同じネームタグで毎 tick 出さないよう、1度出したらそれで終わり
+     */
+    private static void reportMissingHeadSkin(Minecraft client, Entity nameTag, MobVisual target) {
+        reportMissingVisual(client, nameTag, target.plainLabel(), "known head skin");
+    }
+
+    // 実体名で見つかるはずのプレイヤーエンティティ型モブが、見つからないことを知らせる
+    private static void reportMissingNamedPlayer(Minecraft client, Entity nameTag, MobVisual target) {
+        reportMissingVisual(client, nameTag, target.plainLabel(), "named entity");
+    }
+
+    // ネームタグはあるのに、そのモブの本体が見つからないことを知らせる
+    private static void reportMissingBody(Minecraft client, Entity nameTag, MobVisual target) {
+        reportMissingVisual(client, nameTag, target.plainLabel(), "matching entity");
+    }
+
+    // 同じく本体が見つからないが、MobVisual ではないボス用
+    private static void reportMissingBody(Minecraft client, Entity nameTag, String bossName) {
+        reportMissingVisual(client, nameTag, bossName, "matching entity");
+    }
+
+    // 同じく実体名で探すが、MobVisual ではない Crimson Isle のボス用
+    private static void reportMissingNamedPlayer(Minecraft client, Entity nameTag, String bossName) {
+        reportMissingVisual(client, nameTag, bossName, "named entity");
+    }
+
+    private static void reportMissingVisual(Minecraft client, Entity nameTag, String name, String what) {
+        if (missingVisualReported.contains(nameTag)) return;
+
+        long now = System.currentTimeMillis();
+        MissingWindow window = missingVisualWindows.get(nameTag);
+        // 途中で見つかっていた(呼ばれない tick があった)なら、数え直す
+        if (window == null || now - window.last > MISSING_VISUAL_GAP_MS) {
+            missingVisualWindows.put(nameTag, new MissingWindow(now));
+            return;
+        }
+
+        window.last = now;
+        if (now - window.since < MISSING_VISUAL_GRACE_MS) return;
+
+        missingVisualReported.add(nameTag);
+        NotificationUtils.sendSystemChat(client, Component.literal(
+                "§c" + name + ": " + what + " not found. "
+                        + "§7Hypixel may have changed it."));
+    }
+
+    // スキンが見つからない状態の、数え始めと最後に確かめた時刻
+    private static final class MissingWindow {
+        private final long since;
+        private long last;
+
+        private MissingWindow(long now) {
+            this.since = now;
+            this.last = now;
+        }
+    }
+
+    /**
+     * Tracer とネームプレートを出すヘッドを選ぶ。
+     *
+     * Titanoboa は頭の skull が分かっているので、届いている間は頭に出す。
+     * 頭がまだ届いていない間は、代わりに体の真ん中に1つだけ出す。
+     * 表示位置が飛ばないよう、代表は毎 tick 同じヘッドになるように選ぶ。
+     * エンティティIDは湧いた順に振られるので、ID順に並べた真ん中がモブの中ほどにあたる
+     */
+    private static Entity headBodyAnchor(MobVisual target, List<Entity> heads) {
+        String headSkin = HEAD_ANCHOR_SKINS.get(target);
+        if (headSkin != null) {
+            for (Entity head : heads) {
+                if (matchesHeadSkin(head, headSkin)) return head;
+            }
+        }
+        return heads.get(heads.size() / 2);
+    }
+
+    /**
+     * 複数のヘッドで1体を成す Sea Creature の、ヘッドをすべて集める。
+     *
+     * Titanoboa は登録済みのスキンを被っているものを、
+     * それ以外は隣り合って連なっているものを集める。
+     * どのヘッドを起点にしても同じ顔ぶれになるので、同じ個体かどうかの判定に使える
+     */
+    private static List<Entity> headBodyParts(Minecraft client, MobVisual target, Entity anyHead) {
+        if (HEAD_SKIN_GROUPED_TARGETS.contains(target)) return skinMatchedHeads(client, anyHead, target);
+        return new ArrayList<>(connectedHeadStands(client, anyHead, target, HEAD_PARTS_SEARCH_RADIUS));
+    }
+
+    // 近くにある、その Sea Creature のスキンを被ったヘッド。
+    // 見た目が複数の部品でできているモブを、1体としてまとめて扱うために使う
+    private static List<Entity> skinMatchedHeads(Minecraft client, Entity body, MobVisual target) {
+        AABB box = body.getBoundingBox().inflate(HEAD_PARTS_SEARCH_RADIUS);
+
+        List<Entity> parts = new ArrayList<>();
+        for (ArmorStand stand : client.level.getEntitiesOfClass(ArmorStand.class, box, stand -> true)) {
+            if (headSkinTarget(stand) == target) parts.add(stand);
+        }
+        return parts;
+    }
+
+    /**
+     * 被っているヘッドのスキンから Sea Creature を引く。ヘッドを被っていなければ null。
+     *
+     * 当たり判定が同じ形で型では分けられない面々を、見た目のテクスチャで見分けるために使う。
+     */
+    private static MobVisual headSkinTarget(Entity entity) {
+        // ヘッドを被せたアーマースタンドだけでなく、
+        // Water Hydra のようにモブ本体が被っていることもある。
+        // 毎 tick すべてのエンティティを見るので、見る型は必要なものだけに絞る
+        for (String value : headSkinValues(entity)) {
+            MobVisual target = cachedHeadSkinTarget(value);
+            if (target != null) return target;
+        }
+        return null;
+    }
+
+    // 被っているヘッドが、その skull か。
+    // 同じ Sea Creature の中で部位を見分けるのに使う
+    private static boolean matchesHeadSkin(Entity entity, String skinId) {
+        for (String value : headSkinValues(entity)) {
+            if (decodeSkinTexture(value).contains(skinId)) return true;
+        }
+        return false;
+    }
+
+    // 被っているヘッドのテクスチャ値。ヘッドを被っていなければ空
+    private static List<String> headSkinValues(Entity entity) {
+        if (!(entity instanceof ArmorStand) && !(entity instanceof Zombie)) return List.of();
+
+        LivingEntity wearer = (LivingEntity) entity;
+        if (wearer.getCustomName() != null) return List.of();
+
+        return skinValues(wearer.getItemBySlot(EquipmentSlot.HEAD));
+    }
+
+    // アイテムに付いている skull からモブを引く。skull でなければ null。
+    // 見た目を Display で作っているモブを見分けるのに使う
+    private static MobVisual itemSkinTarget(ItemStack stack) {
+        for (String value : skinValues(stack)) {
+            MobVisual target = cachedHeadSkinTarget(value);
+            if (target != null) return target;
+        }
+        return null;
+    }
+
+    // アイテムに付いている skull のテクスチャ値。skull でなければ空
+    private static List<String> skinValues(ItemStack stack) {
+        if (stack.isEmpty()) return List.of();
+
+        ResolvableProfile profile = stack.get(DataComponents.PROFILE);
+        if (profile == null) return List.of();
+
+        List<String> values = new ArrayList<>();
+        for (Property property : profile.partialProfile().properties().get("textures")) {
+            if (property != null) values.add(property.value());
+        }
+        return values;
+    }
+
+    // 当たり判定の近くにある Display が被っている skull から、モブを引く
+    private static MobVisual safariDisplaySkinTarget(Minecraft client, Entity entity) {
+        AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
+        for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
+            MobVisual target = itemSkinTarget(displayItem(display));
+            if (SAFARI_SKIN_TARGETS.contains(target)) return target;
+        }
+        return null;
+    }
+
+    // スキンのテクスチャ値から Sea Creature を引く。1度見た値は覚えておく
+    private static MobVisual cachedHeadSkinTarget(String value) {
+        Optional<MobVisual> cached = HEAD_SKIN_CACHE.get(value);
+        if (cached != null) return cached.orElse(null);
+
+        // 見たことのないスキンばかりの場面でも、覚える量が増え続けないようにする
+        if (HEAD_SKIN_CACHE.size() >= MAX_HEAD_SKIN_CACHE) HEAD_SKIN_CACHE.clear();
+
+        String decoded = decodeSkinTexture(value);
+        MobVisual found = null;
+        for (Map.Entry<String, MobVisual> entry : HEAD_SKIN_TARGETS.entrySet()) {
+            if (decoded.contains(entry.getKey())) {
+                found = entry.getValue();
+                break;
+            }
+        }
+        HEAD_SKIN_CACHE.put(value, Optional.ofNullable(found));
+        return found;
+    }
+
+    // The Loch Emperor の上に乗っているスケルトン。見つからなければ null
+    private static Entity lochEmperorRider(Entity body) {
+        for (Entity passenger : body.getPassengers()) {
+            if (passenger instanceof Skeleton) return passenger;
+        }
+        return null;
+    }
+
+    // The Loch Emperor の土台か。スケルトンを乗せたガーディアンで1体を成す
+    private static boolean isLochEmperorBody(Entity entity) {
+        if (!(entity instanceof Guardian) || entity instanceof ElderGuardian) return false;
+        for (Entity passenger : entity.getPassengers()) {
+            if (passenger instanceof Skeleton) return true;
+        }
+        return false;
+    }
+
+    // Sea Creature として扱う型。エリアと設定で対象が変わるため、毎 tick 作り直す判定に使う
+    private static boolean isSeaCreatureTypeEntity(Entity entity) {
+        return seaCreatureTypeTarget(entity) != null;
     }
 
     // エリア固有モブとして扱う型。対象がエリアや変種で変わるため、毎 tick 作り直す判定に使う

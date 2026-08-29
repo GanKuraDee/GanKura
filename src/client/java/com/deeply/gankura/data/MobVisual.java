@@ -48,6 +48,10 @@ public interface MobVisual {
         if (target instanceof TorrhusCanyon) {
             return GameState.Server.isTorrhusCanyon() || GameState.Server.isTorrhusHeights();
         }
+        if (target instanceof LotusAtoll) return GameState.Server.isLotusAtoll();
+        // Sea Creature は釣れる場所が種類ごとに決まっている。
+        // どこでも釣れるものだけ ANYWHERE として素通しにする
+        if (target instanceof SeaCreature seaCreature) return seaCreature.area().isHere();
         // 残りは Critter Safari の4バイオーム。バイオームの区別は座標で行う
         return GameState.Server.isSafari();
     }
@@ -61,7 +65,8 @@ public interface MobVisual {
         if (!ModConfig.INSTANCE.mobVisuals.hideCapturedCritters) return false;
         if (target instanceof TheEnd || target instanceof SpidersDen
                 || target instanceof CrimsonIsle || target instanceof CrystalHollows
-                || target instanceof MoongladeMarsh || target instanceof TorrhusCanyon) {
+                || target instanceof MoongladeMarsh || target instanceof TorrhusCanyon
+                || target instanceof SeaCreature) {
             return false;
         }
         return GameState.CritterSafari.isCaptured(target.plainLabel());
@@ -508,6 +513,164 @@ public interface MobVisual {
         @Override
         public List<TorrhusCanyon> targets() {
             return ModConfig.INSTANCE.mobVisuals.targetsTorrhusCanyon;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    /**
+     * 釣りで湧く Sea Creature のうち、LEGENDARY / MYTHIC のティアと Special の面々。
+     *
+     * 釣れる場所は種類ごとに決まっているので、そのエリアにいるときだけ対象にする。
+     * Basic / Spooky / Shark と水の Hotspot の面々はどのエリアでも釣れるため ANYWHERE にしてある。
+     * 色は SkyBlock のレア度の色に合わせている。
+     */
+    /**
+     * Sea Creature を釣れる場所。
+     *
+     * Basic / Spooky / Shark と水の Hotspot の面々はどのエリアでも釣れるので ANYWHERE。
+     * Fiery Scuttler と Ragnarok は溶岩の Hotspot 限定だが、
+     * それが湧くのは Crimson Isle だけなので CRIMSON_ISLE にしてある。
+     */
+    /**
+     * Lotus Atoll の Critter。
+     *
+     * どれも Hunting に紐づいていて、普通の攻撃では倒せない。
+     * Sea Creature とは別の面々なので、エリアの enum として分けている
+     */
+    enum LotusAtoll implements MobVisual {
+        LOTUSFISH("§bLotusfish", 0x55FFFF),
+        LOTUM("§dLotum", 0xFF55FF),
+        TEWTIL("§aTewtil", 0x55FF55),
+        FLIPFLOPPER("§6Flipflopper", 0xFFAA00),
+        SEASHINE("§eSeashine", 0xFFFF55);
+
+        private final String label;
+        private final int glowColorRGB;
+
+        LotusAtoll(String label, int glowColorRGB) {
+            this.label = label;
+            this.glowColorRGB = glowColorRGB;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+
+        @Override
+        public int glowColorRGB() {
+            return glowColorRGB;
+        }
+
+        @Override
+        public List<LotusAtoll> targets() {
+            return ModConfig.INSTANCE.mobVisuals.targetsLotusAtoll;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    enum FishingArea {
+        ANYWHERE,
+        BACKWATER_BAYOU,
+        LOTUS_ATOLL,
+        MOONGLADE_MARSH,
+        TORRHUS_CANYON,
+        CRIMSON_ISLE,
+        JERRYS_WORKSHOP,
+        DWARVEN_MINES,
+        FARMING_ISLANDS,
+        CRYSTAL_HOLLOWS;
+
+        public boolean isHere() {
+            return switch (this) {
+                case ANYWHERE -> true;
+                case BACKWATER_BAYOU -> GameState.Server.isBackwaterBayou();
+                case LOTUS_ATOLL -> GameState.Server.isLotusAtoll();
+                case MOONGLADE_MARSH -> GameState.Server.isMoongladeMarsh();
+                case TORRHUS_CANYON -> GameState.Server.isTorrhusCanyon();
+                case CRIMSON_ISLE -> GameState.Server.isCrimsonIsle();
+                case JERRYS_WORKSHOP -> GameState.Server.isJerrysWorkshop();
+                case DWARVEN_MINES -> GameState.Server.isDwarvenMines();
+                case FARMING_ISLANDS -> GameState.Server.isFarmingIslands();
+                case CRYSTAL_HOLLOWS -> GameState.Server.isCrystalHollows();
+            };
+        }
+    }
+
+    enum SeaCreature implements MobVisual {
+        // LEGENDARY
+        WATER_HYDRA("§6Water Hydra", 0xFFAA00, FishingArea.ANYWHERE),
+        ALLIGATOR("§6Alligator", 0xFFAA00, FishingArea.BACKWATER_BAYOU),
+        PUDDLE_JUMPER("§6Puddle Jumper", 0xFFAA00, FishingArea.LOTUS_ATOLL),
+        THE_LOCH_EMPEROR("§6The Loch Emperor", 0xFFAA00, FishingArea.MOONGLADE_MARSH),
+        SILKBREEZE("§6Silkbreeze", 0xFFAA00, FishingArea.TORRHUS_CANYON),
+        THUNDER("§6Thunder", 0xFFAA00, FishingArea.CRIMSON_ISLE),
+        FIERY_SCUTTLER("§6Fiery Scuttler", 0xFFAA00, FishingArea.CRIMSON_ISLE),
+        BLUE_RINGED_OCTOPUS("§6Blue Ringed Octopus", 0xFFAA00, FishingArea.ANYWHERE),
+        YETI("§6Yeti", 0xFFAA00, FishingArea.JERRYS_WORKSHOP),
+        PHANTOM_FISHER("§6Phantom Fisher", 0xFFAA00, FishingArea.ANYWHERE),
+        GREAT_WHITE_SHARK("§6Great White Shark", 0xFFAA00, FishingArea.ANYWHERE),
+
+        // MYTHIC
+        TITANOBOA("§dTitanoboa", 0xFF55FF, FishingArea.BACKWATER_BAYOU),
+        FROG_PRINCE("§dFrog Prince", 0xFF55FF, FishingArea.LOTUS_ATOLL),
+        NESSIE("§dNessie", 0xFF55FF, FishingArea.MOONGLADE_MARSH),
+        GIANT_ISOPOD("§dGiant Isopod", 0xFF55FF, FishingArea.TORRHUS_CANYON),
+        LORD_JAWBUS("§dLord Jawbus", 0xFF55FF, FishingArea.CRIMSON_ISLE),
+        RAGNAROK("§dRagnarok", 0xFF55FF, FishingArea.CRIMSON_ISLE),
+        WIKI_TIKI("§dWiki Tiki", 0xFF55FF, FishingArea.ANYWHERE),
+        REINDRAKE("§dReindrake", 0xFF55FF, FishingArea.JERRYS_WORKSHOP),
+        GRIM_REAPER("§dGrim Reaper", 0xFF55FF, FishingArea.ANYWHERE),
+
+        // Special
+        MITHRIL_GRUBBER("§aMithril Grubber", 0x55FF55, FishingArea.DWARVEN_MINES),
+        OASIS_SHEEP("§aOasis Sheep", 0x55FF55, FishingArea.FARMING_ISLANDS),
+        OASIS_RABBIT("§aOasis Rabbit", 0x55FF55, FishingArea.FARMING_ISLANDS),
+        CARROT_KING("§9Carrot King", 0x5555FF, FishingArea.ANYWHERE),
+        AGARIMOO("§9Agarimoo", 0x5555FF, FishingArea.ANYWHERE),
+        WATER_WORM("§9Water Worm", 0x5555FF, FishingArea.CRYSTAL_HOLLOWS),
+        POISONED_WATER_WORM("§9Poisoned Water Worm", 0x5555FF, FishingArea.CRYSTAL_HOLLOWS),
+        FLAMING_WORM("§9Flaming Worm", 0x5555FF, FishingArea.CRYSTAL_HOLLOWS),
+        LAVA_BLAZE("§5Lava Blaze", 0xAA00AA, FishingArea.CRYSTAL_HOLLOWS),
+        LAVA_PIGMAN("§5Lava Pigman", 0xAA00AA, FishingArea.CRYSTAL_HOLLOWS),
+        ABYSSAL_MINER("§6Abyssal Miner", 0xFFAA00, FishingArea.CRYSTAL_HOLLOWS),
+        PLHLEGBLAST("§dPlhlegblast", 0xFF55FF, FishingArea.CRIMSON_ISLE);
+
+        private final String label;
+        private final int glowColorRGB;
+        private final FishingArea area;
+
+        SeaCreature(String label, int glowColorRGB, FishingArea area) {
+            this.label = label;
+            this.glowColorRGB = glowColorRGB;
+            this.area = area;
+        }
+
+        public FishingArea area() {
+            return area;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+
+        @Override
+        public int glowColorRGB() {
+            return glowColorRGB;
+        }
+
+        @Override
+        public List<SeaCreature> targets() {
+            return ModConfig.INSTANCE.mobVisuals.targetsSeaCreature;
         }
 
         @Override

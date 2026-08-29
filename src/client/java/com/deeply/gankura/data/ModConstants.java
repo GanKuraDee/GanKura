@@ -25,6 +25,12 @@ public class ModConstants {
     public static final String MAP_TORRHUS_CANYON = "Torrhus Canyon";
     // Torrhus Canyon の高所側。Tiki 系はこちらにも湧く
     public static final String MAP_TORRHUS_HEIGHTS = "Torrhus Heights";
+    // Sea Creature の釣り場になるエリア
+    public static final String MAP_BACKWATER_BAYOU = "Backwater Bayou";
+    public static final String MAP_LOTUS_ATOLL = "Lotus Atoll";
+    public static final String MAP_JERRYS_WORKSHOP = "Jerry's Workshop";
+    public static final String MAP_DWARVEN_MINES = "Dwarven Mines";
+    public static final String MAP_FARMING_ISLANDS = "The Farming Islands";
 
     // タブリスト上で現在地とサーバーIDを載せている行の接頭辞
     public static final String TAB_AREA_PREFIX = "Area:";
@@ -215,6 +221,12 @@ public class ModConstants {
     public static final List<String> ICY_BIOME_CRITTERS = List.of(
             "Strongarm", "Tepid", "Polaris", "Shuddersquid",
             "Billygoat", "Mantis Shrimp", "Nozzlenose", "Troodon");
+
+    // "CAUGHT! You cocooned a Zombie!"
+    // Cocooning は Critter Safari とは別の仕組みで、どのエリアのモブにも使える。
+    // モブ名に "!" は入らないので、最初の "!" までを名前として取る
+    public static final Pattern COCOON_CAUGHT_PATTERN =
+            Pattern.compile("CAUGHT! You cocooned an? (.+?)!", Pattern.CASE_INSENSITIVE);
 
     // "CAPTURE! You caught a Troodon and gained a Troodon Shard!"
     // シャードが複数落ちると "gained 2x Troodon Shard!" のように個数表記へ変わるため、
