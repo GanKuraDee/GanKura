@@ -6,6 +6,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +24,9 @@ import java.util.regex.Pattern;
 //   - Armor Sets / Equipment Sets: 5行目(0-index 4)の9列がそれぞれの切り替えボタン
 // 実際のクリックはslotClickedを直接呼び出すことで、左クリックした場合と完全に同じ経路(サーバーへの
 // パケット送信、LoadoutsClickMixin/LoadoutsContentSyncMixinによるPet/Equipment Hud更新)を通す。
+// ただしバニラのクリックは「アイテムを拾う」予測を手元で先に進めるため、そのままだと
+// アイテムが一瞬カーソルに乗って見える。これらのメニューはHypixel側の押しボタンで、
+// 手元の予測はサーバーの返事で必ず上書きされるので、送った直後に見た目を戻している。
 // 割り当てたキーはバニラでは「ホバー中スロットをホットバーへスワップ」に使われる場合があるため、
 // ここで消費して意図しないスワップが発生しないようにする。
 @Mixin(AbstractContainerScreen.class)
@@ -55,7 +59,14 @@ public abstract class MenuSetKeybindMixin {
         Slot slot = menu.slots.get(slotIndex);
         if (slot == null || !slot.hasItem()) return;
 
+        ItemStack carried = menu.getCarried().copy();
+        ItemStack clicked = slot.getItem().copy();
+
         slotClicked(slot, slotIndex, 0, ContainerInput.PICKUP);
+
+        // 送るものは送った上で、拾った扱いになった手元の見た目だけ元に戻す
+        menu.setCarried(carried);
+        slot.set(clicked);
         cir.setReturnValue(true);
     }
 

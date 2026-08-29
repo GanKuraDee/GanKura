@@ -18,7 +18,6 @@ public class ServerRestartHandler {
 
     // スコアボードから時間を抽出する正規表現 (例: "Server closing: 02:30")
     private static final Pattern CLOSING_PATTERN = Pattern.compile("Server closing: (\\d{1,2}:\\d{2})", Pattern.CASE_INSENSITIVE);
-    private static int tickCounter = 0;
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -47,9 +46,8 @@ public class ServerRestartHandler {
             // ★復元: チャットでリブート警告を受信した状態でのみスコアボードをスキャンする (負荷軽減)
             if (!GameState.Server.isClosing) return;
 
-            // ★復元: 毎tickではなく、0.5秒(10tick)に1回の頻度で確認して負荷を下げる
-            if (tickCounter++ < 10) return;
-            tickCounter = 0;
+            // スコアボードの秒数は1秒ごとに変わる。間を置いて読むとその変わり目とずれて、
+            // 表示が飛んだり止まったりする。リブート予告中だけの処理なので、毎tick読む
 
             Scoreboard scoreboard = client.level.getScoreboard();
             boolean found = false;

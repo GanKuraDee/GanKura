@@ -9,6 +9,7 @@ import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.MobVisual.CrimsonIsle;
 import com.deeply.gankura.data.MobVisual.CrystalHollows;
 import com.deeply.gankura.handler.CorleoneHandler;
+import com.deeply.gankura.handler.GoldenFishHandler;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.monster.Guardian;
@@ -319,6 +320,12 @@ public class EntityHighlightManager {
 
     // Scrappy に与える魚のハイライト色。水色で、Critter の色とは役割を分けている
     private static final int SAFARI_FISH_GLOW_COLOR = 0x55FFFF;
+
+    // Golden Fish の見た目に使われている skull と、ハイライト色。
+    // Mob Visuals の対象ではないので、Golden Fish の機能側から直接光らせる
+    private static final String GOLDEN_FISH_SKIN =
+            "120cf3c0a40fc67e0e5fe0c46b0ae409ac71030a7656da17b11ed001645888fe";
+    private static final int GOLDEN_FISH_GLOW_COLOR = 0xFFAA00;
 
     // Rockmite Mound のハイライト色と、その見た目に使われているスキンのテクスチャ。
     // 色は移植元の Skyblocker と同じ明るい水色
@@ -979,6 +986,29 @@ public class EntityHighlightManager {
             // ワールド遷移をまたいで古い計測・ラッチを持ち越さない
             resetCrimsonBossTracking();
             return;
+        }
+
+        // Golden Fish: Mob Visuals とは別の機能なので、ここもハイライトだけにする。
+        // 下の早期戻りより前に置き、Mob Visuals を全て切っていても動くようにする
+        boolean goldenFishVisuals = ModConfig.INSTANCE.fishing.highlightGoldenFish
+                || ModConfig.INSTANCE.fishing.tracerGoldenFish;
+        if (goldenFishVisuals && GoldenFishHandler.isActive()) {
+            for (Entity entity : client.level.entitiesForRendering()) {
+                if (!matchesHeadSkin(entity, GOLDEN_FISH_SKIN)) continue;
+
+                if (ModConfig.INSTANCE.fishing.tracerGoldenFish) {
+                    tracerEntities.put(entity, 0xFF000000 | GOLDEN_FISH_GLOW_COLOR);
+                }
+                if (!ModConfig.INSTANCE.fishing.highlightGoldenFish) continue;
+
+                // marker でないアーマースタンドは、そのままだと腕・胴・脚の輪郭まで出てしまう
+                if (entity instanceof ArmorStand stand && !stand.isMarker()) headOnlyGlowEntities.add(entity);
+
+                highlightedEntities.add(entity);
+                // アーマースタンドは型による一括削除ができないので、毎 tick 作り直す集合へ入れる
+                rebuiltVisuals.add(entity);
+                customGlowColors.put(entity, GOLDEN_FISH_GLOW_COLOR);
+            }
         }
 
         ModConfig.TheEndCategory theEnd = ModConfig.INSTANCE.theEnd;

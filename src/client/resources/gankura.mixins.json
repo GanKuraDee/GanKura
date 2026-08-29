@@ -17,6 +17,8 @@
 		"ArachneCrystalParticleMixin",
 		"InvisibugParticleMixin",
 		"FloorDropParticleMixin",
+		"HotspotRadarParticleMixin",
+		"HotspotParticleMixin",
 		"ArmorStandHeadOnlyGlowMixin",
 		"HideDamageSplashMixin",
 		"PetsMenuClickMixin",

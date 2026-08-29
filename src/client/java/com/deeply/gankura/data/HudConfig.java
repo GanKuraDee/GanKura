@@ -64,8 +64,12 @@ public class HudConfig {
                 new GearHud(),
                 new YawPitchHud(),
                 new QuiverHud(),
-                new FerocityHud(),
-                new BiteCountdownHud());
+                new FerocityHud());
+
+        register(HudCategory.FISHING,
+                new BiteCountdownHud(),
+                new BaitHud(),
+                new GoldenFishHud());
     }
 
     private static void register(HudCategory category, HudElement... elements) {
