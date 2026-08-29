@@ -2,6 +2,8 @@ package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.FishingBobberTracker;
+import com.deeply.gankura.handler.HotspotAreaHandler;
+import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
@@ -11,6 +13,7 @@ import com.deeply.gankura.waypoint.WaypointData;
 import com.deeply.gankura.waypoint.WaypointManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoProperties;
+import net.minecraft.gizmos.LineGizmo;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.TextGizmo;
 import net.minecraft.core.BlockPos;
@@ -35,6 +38,17 @@ public class WorldTextRenderer {
     private static final int WAYPOINT_LABEL_COLOR = 0xFFFFFFFF;
     private static final double WAYPOINT_MAX_DISTANCE = 384.0;
 
+    // Hotspot の範囲を示す円の太さ・分割数と、描くのをやめる距離(ブロック)。
+    // 色は効果の種類ごとに変わるので HotspotAreaHandler が持つ
+    private static final float HOTSPOT_CIRCLE_WIDTH = 2.0f;
+    private static final int HOTSPOT_CIRCLE_SEGMENTS = 64;
+    private static final double HOTSPOT_CIRCLE_MAX_DISTANCE = 128.0;
+
+    // Hotspot Radar の推測地点に使う色と太さ
+    public static final int HOTSPOT_COLOR = 0xFFFF55FF;
+    private static final int HOTSPOT_FILL_COLOR = 0x40FF55FF;
+    private static final float HOTSPOT_LINE_WIDTH = 3.0f;
+
     public static void render(Minecraft client) {
         if (client.player == null) return;
         renderGolemLocationText();
@@ -46,6 +60,54 @@ public class WorldTextRenderer {
         renderBeeNests();
         renderCustomWaypoints(client);
         renderCastTimer(client);
+        renderHotspotGuess(client);
+        renderHotspotCircles(client);
+    }
+
+    /**
+     * Hotspot の範囲を円で示す。
+     *
+     * 円の描画は無いので、短い線をつないで多角形にする。
+     * 分割数を十分に取れば、見た目は円と区別が付かない
+     */
+    private static void renderHotspotCircles(Minecraft client) {
+        for (HotspotAreaHandler.Circle circle : HotspotAreaHandler.circles()) {
+            if (client.player.position().distanceTo(circle.center()) > HOTSPOT_CIRCLE_MAX_DISTANCE) continue;
+
+            renderCircle(circle.center(), circle.radius(), circle.argb());
+        }
+    }
+
+    private static void renderCircle(Vec3 center, double radius, int argb) {
+        Vec3 previous = null;
+        for (int i = 0; i <= HOTSPOT_CIRCLE_SEGMENTS; i++) {
+            double angle = Math.TAU * i / HOTSPOT_CIRCLE_SEGMENTS;
+            Vec3 point = center.add(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+
+            if (previous != null) drawSegment(previous, point, argb);
+            previous = point;
+        }
+    }
+
+    private static void drawSegment(Vec3 from, Vec3 to, int argb) {
+            GizmoProperties segment = Gizmos.addGizmo(new LineGizmo(from, to, argb,
+                    HOTSPOT_CIRCLE_WIDTH));
+            segment.setAlwaysOnTop();
+    }
+
+    // Hotspot Radar から推測した場所に印を出す
+    private static void renderHotspotGuess(Minecraft client) {
+        Vec3 guess = HotspotRadarHandler.guess();
+        if (guess == null) return;
+
+        int distance = (int) Math.round(client.player.position().distanceTo(guess));
+        // この描画は1行分なので、改行せずに並べる
+        renderGizmoLabelAt("§d§lHOTSPOT §e" + distance + "m", guess.add(0, 1.5, 0), HOTSPOT_COLOR);
+
+        // 推測なので、居場所が分かるようブロック1つ分の枠も出す
+        GizmoProperties box = Gizmos.cuboid(BlockPos.containing(guess),
+                GizmoStyle.strokeAndFill(HOTSPOT_COLOR, HOTSPOT_LINE_WIDTH, HOTSPOT_FILL_COLOR));
+        box.setAlwaysOnTop();
     }
 
     // 投げている浮きの上に、投げてからの経過秒を出す

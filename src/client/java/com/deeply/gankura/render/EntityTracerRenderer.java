@@ -1,6 +1,7 @@
 package com.deeply.gankura.render;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -25,7 +26,9 @@ public class EntityTracerRenderer {
         WorldTextRenderer.GolemAnchor golem = ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Tracer
                 ? WorldTextRenderer.golemAnchor()
                 : null;
-        if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null) return;
+        boolean hasHotspot = ModConfig.INSTANCE.fishing.showHotspotTracer
+                && HotspotRadarHandler.guess() != null;
+        if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null && !hasHotspot) return;
 
         // 三人称ではカメラがプレイヤーの後方へ離れるため、カメラ位置を始点にすると
         // 線が背後から伸びているように見えるので、その場合だけプレイヤーの目の位置を使う。
@@ -38,6 +41,17 @@ public class EntityTracerRenderer {
         Camera camera = client.gameRenderer.mainCamera();
         Vec3 basePos = camera.isDetached() ? client.player.getEyePosition(partialTicks) : camera.position();
         Vec3 startPos = basePos.add(client.player.getViewVector(partialTicks).scale(0.2));
+
+        // Hotspot Radar の推測地点も、指す相手のエンティティが無いので位置で線を引く
+        Vec3 hotspot = ModConfig.INSTANCE.fishing.showHotspotTracer
+                ? HotspotRadarHandler.guess()
+                : null;
+        if (hotspot != null) {
+            GizmoProperties hotspotProps = Gizmos.addGizmo(
+                new LineGizmo(startPos, hotspot.add(0, 1.5, 0), WorldTextRenderer.HOTSPOT_COLOR, 4.0f)
+            );
+            hotspotProps.setAlwaysOnTop();
+        }
 
         if (golem != null) {
             GizmoProperties golemProps = Gizmos.addGizmo(

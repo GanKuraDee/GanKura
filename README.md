@@ -27,6 +27,10 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - All Moonglade Marsh Mobs (Excluding Sea Creatures)
   - All Torrhus Canyon Mobs (Excluding Sea Creatures)
   - All Critter Safari Mobs
+- **Fishing**
+  - All Sea Creatures
+  - All Lotus Atoll Critters
+  - Golden Fish
 
 # Features
 <details>
@@ -40,7 +44,6 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
 ![Rare Drop Notification](https://cdn.modrinth.com/data/cached_images/083fb73c0c606473ca634b7548aca070825fc15f.png)
   - Status HUD
   - Loot Tracker HUD
-  - HP HUD
   - DPS Calculator
   - Loot Quality Calculator
 
@@ -70,6 +73,24 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Equipment Menu Keybind
   - Tree Felled Title
   - Mob From Tree Title
+  - Cocoon Catch Title
+</details>
+
+<details>
+<summary>Fishing</summary>
+
+  - Shorten Catch Message
+  - Bite Countdown HUD
+  - Bait HUD
+  - Low Bait Alert
+  - Cast Timer
+  - Hotspot
+    - Radar Guess - Reads the Hotspot Radar trail and marks where the hotspot should be.
+    - Gone Title
+    - Circle - Draws the hotspot edge as a circle, coloured by its perk.
+    - Share - Offers to send the coordinates of a hotspot with the perks you picked.
+  - Golden Fish
+    - Spawn window timer, highlight, tracer and throw rod warning.
 </details>
 
 <details>
