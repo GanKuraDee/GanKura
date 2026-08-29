@@ -1787,9 +1787,10 @@ public class EntityHighlightManager {
                 CrimsonBossEntry boss = CRIMSON_BOSSES.get(i);
                 if (!"Bladesoul".equals(boss.nameTag())) continue;
 
+                // Mob Visuals を切っていても、ワールドテキストと Status HUD の
+                // スポーン表示に使うので探索自体は続ける。見た目は下で個別に出し分ける
                 boolean glowBoss = boss.enableHighlight().get();
                 boolean plateBoss = boss.enableNameplate().get();
-                if (!glowBoss && !plateBoss && !boss.enableTracer().get()) break;
 
                 Vec3d center = Vec3d.ofCenter(ModConstants.BLADESOUL_POS);
                 Box area = new Box(
