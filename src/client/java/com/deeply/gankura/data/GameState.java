@@ -65,6 +65,26 @@ public class GameState {
         public static boolean isTorrhusHeights() {
             return ModConstants.MAP_TORRHUS_HEIGHTS.equals(map);
         }
+
+        public static boolean isBackwaterBayou() {
+            return ModConstants.MAP_BACKWATER_BAYOU.equals(map);
+        }
+
+        public static boolean isLotusAtoll() {
+            return ModConstants.MAP_LOTUS_ATOLL.equals(map);
+        }
+
+        public static boolean isJerrysWorkshop() {
+            return ModConstants.MAP_JERRYS_WORKSHOP.equals(map);
+        }
+
+        public static boolean isDwarvenMines() {
+            return ModConstants.MAP_DWARVEN_MINES.equals(map);
+        }
+
+        public static boolean isFarmingIslands() {
+            return ModConstants.MAP_FARMING_ISLANDS.equals(map);
+        }
     }
 
     public static class Player {

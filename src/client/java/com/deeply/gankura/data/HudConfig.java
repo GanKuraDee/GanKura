@@ -40,21 +40,16 @@ public class HudConfig {
         register(HudCategory.THE_END,
                 new GolemStatusHud(),
                 new GolemLootTrackerHud(),
-                new GolemHealthHud(),
                 new DragonStatusHud(),
-                new DragonLootTrackerHud(),
-                new DragonHealthHud());
+                new DragonLootTrackerHud());
 
         register(HudCategory.SPIDERS_DEN,
                 new BroodmotherStatusHud(),
-                new BroodmotherHealthHud(),
-                new ArachneStatusHud(),
-                new ArachneHealthHud());
+                new ArachneStatusHud());
 
         register(HudCategory.CRIMSON_ISLE,
                 new CrimsonIsleStatusHud(),
-                new CrimsonLootTrackerHud(),
-                new CrimsonBossesHealthHud());
+                new CrimsonLootTrackerHud());
 
         register(HudCategory.CRITTER_SAFARI,
                 new CapturedCrittersHud());
@@ -69,7 +64,8 @@ public class HudConfig {
                 new GearHud(),
                 new YawPitchHud(),
                 new QuiverHud(),
-                new FerocityHud());
+                new FerocityHud(),
+                new BiteCountdownHud());
     }
 
     private static void register(HudCategory category, HudElement... elements) {

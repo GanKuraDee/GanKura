@@ -49,6 +49,8 @@ public class NetworkHandler {
             WarpCooldownHandler.handleMessage(unformattedMsg);
             ArachneHandler.handleMessage(unformattedMsg, client);
             ForagingHandler.handleMessage(unformattedMsg, client);
+            // 釣り上げの文言。短縮形に差し替えたときは、元のメッセージを出さない
+            if (SeaCreatureCatchHandler.handleMessage(unformattedMsg, client)) return false;
 
             if (DragonHandler.handleMessage(msg, client)) {
                 return true;

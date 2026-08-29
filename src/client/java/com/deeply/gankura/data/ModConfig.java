@@ -84,7 +84,6 @@ public class ModConfig extends Config {
         INSTANCE.theEnd.trackedGolemDrops = normalizeEnumList(INSTANCE.theEnd.trackedGolemDrops, GolemRareDrop.defaults());
         INSTANCE.theEnd.trackedDragonDrops = normalizeEnumList(INSTANCE.theEnd.trackedDragonDrops, DragonRareDrop.defaults());
         INSTANCE.crimsonIsle.trackedCrimsonDrops = normalizeEnumList(INSTANCE.crimsonIsle.trackedCrimsonDrops, CrimsonRareDrop.defaults());
-        INSTANCE.crimsonIsle.crimsonHealthHudTargets = normalizeEnumList(INSTANCE.crimsonIsle.crimsonHealthHudTargets, CrimsonHealthHudTarget.defaults());
         INSTANCE.theEnd.dragonSpawnAlerts = normalizeEnumList(INSTANCE.theEnd.dragonSpawnAlerts, DragonAlertType.defaults());
 
         INSTANCE.mobVisuals.targetsTheEnd = normalizeEnumList(INSTANCE.mobVisuals.targetsTheEnd, List.of());
@@ -97,6 +96,7 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsSafariIcy = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariIcy, List.of());
         INSTANCE.mobVisuals.targetsMoongladeMarsh = normalizeEnumList(INSTANCE.mobVisuals.targetsMoongladeMarsh, List.of());
         INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
+        INSTANCE.mobVisuals.targetsLotusAtoll = normalizeEnumList(INSTANCE.mobVisuals.targetsLotusAtoll, List.of());
 
         INSTANCE.saveNow();
     }
@@ -160,6 +160,10 @@ public class ModConfig extends Config {
     public ForagingCategory foraging = new ForagingCategory();
 
     @Expose
+    @Category(name = "Fishing", desc = "Fishing features.")
+    public FishingCategory fishing = new FishingCategory();
+
+    @Expose
     @Category(name = "Mob Visuals", desc = "Which mobs get a highlight, tracer or nameplate.")
     public MobVisualsCategory mobVisuals = new MobVisualsCategory();
 
@@ -207,12 +211,6 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 0)
         public boolean showGolemStatusHud = true;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean showGolemHealthHud = true;
 
         // ---- Rare Drop Settings (id: 7) ----
         @Expose
@@ -347,12 +345,6 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 10)
         public boolean showDragonStatusHud = true;
 
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 10)
-        public boolean showDragonHealthHud = true;
-
         // ---- Rare Drop Settings (id: 15) ----
         @Expose
         @ConfigOption(name = "Rare Drop Settings", desc = "Expands rare drop settings.")
@@ -438,12 +430,6 @@ public class ModConfig extends Config {
         public boolean showBroodmotherStatusHud = true;
 
         @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 0)
-        public boolean showBroodmotherHealthHud = true;
-
-        @Expose
         @ConfigOption(name = "Stage 4 Alert", desc = "Expands stage 4 alerts.")
         @ConfigEditorAccordion(id = 2)
         @ConfigEditorBoolean
@@ -507,12 +493,6 @@ public class ModConfig extends Config {
         public boolean showArachneStatusHud = true;
 
         @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows HP HUD.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 5)
-        public boolean showArachneHealthHud = true;
-
-        @Expose
         @ConfigOption(name = "World Location Display", desc = "Expands world location settings.")
         @ConfigEditorAccordion(id = 6)
         @ConfigEditorBoolean
@@ -536,16 +516,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Status HUD", desc = "Shows boss status.")
         @ConfigEditorBoolean
         public boolean showCrimsonIsleStatusHud = true;
-
-        @Expose
-        @ConfigOption(name = "HP HUD", desc = "Shows the boss HP HUD.")
-        @ConfigEditorBoolean
-        public boolean showCrimsonHealthHud = true;
-
-        @Expose
-        @ConfigOption(name = "HP HUD Bosses", desc = "Bosses shown on the HP HUD. The order sets which one wins when several are alive.")
-        @ConfigEditorDraggableList
-        public List<CrimsonHealthHudTarget> crimsonHealthHudTargets = new ArrayList<>(CrimsonHealthHudTarget.defaults());
 
         // ---- Rare Drop Settings (id: 5) ----
         @Expose
@@ -621,6 +591,12 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean enableTreeMobTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Cocoon Catch Title", desc = "Shows a title when you cocoon a mob.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean enableCocoonCatchTitle = true;
 
         @Expose
         @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon settings.")
@@ -734,6 +710,38 @@ public class ModConfig extends Config {
     // ==========================================
     // Mob Visuals: 3機能それぞれの対象モブ
     // ==========================================
+    public static class FishingCategory {
+        @Expose
+        @ConfigOption(name = "Cast Timer", desc = "Expands cast timer settings.")
+        @ConfigEditorAccordion(id = 57)
+        @ConfigEditorBoolean
+        public boolean castTimerFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Shows how long the bobber has been floating, above the bobber.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 57)
+        public boolean showCastTimer = false;
+
+        @Expose
+        @ConfigOption(name = "Start on Liquid Touch", desc = "Starts counting when the bobber lands,\n"
+                + "instead of when it is cast.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 57)
+        public boolean castTimerOnLiquidTouch = true;
+
+        @Expose
+        @ConfigOption(name = "Bite Countdown HUD", desc = "Shows how long until something bites while fishing.")
+        @ConfigEditorBoolean
+        public boolean showBiteCountdownHud = false;
+
+        @Expose
+        @ConfigOption(name = "Shorten Catch Message", desc = "Replaces the long sea creature catch message\n"
+                + "with a short one.")
+        @ConfigEditorBoolean
+        public boolean shortenSeaCreatureMessage = false;
+    }
+
     public static class MobVisualsCategory {
         // ネームプレートの基準サイズ。1.0 でGUIスケール4相当の見え方になる
         public static final float DEFAULT_NAMEPLATE_SCALE = 1.0f;
@@ -917,6 +925,29 @@ public class ModConfig extends Config {
         public transient Runnable disableAllTorrhusCanyon = () -> targetsTorrhusCanyon.clear();
 
         @Expose
+        @ConfigOption(name = "Lotus Atoll", desc = "Expands Lotus Atoll targets.")
+        @ConfigEditorAccordion(id = 95)
+        @ConfigEditorBoolean
+        public boolean lotusAtollFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 95)
+        public List<MobVisual.LotusAtoll> targetsLotusAtoll = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Lotus Atoll mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 95)
+        public transient Runnable enableAllLotusAtoll = () -> setAll(targetsLotusAtoll, MobVisual.LotusAtoll.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 95)
+        public transient Runnable disableAllLotusAtoll = () -> targetsLotusAtoll.clear();
+
+        @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari areas.")
         @ConfigEditorAccordion(id = 92)
         @ConfigEditorBoolean
@@ -1023,6 +1054,36 @@ public class ModConfig extends Config {
         @ConfigEditorButton(buttonText = "None")
         @ConfigAccordionId(id = 91)
         public transient Runnable disableAllSafariIcy = () -> targetsSafariIcy.clear();
+
+        @Expose
+        @ConfigOption(name = "Sea Creatures", desc = "Expands Sea Creature targets.\n"
+                + "§eLegendary and Mythic tiers, plus the Special ones.")
+        @ConfigEditorAccordion(id = 94)
+        @ConfigEditorBoolean
+        public boolean seaCreatureFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Spawn Title", desc = "Shows a title with the name when a listed Sea Creature is found.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 94)
+        public boolean enableSeaCreatureTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 94)
+        public List<MobVisual.SeaCreature> targetsSeaCreature = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Sea Creature into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 94)
+        public transient Runnable enableAllSeaCreature = () -> setAll(targetsSeaCreature, MobVisual.SeaCreature.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 94)
+        public transient Runnable disableAllSeaCreature = () -> targetsSeaCreature.clear();
 
         /** Tracer をどのモブに出すか。表示名はそのまま設定画面の選択肢になる */
         public enum TracerMode {
