@@ -28,9 +28,8 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - All Torrhus Canyon Mobs (Excluding Sea Creatures)
   - All Critter Safari Mobs
 - **Fishing**
-  - All Sea Creatures
+  - All Rare Sea Creatures
   - All Lotus Atoll Critters
-  - Golden Fish
 
 # Features
 <details>
