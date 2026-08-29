@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3fc;
 
 import java.util.Map;
 
@@ -28,8 +29,6 @@ public class BossNameplateRenderer {
     // GUIスケール設定を変えても画面上での大きさが変わらないようにする。
     // 設定のサイズ(既定1.0)はこの見え方に対する倍率として掛ける
     private static final double REFERENCE_GUI_SCALE = 4.0;
-    // projectPointToScreen の戻り値は正規化デバイス座標。z > 1 はカメラの後方を意味する
-    private static final double NDC_BEHIND_CAMERA_Z = 1.0;
 
     public static void render(GuiGraphicsExtractor graphics, Minecraft client, float partialTicks) {
         if (EntityHighlightManager.nameplateEntities.isEmpty()) return;
@@ -52,9 +51,14 @@ public class BossNameplateRenderer {
             // カメラと同じ位置だと投影が破綻するため除外する
             if (cameraPos.distanceToSqr(center) < 1.0E-4) continue;
 
+            // 投影は w で割るため、カメラの後ろにあるものは x/y の符号が反転し、
+            // 画面のちょうど反対側に現れてしまう。奥行きの符号は投影後の z では見分けが付かないので、
+            // 視線ベクトルとの向きで前後を判定して弾く
+            Vec3 toTarget = center.subtract(cameraPos);
+            Vector3fc forward = camera.forwardVector();
+            if (toTarget.x * forward.x() + toTarget.y * forward.y() + toTarget.z * forward.z() <= 0) continue;
+
             Vec3 ndc = client.gameRenderer.projectPointToScreen(center);
-            // カメラの後方にある対象は、投影結果が反転して画面内に現れてしまうので描画しない
-            if (ndc.z > NDC_BEHIND_CAMERA_Z) continue;
 
             float centerX = (float) (ndc.x * 0.5 + 0.5) * screenWidth;
             float centerY = (float) (0.5 - ndc.y * 0.5) * screenHeight;
