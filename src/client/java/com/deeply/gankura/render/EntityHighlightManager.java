@@ -1705,7 +1705,7 @@ public class EntityHighlightManager {
 
                 // 当たり判定が起点になったモブは、見た目のブロック表示(Display)へ差し替える
                 if (SAFARI_DISPLAY_TARGETS.contains(target)) {
-                    Entity display = nearestOfType(client, entity, Display.class);
+                    Entity display = nearestBodyDisplay(client, entity);
                     if (display == null) continue;
                     entity = display;
                 }
@@ -2269,6 +2269,8 @@ public class EntityHighlightManager {
             // 被っている skull だけで種まで決まる。
             // Fairy Soul も名前なし・装備ありのアーマースタンドだが、skull が違うので自然に外れる
             MobVisual bySkin = headSkinTarget(entity);
+            // 未登録のスキンなら null。List.of は contains(null) で例外を投げる
+            if (bySkin == null) return null;
             return SAFARI_SKIN_TARGETS.contains(bySkin) ? bySkin : null;
         }
 
@@ -2660,6 +2662,15 @@ public class EntityHighlightManager {
 
     private static boolean inSafariIcy(Entity entity) {
         return entity.getX() < SAFARI_CENTER_X && entity.getZ() < SAFARI_CENTER_Z;
+    }
+
+    // 見た目を担う Display のうち、最も近いもの。
+    // ネームタグも Display(TextDisplay) で作られており、
+    // そちらを本体と取り違えるとネームプレートやトレーサーが頭の上のタグに付いてしまう
+    private static Entity nearestBodyDisplay(Minecraft client, Entity entity) {
+        AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
+        return getClosestEntity(client.level.getEntitiesOfClass(Display.class, box,
+                e -> !(e instanceof Display.TextDisplay)), entity);
     }
 
     // すぐ近くにある、指定した種類の最も近いエンティティ
@@ -3330,7 +3341,8 @@ public class EntityHighlightManager {
         AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
         for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
             MobVisual target = itemSkinTarget(displayItem(display));
-            if (SAFARI_SKIN_TARGETS.contains(target)) return target;
+            // 未登録のスキンなら null。List.of は contains(null) で例外を投げる
+            if (target != null && SAFARI_SKIN_TARGETS.contains(target)) return target;
         }
         return null;
     }
