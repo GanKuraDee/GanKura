@@ -1,6 +1,10 @@
 # GanKura
 GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses. 
 
+> **This branch is no longer supported.**
+> Hypixel SkyBlock now only supports 26.1.x and newer, so 1.21.11 support ends here.
+> 7.0.1 is the final release for 1.21.11. Development continues on the 26.1.x and 26.2 branches.
+
 - **Commands**
   - `/gankura` - Open the main settings screen.
   - `/gankura hud` - Open the HUD movement and scaling settings screen.
