@@ -22,8 +22,8 @@ public enum CrimsonRareDrop {
     WAND_OF_STRENGTH("§5Wand of Strength", "Wand of Strength", "MAGE OUTLAW", () -> LootStats.wandsOfStrength, LootStats::addWandOfStrength),
     FLAMING_FIST("§5Flaming Fist", "Flaming Fist", "BARBARIAN DUKE X", () -> LootStats.flamingFists, LootStats::addFlamingFist),
     FIRE_FURY_STAFF("§5Fire Fury Staff", "Fire Fury Staff", "MAGMA BOSS", () -> LootStats.fireFuryStaffs, LootStats::addFireFuryStaff),
-    EPIC_MAGMA_CUBE_PET("§5Magma Cube §7(Pet)", null, "MAGMA BOSS", () -> LootStats.epicMagmaCubePets, LootStats::addEpicMagmaCubePet),
-    LEGENDARY_MAGMA_CUBE_PET("§6Magma Cube §7(Pet)", null, "MAGMA BOSS", () -> LootStats.legendaryMagmaCubePets, LootStats::addLegendaryMagmaCubePet);
+    EPIC_MAGMA_CUBE_PET("§7[Lvl 1] §5Magma Cube", null, "MAGMA BOSS", () -> LootStats.epicMagmaCubePets, LootStats::addEpicMagmaCubePet),
+    LEGENDARY_MAGMA_CUBE_PET("§7[Lvl 1] §6Magma Cube", null, "MAGMA BOSS", () -> LootStats.legendaryMagmaCubePets, LootStats::addLegendaryMagmaCubePet);
 
     private final String label;
     private final String itemName;

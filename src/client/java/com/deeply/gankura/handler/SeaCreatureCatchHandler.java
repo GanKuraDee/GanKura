@@ -23,12 +23,6 @@ import java.util.regex.Pattern;
  */
 public class SeaCreatureCatchHandler {
 
-    // プレイヤーの発言の前置き。"[MVP+] Name: " や "Party > Name: " のような形。
-    // 行頭に限って見るので、Ragnarok の文言のように途中にコロンがあるものは弾かれない
-    private static final Pattern PLAYER_CHAT_PREFIX = Pattern.compile(
-            "^(?:(?:Party|Guild|Co-op|Officer) > |From |To )?"
-                    + "(?:\\[[^\\]]+\\] )?\\w{1,16}(?: \\[[^\\]]+\\])?: ");
-
     // 1度に2匹釣れた合図。Hypixel は釣り上げの文言の直前にこの行を出す
     private static final Pattern DOUBLE_HOOK_PATTERN =
             Pattern.compile("It's a Double Hook!(?: Woot woot!)?");
@@ -56,9 +50,7 @@ public class SeaCreatureCatchHandler {
      * @return 元のメッセージを差し止めるなら true。短縮形に差し替えたときだけ true になる
      */
     public static boolean handleMessage(String unformattedMsg, Minecraft client) {
-        // 誰かが同じ文言を発言しただけのときに反応させない
-        if (PLAYER_CHAT_PREFIX.matcher(unformattedMsg).find()) return false;
-
+        // プレイヤーの発言は NetworkHandler で弾かれているので、ここには来ない
         if (DOUBLE_HOOK_PATTERN.matcher(unformattedMsg.trim()).matches()) {
             doubleHookMillis = System.currentTimeMillis();
             // 短縮するときは、この行を釣り上げの文言の頭にまとめるので出さない

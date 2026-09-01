@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.scanner.BeeNestScanner;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -42,7 +43,13 @@ public class NetworkHandler {
             String unformattedMsg = msg.replaceAll("§[0-9a-fk-or]", "");
             Minecraft client = Minecraft.getInstance();
 
-            // 2. 各ドメイン(機能)への純粋な委譲
+            // 2. プレイヤーの発言はここで止める。
+            // 下の担当者はどれもサーバーからの知らせだけを見ているので、
+            // 誰かが同じ文言を発言しただけのときに反応させない。
+            // 発言そのものを扱う機能を足すときは、ここより前で受け取る
+            if (ModConstants.isPlayerChat(unformattedMsg)) return true;
+
+            // 3. 各ドメイン(機能)への純粋な委譲
             // NetworkHandler自身は、メッセージの中身が何なのか一切気にせず担当者に投げるだけ！
             ServerRestartHandler.handleChat(unformattedMsg, client);
             PetHandler.handleMessage(message);

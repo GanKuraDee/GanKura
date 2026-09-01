@@ -1,0 +1,338 @@
+{
+  "Empty": [
+    {
+      "x": 97,
+      "y": 17,
+      "playerInvOnly": true,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 115,
+      "y": 17,
+      "playerInvOnly": true,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 97,
+      "y": 35,
+      "playerInvOnly": true,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 115,
+      "y": 35,
+      "playerInvOnly": true,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 153,
+      "y": 27,
+      "playerInvOnly": true,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": 22,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": 42,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": 62,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": -84,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": -64,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": "",
+      "icon": ""
+    },
+    {
+      "x": 2,
+      "y": -44,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 2,
+      "y": -24,
+      "playerInvOnly": false,
+      "anchorRight": true,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 4,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 25,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 46,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 67,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 88,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 109,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 130,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 151,
+      "y": -19,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": 22,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": 42,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": 62,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": false,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": -84,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": -64,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": -44,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": -19,
+      "y": -24,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 25,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 46,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 67,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 88,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 109,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 130,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    },
+    {
+      "x": 151,
+      "y": 2,
+      "playerInvOnly": false,
+      "anchorRight": false,
+      "anchorBottom": true,
+      "backgroundIndex": 0,
+      "command": ""
+    }
+  ]
+}

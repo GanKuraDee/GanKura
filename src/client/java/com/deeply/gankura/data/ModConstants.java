@@ -146,8 +146,16 @@ public class ModConstants {
     // =======================================================
     // Foraging 関連のチャット
     // =======================================================
-    // 通常は木を最後まで切らないと倒せないが、特定の効果が発動すると途中でも一度に切り倒せる
-    public static final String TREE_FELLED_MSG = "You felled the entire Tree!";
+    /**
+     * 通常は木を最後まで切らないと倒せないが、Timber が発動すると途中でも一度に切り倒せる。
+     *
+     * 文面は木の種類ごとに変わり、他人の Timber でも流れてくる。
+     *   "TIMBER! You felled the entire Oak Tree!"
+     *   "TIMBER! <player> felled the entire Helix Tree!"
+     * 変わらないのは "felled the entire ... Tree!" の部分だけなので、そこだけを見る
+     */
+    public static final Pattern TREE_FELLED_PATTERN =
+            Pattern.compile("felled the entire .*Tree!", Pattern.CASE_INSENSITIVE);
     // 切り倒した木からモブが降ってきたときに流れる。モブ名は複数種類あるのでキャプチャして表示に使う
     public static final Pattern TREE_MOB_FELL_PATTERN =
             Pattern.compile("A (.+?) fell from the Tree!", Pattern.CASE_INSENSITIVE);
@@ -162,6 +170,11 @@ public class ModConstants {
 
     // Forest Biome の Legendary Critter。Birdfeeder に寄ってきた時のメッセージでしか分からない
     public static final String MACAW_ATTRACTED_MSG = "Two Macaws were attracted to the Birdfeeder!";
+
+    // "BEEHEEMOTH! A Beeheemoth has spawned at Torrhus Springs!"
+    // Torrhus Canyon のミニボス。湧いた場所はサブエリア名で知らされるので、そこを取り出す
+    public static final Pattern BEEHEEMOTH_SPAWN_PATTERN =
+            Pattern.compile("A Beeheemoth has spawned at (.+?)!", Pattern.CASE_INSENSITIVE);
 
     // Wumpa のキャプチャ成功の合図
     public static final String WUMPA_CAPTURED_MSG = "The cave opens up again";
@@ -268,6 +281,39 @@ public class ModConstants {
     // 全文は "You hear the sound of massive footsteps echoing through the Icy Biome... What could it be?" だが、
     // 末尾の煽り文が変わっても拾えるよう、核となる部分だけを一致条件にする
     public static final String WUMPA_SPAWN_MSG = "massive footsteps echoing through the Icy Biome";
+
+    /**
+     * プレイヤーの発言か。サーバーからの知らせと見分けるために使う。
+     *
+     * SkyBlock の発言には必ずスカイブロックレベルが先に付き、
+     * 逆に "[数字]" で始まるサーバーの知らせは無い。これが一番確かな手掛かりになる。
+     *   "[500] [MVP+] Name: text" / "Party > [500] Name: text"
+     *
+     * レベルが付かない場面(ささやきなど)に備えて、名前とコロンの形も併せて見る。
+     * どちらも行頭に限って調べるので、文中にコロンがあるだけの知らせは弾かれない
+     */
+    public static boolean isPlayerChat(String unformattedMsg) {
+        if (unformattedMsg == null) return false;
+        // ボスやNPCのセリフも「名前: 中身」の形をしているが、これはサーバー側の知らせ
+        if (DIALOGUE_PATTERN.matcher(unformattedMsg).find()) return false;
+
+        return PLAYER_CHAT_LEVEL_PATTERN.matcher(unformattedMsg).find()
+                || PLAYER_CHAT_NAME_PATTERN.matcher(unformattedMsg).find();
+    }
+
+    // "[BOSS] Arachne: ..." や "[NPC] Jerry: ..." のセリフ
+    private static final Pattern DIALOGUE_PATTERN = Pattern.compile("^\\[(?:BOSS|NPC)\\] ");
+
+    // 発言の前に付く、パーティやギルドなどの宛先
+    private static final String CHAT_CHANNEL = "^(?:(?:Party|Guild|Co-op|Officer) > |From |To )?";
+
+    // スカイブロックレベル。これで始まるのは発言だけ
+    private static final Pattern PLAYER_CHAT_LEVEL_PATTERN =
+            Pattern.compile(CHAT_CHANNEL + "\\[\\d+\\] ");
+
+    // 括弧の前置き(レベル・ランク・称号)はいくつ付いても許す
+    private static final Pattern PLAYER_CHAT_NAME_PATTERN =
+            Pattern.compile(CHAT_CHANNEL + "(?:\\[[^\\]]+\\] )*\\w{1,16}(?: \\[[^\\]]+\\])?: ");
 
     // Hypixel側の大文字小文字の表記ゆれに対応するための共通ヘルパー
     public static boolean containsIgnoreCase(String source, String target) {

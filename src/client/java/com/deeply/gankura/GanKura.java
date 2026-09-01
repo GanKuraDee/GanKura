@@ -9,6 +9,7 @@ import com.deeply.gankura.handler.GoldenFishHandler;
 import com.deeply.gankura.handler.HotspotAlertHandler;
 import com.deeply.gankura.handler.HotspotAreaHandler;
 import com.deeply.gankura.handler.HotspotRadarHandler;
+import com.deeply.gankura.handler.InventoryButtonHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
@@ -20,6 +21,7 @@ import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
+import com.deeply.gankura.gui.InventoryButtonEditorScreen;
 import com.deeply.gankura.gui.WaypointScreen;
 import com.deeply.gankura.waypoint.Waypoint;
 import com.deeply.gankura.waypoint.WaypointData;
@@ -61,6 +63,8 @@ public class GanKura implements ClientModInitializer {
     private static boolean openHudNextTick = false;
     // ウェイポイント画面もコマンドから開く。チャットが閉じた次のtickまで待つのは他と同じ理由
     private static boolean openWaypointNextTick = false;
+    // Inventory Button の編集画面も同じ理由で 1tick 待つ
+    private static boolean openButtonEditorNextTick = false;
 
     @Override
     public void onInitializeClient() {
@@ -98,6 +102,7 @@ public class GanKura implements ClientModInitializer {
         FloorDropHandler.register();
         BeeNestScanner.register();
         FishingBobberTracker.register();
+        InventoryButtonHandler.register();
         // 開発中の一時的な機能。配布ビルドには入っていないので、あるときだけ読み込む
         DevHooks.load();
 
@@ -115,6 +120,10 @@ public class GanKura implements ClientModInitializer {
             if (openWaypointNextTick) {
                 openWaypointNextTick = false;
                 client.gui.setScreen(new WaypointScreen(null));
+            }
+            if (openButtonEditorNextTick) {
+                openButtonEditorNextTick = false;
+                client.gui.setScreen(new InventoryButtonEditorScreen(null));
             }
         });
 
@@ -141,6 +150,13 @@ public class GanKura implements ClientModInitializer {
                     .then(ClientCommands.literal("hud")
                             .executes(context -> {
                                 openHudNextTick = true;
+                                return 1;
+                            })
+                    )
+                    // /gankura buttons -> Inventory Button の編集画面の予約チケットをON
+                    .then(ClientCommands.literal("buttons")
+                            .executes(context -> {
+                                openButtonEditorNextTick = true;
                                 return 1;
                             })
                     )

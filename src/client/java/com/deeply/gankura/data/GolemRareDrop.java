@@ -9,8 +9,8 @@ import java.util.function.IntSupplier;
  * ドラッグリストは toString() を表示に使うため、ラベルには色コードをそのまま入れている。
  */
 public enum GolemRareDrop {
-    EPIC_GOLEM_PET("§5Golem §7(Pet)", () -> LootStats.epicGolemPets),
-    LEGENDARY_GOLEM_PET("§6Golem §7(Pet)", () -> LootStats.legendaryGolemPets),
+    EPIC_GOLEM_PET("§7[Lvl 1] §5Golem", () -> LootStats.epicGolemPets),
+    LEGENDARY_GOLEM_PET("§7[Lvl 1] §6Golem", () -> LootStats.legendaryGolemPets),
     TIER_BOOST_CORE("§6Tier Boost Core", () -> LootStats.tierBoostCores);
 
     private final String label;
