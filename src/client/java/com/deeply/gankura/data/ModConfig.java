@@ -1339,12 +1339,6 @@ public class ModConfig extends Config {
         };
 
         @Expose
-        @ConfigOption(name = "Always Hide \"Crafting\"",
-                desc = "Hides the crafting label in the inventory even when no button covers it.")
-        @ConfigEditorBoolean
-        public boolean hideCrafting = false;
-
-        @Expose
         @ConfigOption(name = "Hide in Dungeon Menus", desc = "Hides the buttons in dungeon puzzle menus.")
         @ConfigEditorBoolean
         public boolean hideInDungeonMenus = false;
