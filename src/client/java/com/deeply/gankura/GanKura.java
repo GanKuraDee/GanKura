@@ -16,6 +16,7 @@ import com.deeply.gankura.handler.QuiverAlertHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
 import com.deeply.gankura.handler.WarpCooldownHandler;
 import com.deeply.gankura.render.EntityHighlightManager;
+import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.scanner.*;
 import com.deeply.gankura.render.HudEditorScreen;
@@ -97,6 +98,8 @@ public class GanKura implements ClientModInitializer {
         FloorDropHandler.register();
         BeeNestScanner.register();
         FishingBobberTracker.register();
+        // 開発中の一時的な機能。配布ビルドには入っていないので、あるときだけ読み込む
+        DevHooks.load();
 
         // ★追加: 毎ティック（1/20秒）ごとに予約チケットをチェックする
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -128,7 +131,7 @@ public class GanKura implements ClientModInitializer {
 
         // コマンドの登録
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> {
-            dispatcher.register(ClientCommands.literal("gankura")
+            LiteralArgumentBuilder<FabricClientCommandSource> gankura = ClientCommands.literal("gankura")
                     // /gankura (引数なし) -> 設定画面の予約チケットをON
                     .executes(context -> {
                         openConfigNextTick = true;
@@ -142,8 +145,11 @@ public class GanKura implements ClientModInitializer {
                             })
                     )
                     .then(waypointCommand())
-                    .then(shareHotspotCommand())
-            );
+                    .then(shareHotspotCommand());
+
+            // 開発中の一時的な機能。配布ビルドでは何も足されない
+            DevHooks.buildCommand(gankura);
+            dispatcher.register(gankura);
 
             // ウェイポイントは出し入れの回数が多いので、短い別名も用意しておく
             dispatcher.register(ClientCommands.literal("gkw")
@@ -170,6 +176,9 @@ public class GanKura implements ClientModInitializer {
             driver.processConfig(ModConfig.INSTANCE);
 
             // 4. 解析が完了したプロセッサをエディタに渡す
+            // 開発中の一時的な機能。配布ビルドではカテゴリが増えない
+            DevHooks.extendConfig(processor);
+
             MoulConfigEditor<ModConfig> editor = new MoulConfigEditor<>(processor);
             GuiElementComponent editorComponent = new GuiElementComponent(editor);
             GuiContext guiContext = new GuiContext(editorComponent);

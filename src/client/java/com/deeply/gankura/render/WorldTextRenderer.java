@@ -8,6 +8,7 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.scanner.BeeNestScanner;
+import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.waypoint.Waypoint;
 import com.deeply.gankura.waypoint.WaypointData;
 import com.deeply.gankura.waypoint.WaypointManager;
@@ -62,6 +63,8 @@ public class WorldTextRenderer {
         renderCastTimer(client);
         renderHotspotGuess(client);
         renderHotspotCircles(client);
+        // 開発中の一時的な機能。配布ビルドでは何も登録されていない
+        DevHooks.renderWorld(client);
     }
 
     /**
@@ -352,7 +355,7 @@ public class WorldTextRenderer {
         renderGizmoLabel(nameText + " " + status, renderPos, argbColor);
     }
 
-    private static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
+    public static void renderGizmoLabel(String text, BlockPos renderPos, int argbColor) {
         renderGizmoLabelAt(text, labelPos(renderPos), argbColor);
     }
 

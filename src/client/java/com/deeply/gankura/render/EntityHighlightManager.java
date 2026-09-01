@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.util.NotificationUtils;
 import com.deeply.gankura.data.CrimsonBossEntry;
 import com.deeply.gankura.data.GameState;
@@ -51,6 +52,8 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import com.mojang.authlib.properties.Property;
+import com.mojang.math.Transformation;
+import org.joml.Vector3fc;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton;
@@ -248,6 +251,11 @@ public class EntityHighlightManager {
     // ただしブロックを映しているものは、原点がブロックの底になる。
     // そのままだと足元に寄ってしまうので、ブロックの中ほどまで上げる
     private static final double BLOCK_DISPLAY_ANCHOR = 0.5;
+    // skull はブロック半分の高さ。Display はその下端を原点に描くので、
+    // 拡大率を掛けた半分だけ下げると見た目の中ほどに合う
+    private static final double SKULL_DISPLAY_HALF_HEIGHT = 0.25;
+    // 描かれているとみなす拡大率の下限
+    private static final double DISPLAY_MIN_SCALE = 0.01;
     // 当たり判定のモブから、見た目を担うヘッドを探す距離(ブロック)。
     // これが見つかる当たり判定は「別のモブの一部」なので、それ自体をモブとして扱わない
     private static final double HITBOX_HEAD_RADIUS = 1.5;
@@ -440,9 +448,7 @@ public class EntityHighlightManager {
     // 見た目がブロック表示(Display)のモブ。透明な当たり判定から見つけて差し替える
     // 表示の差し替え先(判定ではない)
     public static final List<MobVisual> SAFARI_DISPLAY_TARGETS = List.of(
-            SafariCavern.CHUCKWALLA, SafariCavern.FLITTER,
-            SafariHaunted.DUPLICO, SafariHaunted.GIMMIEGOLD,
-            SafariIcy.MANTIS_SHRIMP, SafariIcy.TROODON,
+            SafariHaunted.DUPLICO,
             SafariForest.HIDEONFLOOR, SafariHaunted.HIDEONWALL);
 
     // Critter Safari の、独自の見た目でエンティティ型からは判別できないモブ。ネームタグで判定する。
@@ -611,6 +617,16 @@ public class EntityHighlightManager {
     // ネームタグがあるのに登録済みのスキンが1つも見つからないのは、
     // Hypixel 側で差し替えられたときだけ
     private static final Set<MobVisual> HEAD_SKIN_SPECIES = new HashSet<>(HEAD_SKIN_TARGETS.values());
+
+    // ヘッドのスキンで見分ける Sea Creature。
+    // スキンだけで種まで決まるので、ネームタグを待たずに
+    // 被っているヘッドから直接見つけられる
+    private static final Set<MobVisual> SEA_CREATURE_SKIN_SPECIES = new HashSet<>();
+    static {
+        for (MobVisual target : HEAD_SKIN_SPECIES) {
+            if (SEA_CREATURE_TARGETS.contains(target)) SEA_CREATURE_SKIN_SPECIES.add(target);
+        }
+    }
     // スキンが見つからないことをすでに知らせたネームタグ。
     // 同じネームタグで毎 tick 出さないために覚えておく。
     // エンティティが消えれば勝手に落ちるよう、弱参照で持つ
@@ -1090,6 +1106,7 @@ public class EntityHighlightManager {
         // Sea Creature は釣れる場所が決まっているので、対象の絞り込み(anyEnabled)が
         // そのままエリアの絞り込みになる
         boolean scanSeaCreatures = SEA_CREATURE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean scanSeaCreatureSkins = SEA_CREATURE_SKIN_SPECIES.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanSeaCreatureTypes = SEA_CREATURE_TYPE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanSeaCreaturePlayers = SEA_CREATURE_PLAYER_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         // Torrhus Canyon には同じ型のモブが多数いてエンティティ型では絞れないため、
@@ -1391,6 +1408,16 @@ public class EntityHighlightManager {
                     if (SEA_CREATURE_PLAYER_TARGETS.contains(target)
                             && hasNamedPlayerMob(client, target)) break;
 
+                    // スキンで見分ける種は、表示をスキン照合側に任せる。
+                    // ネームタグが届いているならスキンも届いているので、
+                    // 見つからないときだけ差し替えを知らせる
+                    if (SEA_CREATURE_SKIN_SPECIES.contains(target)) {
+                        if (!hasHeadSkinAnywhere(client, target)) {
+                            reportMissingHeadSkin(client, entity, target);
+                        }
+                        break;
+                    }
+
                     Entity visualTarget = seaCreatureVisual(client, entity, target);
                     if (visualTarget != null) {
                         applySeaCreatureVisuals(client, target, visualTarget);
@@ -1405,11 +1432,7 @@ public class EntityHighlightManager {
                         }
                         announceSeaCreature(client, target, entity);
 
-                        // スキンで見分ける種は、ネームタグが届いているならヘッドも届いている。
-                        // 見つからないのはスキンが変わったときなので、その場で知らせる
-                        if (HEAD_SKIN_SPECIES.contains(target)) {
-                            reportMissingHeadSkin(client, entity, target);
-                        } else if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) {
+                        if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) {
                             reportMissingNamedPlayer(client, entity, target);
                         } else {
                             // 残りはネームタグの名前で種を決め、その型のモブを本体とする。
@@ -1643,6 +1666,21 @@ public class EntityHighlightManager {
                 // Nessie のように、ここで拾う Sea Creature もいる。
                 // タイトルはその種のときだけ出る(announceSeaCreature)
                 announceSeaCreature(client, target, entity);
+            }
+        }
+
+        // ヘッドのスキンで見分ける Sea Creature。スキンだけで種が決まるので、
+        // ネームタグを待たずに被っているヘッドから直接見つける。
+        // ネームタグと組にすると、二つが離れたときに見失う
+        if (scanSeaCreatureSkins) {
+            for (Entity entity : client.level.entitiesForRendering()) {
+                // ネームタグ経由で別のモブの一部と確定しているものは飛ばす
+                if (nametagClaimedEntities.contains(entity)) continue;
+                MobVisual target = headSkinTarget(entity);
+                if (target == null || !SEA_CREATURE_SKIN_SPECIES.contains(target)) continue;
+                if (!target.anyEnabled()) continue;
+
+                applySeaCreatureVisuals(client, target, entity);
             }
         }
 
@@ -2258,10 +2296,24 @@ public class EntityHighlightManager {
     // バイオームでは絞れない。幸い型はエリア全体で重複しないため、型だけで呼び名が決まる
     private static MobVisual safariTarget(Minecraft client, Entity entity) {
         // Hypixel は「見た目のエンティティ」と「当たり判定のモブ」を重ねて1体のモブを作る。
-        // 当たり判定側は必ず透明にされているので、透明なものは見た目の主役ではないと判断できる。
+        // 見た目だけで種が決まるなら見た目側を、決まらないものだけ当たり判定側を起点にする。
         //   Rockmite … シルバーフィッシュそのもの(見えている)
-        //   Hideonwall / Duplico / Driftling / Chuckwalla / Troodon
-        //            … 見た目は別のエンティティで、中の透明なシルバーフィッシュは当たり判定
+        //   Gimmiegold / Troodon / Mantis Shrimp / Chuckwalla / Flitter … skull を被せた Display
+        //   Gazer / Driftling … skull を被せたアーマースタンド
+        //   Hideonwall / Hideonfloor / Duplico … skull が無いので、透明な当たり判定から探す
+        // 見た目の Display が skull を被っているモブ。
+        // skull のスキンだけで種まで決まるので、透明な当たり判定と組にせずとも
+        // この Display だけで本体として扱える。
+        // 組にすると、二つが離れたときに見失う
+        if (entity instanceof Display.ItemDisplay item) {
+            // 拡大率 0 の抜け殻は、見た目を持たないので本体ではない
+            if (!isDrawnDisplay(item)) return null;
+
+            MobVisual bySkin = itemSkinTarget(displayItem(item));
+            if (bySkin == null) return null;
+            return SAFARI_SKIN_TARGETS.contains(bySkin) ? bySkin : null;
+        }
+
         // 見た目がアーマースタンドのモブ。装備の無いものはネームタグ用の透明なスタンド
         if (entity instanceof ArmorStand stand) {
             if (stand.getCustomName() != null || !hasAnyEquipment(stand)) return null;
@@ -2291,26 +2343,19 @@ public class EntityHighlightManager {
                     return safariShulkerColorTarget(shulkerBox.getColor());
                 }
 
-                // 見た目の Display に被せた skull で種が決まる。
-                // Duplico だけはバニラのブロックに化けるので skull が無く、バイオームで決める
-                MobVisual bySkin = safariDisplaySkinTarget(client, entity);
-                if (bySkin != null) return bySkin;
+                // skull を被った Display で見た目を作るモブは、その Display 側で拾っている。
+                // 当たり判定まで拾うと二重になるので、ここでは何もしない
+                if (safariDisplaySkinTarget(client, entity) != null) return null;
 
+                // Duplico はバニラのブロックに化けるので skull が無く、バイオームで決める
                 if (inSafariHaunted(entity)) return SafariHaunted.DUPLICO;
                 // Forest で透明なシルバーフィッシュを使うのは Hideonfloor だけ。
                 // 動いてシュルカーを見失っても、見た目のブロックを対象にできる
                 if (inSafariForest(entity)) return SafariForest.HIDEONFLOOR;
                 return null;
             }
-            if (entity instanceof Bat) {
-                // 見た目の Display に被せた skull で、バイオームを見なくても種が決まる
-                return safariDisplaySkinTarget(client, entity);
-            }
-            if (entity instanceof TropicalFish) {
-                // 見た目の Display に被せた skull で、バイオームを見なくても種が決まる
-                return safariDisplaySkinTarget(client, entity);
-            }
-            // Shyworm(スライム)など、見た目を別で拾うものはここでは扱わない
+            // コウモリや熱帯魚の当たり判定を使うモブも、Shyworm(スライム)も、
+            // 見た目を別のエンティティで拾っているので、ここでは扱わない
             return null;
         }
 
@@ -2543,7 +2588,12 @@ public class EntityHighlightManager {
         // Display は当たり判定を持たないので、原点をそのまま表示位置にする。
         // ブロックを映しているものだけは、原点が底なので中ほどまで上げる
         if (entity instanceof Display.ItemDisplay item) {
-            return displayItem(item).getItem() instanceof BlockItem ? BLOCK_DISPLAY_ANCHOR : DISPLAY_ANCHOR;
+            ItemStack stack = displayItem(item);
+            // skull はプレイヤーヘッドブロックのアイテムなので BlockItem に当たるが、
+            // ここではモブの見た目そのものであってブロックではない。
+            // ブロックと同じく持ち上げると、本体の上に浮いてしまう
+            if (stack.get(DataComponents.PROFILE) != null) return skullDisplayAnchor(item);
+            return stack.getItem() instanceof BlockItem ? BLOCK_DISPLAY_ANCHOR : DISPLAY_ANCHOR;
         }
         if (entity instanceof Display) return DISPLAY_ANCHOR;
 
@@ -2664,13 +2714,42 @@ public class EntityHighlightManager {
         return entity.getX() < SAFARI_CENTER_X && entity.getZ() < SAFARI_CENTER_Z;
     }
 
+    // skull を映す Display の、見た目の中ほどの高さ。
+    // Display は transformation で原点からずらして描かれるので、
+    // ずれと大きさの両方を見ないと表示が本体から浮く
+    private static double skullDisplayAnchor(Display display) {
+        Display.RenderState state = display.renderState();
+        if (state == null) return DISPLAY_ANCHOR;
+
+        Transformation transformation = state.transformation().get(1.0F);
+        return transformation.translation().y()
+                - transformation.scale().y() * SKULL_DISPLAY_HALF_HEIGHT;
+    }
+
+    /**
+     * 実際に描かれている Display か。
+     *
+     * Hypixel は Critter Capsule で捕まえるとき、元の Display を消さずに
+     * 拡大率 0 にしてその場に残す。skull は付いたままなので、
+     * これを弾かないと捕まえるたびに抜け殻が残っていく
+     */
+    private static boolean isDrawnDisplay(Display display) {
+        Display.RenderState state = display.renderState();
+        if (state == null) return true;
+
+        Vector3fc scale = state.transformation().get(1.0F).scale();
+        return scale.x() > DISPLAY_MIN_SCALE
+                && scale.y() > DISPLAY_MIN_SCALE
+                && scale.z() > DISPLAY_MIN_SCALE;
+    }
+
     // 見た目を担う Display のうち、最も近いもの。
     // ネームタグも Display(TextDisplay) で作られており、
     // そちらを本体と取り違えるとネームプレートやトレーサーが頭の上のタグに付いてしまう
     private static Entity nearestBodyDisplay(Minecraft client, Entity entity) {
         AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
         return getClosestEntity(client.level.getEntitiesOfClass(Display.class, box,
-                e -> !(e instanceof Display.TextDisplay)), entity);
+                e -> !(e instanceof Display.TextDisplay) && isDrawnDisplay(e)), entity);
     }
 
     // すぐ近くにある、指定した種類の最も近いエンティティ
@@ -2871,6 +2950,9 @@ public class EntityHighlightManager {
         if (!(target instanceof MobVisual.SeaCreature)) return;
         if (entity == null || !announcedSeaCreatures.add(entity)) return;
 
+        // 開発中の一時的な機能。配布ビルドでは誰も登録していないので何も起きない
+        DevHooks.seaCreatureFound(target.plainLabel());
+
         showSeaCreatureTitle(client, target);
     }
 
@@ -2931,17 +3013,32 @@ public class EntityHighlightManager {
         // ネームタグからは探さず、見つからないことを合図として使う
         if (SEA_CREATURE_PLAYER_TARGETS.contains(target)) return null;
 
-        // スキンで見分ける種は、そのスキンを被ったヘッドだけを本体とする。
-        // 「ネームタグの下にいる何か」を本体とみなす保険は置かない。
-        // 見つからないことを、スキン差し替えの合図として使いたいため
-        if (HEAD_SKIN_SPECIES.contains(target)) return skinnedHeadUnderNameTag(client, nameTag, target);
-
         Class<? extends Entity> bodyType = seaCreatureBodyType(target);
         if (bodyType == null) return null;
 
         AABB box = nameTag.getBoundingBox().inflate(NAMETAG_SEARCH_RADIUS);
         Predicate<Entity> filter = body -> !body.isInvisible() && seaCreatureBodyMatches(target, body);
         return headStandUnderNameTag(client.level.getEntitiesOfClass(bodyType, box, filter), nameTag);
+    }
+
+    /**
+     * 被っている skull、または映しているアイテムの skull からモブを引く。
+     *
+     * 判定本体では型ごとに入口を分けているが、
+     * 「このエンティティは何に見えているのか」を知りたいだけのときに使う
+     */
+    public static MobVisual skullTarget(Entity entity) {
+        if (entity instanceof Display.ItemDisplay item) return itemSkinTarget(displayItem(item));
+        return headSkinTarget(entity);
+    }
+
+    // 登録済みのスキンを被ったヘッドが、読み込み範囲のどこかにあるか。
+    // スキンはネームタグより遠くまで届くので、ネームタグの周りだけ見ると取りこぼす
+    private static boolean hasHeadSkinAnywhere(Minecraft client, MobVisual target) {
+        for (Entity entity : client.level.entitiesForRendering()) {
+            if (headSkinTarget(entity) == target) return true;
+        }
+        return false;
     }
 
     // ネームタグの下から、その Sea Creature のスキンを被ったヘッドを探す。
@@ -3337,6 +3434,8 @@ public class EntityHighlightManager {
     private static MobVisual safariDisplaySkinTarget(Minecraft client, Entity entity) {
         AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
         for (Display.ItemDisplay display : client.level.getEntitiesOfClass(Display.ItemDisplay.class, box, e -> true)) {
+            if (!isDrawnDisplay(display)) continue;
+
             MobVisual target = itemSkinTarget(displayItem(display));
             // 未登録のスキンなら null。List.of は contains(null) で例外を投げる
             if (target != null && SAFARI_SKIN_TARGETS.contains(target)) return target;
