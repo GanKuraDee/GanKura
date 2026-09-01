@@ -28,7 +28,7 @@
 		"MenuSetKeybindMixin",
 		"HeldItemScaleMixin",
 		"ContainerScreenAccessor",
-		"CraftingLabelMixin"
+		"InventoryButtonRenderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

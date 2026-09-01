@@ -12,9 +12,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
@@ -47,13 +47,6 @@ public final class InventoryButtonHandler {
             "What starts with",
             "Select all the");
 
-    // "Crafting" の文字が出る場所。ボタンが重なったら文字の方を消す。
-    // 持ち物画面は題名を (97, 6) に置くので、その周りを少し広めに取る
-    private static final int CRAFTING_LABEL_X = 97;
-    private static final int CRAFTING_LABEL_Y = 4;
-    private static final int CRAFTING_LABEL_WIDTH = 46;
-    private static final int CRAFTING_LABEL_HEIGHT = 12;
-
     // 今カーソルが乗っているボタンと、乗り始めた時刻。説明を出すまでの間を測るために持つ
     private static InventoryButton hoveredButton = null;
     private static long hoveredSince = 0;
@@ -74,8 +67,9 @@ public final class InventoryButtonHandler {
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
             if (!(screen instanceof AbstractContainerScreen<?> container)) return;
 
-            ScreenEvents.afterExtract(screen).register(
-                    (ignored, graphics, mouseX, mouseY, partialTick) -> render(container, graphics, mouseX, mouseY));
+            // 描画は InventoryButtonRenderMixin が受け持つ。
+            // 画面イベントはアイテムの説明を描き終えた後に呼ばれるので、
+            // ここで描くとボタンが説明の上に出てしまい、こちらの説明も間に合わない
             ScreenMouseEvents.allowMouseClick(screen).register(
                     (ignored, event) -> allowMouse(container, event, ButtonClickType.MOUSE_DOWN));
             ScreenMouseEvents.allowMouseRelease(screen).register(
@@ -85,7 +79,7 @@ public final class InventoryButtonHandler {
 
     // -------------------------------------------------- 描画
 
-    private static void render(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    public static void render(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         Minecraft client = Minecraft.getInstance();
         InventoryButton hovered = null;
 
@@ -111,8 +105,10 @@ public final class InventoryButtonHandler {
         }
         if (now - hoveredSince <= config().tooltipDelay) return;
 
-        graphics.setTooltipForNextFrame(client.font,
-                Component.literal(commandWithSlash(hovered)).withStyle(ChatFormatting.GRAY), mouseX, mouseY);
+        // ボタンはスロットの上にも置けるので、下のスロットの説明を押しのけて自分のものを出す
+        Component text = Component.literal(commandWithSlash(hovered)).withStyle(ChatFormatting.GRAY);
+        graphics.setTooltipForNextFrame(client.font, List.of(text.getVisualOrderText()),
+                DefaultTooltipPositioner.INSTANCE, mouseX, mouseY, true);
     }
 
     // -------------------------------------------------- 操作
@@ -185,30 +181,6 @@ public final class InventoryButtonHandler {
             if (placement.contains(mouseX, mouseY)) return placement;
         }
         return null;
-    }
-
-    /**
-     * 持ち物画面の "Crafting" を消すか。
-     *
-     * 設定で常に消すか、ボタンが文字に重なっているときに消す
-     */
-    public static boolean shouldHideCraftingLabel(Screen screen) {
-        ModConfig.InventoryButtonsCategory config = config();
-        if (config.hideCrafting) return true;
-        if (!(screen instanceof AbstractContainerScreen<?> container)) return false;
-
-        ContainerScreenAccessor accessor = (ContainerScreenAccessor) container;
-        int labelLeft = accessor.gankura$getLeftPos() + CRAFTING_LABEL_X;
-        int labelTop = accessor.gankura$getTopPos() + CRAFTING_LABEL_Y;
-
-        for (Placement placement : placements(container)) {
-            boolean overlaps = placement.x() < labelLeft + CRAFTING_LABEL_WIDTH
-                    && placement.x() + InventoryButtonTexture.BUTTON_SIZE > labelLeft
-                    && placement.y() < labelTop + CRAFTING_LABEL_HEIGHT
-                    && placement.y() + InventoryButtonTexture.BUTTON_SIZE > labelTop;
-            if (overlaps) return true;
-        }
-        return false;
     }
 
     // ダンジョンの仕掛けメニューか。名前がそのまま画面の題になっている
