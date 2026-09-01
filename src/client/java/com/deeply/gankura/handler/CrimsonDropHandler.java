@@ -104,16 +104,14 @@ public class CrimsonDropHandler {
                 if (isTracked(CrimsonRareDrop.LEGENDARY_MAGMA_CUBE_PET, killedBoss)
                         && hasColor(customName, ChatFormatting.GOLD)) {
                     CrimsonRareDrop.LEGENDARY_MAGMA_CUBE_PET.increment();
-                    Component itemName = Component.literal("Magma Cube").withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                    notifyDrop(client, itemName);
+                    Component itemName = Component.literal("[Lvl 1] ").withStyle(ChatFormatting.GRAY).append(Component.literal("Magma Cube").withStyle(ChatFormatting.GOLD));
+                    notifyDrop(client, itemName, CrimsonRareDrop.LEGENDARY_MAGMA_CUBE_PET.count());
                     return;
                 } else if (isTracked(CrimsonRareDrop.EPIC_MAGMA_CUBE_PET, killedBoss)
                         && hasColor(customName, ChatFormatting.DARK_PURPLE)) {
                     CrimsonRareDrop.EPIC_MAGMA_CUBE_PET.increment();
-                    Component itemName = Component.literal("Magma Cube").withStyle(ChatFormatting.DARK_PURPLE)
-                            .append(Component.literal(" (Pet)").withStyle(ChatFormatting.GRAY));
-                    notifyDrop(client, itemName);
+                    Component itemName = Component.literal("[Lvl 1] ").withStyle(ChatFormatting.GRAY).append(Component.literal("Magma Cube").withStyle(ChatFormatting.DARK_PURPLE));
+                    notifyDrop(client, itemName, CrimsonRareDrop.EPIC_MAGMA_CUBE_PET.count());
                     return;
                 }
             }
@@ -123,7 +121,7 @@ public class CrimsonDropHandler {
             for (CrimsonRareDrop drop : nameMatchedDrops(killedBoss)) {
                 if (nameStr.contains(drop.itemName())) {
                     drop.increment();
-                    notifyDrop(client, customName);
+                    notifyDrop(client, customName, drop.count());
                     return;
                 }
             }
@@ -154,7 +152,7 @@ public class CrimsonDropHandler {
         return false;
     }
 
-    private static void notifyDrop(Minecraft client, Component itemName) {
+    private static void notifyDrop(Minecraft client, Component itemName, int count) {
         GameState.CrimsonDrop.hasShownAlert = true;
         GameState.CrimsonDrop.isScanning = false;
         LOGGER.info("Crimson Drop Detected: " + itemName.getString());
@@ -162,7 +160,11 @@ public class CrimsonDropHandler {
         if (!ModConfig.INSTANCE.crimsonIsle.enableCrimsonDropAlerts) return;
 
         MutableComponent title = Component.literal("§c§lDROP!");
-        NotificationUtils.showTitle(client, title, itemName, 5, 100, 20);
+        // アイテム名に通算数を添える。何個目のドロップかがその場で分かるようにする
+        MutableComponent titleItem = Component.empty()
+                .append(itemName)
+                .append(Component.literal(" #" + count).withStyle(ChatFormatting.GRAY));
+        NotificationUtils.showTitle(client, title, titleItem, 5, 100, 20);
 
         Component playerName = client.player.getDisplayName();
         MutableComponent chatMsg = Component.literal("")

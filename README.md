@@ -4,6 +4,7 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
 - **Commands**
   - `/gankura` - Open the main settings screen.
   - `/gankura hud` - Open the HUD movement and scaling settings screen.
+  - `/gankura buttons` - Open the Inventory Buttons editor screen.
   - `/gankura waypoint <arg> (/gkw)` - Open the Custom Waypoints settings screen.
     - `toggle` - Toggle the rendering of Waypoints.
     - `add` - Add a Waypoint to your current location.
@@ -72,6 +73,7 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Equipment Menu Keybind
   - Tree Felled Title
   - Mob From Tree Title
+  - Beeheemoth Spawn Title
   - Cocoon Catch Title
 </details>
 
@@ -125,3 +127,26 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
 ![Custom Waypoints 1](https://cdn.modrinth.com/data/cached_images/8b39be6a666a8a36f4844bc7f39bdd618cea4f0f.png)
 ![Custom Waypoints 2](https://cdn.modrinth.com/data/cached_images/c9685eeb75c9bd7a20cb900d570b24ac5010febe.png)
 </details>
+
+<details>
+<summary>Inventory Buttons</summary>
+
+Buttons placed around inventory menus that run a command when clicked. Ported from [NotEnoughUpdates](https://github.com/NotEnoughUpdates/NotEnoughUpdates).
+
+- **Editor** (`/gankura buttons`, or the button in the settings screen)
+  - Click a slot around the inventory to edit it, click it again to close the panel.
+  - **Command** -> The command the button runs. A slot with no command stays hidden in game.
+  - **Background** -> One of five frame styles.
+  - **Icon Type** -> Item, head or built-in icon.
+  - **Icon Selector** -> Type to filter, then click an icon.
+  - **Presets** -> The list on the right. Click a name to load it, right click to delete it. `Empty` is built in and restores the default layout.
+  - **Save Preset** -> Saves the current buttons to the preset list under the name typed above the button (up to 12).
+- **Options**
+  - Click Type -> Run the command on press or on release.
+  - Tooltip Delay -> How long the cursor rests on a button before its command is shown.
+  - Always Hide "Crafting" -> Hides the crafting label even when no button covers it.
+  - Hide in Dungeon Menus -> Keeps the buttons out of dungeon puzzle menus.
+</details>
+
+# Credits
+- [NotEnoughUpdates](https://github.com/NotEnoughUpdates/NotEnoughUpdates) (LGPL-3.0-or-later) - the Inventory Buttons feature, its button textures, icons and presets.

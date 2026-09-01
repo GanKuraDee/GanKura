@@ -114,7 +114,7 @@ public class GolemHandler {
                 }
                 if (ModConfig.INSTANCE.theEnd.showLootQualityChat) {
                     NotificationUtils.sendSystemChat(client, Component.literal(String.format("§6Your Golem Loot Quality: §l§o%d", lq)));
-                    String dropsMsg = String.format("§6Tier Boost Core: %s §8| §6Golem §7(Pet): %s §8| §5Golem §7(Pet): %s", (lq >= 250) ? "§a✔" : "§c✘", (lq >= 235) ? "§a✔" : "§c✘", (lq >= 220) ? "§a✔" : "§c✘");
+                    String dropsMsg = String.format("§6Tier Boost Core: %s §8| §7[Lvl 1] §6Golem: %s §8| §7[Lvl 1] §5Golem: %s", (lq >= 250) ? "§a✔" : "§c✘", (lq >= 235) ? "§a✔" : "§c✘", (lq >= 220) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Component.literal(dropsMsg));
                 }
             }

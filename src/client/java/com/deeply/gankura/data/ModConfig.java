@@ -1,6 +1,8 @@
 package com.deeply.gankura.data;
 
 import com.deeply.gankura.render.HudEditorScreen;
+import com.deeply.gankura.gui.InventoryButtonEditorScreen;
+import com.deeply.gankura.gui.InventoryButtonPresets;
 import com.deeply.gankura.gui.WaypointScreen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,6 +79,7 @@ public class ModConfig extends Config {
         if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
         if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
         if (INSTANCE.mobVisuals == null) INSTANCE.mobVisuals = new MobVisualsCategory();
+        if (INSTANCE.inventoryButtons == null) INSTANCE.inventoryButtons = new InventoryButtonsCategory();
         INSTANCE.gui.openWaypointScreen = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().setScreen(new WaypointScreen(Minecraft.getInstance().screen));
@@ -91,6 +95,26 @@ public class ModConfig extends Config {
         INSTANCE.misc.resetHeldItemScale = () -> INSTANCE.misc.heldItemScale = 1.0f;
         INSTANCE.misc.resetHeldItemOffsetX = () -> INSTANCE.misc.heldItemOffsetX = 0.0f;
         INSTANCE.misc.resetHeldItemOffsetY = () -> INSTANCE.misc.heldItemOffsetY = 0.0f;
+        INSTANCE.inventoryButtons.openButtonEditor = () -> {
+            Minecraft.getInstance().execute(() -> {
+                Minecraft.getInstance().setScreen(
+                        new InventoryButtonEditorScreen(Minecraft.getInstance().screen));
+            });
+        };
+
+        // ボタンを全部消した状態も設定のうちなので、未設定(null)のときだけひな型に戻す
+        if (INSTANCE.inventoryButtons.buttons == null) {
+            INSTANCE.inventoryButtons.buttons = InventoryButtonPresets.defaults();
+        }
+        INSTANCE.inventoryButtons.buttons.removeIf(java.util.Objects::isNull);
+        InventoryButtonPresets.migrateLegacyPositions(INSTANCE.inventoryButtons.buttons);
+
+        if (INSTANCE.inventoryButtons.savedPresets == null) {
+            INSTANCE.inventoryButtons.savedPresets = new LinkedHashMap<>();
+        }
+        for (List<InventoryButton> preset : INSTANCE.inventoryButtons.savedPresets.values()) {
+            if (preset != null) InventoryButtonPresets.migrateLegacyPositions(preset);
+        }
 
         // ドラッグリストは要素を全削除できるため、未設定(null)と「空にした」を区別する必要がある。
         // null のときだけ既定値に戻し、Gsonが解決できなかった不明な要素(null)は取り除く
@@ -189,6 +213,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Mob Visuals", desc = "Which mobs get a highlight, tracer or nameplate.")
     public MobVisualsCategory mobVisuals = new MobVisualsCategory();
+
+    @Expose
+    @Category(name = "Inventory Buttons", desc = "Buttons around inventory menus that run commands.")
+    public InventoryButtonsCategory inventoryButtons = new InventoryButtonsCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous features.")
@@ -609,7 +637,8 @@ public class ModConfig extends Config {
         public boolean titleFolder = false;
 
         @Expose
-        @ConfigOption(name = "Tree Felled Title", desc = "Shows a title when the whole tree is felled at once.")
+        @ConfigOption(name = "Tree Felled Title",
+                desc = "Shows a title when Timber fells a whole tree, yours or another player's.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean enableTreeFelledTitle = true;
@@ -631,6 +660,12 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 74)
         public boolean enableTikiWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Beeheemoth Spawn Title", desc = "Shows a title with the sub-area when a Beeheemoth spawns.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 74)
+        public boolean enableBeeheemothSpawnTitle = true;
 
         @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari settings.")
@@ -1283,6 +1318,55 @@ public class ModConfig extends Config {
             list.addAll(java.util.Arrays.asList(values));
         }
 
+    }
+
+    // 収納画面の周りに置くボタン。NotEnoughUpdates の Inventory Buttons を移植したもの
+    public static class InventoryButtonsCategory {
+
+        @Expose
+        @ConfigOption(name = "Inventory Buttons", desc = "Shows the buttons around inventory menus.")
+        @ConfigEditorBoolean
+        public boolean enableInventoryButtons = true;
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Button Editor", desc = "Opens the screen where buttons are placed and edited.")
+        @ConfigEditorButton(buttonText = "Open")
+        public transient Runnable openButtonEditor = () -> {
+            Minecraft.getInstance().execute(() -> {
+                Minecraft.getInstance().setScreen(
+                        new InventoryButtonEditorScreen(Minecraft.getInstance().screen));
+            });
+        };
+
+        @Expose
+        @ConfigOption(name = "Always Hide \"Crafting\"",
+                desc = "Hides the crafting label in the inventory even when no button covers it.")
+        @ConfigEditorBoolean
+        public boolean hideCrafting = false;
+
+        @Expose
+        @ConfigOption(name = "Hide in Dungeon Menus", desc = "Hides the buttons in dungeon puzzle menus.")
+        @ConfigEditorBoolean
+        public boolean hideInDungeonMenus = false;
+
+        @Expose
+        @ConfigOption(name = "Click Type", desc = "When the command runs: on press or on release.")
+        @ConfigEditorDropdown
+        public ButtonClickType clickType = ButtonClickType.MOUSE_DOWN;
+
+        @Expose
+        @ConfigOption(name = "Tooltip Delay",
+                desc = "Milliseconds the cursor has to rest on a button before its command is shown.")
+        @ConfigEditorSlider(minValue = 0f, maxValue = 1500f, minStep = 50f)
+        public int tooltipDelay = 600;
+
+        // 置いたボタンの一覧。並べ替えは専用の画面で行うので、設定項目としては出さない
+        @Expose
+        public List<InventoryButton> buttons = InventoryButtonPresets.defaults();
+
+        // 名前を付けて保存した並び。エディタの一覧に出す
+        @Expose
+        public LinkedHashMap<String, List<InventoryButton>> savedPresets = new LinkedHashMap<>();
     }
 
     public static class MiscCategory {

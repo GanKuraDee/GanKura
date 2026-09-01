@@ -169,7 +169,7 @@ public class DragonHandler {
                 }
                 if (ModConfig.INSTANCE.theEnd.showDragonLootQualityChat) {
                     NotificationUtils.sendSystemChat(client, Component.literal(String.format("§dYour Dragon Loot Quality: §l§o%d", lq)));
-                    String dropsMsg = String.format("§6Ender Dragon §7(Pet): %s §8| §5Ender Dragon §7(Pet): %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
+                    String dropsMsg = String.format("§7[Lvl 1] §6Ender Dragon: %s §8| §7[Lvl 1] §5Ender Dragon: %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
                     NotificationUtils.sendSystemChat(client, Component.literal(dropsMsg));
                 }
             }

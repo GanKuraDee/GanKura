@@ -16,7 +16,7 @@ public class ForagingHandler {
     public static void handleMessage(String unformattedMsg, Minecraft client) {
         // 木を一度に切り倒せた合図。チャットに埋もれると見逃すのでタイトルで知らせる
         if (ModConfig.INSTANCE.foraging.enableTreeFelledTitle
-                && ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.TREE_FELLED_MSG)) {
+                && ModConstants.TREE_FELLED_PATTERN.matcher(unformattedMsg).find()) {
             MutableComponent title = Component.literal("TREE FELLED!")
                     .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);
             client.execute(() -> NotificationUtils.showTitle(client, title, null));
@@ -25,6 +25,8 @@ public class ForagingHandler {
 
         // Cocooning はエリアを問わず使えるので、Critter Safari の判定より先に見る
         if (handleCocoonCatch(unformattedMsg, client)) return;
+
+        if (handleBeeheemothSpawn(unformattedMsg, client)) return;
 
         // Wumpa と Critter のキャプチャは Critter Safari 限定。
         // 他エリアで同じ文言が流れても反応させない
@@ -93,6 +95,27 @@ public class ForagingHandler {
             MutableComponent title = Component.literal("WUMPA SPAWNED!")
                     .withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);
             MutableComponent subtitle = Component.literal("Icy Biome")
+                    .withStyle(ChatFormatting.YELLOW);
+            client.execute(() -> NotificationUtils.showTitle(client, title, subtitle));
+        }
+        return true;
+    }
+
+    /**
+     * Torrhus Canyon のミニボス。湧いた場所がサブエリア名で知らされるので、
+     * どこへ向かえばよいかが分かるようにタイトルへ出す。
+     *
+     * 文面が Beeheemoth 専用で紛れようがないため、エリアでは絞っていない
+     */
+    private static boolean handleBeeheemothSpawn(String unformattedMsg, Minecraft client) {
+        Matcher matcher = ModConstants.BEEHEEMOTH_SPAWN_PATTERN.matcher(unformattedMsg);
+        if (!matcher.find()) return false;
+
+        if (ModConfig.INSTANCE.foraging.enableBeeheemothSpawnTitle) {
+            String subArea = matcher.group(1).trim();
+            MutableComponent title = Component.literal("BEEHEEMOTH!")
+                    .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
+            MutableComponent subtitle = Component.literal(subArea)
                     .withStyle(ChatFormatting.YELLOW);
             client.execute(() -> NotificationUtils.showTitle(client, title, subtitle));
         }

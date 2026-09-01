@@ -7,8 +7,8 @@ import java.util.function.IntSupplier;
  * Ender Dragon のレアドロップ。詳細は {@link GolemRareDrop} と同じ。
  */
 public enum DragonRareDrop {
-    EPIC_DRAGON_PET("§5Ender Dragon §7(Pet)", () -> LootStats.epicDragonPets),
-    LEGENDARY_DRAGON_PET("§6Ender Dragon §7(Pet)", () -> LootStats.legendaryDragonPets);
+    EPIC_DRAGON_PET("§7[Lvl 1] §5Ender Dragon", () -> LootStats.epicDragonPets),
+    LEGENDARY_DRAGON_PET("§7[Lvl 1] §6Ender Dragon", () -> LootStats.legendaryDragonPets);
 
     private final String label;
     private final IntSupplier counter;
