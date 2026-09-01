@@ -1,8 +1,10 @@
 package com.deeply.gankura.util;
 
+import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
 import net.minecraft.client.Minecraft;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,9 @@ public class DevHooks {
 
     // /gankura の下にぶら下げるサブコマンド。一時的な機能が自分で登録する
     private static final List<Consumer<LiteralArgumentBuilder<FabricClientCommandSource>>> SUBCOMMANDS = new ArrayList<>();
+
+    // 設定画面に足すカテゴリ。一時的な機能が自分で登録する
+    private static final List<Consumer<MoulConfigProcessor<ModConfig>>> CONFIG_EXTENSIONS = new ArrayList<>();
 
     public static void load() {
         try {
@@ -63,6 +68,17 @@ public class DevHooks {
     public static void buildCommand(LiteralArgumentBuilder<FabricClientCommandSource> command) {
         for (Consumer<LiteralArgumentBuilder<FabricClientCommandSource>> builder : SUBCOMMANDS) {
             builder.accept(command);
+        }
+    }
+
+    public static void onExtendConfig(Consumer<MoulConfigProcessor<ModConfig>> extension) {
+        CONFIG_EXTENSIONS.add(extension);
+    }
+
+    // 設定画面を組み上げた後に呼ばれる。配布ビルドでは何も足されない
+    public static void extendConfig(MoulConfigProcessor<ModConfig> processor) {
+        for (Consumer<MoulConfigProcessor<ModConfig>> extension : CONFIG_EXTENSIONS) {
+            extension.accept(processor);
         }
     }
 

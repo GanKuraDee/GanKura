@@ -176,6 +176,9 @@ public class GanKura implements ClientModInitializer {
             driver.processConfig(ModConfig.INSTANCE);
 
             // 4. 解析が完了したプロセッサをエディタに渡す
+            // 開発中の一時的な機能。配布ビルドではカテゴリが増えない
+            DevHooks.extendConfig(processor);
+
             MoulConfigEditor<ModConfig> editor = new MoulConfigEditor<>(processor);
             GuiElementComponent editorComponent = new GuiElementComponent(editor);
             GuiContext guiContext = new GuiContext(editorComponent);
