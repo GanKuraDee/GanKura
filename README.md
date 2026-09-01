@@ -146,6 +146,7 @@ Buttons placed around inventory menus that run a command when clicked. Ported fr
   - Tooltip Delay -> How long the cursor rests on a button before its command is shown.
   - Always Hide "Crafting" -> Hides the crafting label even when no button covers it.
   - Hide in Dungeon Menus -> Keeps the buttons out of dungeon puzzle menus.
+![Inventory Buttons](https://cdn.modrinth.com/data/cached_images/b653085fbbbe946318af5927c82b4a4c727da7bd.png)
 </details>
 
 # Credits
