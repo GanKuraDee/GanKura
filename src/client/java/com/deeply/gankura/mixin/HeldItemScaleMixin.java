@@ -30,13 +30,13 @@ public class HeldItemScaleMixin {
     private void onRenderArmWithItem(AbstractClientPlayer player, float frameInterp, float xRot, InteractionHand hand,
                                       float attack, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack,
                                       SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
-        float offsetX = ModConfig.INSTANCE.misc.heldItemOffsetX;
-        float offsetY = ModConfig.INSTANCE.misc.heldItemOffsetY;
+        float offsetX = ModConfig.INSTANCE.heldItem.heldItemOffsetX;
+        float offsetY = ModConfig.INSTANCE.heldItem.heldItemOffsetY;
         if (offsetX != 0.0f || offsetY != 0.0f) {
             poseStack.translate(offsetX, offsetY, 0.0f);
         }
 
-        float scale = ModConfig.INSTANCE.misc.heldItemScale;
+        float scale = ModConfig.INSTANCE.heldItem.heldItemScale;
         if (scale != 1.0f) {
             poseStack.scale(scale, scale, scale);
         }

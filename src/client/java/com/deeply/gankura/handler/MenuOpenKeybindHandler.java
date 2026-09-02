@@ -24,16 +24,16 @@ public class MenuOpenKeybindHandler {
 
         // GUI表示中(チャット入力・コンテナ画面・設定画面など)はキー入力をそちらに譲り、誤爆を防ぐ。
         // 無効時も含め、押しっぱなしの状態を持ち越さないようにリセットしておく
-        if (!ModConfig.INSTANCE.misc.enableOpenMenuKeybind || client.screen != null) {
+        if (!ModConfig.INSTANCE.keybinds.enableOpenMenuKeybind || client.screen != null) {
             Arrays.fill(WAS_DOWN, false);
             return;
         }
 
-        ModConfig.MiscCategory misc = ModConfig.INSTANCE.misc;
-        int[] keybinds = {misc.openLoadoutsKeybind, misc.openWardrobeKeybind, misc.openEquipmentKeybind};
+        ModConfig.KeybindsCategory config = ModConfig.INSTANCE.keybinds;
+        int[] keys = {config.openLoadoutsKeybind, config.openWardrobeKeybind, config.openEquipmentKeybind};
 
         for (int i = 0; i < COMMANDS.length; i++) {
-            boolean down = isKeyDown(client, keybinds[i]);
+            boolean down = isKeyDown(client, keys[i]);
             // 押した瞬間のみ送信する(押しっぱなしでコマンドを連投しない)
             if (down && !WAS_DOWN[i]) {
                 client.player.connection.sendCommand(COMMANDS[i]);

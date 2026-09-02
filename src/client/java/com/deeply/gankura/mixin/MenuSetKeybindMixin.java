@@ -71,16 +71,16 @@ public abstract class MenuSetKeybindMixin {
     }
 
     private static int resolveTargetSlot(String title, int keyCode) {
-        ModConfig.MiscCategory misc = ModConfig.INSTANCE.misc;
+        ModConfig.KeybindsCategory keybinds = ModConfig.INSTANCE.keybinds;
 
         Matcher loadoutsMatcher = LOADOUTS_TITLE_PATTERN.matcher(title);
         if (loadoutsMatcher.find()) {
-            if (!misc.enableLoadoutsKeybind) return -1;
+            if (!keybinds.enableLoadoutsKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    misc.loadoutsKeybindSlot1, misc.loadoutsKeybindSlot2, misc.loadoutsKeybindSlot3,
-                    misc.loadoutsKeybindSlot4, misc.loadoutsKeybindSlot5, misc.loadoutsKeybindSlot6,
-                    misc.loadoutsKeybindSlot7, misc.loadoutsKeybindSlot8, misc.loadoutsKeybindSlot9,
-                    misc.loadoutsKeybindSlot10, misc.loadoutsKeybindSlot11, misc.loadoutsKeybindSlot12);
+                    keybinds.loadoutsKeybindSlot1, keybinds.loadoutsKeybindSlot2, keybinds.loadoutsKeybindSlot3,
+                    keybinds.loadoutsKeybindSlot4, keybinds.loadoutsKeybindSlot5, keybinds.loadoutsKeybindSlot6,
+                    keybinds.loadoutsKeybindSlot7, keybinds.loadoutsKeybindSlot8, keybinds.loadoutsKeybindSlot9,
+                    keybinds.loadoutsKeybindSlot10, keybinds.loadoutsKeybindSlot11, keybinds.loadoutsKeybindSlot12);
             if (index < 0) return -1;
 
             int page = Integer.parseInt(loadoutsMatcher.group("page"));
@@ -90,21 +90,21 @@ public abstract class MenuSetKeybindMixin {
         }
 
         if (ARMOR_SET_TITLE_PATTERN.matcher(title).find()) {
-            if (!misc.enableArmorSetKeybind) return -1;
+            if (!keybinds.enableArmorSetKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    misc.armorSetKeybindSlot1, misc.armorSetKeybindSlot2, misc.armorSetKeybindSlot3,
-                    misc.armorSetKeybindSlot4, misc.armorSetKeybindSlot5, misc.armorSetKeybindSlot6,
-                    misc.armorSetKeybindSlot7, misc.armorSetKeybindSlot8, misc.armorSetKeybindSlot9);
+                    keybinds.armorSetKeybindSlot1, keybinds.armorSetKeybindSlot2, keybinds.armorSetKeybindSlot3,
+                    keybinds.armorSetKeybindSlot4, keybinds.armorSetKeybindSlot5, keybinds.armorSetKeybindSlot6,
+                    keybinds.armorSetKeybindSlot7, keybinds.armorSetKeybindSlot8, keybinds.armorSetKeybindSlot9);
             if (index < 0 || index >= SET_COLUMNS) return -1;
             return SET_BUTTON_ROW * MENU_WIDTH + index;
         }
 
         if (EQUIPMENT_SET_TITLE_PATTERN.matcher(title).find()) {
-            if (!misc.enableEquipmentSetKeybind) return -1;
+            if (!keybinds.enableEquipmentSetKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    misc.equipmentSetKeybindSlot1, misc.equipmentSetKeybindSlot2, misc.equipmentSetKeybindSlot3,
-                    misc.equipmentSetKeybindSlot4, misc.equipmentSetKeybindSlot5, misc.equipmentSetKeybindSlot6,
-                    misc.equipmentSetKeybindSlot7, misc.equipmentSetKeybindSlot8, misc.equipmentSetKeybindSlot9);
+                    keybinds.equipmentSetKeybindSlot1, keybinds.equipmentSetKeybindSlot2, keybinds.equipmentSetKeybindSlot3,
+                    keybinds.equipmentSetKeybindSlot4, keybinds.equipmentSetKeybindSlot5, keybinds.equipmentSetKeybindSlot6,
+                    keybinds.equipmentSetKeybindSlot7, keybinds.equipmentSetKeybindSlot8, keybinds.equipmentSetKeybindSlot9);
             if (index < 0 || index >= SET_COLUMNS) return -1;
             return SET_BUTTON_ROW * MENU_WIDTH + index;
         }

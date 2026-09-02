@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class CrimsonLootTrackerHud extends HudElement {
     public CrimsonLootTrackerHud() {
         super("crimson_loot_tracker", 230, 90, 1.0f, 185, 144,
-                () -> ModConfig.INSTANCE.crimsonIsle.showCrimsonLootTrackerHud,
+                () -> ModConfig.INSTANCE.combat.crimsonIsle.showCrimsonLootTrackerHud,
                 () -> GameState.Server.isCrimsonIsle());
     }
 
@@ -22,7 +22,7 @@ public class CrimsonLootTrackerHud extends HudElement {
 
         // 表示する行と並び順は設定画面のドラッグリストに従う
         int y = 12;
-        for (CrimsonRareDrop drop : ModConfig.INSTANCE.crimsonIsle.trackedCrimsonDrops) {
+        for (CrimsonRareDrop drop : ModConfig.INSTANCE.combat.crimsonIsle.trackedCrimsonDrops) {
             int count = isPreview ? 0 : drop.count();
             text(graphics, font, drop.label() + "§f: §f" + count, 0, y, 0xFFFFFFFF, true);
             y += 12;

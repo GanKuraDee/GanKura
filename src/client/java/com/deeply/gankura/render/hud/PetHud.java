@@ -11,7 +11,7 @@ public class PetHud extends HudElement {
     private static final long LEVEL_UP_DISPLAY_MS = 5000;
 
     public PetHud() {
-        super("pet", 10, 10, 1.0f, 200, 34, () -> ModConfig.INSTANCE.misc.showPetHud, () -> true);
+        super("pet", 10, 10, 1.0f, 200, 34, () -> ModConfig.INSTANCE.generalHud.showPetHud, () -> true);
     }
 
     @Override

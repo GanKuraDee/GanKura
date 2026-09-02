@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class ArachneStatusHud extends HudElement {
     public ArachneStatusHud() {
         super("arachne_status", 230, 38, 1.0f, 270, 48,
-                () -> ModConfig.INSTANCE.spidersDen.showArachneStatusHud,
+                () -> ModConfig.INSTANCE.combat.spidersDen.showArachneStatusHud,
                 () -> GameState.Server.isSpidersDen());
     }
 

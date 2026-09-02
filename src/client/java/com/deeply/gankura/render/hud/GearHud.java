@@ -24,12 +24,12 @@ public class GearHud extends HudElement {
 
     public GearHud() {
         super("gear", 10, 131, 1.0f, SLOT_SIZE * DEFAULT_SLOTS, SLOT_SIZE,
-                () -> ModConfig.INSTANCE.misc.showGearHud, () -> true);
+                () -> ModConfig.INSTANCE.generalHud.showGearHud, () -> true);
     }
 
     @Override
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
-        boolean vertical = ModConfig.INSTANCE.misc.gearHudOrientation == ModConfig.HudOrientation.VERTICAL;
+        boolean vertical = ModConfig.INSTANCE.generalHud.gearHudOrientation == ModConfig.HudOrientation.VERTICAL;
         List<ItemStack> stacks;
         if (isPreview) {
             stacks = PREVIEW_STACKS;

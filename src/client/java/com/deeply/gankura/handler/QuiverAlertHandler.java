@@ -41,7 +41,7 @@ public class QuiverAlertHandler {
         lastCount = count;
         lastArrow = arrow;
 
-        if (!ModConfig.INSTANCE.misc.enableQuiverAlert) return;
+        if (!ModConfig.INSTANCE.combat.enableQuiverAlert) return;
         // 読み始めた直後と、矢を持ち替えた直後は比べる相手がいない。
         // 種類を変えると残数が別の矢のものへ飛ぶので、それを「減った」と数えないようにする
         if (previous < 0 || !sameArrow) return;

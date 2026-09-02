@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class BroodmotherStatusHud extends HudElement {
     public BroodmotherStatusHud() {
         super("broodmother", 230, 10, 1.0f, 150, 24,
-                () -> ModConfig.INSTANCE.spidersDen.showBroodmotherStatusHud,
+                () -> ModConfig.INSTANCE.combat.spidersDen.showBroodmotherStatusHud,
                 () -> GameState.Server.isSpidersDen());
     }
 

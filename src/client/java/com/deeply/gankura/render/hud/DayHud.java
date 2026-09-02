@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class DayHud extends HudElement {
     public DayHud() {
-        super("day", 10, 62, 1.0f, 60, 15, () -> ModConfig.INSTANCE.misc.showDayHud, () -> true);
+        super("day", 10, 62, 1.0f, 60, 15, () -> ModConfig.INSTANCE.generalHud.showDayHud, () -> true);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class DayHud extends HudElement {
         int color = 0xFFFFFFFF;
         boolean isTargetMap = GameState.Server.isTheEnd();
 
-        if (ModConfig.INSTANCE.theEnd.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
+        if (ModConfig.INSTANCE.combat.theEnd.enableDay30Alert && isTargetMap && day >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage)) {
             color = 0xFFFF5555;
         }
 

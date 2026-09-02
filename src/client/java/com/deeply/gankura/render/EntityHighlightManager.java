@@ -1026,8 +1026,8 @@ public class EntityHighlightManager {
             }
         }
 
-        ModConfig.TheEndCategory theEnd = ModConfig.INSTANCE.theEnd;
-        ModConfig.SpidersDenCategory spidersDen = ModConfig.INSTANCE.spidersDen;
+        ModConfig.TheEndCategory theEnd = ModConfig.INSTANCE.combat.theEnd;
+        ModConfig.SpidersDenCategory spidersDen = ModConfig.INSTANCE.combat.spidersDen;
 
         // 各ボスについて「その場に居るか(Present)」「Glowing対象か(glow)」「探索が必要か(scan)」を分けて持つ。
         // ネームプレートのみ有効な場合も探索は必要だが、Glowing対象には加えない
@@ -2976,7 +2976,8 @@ public class EntityHighlightManager {
     }
 
     private static void showSeaCreatureTitle(Minecraft client, MobVisual target, boolean fromCatch, String suffix) {
-        if (!ModConfig.INSTANCE.mobVisuals.enableSeaCreatureTitle) return;
+        ModConfig.MobVisualsCategory config = ModConfig.INSTANCE.mobVisuals;
+        if (!config.enableSeaCreatureTitle && !config.enableSeaCreatureSound) return;
 
         // 自分で釣った分は、チャットの文言で既に知らせている。
         // 引換券のように釣れた匹数ぶんだけ使うので、
@@ -2992,10 +2993,14 @@ public class EntityHighlightManager {
         String text = color + "§l" + target.plainLabel() + suffix + color + "§l!";
         // このタイトルだけはフェードを挟まず、出た瞬間に読めるようにする
         client.execute(() -> {
-            NotificationUtils.showTitle(client, Component.literal(text), null,
-                    SEA_CREATURE_TITLE_FADE, SEA_CREATURE_TITLE_STAY, SEA_CREATURE_TITLE_FADE);
-            NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP,
-                    SEA_CREATURE_SOUND_VOLUME, SEA_CREATURE_SOUND_PITCH);
+            if (config.enableSeaCreatureTitle) {
+                NotificationUtils.showTitle(client, Component.literal(text), null,
+                        SEA_CREATURE_TITLE_FADE, SEA_CREATURE_TITLE_STAY, SEA_CREATURE_TITLE_FADE);
+            }
+            if (config.enableSeaCreatureSound) {
+                NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP,
+                        SEA_CREATURE_SOUND_VOLUME, SEA_CREATURE_SOUND_PITCH);
+            }
         });
     }
 

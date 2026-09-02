@@ -62,6 +62,16 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Ferocity HUD
   - Quiver HUD
   - Hide Damage Splash
+  - Hide Fire Overlay
+  - Tab List Cleanup
+  - Inventory Cleanup
+  - Scrollable Tooltips
+  - Invert Tooltip Scroll
+  - Tooltip From Top
+  - Replace Roman Numerals
+  - Max Enchant Chroma
+  - Book Enchant Gold
+  - Skip Ultimate Enchants
   - Arrow Poison Indicator
   - Server Reboot Alert
   - Low Quiver Alert
@@ -75,6 +85,10 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Mob From Tree Title
   - Beeheemoth Spawn Title
   - Cocoon Catch Title
+  - Bestiary Menu - Replace Roman Numerals, MAX highlight and per-slot tier numbers.
+  - Attribute Menu - Replace Roman Numerals, MAX highlight and per-slot tier numbers.
+  - Search Input Screen - Replaces the Bazaar and Auction House sign editor with a text box.
+  - Chat Filter - Hides the profile lines, the stash reminder and blank chat lines.
 </details>
 
 <details>
@@ -89,9 +103,12 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
     - Radar Guess - Reads the Hotspot Radar trail and marks where the hotspot should be.
     - Gone Title
     - Circle - Draws the hotspot edge as a circle, coloured by its perk.
-    - Share - Offers to send the coordinates of a hotspot with the perks you picked.
+    - Found Alert - Title, sound, temporary waypoint and tracer when a hotspot with the perks
+      you picked shows up, plus a button to share its coordinates.
   - Golden Fish
     - Spawn window timer, highlight, tracer and throw rod warning.
+  - Lava as Water - Draws lava with the water texture and clears the orange view inside it,
+    on Crimson Isle or everywhere.
 </details>
 
 <details>
@@ -150,3 +167,4 @@ Buttons placed around inventory menus that run a command when clicked. Ported fr
 
 # Credits
 - [NotEnoughUpdates](https://github.com/NotEnoughUpdates/NotEnoughUpdates) (LGPL-3.0-or-later) - the Inventory Buttons feature, its button textures, icons and presets.
+- [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO) (MIT, Copyright (c) 2022 hannibal2) - the enchantment level limits used by Max Enchant Chroma and Book Enchant Gold.

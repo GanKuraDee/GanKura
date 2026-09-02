@@ -70,7 +70,7 @@ public class ForagingHandler {
         Matcher matcher = ModConstants.COCOON_CAUGHT_PATTERN.matcher(unformattedMsg);
         if (!matcher.find()) return false;
 
-        if (ModConfig.INSTANCE.misc.enableCocoonCatchTitle) {
+        if (ModConfig.INSTANCE.combat.enableCocoonCatchTitle) {
             String mobName = matcher.group(1).trim();
             MutableComponent title = Component.literal(mobName)
                     .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);

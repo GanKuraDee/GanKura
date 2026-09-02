@@ -29,7 +29,7 @@ public class CorleoneHandler {
     }
 
     private static void announce(Minecraft client) {
-        if (!ModConfig.INSTANCE.crystalHollows.enableCorleoneSpawnTitle) return;
+        if (!ModConfig.INSTANCE.combat.crystalHollows.enableCorleoneSpawnTitle) return;
 
         MutableComponent title = Component.literal("BOSS CORLEONE").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD);
         NotificationUtils.showTitle(client, title, null);
