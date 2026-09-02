@@ -15,7 +15,7 @@ public class YawPitchHud extends HudElement {
 
     public YawPitchHud() {
         super("yawPitch", 460, 160, 1.0f, 80, 20,
-                () -> ModConfig.INSTANCE.misc.showYawPitchHud, () -> true);
+                () -> ModConfig.INSTANCE.generalHud.showYawPitchHud, () -> true);
     }
 
     @Override
@@ -30,8 +30,8 @@ public class YawPitchHud extends HudElement {
             pitch = client.player.getXRot();
         }
 
-        text(graphics, font, "§bYaw: §f" + format(yaw, ModConfig.INSTANCE.misc.yawPrecision), 0, 0, 0xFFFFFFFF, true);
-        text(graphics, font, "§bPitch: §f" + format(pitch, ModConfig.INSTANCE.misc.pitchPrecision), 0, 10, 0xFFFFFFFF, true);
+        text(graphics, font, "§bYaw: §f" + format(yaw, ModConfig.INSTANCE.generalHud.yawPrecision), 0, 0, 0xFFFFFFFF, true);
+        text(graphics, font, "§bPitch: §f" + format(pitch, ModConfig.INSTANCE.generalHud.pitchPrecision), 0, 10, 0xFFFFFFFF, true);
     }
 
     // 生の Yaw は回った回数ぶん際限なく増減するので、-180〜180 に畳んでおく

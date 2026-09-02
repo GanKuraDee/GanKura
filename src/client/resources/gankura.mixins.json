@@ -28,7 +28,18 @@
 		"MenuSetKeybindMixin",
 		"HeldItemScaleMixin",
 		"ContainerScreenAccessor",
-		"InventoryButtonRenderMixin"
+		"InventoryButtonRenderMixin",
+		"TooltipPositionMixin",
+		"TabListMixin",
+		"InventoryEffectsMixin",
+		"ScreenBackgroundMixin",
+		"RecipeBookButtonMixin",
+		"RecipeBookPanelMixin",
+		"ProgressHighlightMixin",
+		"SignInputMixin",
+		"LavaTextureMixin",
+		"LavaFogMixin",
+		"FireOverlayMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

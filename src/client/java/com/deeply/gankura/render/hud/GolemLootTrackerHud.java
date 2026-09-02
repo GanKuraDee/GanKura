@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class GolemLootTrackerHud extends HudElement {
     public GolemLootTrackerHud() {
         super("tracker", 230, 50, 1.0f, 150, 50,
-                () -> ModConfig.INSTANCE.theEnd.showLootTrackerHud,
+                () -> ModConfig.INSTANCE.combat.theEnd.showLootTrackerHud,
                 () -> GameState.Server.isTheEnd());
     }
 
@@ -24,7 +24,7 @@ public class GolemLootTrackerHud extends HudElement {
 
         // 表示する行と並び順は設定画面のドラッグリストに従う
         int y = 12;
-        for (GolemRareDrop drop : ModConfig.INSTANCE.theEnd.trackedGolemDrops) {
+        for (GolemRareDrop drop : ModConfig.INSTANCE.combat.theEnd.trackedGolemDrops) {
             int count = isPreview ? 0 : drop.count();
             text(graphics, font, drop.label() + "§f: §f" + count, 0, y, 0xFFFFFFFF, true);
             y += 12;

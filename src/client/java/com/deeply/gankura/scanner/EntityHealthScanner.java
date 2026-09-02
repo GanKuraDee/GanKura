@@ -284,7 +284,7 @@ public class EntityHealthScanner {
 
         // Final Stage 以外で値が変化した場合にタイトル表示
         if (found != null && !"Final Stage".equals(found) && !found.equals(previousMagmaSpawnStatus)) {
-            if (ModConfig.INSTANCE.crimsonIsle.enableMagmaBossSpawnTitle) {
+            if (ModConfig.INSTANCE.combat.crimsonIsle.enableMagmaBossSpawnTitle) {
                 MutableComponent title = Component.literal("§c§l" + found);
                 NotificationUtils.showTitle(client, title, null);
             }

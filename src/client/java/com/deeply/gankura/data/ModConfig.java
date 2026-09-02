@@ -74,13 +74,21 @@ public class ModConfig extends Config {
 
         // ★超重要: Gsonでデータを読み込むと、transient（保存除外）にしていた「ボタンの処理」が消滅してしまうため、ここで再セットする！
         if (INSTANCE.gui == null)         INSTANCE.gui         = new GuiCategory();
-        if (INSTANCE.theEnd == null)      INSTANCE.theEnd      = new TheEndCategory();
-        if (INSTANCE.spidersDen == null)  INSTANCE.spidersDen  = new SpidersDenCategory();
-        if (INSTANCE.crimsonIsle == null) INSTANCE.crimsonIsle = new CrimsonIsleCategory();
+        if (INSTANCE.waypoints == null)   INSTANCE.waypoints   = new WaypointsCategory();
+        if (INSTANCE.generalHud == null)  INSTANCE.generalHud  = new GeneralHudCategory();
+        if (INSTANCE.heldItem == null)    INSTANCE.heldItem    = new HeldItemCategory();
+        if (INSTANCE.combat == null)      INSTANCE.combat      = new CombatCategory();
+        if (INSTANCE.combat.theEnd == null) INSTANCE.combat.theEnd = new TheEndCategory();
+        if (INSTANCE.combat.spidersDen == null) INSTANCE.combat.spidersDen = new SpidersDenCategory();
+        if (INSTANCE.combat.crimsonIsle == null) INSTANCE.combat.crimsonIsle = new CrimsonIsleCategory();
+        if (INSTANCE.combat.crystalHollows == null) INSTANCE.combat.crystalHollows = new CrystalHollowsCategory();
         if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
         if (INSTANCE.mobVisuals == null) INSTANCE.mobVisuals = new MobVisualsCategory();
         if (INSTANCE.inventoryButtons == null) INSTANCE.inventoryButtons = new InventoryButtonsCategory();
-        INSTANCE.gui.openWaypointScreen = () -> {
+        if (INSTANCE.interfaceSettings == null) INSTANCE.interfaceSettings = new InterfaceCategory();
+        if (INSTANCE.chatFilter == null) INSTANCE.chatFilter = new ChatFilterCategory();
+        if (INSTANCE.keybinds == null) INSTANCE.keybinds = new KeybindsCategory();
+        INSTANCE.waypoints.openWaypointScreen = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().gui.setScreen(new WaypointScreen(Minecraft.getInstance().gui.screen()));
             });
@@ -92,9 +100,9 @@ public class ModConfig extends Config {
         };
         INSTANCE.mobVisuals.resetNameplateScale =
                 () -> INSTANCE.mobVisuals.nameplateScale = MobVisualsCategory.DEFAULT_NAMEPLATE_SCALE;
-        INSTANCE.misc.resetHeldItemScale = () -> INSTANCE.misc.heldItemScale = 1.0f;
-        INSTANCE.misc.resetHeldItemOffsetX = () -> INSTANCE.misc.heldItemOffsetX = 0.0f;
-        INSTANCE.misc.resetHeldItemOffsetY = () -> INSTANCE.misc.heldItemOffsetY = 0.0f;
+        INSTANCE.heldItem.resetHeldItemScale = () -> INSTANCE.heldItem.heldItemScale = 1.0f;
+        INSTANCE.heldItem.resetHeldItemOffsetX = () -> INSTANCE.heldItem.heldItemOffsetX = 0.0f;
+        INSTANCE.heldItem.resetHeldItemOffsetY = () -> INSTANCE.heldItem.heldItemOffsetY = 0.0f;
         INSTANCE.inventoryButtons.openButtonEditor = () -> {
             Minecraft.getInstance().execute(() -> {
                 Minecraft.getInstance().gui.setScreen(
@@ -118,10 +126,10 @@ public class ModConfig extends Config {
 
         // ドラッグリストは要素を全削除できるため、未設定(null)と「空にした」を区別する必要がある。
         // null のときだけ既定値に戻し、Gsonが解決できなかった不明な要素(null)は取り除く
-        INSTANCE.theEnd.trackedGolemDrops = normalizeEnumList(INSTANCE.theEnd.trackedGolemDrops, GolemRareDrop.defaults());
-        INSTANCE.theEnd.trackedDragonDrops = normalizeEnumList(INSTANCE.theEnd.trackedDragonDrops, DragonRareDrop.defaults());
-        INSTANCE.crimsonIsle.trackedCrimsonDrops = normalizeEnumList(INSTANCE.crimsonIsle.trackedCrimsonDrops, CrimsonRareDrop.defaults());
-        INSTANCE.theEnd.dragonSpawnAlerts = normalizeEnumList(INSTANCE.theEnd.dragonSpawnAlerts, DragonAlertType.defaults());
+        INSTANCE.combat.theEnd.trackedGolemDrops = normalizeEnumList(INSTANCE.combat.theEnd.trackedGolemDrops, GolemRareDrop.defaults());
+        INSTANCE.combat.theEnd.trackedDragonDrops = normalizeEnumList(INSTANCE.combat.theEnd.trackedDragonDrops, DragonRareDrop.defaults());
+        INSTANCE.combat.crimsonIsle.trackedCrimsonDrops = normalizeEnumList(INSTANCE.combat.crimsonIsle.trackedCrimsonDrops, CrimsonRareDrop.defaults());
+        INSTANCE.combat.theEnd.dragonSpawnAlerts = normalizeEnumList(INSTANCE.combat.theEnd.dragonSpawnAlerts, DragonAlertType.defaults());
 
         // 起動時やエラー発生時に、確実に現在の設定をJSON形式でファイルに書き込んでおく
         INSTANCE.mobVisuals.targetsTheEnd = normalizeEnumList(INSTANCE.mobVisuals.targetsTheEnd, List.of());
@@ -183,24 +191,12 @@ public class ModConfig extends Config {
     // ==========================================
     // ★ ここにGUIカテゴリを追加（一番上に書くことで、画面でも一番上に表示されます）
     @Expose
-    @Category(name = "GUI", desc = "HUD and GUI settings.")
+    @Category(name = "Edit HUD Locations", desc = "Move and scale everything this mod draws on screen.")
     public GuiCategory gui = new GuiCategory();
 
     @Expose
-    @Category(name = "The End", desc = "End Stone Protector and Dragon.")
-    public TheEndCategory theEnd = new TheEndCategory();
-
-    @Expose
-    @Category(name = "Spider's Den", desc = "Broodmother and Arachne.")
-    public SpidersDenCategory spidersDen = new SpidersDenCategory();
-
-    @Expose
-    @Category(name = "Crimson Isle", desc = "Crimson Isle bosses.")
-    public CrimsonIsleCategory crimsonIsle = new CrimsonIsleCategory();
-
-    @Expose
-    @Category(name = "Crystal Hollows", desc = "Crystal Hollows features.")
-    public CrystalHollowsCategory crystalHollows = new CrystalHollowsCategory();
+    @Category(name = "Combat", desc = "Bosses and combat features of each area.")
+    public CombatCategory combat = new CombatCategory();
 
     @Expose
     @Category(name = "Foraging", desc = "Foraging features.")
@@ -211,12 +207,36 @@ public class ModConfig extends Config {
     public FishingCategory fishing = new FishingCategory();
 
     @Expose
+    @Category(name = "General HUD", desc = "The HUDs that stay on screen everywhere.")
+    public GeneralHudCategory generalHud = new GeneralHudCategory();
+
+    @Expose
     @Category(name = "Mob Visuals", desc = "Which mobs get a highlight, tracer or nameplate.")
     public MobVisualsCategory mobVisuals = new MobVisualsCategory();
 
     @Expose
+    @Category(name = "Custom Waypoints", desc = "Your own waypoints.")
+    public WaypointsCategory waypoints = new WaypointsCategory();
+
+    @Expose
     @Category(name = "Inventory Buttons", desc = "Buttons around inventory menus that run commands.")
     public InventoryButtonsCategory inventoryButtons = new InventoryButtonsCategory();
+
+    @Expose
+    @Category(name = "Viewmodel", desc = "Size and position of the item in your hand.")
+    public HeldItemCategory heldItem = new HeldItemCategory();
+
+    @Expose
+    @Category(name = "Interface", desc = "Tweaks to the vanilla menus, tooltips and tab list.")
+    public InterfaceCategory interfaceSettings = new InterfaceCategory();
+
+    @Expose
+    @Category(name = "Chat Filter", desc = "Repeated messages to drop from chat.")
+    public ChatFilterCategory chatFilter = new ChatFilterCategory();
+
+    @Expose
+    @Category(name = "Keybinds", desc = "Keys that open menus and switch sets.")
+    public KeybindsCategory keybinds = new KeybindsCategory();
 
     @Expose
     @Category(name = "Misc", desc = "Miscellaneous features.")
@@ -229,7 +249,7 @@ public class ModConfig extends Config {
     // ★ 新しくGUIカテゴリの中身を追加
     public static class GuiCategory {
         // ボタンには @Expose は付けず、代わりに transient を付けます！
-        @ConfigOption(name = "Edit GUI Locations", desc = "Opens HUD editor.")
+        @ConfigOption(name = "Edit HUD Locations", desc = "Opens HUD editor.")
         @ConfigEditorButton(buttonText = "Open")
         public transient Runnable openHudEditor = () -> {
             // ボタンが押されたら、マイクラの画面をHudEditorScreenに切り替える
@@ -238,7 +258,11 @@ public class ModConfig extends Config {
             });
         };
 
-        // 自分で置いたウェイポイントの一覧。MoulConfig では表を出せないので専用の画面を開く
+    }
+
+    // 自分で置いたウェイポイント
+    public static class WaypointsCategory {
+        // MoulConfig では表を出せないので専用の画面を開く
         @ConfigOption(name = "Custom Waypoints", desc = "Opens the waypoint list of the area you are in.")
         @ConfigEditorButton(buttonText = "Open")
         public transient Runnable openWaypointScreen = () -> {
@@ -251,6 +275,56 @@ public class ModConfig extends Config {
     // ==========================================
     // The End: End Stone Protector + Dragon
     // ==========================================
+    // エリアごとのボスの設定と、戦闘中に出しておきたいもの
+    public static class CombatCategory {
+
+        @Expose
+        @ConfigOption(name = "The End", desc = "End Stone Protector and Dragon.")
+        @Accordion
+        public TheEndCategory theEnd = new TheEndCategory();
+
+        @Expose
+        @ConfigOption(name = "Spider's Den", desc = "Broodmother and Arachne.")
+        @Accordion
+        public SpidersDenCategory spidersDen = new SpidersDenCategory();
+
+        @Expose
+        @ConfigOption(name = "Crimson Isle", desc = "Crimson Isle bosses.")
+        @Accordion
+        public CrimsonIsleCategory crimsonIsle = new CrimsonIsleCategory();
+
+        @Expose
+        @ConfigOption(name = "Crystal Hollows", desc = "Crystal Hollows features.")
+        @Accordion
+        public CrystalHollowsCategory crystalHollows = new CrystalHollowsCategory();
+
+        @Expose
+        @ConfigOption(name = "Hide Damage Splash", desc = "Hides the damage numbers popping off mobs.")
+        @ConfigEditorBoolean
+        public boolean hideDamageSplash = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Fire Overlay", desc = "Hides the flames drawn at the bottom of the screen\n"
+                + "while you are burning.")
+        @ConfigEditorBoolean
+        public boolean hideFireOverlay = false;
+
+        @Expose
+        @ConfigOption(name = "Cocoon Catch Title", desc = "Shows a title when you cocoon a mob.")
+        @ConfigEditorBoolean
+        public boolean enableCocoonCatchTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Low Quiver Alert", desc = "Warns with a title and sound at 50 and 10 arrows left.")
+        @ConfigEditorBoolean
+        public boolean enableQuiverAlert = true;
+
+        @Expose
+        @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
+        @ConfigEditorBoolean
+        public boolean showPoisonIndicator = true;
+    }
+
     public static class TheEndCategory {
 
         // ========== End Stone Protector section ==========
@@ -874,30 +948,85 @@ public class ModConfig extends Config {
         public boolean hideHotspotParticles = true;
 
         @Expose
-        @ConfigOption(name = "Share", desc = "Expands hotspot sharing settings.")
-        @ConfigEditorAccordion(id = 99)
+        @ConfigOption(name = "Found Alert", desc = "Expands what to do when a hotspot with one of\n"
+                + "the perks below shows up.")
+        @ConfigEditorAccordion(id = 95)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 100)
-        public boolean hotspotShareFolder = false;
+        public boolean hotspotFoundFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Sends the coordinates in chat when you stand in a hotspot\n"
-                + "with one of the perks below.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 99)
-        public boolean shareHotspot = false;
-
-        @Expose
-        @ConfigOption(name = "Perks", desc = "Hotspot perks worth sharing.")
+        @ConfigOption(name = "Perks", desc = "Hotspot perks worth being told about.")
         @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 99)
+        @ConfigAccordionId(id = 95)
         public List<HotspotPerk> sharedHotspotPerks = new ArrayList<>(HotspotPerk.defaults());
+
+        @Expose
+        @ConfigOption(name = "Title", desc = "Shows a title naming the perk.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 95)
+        public boolean showHotspotFoundTitle = true;
+
+        @Expose
+        @ConfigOption(name = "Sound", desc = "Plays an alert sound.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 95)
+        public boolean playHotspotFoundSound = true;
+
+        @Expose
+        @ConfigOption(name = "Waypoint", desc = "Marks the hotspot until it runs out.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 95)
+        public boolean showHotspotFoundWaypoint = true;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line pointing at the waypoint.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 95)
+        public boolean showHotspotFoundTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Duration", desc = "Seconds the waypoint and tracer stay.")
+        @ConfigEditorSlider(minValue = 10f, maxValue = 300f, minStep = 10f)
+        @ConfigAccordionId(id = 95)
+        public int hotspotFoundSeconds = 60;
+
+        @Expose
+        @ConfigOption(name = "Share", desc = "Posts the coordinates in chat with a button\n"
+                + "that sends them to the channel below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 95)
+        public boolean shareHotspot = false;
 
         @Expose
         @ConfigOption(name = "Channel", desc = "Where the coordinates are sent.")
         @ConfigEditorDropdown
-        @ConfigAccordionId(id = 99)
+        @ConfigAccordionId(id = 95)
         public HotspotShareChannel hotspotShareChannel = HotspotShareChannel.PARTY;
+
+        @Expose
+        @ConfigOption(name = "Lava as Water", desc = "Expands the lava texture settings.")
+        @ConfigEditorAccordion(id = 102)
+        @ConfigEditorBoolean
+        public boolean lavaTextureFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Draws lava with the water texture.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 102)
+        public boolean replaceLavaTexture = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Lava Fog", desc = "Clears the orange view while you are in lava.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 102)
+        public boolean hideLavaFog = true;
+
+        @Expose
+        @ConfigOption(name = "Area", desc = "Where lava is drawn as water.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 102)
+        public LavaTextureArea lavaTextureArea = LavaTextureArea.CRIMSON_ISLE;
 
         @Expose
         @ConfigOption(name = "Golden Fish", desc = "Expands Golden Fish settings.")
@@ -1278,6 +1407,12 @@ public class ModConfig extends Config {
         public boolean enableSeaCreatureTitle = true;
 
         @Expose
+        @ConfigOption(name = "Spawn Sound", desc = "Plays a sound together with the title.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 94)
+        public boolean enableSeaCreatureSound = true;
+
+        @Expose
         @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 94)
@@ -1364,17 +1499,25 @@ public class ModConfig extends Config {
     }
 
     public static class MiscCategory {
+
         @Expose
-        @ConfigOption(name = "HUD Settings", desc = "Expands HUD settings.")
-        @ConfigEditorAccordion(id = 50)
+        @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
         @ConfigEditorBoolean
-        public boolean hudFolder = false;
+        public boolean enableRebootAlert = true;
+
+        @Expose
+        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
+        @ConfigEditorBoolean
+        public boolean enableWarpQueue = true;
+    }
+
+    // どの場面でも出しっぱなしにする HUD
+    public static class GeneralHudCategory {
 
         @Expose
         @ConfigOption(name = "Armor HUD", desc = "Expands armor HUD settings.")
         @ConfigEditorAccordion(id = 51)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean armorHudFolder = false;
 
         @Expose
@@ -1393,7 +1536,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Equipment HUD", desc = "Expands equipment HUD settings.")
         @ConfigEditorAccordion(id = 52)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean equipmentHudFolder = false;
 
         @Expose
@@ -1412,7 +1554,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Yaw and Pitch HUD", desc = "Expands yaw and pitch HUD settings.")
         @ConfigEditorAccordion(id = 54)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean yawPitchHudFolder = false;
 
         @Expose
@@ -1436,25 +1577,21 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showPetHud = true;
 
         @Expose
         @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showTpsHud = true;
 
         @Expose
         @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showDayHud = true;
 
         @Expose
         @ConfigOption(name = "Armor Stack HUD", desc = "Shows armor stack counts.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showArmorStackHud = true;
 
         @Expose
@@ -1462,26 +1599,339 @@ public class ModConfig extends Config {
                 + "§eNeeds the Ferocity Stats Widget.\n"
                 + "§e(/widget -> Stats Widget -> Enable Ferocity)")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showFerocityHud = false;
 
         @Expose
         @ConfigOption(name = "Quiver HUD", desc = "Shows selected arrow and how many are left.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 50)
         public boolean showQuiverHud = true;
+    }
+
+    // 手に持っているアイテムの見え方
+    public static class HeldItemCategory {
 
         @Expose
-        @ConfigOption(name = "Keybind Settings", desc = "Expands menu keybind settings.")
-        @ConfigEditorAccordion(id = 59)
+        @ConfigOption(name = "Size", desc = "Changes held item size.")
+        @ConfigEditorSlider(minValue = 0.01f, maxValue = 1.0f, minStep = 0.01f)
+        public float heldItemScale = 1.0f;
+
+        // ボタンには @Expose は付けず、代わりに transient を付けます！
+        @ConfigOption(name = "Reset Size", desc = "Reset to default.")
+        @ConfigEditorButton(buttonText = "Reset")
+        public transient Runnable resetHeldItemScale = () -> heldItemScale = 1.0f;
+
+        @Expose
+        @ConfigOption(name = "X", desc = "Shifts item horizontally.")
+        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
+        public float heldItemOffsetX = 0.0f;
+
+        @ConfigOption(name = "Reset X", desc = "Reset to default.")
+        @ConfigEditorButton(buttonText = "Reset")
+        public transient Runnable resetHeldItemOffsetX = () -> heldItemOffsetX = 0.0f;
+
+        @Expose
+        @ConfigOption(name = "Y", desc = "Shifts item vertically.")
+        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
+        public float heldItemOffsetY = 0.0f;
+
+        @ConfigOption(name = "Reset Y", desc = "Reset to default.")
+        @ConfigEditorButton(buttonText = "Reset")
+        public transient Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
+    }
+
+    // 繰り返し流れるチャットを黙らせる
+    public static class ChatFilterCategory {
+
+        @Expose
+        @ConfigOption(name = "Hide Profile Name", desc = "Hides \"You are playing on profile: ...\".")
         @ConfigEditorBoolean
-        public boolean keybindFolder = false;
+        public boolean hideProfileMessage = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Profile ID", desc = "Hides \"Profile ID: ...\".")
+        @ConfigEditorBoolean
+        public boolean hideProfileIdMessage = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Stash Reminder", desc = "Hides the stash reminder sent every minute.")
+        @ConfigEditorBoolean
+        public boolean hideStashMessage = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Blank Lines", desc = "Hides chat lines that have no text.")
+        @ConfigEditorBoolean
+        public boolean hideBlankMessages = true;
+    }
+
+    // バニラの画面まわりの手入れ
+    public static class InterfaceCategory {
+
+        // ---- Better Inventory (id: 67) ----
+        @Expose
+        @ConfigOption(name = "Inventory", desc = "Expands what is drawn around inventory menus.")
+        @ConfigEditorAccordion(id = 67)
+        @ConfigEditorBoolean
+        public boolean betterInventoryFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the inventory tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 67)
+        public boolean enableInventoryTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Potion Effects", desc = "Hides the effect list beside the inventory.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 67)
+        public boolean hideInventoryEffects = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Background Dim", desc = "Removes the dark tint behind inventory menus.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 67)
+        public boolean hideInventoryDim = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Recipe Book", desc = "Hides the recipe book and its button.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 67)
+        public boolean hideRecipeBook = true;
+
+        // ---- Better Tab List (id: 66) ----
+        @Expose
+        @ConfigOption(name = "Tab List", desc = "Expands what the tab list shows.")
+        @ConfigEditorAccordion(id = 66)
+        @ConfigEditorBoolean
+        public boolean tabListFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the tab list tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean enableTabListTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Hide Ads", desc = "Hides the Hypixel adverts above and below the tab list.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean hideTabListAds = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Ping Icons", desc = "Hides the connection bars on every row.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean hideTabListPing = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Extra Heads", desc = "Hides the head on rows that are not a player.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean hideTabListHeads = true;
+
+        @Expose
+        @ConfigOption(name = "Compact Columns", desc = "Drops the duplicated rows and the empty columns.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean compactTabList = true;
+
+        @Expose
+        @ConfigOption(name = "Fit Column Width", desc = "Sizes every column to its own longest line.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean fitTabColumns = true;
+
+        @Expose
+        @ConfigOption(name = "Shrink To Fit", desc = "Scales the whole list down when it is wider than the screen.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 66)
+        public boolean shrinkTabList = true;
+
+        // ---- Tooltip Position (id: 65) ----
+        @Expose
+        @ConfigOption(name = "Item Tooltips", desc = "Expands where item tooltips are drawn.")
+        @ConfigEditorAccordion(id = 65)
+        @ConfigEditorBoolean
+        public boolean tooltipPositionFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the tooltip tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean enableItemTooltipTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Scrollable Tooltips",
+                desc = "Moves the tooltip of the item under the cursor with the mouse wheel.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean enableScrollableTooltips = true;
+
+        @Expose
+        @ConfigOption(name = "Invert Tooltip Scroll",
+                desc = "Turns the wheel the other way when moving a tooltip.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean invertTooltipScroll = false;
+
+        @Expose
+        @ConfigOption(name = "Tooltip From Top",
+                desc = "Starts tooltips that do not fit on screen at the top instead.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean tooltipFromTop = false;
+
+        // ---- Auction/Bazaar (id: 71) ----
+        @Expose
+        @ConfigOption(name = "Auction/Bazaar", desc = "Expands the Auction House and Bazaar tweaks.")
+        @ConfigEditorAccordion(id = 71)
+        @ConfigEditorBoolean
+        public boolean auctionBazaarFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the Auction House and Bazaar tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableAuctionTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Search Input Screen",
+                desc = "Replaces the sign used by Bazaar and Auction searches with a text box.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean enableSearchInputScreen = true;
+
+        // ---- Attributes (id: 70) ----
+        @Expose
+        @ConfigOption(name = "Attribute Menu", desc = "Expands how the Attribute menu is shown.")
+        @ConfigEditorAccordion(id = 70)
+        @ConfigEditorBoolean
+        public boolean attributeFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the Attribute menu tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean enableAttributeMenuTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Replace Roman Numerals",
+                desc = "Writes Attribute tiers as numbers, and marks undiscovered ones with 0.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean enableAttributeTierNumbers = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight Progress",
+                desc = "Tints maxed attributes green and the rest red.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean highlightAttributeProgress = true;
+
+        @Expose
+        @ConfigOption(name = "Show Tier", desc = "Writes the current tier in the corner of every attribute.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean showAttributeTier = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Maxed Tier", desc = "Leaves the tier off attributes that are already maxed.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean hideMaxedAttributeTier = true;
+
+        // ---- Bestiary (id: 69) ----
+        @Expose
+        @ConfigOption(name = "Bestiary Menu", desc = "Expands how the Bestiary menu is shown.")
+        @ConfigEditorAccordion(id = 69)
+        @ConfigEditorBoolean
+        public boolean bestiaryFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the Bestiary menu tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 69)
+        public boolean enableBestiaryMenuTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Replace Roman Numerals",
+                desc = "Writes Bestiary tiers as numbers, and marks unlocked families with 0.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 69)
+        public boolean enableBestiaryTierNumbers = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight Progress",
+                desc = "Tints finished entries green and unfinished ones red.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 69)
+        public boolean highlightBestiaryProgress = true;
+
+        @Expose
+        @ConfigOption(name = "Show Tier", desc = "Writes the current tier in the corner of every entry.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 69)
+        public boolean showBestiaryTier = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Maxed Tier", desc = "Leaves the tier off entries that are already maxed.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 69)
+        public boolean hideMaxedBestiaryTier = true;
+
+        // ---- Enchant Tooltips (id: 64) ----
+        @Expose
+        @ConfigOption(name = "Enchant Tooltips", desc = "Expands how enchantments are shown in item tooltips.")
+        @ConfigEditorAccordion(id = 64)
+        @ConfigEditorBoolean
+        public boolean enchantTooltipFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the enchantment tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableEnchantTooltipTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Replace Roman Numerals",
+                desc = "Writes enchantment levels as numbers instead of Roman numerals.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableNumericEnchantTiers = true;
+
+        @Expose
+        @ConfigOption(name = "Max Enchant Chroma",
+                desc = "Cycles the colour of enchantments that are already at their maximum level.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableMaxEnchantChroma = true;
+
+        @Expose
+        @ConfigOption(name = "Book Enchant Gold",
+                desc = "Colours enchantments above the enchantment table's highest tier in gold.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableBookEnchantGold = true;
+
+        @Expose
+        @ConfigOption(name = "Skip Ultimate Enchants",
+                desc = "Leaves Ultimate Enchantments in their normal colour.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean ignoreUltimateEnchants = true;
+
+        @Expose
+        @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")
+        @ConfigEditorBoolean
+        public boolean enableCursorRestoreOnRapidReopen = true;
+    }
+
+    // メニューや切り替えをキーに割り当てる
+    public static class KeybindsCategory {
 
         @Expose
         @ConfigOption(name = "Open Menu Keybind", desc = "Expands menu opening keybind settings.")
         @ConfigEditorAccordion(id = 63)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 59)
         public boolean openMenuKeybindFolder = false;
 
         @Expose
@@ -1512,7 +1962,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Loadouts Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 60)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 59)
         public boolean loadoutsKeybindFolder = false;
 
         @Expose
@@ -1597,7 +2046,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Armor Set Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 61)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 59)
         public boolean armorSetKeybindFolder = false;
 
         @Expose
@@ -1664,7 +2112,6 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Equipment Set Keybind", desc = "Expands per-slot keybind settings.")
         @ConfigEditorAccordion(id = 62)
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 59)
         public boolean equipmentSetKeybindFolder = false;
 
         @Expose
@@ -1726,80 +2173,5 @@ public class ModConfig extends Config {
         @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_9)
         @ConfigAccordionId(id = 62)
         public int equipmentSetKeybindSlot9 = GLFW.GLFW_KEY_9;
-
-        @Expose
-        @ConfigOption(name = "Held Item Size", desc = "Expands size and position settings.")
-        @ConfigEditorAccordion(id = 53)
-        @ConfigEditorBoolean
-        public boolean heldItemFolder = false;
-
-        @Expose
-        @ConfigOption(name = "Size", desc = "Changes held item size.")
-        @ConfigEditorSlider(minValue = 0.01f, maxValue = 1.0f, minStep = 0.01f)
-        @ConfigAccordionId(id = 53)
-        public float heldItemScale = 1.0f;
-
-        // ボタンには @Expose は付けず、代わりに transient を付けます！
-        @ConfigOption(name = "Reset Size", desc = "Reset to default.")
-        @ConfigEditorButton(buttonText = "Reset")
-        @ConfigAccordionId(id = 53)
-        public transient Runnable resetHeldItemScale = () -> heldItemScale = 1.0f;
-
-        @Expose
-        @ConfigOption(name = "X", desc = "Shifts item horizontally.")
-        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
-        @ConfigAccordionId(id = 53)
-        public float heldItemOffsetX = 0.0f;
-
-        @ConfigOption(name = "Reset X", desc = "Reset to default.")
-        @ConfigEditorButton(buttonText = "Reset")
-        @ConfigAccordionId(id = 53)
-        public transient Runnable resetHeldItemOffsetX = () -> heldItemOffsetX = 0.0f;
-
-        @Expose
-        @ConfigOption(name = "Y", desc = "Shifts item vertically.")
-        @ConfigEditorSlider(minValue = -1.0f, maxValue = 1.0f, minStep = 0.01f)
-        @ConfigAccordionId(id = 53)
-        public float heldItemOffsetY = 0.0f;
-
-        @ConfigOption(name = "Reset Y", desc = "Reset to default.")
-        @ConfigEditorButton(buttonText = "Reset")
-        @ConfigAccordionId(id = 53)
-        public transient Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
-
-        @Expose
-        @ConfigOption(name = "Hide Damage Splash", desc = "Hides the damage numbers popping off mobs.")
-        @ConfigEditorBoolean
-        public boolean hideDamageSplash = false;
-
-        @Expose
-        @ConfigOption(name = "Cocoon Catch Title", desc = "Shows a title when you cocoon a mob.")
-        @ConfigEditorBoolean
-        public boolean enableCocoonCatchTitle = true;
-
-        @Expose
-        @ConfigOption(name = "Low Quiver Alert", desc = "Warns with a title and sound at 50 and 10 arrows left.")
-        @ConfigEditorBoolean
-        public boolean enableQuiverAlert = true;
-
-        @Expose
-        @ConfigOption(name = "Arrow Poison Indicator", desc = "Shows arrow poison uses left.")
-        @ConfigEditorBoolean
-        public boolean showPoisonIndicator = true;
-
-        @Expose
-        @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
-        @ConfigEditorBoolean
-        public boolean enableRebootAlert = true;
-
-        @Expose
-        @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
-        @ConfigEditorBoolean
-        public boolean enableWarpQueue = true;
-
-        @Expose
-        @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")
-        @ConfigEditorBoolean
-        public boolean enableCursorRestoreOnRapidReopen = true;
     }
 }

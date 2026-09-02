@@ -1,0 +1,652 @@
+{
+  "_comment": "SkyBlock enchantments, keyed by the name shown in the item lore. \"table\" is the highest level an enchantment table can apply, \"max\" is the highest level that exists, \"ultimate\" marks the Ultimate Enchantments. Derived from SkyHanni-REPO constants/Enchants.json.",
+  "_source": "https://github.com/hannibal002/SkyHanni-REPO (MIT License, Copyright (c) 2022 hannibal2)",
+  "enchantments": {
+    "Absorb": {
+      "table": 0,
+      "max": 10
+    },
+    "Angler": {
+      "table": 5,
+      "max": 6
+    },
+    "Aqua Affinity": {
+      "table": 1,
+      "max": 1
+    },
+    "Bane of Arthropods": {
+      "table": 5,
+      "max": 7
+    },
+    "Bank": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Big Brain": {
+      "table": 2,
+      "max": 5
+    },
+    "Blast Protection": {
+      "table": 5,
+      "max": 7
+    },
+    "Blessing": {
+      "table": 5,
+      "max": 6
+    },
+    "Bobbin' Time": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Bug Blender": {
+      "table": 0,
+      "max": 5
+    },
+    "Caster": {
+      "table": 5,
+      "max": 6
+    },
+    "Cayenne": {
+      "table": 3,
+      "max": 5
+    },
+    "Champion": {
+      "table": 0,
+      "max": 10
+    },
+    "Chance": {
+      "table": 3,
+      "max": 5
+    },
+    "Charm": {
+      "table": 0,
+      "max": 6
+    },
+    "Chimera": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Cleave": {
+      "table": 5,
+      "max": 6
+    },
+    "Combo": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Compact": {
+      "table": 0,
+      "max": 10
+    },
+    "Corruption": {
+      "table": 0,
+      "max": 5
+    },
+    "Counter-Strike": {
+      "table": 2,
+      "max": 5
+    },
+    "Critical": {
+      "table": 5,
+      "max": 7
+    },
+    "Crop Fever": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Cubism": {
+      "table": 5,
+      "max": 6
+    },
+    "Cultivating": {
+      "table": 0,
+      "max": 10
+    },
+    "Dedication": {
+      "table": 0,
+      "max": 4
+    },
+    "Delicate": {
+      "table": 4,
+      "max": 5
+    },
+    "Depth Strider": {
+      "table": 3,
+      "max": 3
+    },
+    "Divine Gift": {
+      "table": 0,
+      "max": 3
+    },
+    "Dragon Tracer": {
+      "table": 5,
+      "max": 5
+    },
+    "Drain": {
+      "table": 3,
+      "max": 5
+    },
+    "Duplex": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Efficiency": {
+      "table": 5,
+      "max": 10
+    },
+    "Ender Slayer": {
+      "table": 5,
+      "max": 7
+    },
+    "Execute": {
+      "table": 5,
+      "max": 6
+    },
+    "Experience": {
+      "table": 3,
+      "max": 5
+    },
+    "Expertise": {
+      "table": 0,
+      "max": 10
+    },
+    "Fatal Tempo": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Feast": {
+      "table": 0,
+      "max": 5
+    },
+    "Feather Falling": {
+      "table": 5,
+      "max": 10
+    },
+    "Fire Aspect": {
+      "table": 2,
+      "max": 3
+    },
+    "Fire Protection": {
+      "table": 5,
+      "max": 7
+    },
+    "First Impression": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "First Strike": {
+      "table": 4,
+      "max": 5
+    },
+    "Flame": {
+      "table": 2,
+      "max": 2
+    },
+    "Flash": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Flowstate": {
+      "table": 0,
+      "max": 3,
+      "ultimate": true
+    },
+    "Forest Pledge": {
+      "table": 2,
+      "max": 6
+    },
+    "Fortune": {
+      "table": 3,
+      "max": 4
+    },
+    "Frail": {
+      "table": 5,
+      "max": 7
+    },
+    "Frost Walker": {
+      "table": 2,
+      "max": 2
+    },
+    "Giant Killer": {
+      "table": 5,
+      "max": 7
+    },
+    "Gravity": {
+      "table": 5,
+      "max": 6
+    },
+    "Great Spook": {
+      "table": 0,
+      "max": 1
+    },
+    "Green Thumb": {
+      "table": 0,
+      "max": 5
+    },
+    "Growth": {
+      "table": 5,
+      "max": 7
+    },
+    "Habanero Tactics": {
+      "table": 4,
+      "max": 5,
+      "ultimate": true
+    },
+    "Hardened Vitality": {
+      "table": 0,
+      "max": 10
+    },
+    "Harvesting": {
+      "table": 5,
+      "max": 6
+    },
+    "Hecatomb": {
+      "table": 0,
+      "max": 10
+    },
+    "Ice Cold": {
+      "table": 0,
+      "max": 5
+    },
+    "Impaling": {
+      "table": 5,
+      "max": 5
+    },
+    "Inferno": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Infinite Quiver": {
+      "table": 5,
+      "max": 10
+    },
+    "Karma": {
+      "table": 0,
+      "max": 6
+    },
+    "Knockback": {
+      "table": 2,
+      "max": 2
+    },
+    "Lapidary": {
+      "table": 0,
+      "max": 5
+    },
+    "Last Stand": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Legion": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Lethality": {
+      "table": 5,
+      "max": 6
+    },
+    "Life Steal": {
+      "table": 3,
+      "max": 5
+    },
+    "Looting": {
+      "table": 3,
+      "max": 5
+    },
+    "Luck": {
+      "table": 5,
+      "max": 7
+    },
+    "Luck of the Sea": {
+      "table": 5,
+      "max": 7
+    },
+    "Lure": {
+      "table": 5,
+      "max": 6
+    },
+    "Magnet": {
+      "table": 5,
+      "max": 6
+    },
+    "Mana Steal": {
+      "table": 0,
+      "max": 3
+    },
+    "Missile": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "No Pain No Gain": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "One For All": {
+      "table": 0,
+      "max": 1,
+      "ultimate": true
+    },
+    "Overload": {
+      "table": 0,
+      "max": 5
+    },
+    "Paleontologist": {
+      "table": 0,
+      "max": 5
+    },
+    "Pesterminator": {
+      "table": 0,
+      "max": 6
+    },
+    "Petalfall": {
+      "table": 0,
+      "max": 5
+    },
+    "Piercing": {
+      "table": 1,
+      "max": 1
+    },
+    "Piscary": {
+      "table": 5,
+      "max": 7
+    },
+    "Power": {
+      "table": 5,
+      "max": 7
+    },
+    "Prismatic": {
+      "table": 0,
+      "max": 5
+    },
+    "Projectile Protection": {
+      "table": 5,
+      "max": 7
+    },
+    "Prosecute": {
+      "table": 5,
+      "max": 6
+    },
+    "Prosperity": {
+      "table": 0,
+      "max": 5
+    },
+    "Protection": {
+      "table": 5,
+      "max": 7
+    },
+    "Punch": {
+      "table": 2,
+      "max": 2
+    },
+    "Pyroclasm": {
+      "table": 5,
+      "max": 6
+    },
+    "Quantum": {
+      "table": 2,
+      "max": 5
+    },
+    "Quick Bite": {
+      "table": 0,
+      "max": 5
+    },
+    "Rainbow": {
+      "table": 1,
+      "max": 3
+    },
+    "Reflection": {
+      "table": 0,
+      "max": 5
+    },
+    "Refrigerate": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Rejuvenate": {
+      "table": 0,
+      "max": 5
+    },
+    "Rend": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Replenish": {
+      "table": 0,
+      "max": 1
+    },
+    "Respiration": {
+      "table": 3,
+      "max": 4
+    },
+    "Respite": {
+      "table": 0,
+      "max": 5
+    },
+    "Scavenger": {
+      "table": 3,
+      "max": 6
+    },
+    "Scuba": {
+      "table": 0,
+      "max": 6
+    },
+    "Sharpness": {
+      "table": 5,
+      "max": 7
+    },
+    "Silk Touch": {
+      "table": 1,
+      "max": 1
+    },
+    "Small Brain": {
+      "table": 2,
+      "max": 5
+    },
+    "Smarty Pants": {
+      "table": 0,
+      "max": 5
+    },
+    "Smelting Touch": {
+      "table": 1,
+      "max": 1
+    },
+    "Smite": {
+      "table": 5,
+      "max": 7
+    },
+    "Smoldering": {
+      "table": 0,
+      "max": 5
+    },
+    "Snipe": {
+      "table": 3,
+      "max": 4
+    },
+    "Soul Eater": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Spiked Hook": {
+      "table": 5,
+      "max": 7
+    },
+    "Stealth": {
+      "table": 0,
+      "max": 1
+    },
+    "Strong Vitality": {
+      "table": 0,
+      "max": 10
+    },
+    "Sugar Rush": {
+      "table": 0,
+      "max": 3
+    },
+    "Sunder": {
+      "table": 0,
+      "max": 6
+    },
+    "Sunset": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Swarm": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Tabasco": {
+      "table": 1,
+      "max": 3
+    },
+    "The One": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Thorns": {
+      "table": 3,
+      "max": 4
+    },
+    "Thunderbolt": {
+      "table": 5,
+      "max": 7
+    },
+    "Thunderlord": {
+      "table": 5,
+      "max": 7
+    },
+    "Tidal": {
+      "table": 0,
+      "max": 3
+    },
+    "Titan Killer": {
+      "table": 5,
+      "max": 7
+    },
+    "Toxophilite": {
+      "table": 0,
+      "max": 10
+    },
+    "Transylvanian": {
+      "table": 3,
+      "max": 5
+    },
+    "Triple-Strike": {
+      "table": 4,
+      "max": 5
+    },
+    "True Protection": {
+      "table": 0,
+      "max": 1
+    },
+    "Turbo-Cacti": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Cane": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Carrot": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Cocoa": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Melon": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Moonflower": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Mushrooms": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Potato": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Pumpkin": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Rose": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Sunflower": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Warts": {
+      "table": 0,
+      "max": 7
+    },
+    "Turbo-Wheat": {
+      "table": 0,
+      "max": 7
+    },
+    "Ultimate Jerry": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Ultimate Wise": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Vampiric Vitality": {
+      "table": 0,
+      "max": 10
+    },
+    "Vampirism": {
+      "table": 5,
+      "max": 6
+    },
+    "Venomous": {
+      "table": 5,
+      "max": 7
+    },
+    "Vicious": {
+      "table": 0,
+      "max": 5
+    },
+    "Vivacious Vitality": {
+      "table": 0,
+      "max": 10
+    },
+    "Wisdom": {
+      "table": 0,
+      "max": 5,
+      "ultimate": true
+    },
+    "Woodsplitter": {
+      "table": 5,
+      "max": 6
+    }
+  }
+}

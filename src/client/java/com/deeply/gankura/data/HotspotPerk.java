@@ -1,5 +1,6 @@
 package com.deeply.gankura.data;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -51,8 +52,8 @@ public enum HotspotPerk {
         return UNKNOWN;
     }
 
-    /** 知らせる既定の顔ぶれ。狙って探すことが多いものだけ入れておく */
+    /** 知らせる既定の顔ぶれ。UNKNOWN は何の効果か分からないので外しておく */
     public static List<HotspotPerk> defaults() {
-        return List.of(SEA_CREATURE, SHARD);
+        return Arrays.stream(values()).filter(perk -> perk != UNKNOWN).toList();
     }
 }

@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class TpsHud extends HudElement {
     public TpsHud() {
-        super("tps", 10, 92, 1.0f, 80, 15, () -> ModConfig.INSTANCE.misc.showTpsHud, () -> true);
+        super("tps", 10, 92, 1.0f, 80, 15, () -> ModConfig.INSTANCE.generalHud.showTpsHud, () -> true);
     }
 
     @Override

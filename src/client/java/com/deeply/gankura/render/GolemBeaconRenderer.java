@@ -19,7 +19,7 @@ public class GolemBeaconRenderer {
     private static String lastStage = null;
 
     public static void submitBeaconState(LevelRenderState worldState, Camera camera) {
-        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Beacon) return;
+        if (!ModConfig.INSTANCE.combat.theEnd.showGolemWorldLocation_Beacon) return;
 
         Minecraft client = Minecraft.getInstance();
         if (client.level == null) return;

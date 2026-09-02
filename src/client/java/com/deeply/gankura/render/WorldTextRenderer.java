@@ -49,6 +49,8 @@ public class WorldTextRenderer {
     public static final int HOTSPOT_COLOR = 0xFFFF55FF;
     private static final int HOTSPOT_FILL_COLOR = 0x40FF55FF;
     private static final float HOTSPOT_LINE_WIDTH = 3.0f;
+    // 見つけた Hotspot の枠の塗り。色は効果ごとに変わるので、濃さだけ決めておく
+    private static final int HOTSPOT_FOUND_FILL_ALPHA = 0x40000000;
 
     public static void render(Minecraft client) {
         if (client.player == null) return;
@@ -62,6 +64,7 @@ public class WorldTextRenderer {
         renderCustomWaypoints(client);
         renderCastTimer(client);
         renderHotspotGuess(client);
+        renderHotspotFound(client);
         renderHotspotCircles(client);
         // 開発中の一時的な機能。配布ビルドでは何も登録されていない
         DevHooks.renderWorld(client);
@@ -111,6 +114,24 @@ public class WorldTextRenderer {
         GizmoProperties box = Gizmos.cuboid(BlockPos.containing(guess),
                 GizmoStyle.strokeAndFill(HOTSPOT_COLOR, HOTSPOT_LINE_WIDTH, HOTSPOT_FILL_COLOR));
         box.setAlwaysOnTop();
+    }
+
+    // 狙っている効果の Hotspot を見つけたとき、しばらくの間その場所に印を出す
+    private static void renderHotspotFound(Minecraft client) {
+        if (!ModConfig.INSTANCE.fishing.showHotspotFoundWaypoint) return;
+
+        for (HotspotAreaHandler.Found spot : HotspotAreaHandler.found()) {
+            int distance = (int) Math.round(client.player.position().distanceTo(spot.center()));
+            // 円や Tracer と同じく、効果の色で塗り分ける
+            int argb = spot.perk().argb();
+            renderGizmoLabelAt("§d§lHOTSPOT " + spot.perk() + " §e" + distance + "m",
+                    spot.center().add(0, 1.5, 0), argb);
+
+            GizmoProperties box = Gizmos.cuboid(BlockPos.containing(spot.center()),
+                    GizmoStyle.strokeAndFill(argb, HOTSPOT_LINE_WIDTH,
+                            (argb & 0xFFFFFF) | HOTSPOT_FOUND_FILL_ALPHA));
+            box.setAlwaysOnTop();
+        }
     }
 
     // 投げている浮きの上に、投げてからの経過秒を出す
@@ -247,7 +268,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGolemLocationText() {
-        if (!ModConfig.INSTANCE.theEnd.showGolemWorldLocation_Text) return;
+        if (!ModConfig.INSTANCE.combat.theEnd.showGolemWorldLocation_Text) return;
 
         GolemAnchor anchor = golemAnchor();
         if (anchor == null) return;
@@ -277,7 +298,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderArachneLocationText() {
-        if (!ModConfig.INSTANCE.spidersDen.showArachneWorldText) return;
+        if (!ModConfig.INSTANCE.combat.spidersDen.showArachneWorldText) return;
         if (!GameState.Server.isSpidersDen()) return;
 
         BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS;
@@ -339,7 +360,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderCrimsonBossLocationTexts() {
-        if (!ModConfig.INSTANCE.crimsonIsle.showCrimsonIsleWorldText) return;
+        if (!ModConfig.INSTANCE.combat.crimsonIsle.showCrimsonIsleWorldText) return;
         boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
         if (!isCrimsonIsle) return;
 

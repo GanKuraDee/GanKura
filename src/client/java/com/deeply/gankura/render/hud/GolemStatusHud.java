@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class GolemStatusHud extends HudElement {
     public GolemStatusHud() {
         super("stats", 230, 10, 1.0f, 150, 36,
-                () -> ModConfig.INSTANCE.theEnd.showGolemStatusHud,
+                () -> ModConfig.INSTANCE.combat.theEnd.showGolemStatusHud,
                 () -> GameState.Server.isTheEnd());
     }
 

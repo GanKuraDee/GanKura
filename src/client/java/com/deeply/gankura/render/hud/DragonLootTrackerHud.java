@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor; // 26.1.2仕様
 public class DragonLootTrackerHud extends HudElement {
     public DragonLootTrackerHud() {
         super("dragonTracker", 230, 158, 1.0f, 150, 36,
-                () -> ModConfig.INSTANCE.theEnd.showDragonTrackerHud,
+                () -> ModConfig.INSTANCE.combat.theEnd.showDragonTrackerHud,
                 () -> GameState.Server.isTheEnd());
     }
 
@@ -24,7 +24,7 @@ public class DragonLootTrackerHud extends HudElement {
 
         // 表示する行と並び順は設定画面のドラッグリストに従う
         int y = 12;
-        for (DragonRareDrop drop : ModConfig.INSTANCE.theEnd.trackedDragonDrops) {
+        for (DragonRareDrop drop : ModConfig.INSTANCE.combat.theEnd.trackedDragonDrops) {
             int count = isPreview ? 0 : drop.count();
             text(graphics, font, drop.label() + "§f: §f" + count, 0, y, 0xFFFFFFFF, true);
             y += 12;

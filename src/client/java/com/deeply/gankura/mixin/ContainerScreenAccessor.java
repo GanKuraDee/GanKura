@@ -20,4 +20,8 @@ public interface ContainerScreenAccessor {
 
     @Accessor("imageHeight")
     int gankura$getImageHeight();
+
+    // 今カーソルが乗っているスロット。ツールチップを動かす対象を知るために読む
+    @Accessor("hoveredSlot")
+    net.minecraft.world.inventory.Slot gankura$getHoveredSlot();
 }

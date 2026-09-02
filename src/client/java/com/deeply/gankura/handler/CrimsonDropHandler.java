@@ -130,7 +130,7 @@ public class CrimsonDropHandler {
 
     // 設定画面のドラッグリストで有効になっていて、かつ撃破したボスのドロップになりうるものだけを返す
     private static List<CrimsonRareDrop> nameMatchedDrops(String killedBoss) {
-        return ModConfig.INSTANCE.crimsonIsle.trackedCrimsonDrops.stream()
+        return ModConfig.INSTANCE.combat.crimsonIsle.trackedCrimsonDrops.stream()
                 .filter(drop -> drop.itemName() != null)
                 .filter(drop -> drop.matchesBoss(killedBoss))
                 .sorted(Comparator.comparingInt((CrimsonRareDrop drop) -> drop.itemName().length()).reversed())
@@ -138,7 +138,7 @@ public class CrimsonDropHandler {
     }
 
     private static boolean isTracked(CrimsonRareDrop drop, String killedBoss) {
-        return drop.matchesBoss(killedBoss) && ModConfig.INSTANCE.crimsonIsle.trackedCrimsonDrops.contains(drop);
+        return drop.matchesBoss(killedBoss) && ModConfig.INSTANCE.combat.crimsonIsle.trackedCrimsonDrops.contains(drop);
     }
 
     private static boolean hasColor(Component text, ChatFormatting targetFormatting) {
@@ -158,7 +158,7 @@ public class CrimsonDropHandler {
         GameState.CrimsonDrop.isScanning = false;
         LOGGER.info("Crimson Drop Detected: " + itemName.getString());
 
-        if (!ModConfig.INSTANCE.crimsonIsle.enableCrimsonDropAlerts) return;
+        if (!ModConfig.INSTANCE.combat.crimsonIsle.enableCrimsonDropAlerts) return;
 
         MutableComponent title = Component.literal("§c§lDROP!");
         // アイテム名に通算数を添える。何個目のドロップかがその場で分かるようにする

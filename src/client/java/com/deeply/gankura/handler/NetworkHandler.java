@@ -49,6 +49,9 @@ public class NetworkHandler {
             // 発言そのものを扱う機能を足すときは、ここより前で受け取る
             if (ModConstants.isPlayerChat(unformattedMsg)) return true;
 
+            // 決まった文面の流し読み用のチャットは、ここで捨てる
+            if (ChatFilterHandler.shouldHide(unformattedMsg)) return false;
+
             // 3. 各ドメイン(機能)への純粋な委譲
             // NetworkHandler自身は、メッセージの中身が何なのか一切気にせず担当者に投げるだけ！
             ServerRestartHandler.handleChat(unformattedMsg, client);

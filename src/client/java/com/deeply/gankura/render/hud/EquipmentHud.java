@@ -19,12 +19,12 @@ public class EquipmentHud extends HudElement {
 
     public EquipmentHud() {
         super("equipment", 10, 110, 1.0f, SLOT_SIZE * SLOTS.length, SLOT_SIZE,
-                () -> ModConfig.INSTANCE.misc.showEquipmentHud, () -> true);
+                () -> ModConfig.INSTANCE.generalHud.showEquipmentHud, () -> true);
     }
 
     @Override
     public void renderElement(GuiGraphicsExtractor graphics, boolean isPreview) {
-        boolean vertical = ModConfig.INSTANCE.misc.equipmentHudOrientation == ModConfig.HudOrientation.VERTICAL;
+        boolean vertical = ModConfig.INSTANCE.generalHud.equipmentHudOrientation == ModConfig.HudOrientation.VERTICAL;
         this.width = vertical ? SLOT_SIZE : SLOT_SIZE * SLOTS.length;
         this.height = vertical ? SLOT_SIZE * SLOTS.length : SLOT_SIZE;
 

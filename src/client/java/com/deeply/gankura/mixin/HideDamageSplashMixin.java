@@ -24,7 +24,7 @@ public class HideDamageSplashMixin {
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void gankura$hideDamageSplash(Entity entity, Frustum frustum, double camX, double camY, double camZ,
                                           CallbackInfoReturnable<Boolean> cir) {
-        if (!ModConfig.INSTANCE.misc.hideDamageSplash) return;
+        if (!ModConfig.INSTANCE.combat.hideDamageSplash) return;
         if (!GameState.Server.isSkyblock()) return;
         if (!(entity instanceof ArmorStand stand)) return;
 
