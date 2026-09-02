@@ -160,11 +160,8 @@ public class CrimsonDropHandler {
         if (!ModConfig.INSTANCE.combat.crimsonIsle.enableCrimsonDropAlerts) return;
 
         MutableComponent title = Component.literal("§c§lDROP!");
-        // アイテム名に通算数を添える。何個目のドロップかがその場で分かるようにする
-        MutableComponent titleItem = Component.empty()
-                .append(itemName)
-                .append(Component.literal(" #" + count).withStyle(ChatFormatting.GRAY));
-        NotificationUtils.showTitle(client, title, titleItem, 5, 100, 20);
+        NotificationUtils.showTitle(client, title,
+                NotificationUtils.dropSubtitle(itemName, count), 5, 100, 20);
 
         Component playerName = client.player.getDisplayName();
         MutableComponent chatMsg = Component.literal("")
