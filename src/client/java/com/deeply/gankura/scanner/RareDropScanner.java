@@ -107,13 +107,6 @@ public class RareDropScanner {
         }
     }
 
-    // アイテム名に通算数を添える。何個目のドロップかがその場で分かるようにする
-    private static Component withCount(Component itemText, int count) {
-        return Component.empty()
-                .append(itemText)
-                .append(Component.literal(" #" + count).withStyle(ChatFormatting.GRAY));
-    }
-
     // 設定画面のドラッグリストから外されたドロップはスキャンしない
     private static boolean isTracked(GolemRareDrop drop) {
         return ModConfig.INSTANCE.combat.theEnd.trackedGolemDrops.contains(drop);
@@ -126,7 +119,8 @@ public class RareDropScanner {
     private static void notifyDrop(Minecraft client, Component itemText, int count, boolean isAlertEnabled) {
         if (isAlertEnabled) {
             MutableComponent title = Component.literal("DROP!").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
-            NotificationUtils.showTitle(client, title, withCount(itemText, count), 5, 100, 20);
+            NotificationUtils.showTitle(client, title,
+                    NotificationUtils.dropSubtitle(itemText, count), 5, 100, 20);
 
             Component playerName = client.player.getDisplayName();
             MutableComponent chatMsg = Component.empty()
