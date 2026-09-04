@@ -1666,6 +1666,12 @@ public class ModConfig extends Config {
     // バニラの画面まわりの手入れ
     public static class InterfaceCategory {
 
+        @Expose
+        @ConfigOption(name = "Highlight Opacity",
+                desc = "How solid the coloured slot highlights are drawn behind the items.")
+        @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 5f)
+        public int highlightOpacity = 50;
+
         // ---- Better Inventory (id: 67) ----
         @Expose
         @ConfigOption(name = "Inventory", desc = "Expands what is drawn around inventory menus.")
@@ -1746,15 +1752,15 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 66)
         public boolean shrinkTabList = true;
 
-        // ---- Tooltip Position (id: 65) ----
+        // ---- Tooltips (id: 65) ----
         @Expose
-        @ConfigOption(name = "Item Tooltips", desc = "Expands where item tooltips are drawn.")
+        @ConfigOption(name = "Tooltips", desc = "Expands how and where item tooltips are drawn.")
         @ConfigEditorAccordion(id = 65)
         @ConfigEditorBoolean
         public boolean tooltipPositionFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Turns on the tooltip tweaks below.")
+        @ConfigOption(name = "Enable", desc = "Turns on the tooltip tweaks below, Enchant and Item Price included.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 65)
         public boolean enableItemTooltipTweaks = false;
@@ -1780,6 +1786,101 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 65)
         public boolean tooltipFromTop = false;
 
+        // ---- Enchant (id: 64、Tooltips の中) ----
+        @Expose
+        @ConfigOption(name = "Enchant", desc = "Expands how enchantments are shown in item tooltips.")
+        @ConfigEditorAccordion(id = 64)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean enchantTooltipFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the enchantment tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableEnchantTooltipTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Replace Roman Numerals",
+                desc = "Writes enchantment levels as numbers instead of Roman numerals.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableNumericEnchantTiers = true;
+
+        @Expose
+        @ConfigOption(name = "Max Enchant Chroma",
+                desc = "Cycles the colour of enchantments that are already at their maximum level.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableMaxEnchantChroma = true;
+
+        @Expose
+        @ConfigOption(name = "Book Enchant Gold",
+                desc = "Colours enchantments above the enchantment table's highest tier in gold.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean enableBookEnchantGold = true;
+
+        @Expose
+        @ConfigOption(name = "Skip Ultimate Enchants",
+                desc = "Leaves Ultimate Enchantments in their normal colour.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 64)
+        public boolean ignoreUltimateEnchants = true;
+
+        // ---- Item Price (id: 103、Tooltips の中) ----
+        @Expose
+        @ConfigOption(name = "Item Price", desc = "Expands the prices written under item tooltips.")
+        @ConfigEditorAccordion(id = 103)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 65)
+        public boolean itemPriceFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Writes the market price at the bottom of item tooltips.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean enableItemPrice = false;
+
+        @Expose
+        @ConfigOption(name = "Lowest BIN", desc = "Shows the cheapest Buy It Now price on the Auction House.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean showLowestBin = true;
+
+        @Expose
+        @ConfigOption(name = "Bazaar", desc = "Shows the price the Bazaar buys and sells at.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean showBazaarPrice = true;
+
+        @Expose
+        @ConfigOption(name = "Bazaar Price", desc = "Which side of the Bazaar to show.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 103)
+        public BazaarPriceType bazaarPriceType = BazaarPriceType.BOTH;
+
+        @Expose
+        @ConfigOption(name = "Craft Cost",
+                desc = "Shows what the materials of one craft cost.\n"
+                        + "Bazaar materials are counted both ways: buying them now, and waiting on a buy order.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean showCraftCost = true;
+
+        @Expose
+        @ConfigOption(name = "Stack Price",
+                desc = "Adds the price of the whole stack when you hold more than one.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean showStackPrice = true;
+
+        @Expose
+        @ConfigOption(name = "Short Numbers", desc = "Writes large prices as 1.2M instead of 1,200,000.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 103)
+        public boolean shortPriceNumbers = true;
+
         // ---- Auction/Bazaar (id: 71) ----
         @Expose
         @ConfigOption(name = "Auction/Bazaar", desc = "Expands the Auction House and Bazaar tweaks.")
@@ -1792,6 +1893,29 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean enableAuctionTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Order Helper",
+                desc = "Marks your own Bazaar orders.\n"
+                        + "Yellow when someone outbid you, green when the order is filled.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean highlightBazaarOrders = true;
+
+        @Expose
+        @ConfigOption(name = "Manage Auctions",
+                desc = "Marks your own auctions.\n"
+                        + "Green when sold, red when expired.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean highlightOwnAuctions = true;
+
+        @Expose
+        @ConfigOption(name = "Undercut Highlight",
+                desc = "Marks an unsold auction yellow while the same item is listed cheaper than yours.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean highlightUndercutAuctions = true;
 
         @Expose
         @ConfigOption(name = "Search Input Screen",
@@ -1839,6 +1963,36 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 70)
         public boolean hideMaxedAttributeTier = true;
 
+        @Expose
+        @ConfigOption(name = "Shard Cost Panel",
+                desc = "Lists what the shards for the unfinished attributes cost on the Bazaar,\n"
+                        + "cheapest first, in a box beside the Attribute Menu.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 70)
+        public boolean showAttributeCosts = true;
+
+        @Expose
+        @ConfigOption(name = "Cost Target",
+                desc = "Whether to price the next tier or all the way to max.\n"
+                        + "Clicking Next or Max in the box switches it too.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 70)
+        public AttributeCostTarget attributeCostTarget = AttributeCostTarget.NEXT_TIER;
+
+        @Expose
+        @ConfigOption(name = "Cost Sort",
+                desc = "Which price the list is ordered by.\n"
+                        + "Clicking either heading in the box switches it too.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 70)
+        public AttributeCostSort attributeCostSort = AttributeCostSort.INSTANT;
+
+        @Expose
+        @ConfigOption(name = "Cost Rows", desc = "How many attributes the box lists.")
+        @ConfigEditorSlider(minValue = 3f, maxValue = 20f, minStep = 1f)
+        @ConfigAccordionId(id = 70)
+        public int attributeCostRows = 10;
+
         // ---- Bestiary (id: 69) ----
         @Expose
         @ConfigOption(name = "Bestiary Menu", desc = "Expands how the Bestiary menu is shown.")
@@ -1878,46 +2032,36 @@ public class ModConfig extends Config {
         @ConfigAccordionId(id = 69)
         public boolean hideMaxedBestiaryTier = true;
 
-        // ---- Enchant Tooltips (id: 64) ----
+        // ---- Pets (id: 104) ----
         @Expose
-        @ConfigOption(name = "Enchant Tooltips", desc = "Expands how enchantments are shown in item tooltips.")
-        @ConfigEditorAccordion(id = 64)
+        @ConfigOption(name = "Pets", desc = "Expands how pets are shown in menus.")
+        @ConfigEditorAccordion(id = 104)
         @ConfigEditorBoolean
-        public boolean enchantTooltipFolder = false;
+        public boolean petFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Turns on the enchantment tweaks below.")
+        @ConfigOption(name = "Enable", desc = "Turns on the pet tweaks below.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 64)
-        public boolean enableEnchantTooltipTweaks = false;
+        @ConfigAccordionId(id = 104)
+        public boolean enablePetTweaks = false;
 
         @Expose
-        @ConfigOption(name = "Replace Roman Numerals",
-                desc = "Writes enchantment levels as numbers instead of Roman numerals.")
+        @ConfigOption(name = "Highlight Active Pet", desc = "Marks the pet you currently have out.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 64)
-        public boolean enableNumericEnchantTiers = true;
+        @ConfigAccordionId(id = 104)
+        public boolean highlightActivePet = true;
 
         @Expose
-        @ConfigOption(name = "Max Enchant Chroma",
-                desc = "Cycles the colour of enchantments that are already at their maximum level.")
+        @ConfigOption(name = "Show Level", desc = "Writes the current level in the corner of every pet.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 64)
-        public boolean enableMaxEnchantChroma = true;
+        @ConfigAccordionId(id = 104)
+        public boolean showPetLevel = true;
 
         @Expose
-        @ConfigOption(name = "Book Enchant Gold",
-                desc = "Colours enchantments above the enchantment table's highest tier in gold.")
+        @ConfigOption(name = "Hide Maxed Level", desc = "Leaves the level off pets that are already maxed.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 64)
-        public boolean enableBookEnchantGold = true;
-
-        @Expose
-        @ConfigOption(name = "Skip Ultimate Enchants",
-                desc = "Leaves Ultimate Enchantments in their normal colour.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 64)
-        public boolean ignoreUltimateEnchants = true;
+        @ConfigAccordionId(id = 104)
+        public boolean hideMaxedPetLevel = false;
 
         @Expose
         @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")

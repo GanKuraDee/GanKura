@@ -86,7 +86,12 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Beeheemoth Spawn Title
   - Cocoon Catch Title
   - Bestiary Menu - Replace Roman Numerals, MAX highlight and per-slot tier numbers.
-  - Attribute Menu - Replace Roman Numerals, MAX highlight and per-slot tier numbers.
+  - Attribute Menu - Replace Roman Numerals, MAX highlight, per-slot tier numbers and a shard cost list.
+  - Pets - Per-slot level numbers and a highlight on the pet you have out.
+  - Item Price - Writes the Auction House lowest BIN, the Bazaar price and the craft cost
+    under item tooltips.
+  - Manage Auctions - Marks your own auctions: green when sold, red when expired, yellow when undercut.
+  - Bazaar Order Helper - Marks your Bazaar orders yellow when you are outbid, green when filled.
   - Search Input Screen - Replaces the Bazaar and Auction House sign editor with a text box.
   - Chat Filter - Hides the profile lines, the stash reminder and blank chat lines.
 </details>

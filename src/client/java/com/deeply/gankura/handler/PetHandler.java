@@ -30,6 +30,11 @@ public class PetHandler {
 
     private static final Pattern LEVEL_UP = Pattern.compile("Your (.+?) leveled up to level (\\d+)!", Pattern.CASE_INSENSITIVE);
 
+    // Pets メニューの案内文。押した先が本当に着脱になるかは、これで見分ける。
+    // "Left-click to summon!" とも "Click to despawn!" とも書かれるので、後ろだけを見る
+    private static final String SUMMON_LINE = "to summon!";
+    private static final String DESPAWN_LINE = "to despawn!";
+
     public static void register() {
     }
 
@@ -56,7 +61,7 @@ public class PetHandler {
         Matcher autoMatcher = AUTOPET_SUMMON.matcher(unformatted);
         if (autoMatcher.find()) {
             String levelAndName = autoMatcher.group(1).trim();
-            GameState.Player.activePetName = extractPerfectColor(formatted, levelAndName);
+            setActivePetName(extractPerfectColor(formatted, levelAndName));
             return;
         }
 
@@ -110,7 +115,7 @@ public class PetHandler {
             int bracketIdx = unformatted.indexOf("[Lvl ");
             if (bracketIdx != -1 && unformatted.indexOf("] ", bracketIdx) != -1) {
                 String levelAndName = unformatted.substring(bracketIdx).trim();
-                GameState.Player.activePetName = extractPerfectColor(formatted, levelAndName);
+                setActivePetName(extractPerfectColor(formatted, levelAndName));
                 hasScannedTabList = true;
                 return;
             }
@@ -145,14 +150,31 @@ public class PetHandler {
     // Petsメニューでアイテムを左クリックした瞬間のスロットのツールチップから
     // "[Lvl X] {ペット名}" の行を読み取り、レベル表記まで含めてそのままHUD表示に反映する
     // (Loadoutsと違い名前だけに絞らず、行全体の色付き文字列をそのまま使うことでレベル部分の色も維持する)
+    //
+    // Loadouts のペット設定画面も見出しが "(1/4) Pets" で同じだが、そちらは切り替え先を
+    // 決めるだけで、その場では着かない("Click to select!")。
+    // 見出しでは区別できないので、押した先が本当に着脱になるかを案内文で確かめる
     public static void processPetsMenuClick(ItemStack stack) {
         if (!GameState.Server.isSkyblock()) return;
         if (stack.isEmpty()) return;
 
-        if (tryExtractPetNameAndLevelLine(stack.getHoverName())) return;
-
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null) return;
+
+        boolean summons = false;
+        for (Component line : lore.lines()) {
+            String text = line.getString();
+
+            // 今着いているペット。押すと外れるので、HUD からも下ろす
+            if (text.contains(DESPAWN_LINE)) {
+                GameState.Player.activePetName = null;
+                return;
+            }
+            if (text.contains(SUMMON_LINE)) summons = true;
+        }
+        if (!summons) return;
+
+        if (tryExtractPetNameAndLevelLine(stack.getHoverName())) return;
 
         for (Component line : lore.lines()) {
             if (tryExtractPetNameAndLevelLine(line)) return;
@@ -166,7 +188,7 @@ public class PetHandler {
         if (!ModConstants.containsIgnoreCase(unformatted, "[Lvl ")) return false;
         if (unformatted.indexOf("] ") == -1) return false;
 
-        GameState.Player.activePetName = formatted.trim();
+        setActivePetName(formatted);
         return true;
     }
 
@@ -181,8 +203,28 @@ public class PetHandler {
         String afterPet = unformatted.substring(petIdx + "Pet:".length()).trim();
         if (afterPet.isEmpty()) return false;
 
-        GameState.Player.activePetName = extractPerfectColor(formatted, afterPet).trim();
+        setActivePetName(extractPerfectColor(formatted, afterPet));
         return true;
+    }
+
+    /**
+     * HUD に出すペット名を控える。
+     *
+     * お気に入りの星印は、名前を読んだ場所によって付いたり付かなかったりする。
+     * 印の文字を決め打ちにすると Hypixel 側の書き換えで外すので、
+     * "[Lvl" より前に付いているものは種類を問わず落とす
+     */
+    private static void setActivePetName(String formatted) {
+        String unformatted = formatted.replaceAll("§[0-9a-fk-or]", "");
+        int bracket = unformatted.indexOf("[Lvl ");
+
+        if (bracket <= 0) {
+            GameState.Player.activePetName = formatted.trim();
+            return;
+        }
+
+        // 切り出すと色指定も落ちるので、色は元の並びから拾い直す
+        GameState.Player.activePetName = extractPerfectColor(formatted, unformatted.substring(bracket).trim());
     }
 
     // 元々の完璧な色抽出ロジック
