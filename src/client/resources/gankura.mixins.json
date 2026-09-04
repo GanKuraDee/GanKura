@@ -39,7 +39,9 @@
 		"SignInputMixin",
 		"LavaTextureMixin",
 		"LavaFogMixin",
-		"FireOverlayMixin"
+		"FireOverlayMixin",
+		"SlotHighlightMixin",
+		"AttributeCostPanelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

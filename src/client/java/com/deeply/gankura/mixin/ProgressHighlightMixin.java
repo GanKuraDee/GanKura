@@ -3,6 +3,7 @@ package com.deeply.gankura.mixin;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.util.BestiaryMenu;
+import com.deeply.gankura.util.HighlightColor;
 import com.deeply.gankura.util.TierText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -32,10 +33,14 @@ public class ProgressHighlightMixin {
     @Unique
     private static final String MAX_MARK = "MAX";
 
+    // 濃さは設定で決まるので、ここでは色味だけを持つ
     @Unique
-    private static final int MAXED_COLOR = 0x6055FF55;
+    private static final int MAXED_COLOR = 0x55FF55;
     @Unique
-    private static final int UNFINISHED_COLOR = 0x60FF5555;
+    private static final int UNFINISHED_COLOR = 0xFF5555;
+    // 今出しているペット。達成状況とは別の話なので、色も分けておく
+    @Unique
+    private static final int ACTIVE_PET_COLOR = 0x55FFFF;
 
     @Unique
     private static final int SLOT_SIZE = 16;
@@ -48,7 +53,8 @@ public class ProgressHighlightMixin {
     @Unique
     private static final int TIER_COLOR = 0xFFFFFFFF;
 
-    @Inject(method = "extractSlot", at = @At("TAIL"))
+    // アイテムより先に塗る。後から重ねると品が透けて見づらくなるので、下に敷く
+    @Inject(method = "extractSlot", at = @At("HEAD"))
     private void gankura$markProgress(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY,
                                       CallbackInfo ci) {
         if (!GameState.Server.isSkyblock()) return;
@@ -56,9 +62,16 @@ public class ProgressHighlightMixin {
         // 枠を描くところでは、画面の左上へ寄せる分だけ既に座標がずらしてある。
         // ここではスロットの位置をそのまま使う
         Integer color = gankura$colorFor(slot.getItem());
-        if (color != null) {
-            graphics.fill(slot.x, slot.y, slot.x + SLOT_SIZE, slot.y + SLOT_SIZE, color);
-        }
+        if (color == null) return;
+
+        graphics.fill(slot.x, slot.y, slot.x + SLOT_SIZE, slot.y + SLOT_SIZE, HighlightColor.tint(color));
+    }
+
+    // 数字の方は読めないと困るので、アイテムを描いた後に重ねる
+    @Inject(method = "extractSlot", at = @At("TAIL"))
+    private void gankura$markTier(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY,
+                                  CallbackInfo ci) {
+        if (!GameState.Server.isSkyblock()) return;
 
         gankura$drawTier(graphics, slot);
     }
@@ -71,20 +84,28 @@ public class ProgressHighlightMixin {
 
         Integer tier = null;
         boolean hideMaxed = false;
+        boolean maxed = false;
 
         if (config.enableAttributeMenuTweaks && config.showAttributeTier) {
             tier = TierText.attributeTier(stack);
             hideMaxed = config.hideMaxedAttributeTier;
+            maxed = TierText.isMaxed(stack);
         }
         if (tier == null && config.enableBestiaryMenuTweaks && config.showBestiaryTier
                 && BestiaryMenu.isOpen()) {
             tier = TierText.bestiaryTier(stack);
             hideMaxed = config.hideMaxedBestiaryTier;
+            maxed = TierText.isMaxed(stack);
+        }
+        if (tier == null && config.enablePetTweaks && config.showPetLevel) {
+            tier = TierText.petLevel(stack);
+            hideMaxed = config.hideMaxedPetLevel;
+            maxed = TierText.isPetMaxed(stack);
         }
         if (tier == null) return;
 
         // 打ち止めのものは色で分かるので、数字まで出さない選び方もできる
-        if (hideMaxed && TierText.isMaxed(stack)) return;
+        if (hideMaxed && maxed) return;
 
         Font font = Minecraft.getInstance().font;
         String text = String.valueOf(tier);
@@ -111,8 +132,12 @@ public class ProgressHighlightMixin {
         boolean bestiary = config.enableBestiaryMenuTweaks && config.highlightBestiaryProgress
                 && BestiaryMenu.isOpen();
 
+        boolean activePet = config.enablePetTweaks && config.highlightActivePet;
+
         for (Component line : lore.lines()) {
             String text = line.getString();
+
+            if (activePet && text.contains(TierText.PET_DESPAWN)) return ACTIVE_PET_COLOR;
 
             if (config.enableAttributeMenuTweaks && config.highlightAttributeProgress) {
                 if (TierText.ATTRIBUTE_LEVEL.matcher(text).find()) {

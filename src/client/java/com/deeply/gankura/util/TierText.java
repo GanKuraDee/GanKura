@@ -31,6 +31,14 @@ public final class TierText {
     // 打ち止めの印。"Attribute Level: 10 (MAX!)" のように添えられる
     public static final String MAX_MARK = "MAX";
 
+    // ペットの名前に付いているレベル("[Lvl 91] Orchid Mantis")
+    public static final Pattern PET_LEVEL = Pattern.compile("\\[Lvl (\\d+)]");
+    // ペットのロアに出る、育ちきった印と育ち具合
+    public static final String PET_MAX = "MAX LEVEL";
+    public static final String PET_PROGRESS = "Progress to Level";
+    // 今出しているペットにだけ書かれる行。他のペットには "Left-click to summon!" と書かれる
+    public static final String PET_DESPAWN = "to despawn!";
+
     private TierText() {
     }
 
@@ -96,6 +104,38 @@ public final class TierText {
 
             if (ATTRIBUTE_LEVEL.matcher(text).find()) return true;
             if (BESTIARY_PROGRESS.matcher(text).find()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * ペットの今のレベル。ペットでなければ null。
+     *
+     * レベルは名前の頭に付いているが、他の品にも同じ書き方のものがあり得るので、
+     * ペットにしか出ないロアの行と揃っているときだけ読む
+     */
+    public static Integer petLevel(ItemStack stack) {
+        if (!isPet(stack)) return null;
+
+        Matcher matcher = PET_LEVEL.matcher(stack.getHoverName().getString());
+        return matcher.find() ? parse(matcher.group(1)) : null;
+    }
+
+    /** そのペットが育ちきっているか */
+    public static boolean isPetMaxed(ItemStack stack) {
+        return hasLine(stack, PET_MAX);
+    }
+
+    private static boolean isPet(ItemStack stack) {
+        return hasLine(stack, PET_MAX) || hasLine(stack, PET_PROGRESS);
+    }
+
+    private static boolean hasLine(ItemStack stack, String mark) {
+        ItemLore lore = lore(stack);
+        if (lore == null) return false;
+
+        for (Component line : lore.lines()) {
+            if (line.getString().contains(mark)) return true;
         }
         return false;
     }

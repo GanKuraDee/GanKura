@@ -56,7 +56,8 @@ public final class EnchantTooltipHandler {
     public static void register() {
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
             ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-            if (!config.enableEnchantTooltipTweaks) return;
+            // Tooltips の Enable が親。ここが切れていれば中の設定は見ない
+            if (!config.enableItemTooltipTweaks || !config.enableEnchantTooltipTweaks) return;
             if (!config.enableMaxEnchantChroma && !config.enableBookEnchantGold
                     && !config.enableNumericEnchantTiers) {
                 return;

@@ -1,6 +1,7 @@
 package com.deeply.gankura;
 
 import com.deeply.gankura.handler.ArachneHandler;
+import com.deeply.gankura.handler.AttributeCostPanel;
 import com.deeply.gankura.handler.ArmorStackHandler;
 import com.deeply.gankura.handler.CrimsonDropHandler;
 import com.deeply.gankura.handler.FishingBobberTracker;
@@ -14,6 +15,7 @@ import com.deeply.gankura.handler.InventoryButtonHandler;
 import com.deeply.gankura.handler.AttributeTooltipHandler;
 import com.deeply.gankura.handler.BestiaryTooltipHandler;
 import com.deeply.gankura.handler.EnchantTooltipHandler;
+import com.deeply.gankura.handler.ItemPriceTooltipHandler;
 import com.deeply.gankura.handler.ScrollableTooltipHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
@@ -111,6 +113,8 @@ public class GanKura implements ClientModInitializer {
         EnchantTooltipHandler.register();
         BestiaryTooltipHandler.register();
         AttributeTooltipHandler.register();
+        ItemPriceTooltipHandler.register();
+        AttributeCostPanel.register();
         ScrollableTooltipHandler.register();
         LavaTextureHandler.register();
         // 開発中の一時的な機能。配布ビルドには入っていないので、あるときだけ読み込む

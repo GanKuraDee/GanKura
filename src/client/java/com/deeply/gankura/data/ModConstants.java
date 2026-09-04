@@ -102,8 +102,12 @@ public class ModConstants {
     // =======================================================
     // ドラゴン関連の正規表現
     // =======================================================
-    public static final Pattern EYE_PLACED_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! \\((\\d)/8\\)", Pattern.CASE_INSENSITIVE);
-    public static final Pattern EYE_PLACED_8_CHAT_PATTERN = Pattern.compile("placed a Summoning Eye! Brace yourselves! \\(8/8\\)", Pattern.CASE_INSENSITIVE);
+    // 目には普通のものと powerful なものがあり、どちらも同じ文型で流れてくる
+    public static final Pattern EYE_PLACED_CHAT_PATTERN = Pattern.compile("placed a (?:powerful )?Summoning Eye! \\((\\d)/8\\)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern EYE_PLACED_8_CHAT_PATTERN = Pattern.compile("placed a (?:powerful )?Summoning Eye! Brace yourselves! \\(8/8\\)", Pattern.CASE_INSENSITIVE);
+    // 置いたのが自分かどうか。自分の分だけを数えるために見る
+    public static final Pattern EYE_PLACED_SELF_PATTERN = Pattern.compile("You placed a (?:powerful )?Summoning Eye!", Pattern.CASE_INSENSITIVE);
+    public static final Pattern EYE_RECOVERED_PATTERN = Pattern.compile("You recovered a (?:powerful )?Summoning Eye!", Pattern.CASE_INSENSITIVE);
     public static final Pattern EYE_PLACED_TAB_PATTERN = Pattern.compile("Eyes placed: (\\d)/8", Pattern.CASE_INSENSITIVE);
     public static final Pattern DRAGON_TYPE_TAB_PATTERN = Pattern.compile("Dragon: \\((.+)\\)", Pattern.CASE_INSENSITIVE);
     public static final Pattern DRAGON_SPAWN_PATTERN = Pattern.compile("The .*?(Protector|Old|Unstable|Young|Strong|Wise|Superior) Dragon has spawned!", Pattern.CASE_INSENSITIVE);
