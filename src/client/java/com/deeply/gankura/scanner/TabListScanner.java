@@ -1,6 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.handler.BroodmotherHandler;
+import com.deeply.gankura.handler.CommissionWaypointHandler;
 import com.deeply.gankura.handler.DragonHandler;
 import com.deeply.gankura.handler.GolemHandler;
 import com.deeply.gankura.handler.PetHandler;
@@ -68,6 +69,7 @@ public class TabListScanner {
         // エリア/サーバーIDは他のハンドラーの判定条件になるため、必ず先に更新する
         LocationScanner.processTabList(unformattedLines);
         FerocityScanner.processTabList(unformattedLines);
+        CommissionWaypointHandler.processTabList(unformattedLines);
         GolemHandler.processTabList(unformattedLines, client);
         BroodmotherHandler.processTabList(unformattedLines);
         DragonHandler.processTabList(unformattedLines, client);

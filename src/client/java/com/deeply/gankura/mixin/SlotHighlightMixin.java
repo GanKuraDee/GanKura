@@ -2,6 +2,7 @@ package com.deeply.gankura.mixin;
 
 import com.deeply.gankura.handler.AuctionHandler;
 import com.deeply.gankura.handler.BazaarOrderHandler;
+import com.deeply.gankura.handler.CommissionHandler;
 import com.deeply.gankura.util.HighlightColor;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,9 +15,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Bazaar に出している注文と、Auction House に出している品の枠を塗る。
+ * Bazaar に出している注文と、Auction House に出している品、
+ * それに終わっている依頼の枠を塗る。
  *
- * 何色に塗るかは {@link BazaarOrderHandler} と {@link AuctionHandler} が決める
+ * 何色に塗るかは {@link BazaarOrderHandler} と {@link AuctionHandler}、
+ * {@link CommissionHandler} が決める
  */
 @Mixin(AbstractContainerScreen.class)
 public class SlotHighlightMixin {
@@ -36,6 +39,8 @@ public class SlotHighlightMixin {
             color = BazaarOrderHandler.colorFor(slot);
         } else if (AuctionHandler.inManageMenu(title)) {
             color = AuctionHandler.colorFor(slot);
+        } else if (CommissionHandler.inMenu(title)) {
+            color = CommissionHandler.colorFor(slot);
         }
         if (color == null) return;
 

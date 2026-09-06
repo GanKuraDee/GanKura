@@ -1,7 +1,5 @@
 package com.deeply.gankura.data;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -50,10 +48,5 @@ public enum HotspotPerk {
             if (perk != UNKNOWN && perk.pattern.matcher(text).matches()) return perk;
         }
         return UNKNOWN;
-    }
-
-    /** 知らせる既定の顔ぶれ。UNKNOWN は何の効果か分からないので外しておく */
-    public static List<HotspotPerk> defaults() {
-        return Arrays.stream(values()).filter(perk -> perk != UNKNOWN).toList();
     }
 }

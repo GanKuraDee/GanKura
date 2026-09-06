@@ -10,26 +10,41 @@ import net.minecraft.network.chat.TextColor;
 
 public class NotificationUtils {
 
+    // 括弧の色。名前と同じ青系のまま、彩度も明度も一段深く沈めた鋼色。
+    // 名前の彩度を落としてあるぶん、枠まで近い色にすると境目が消えてしまうので、
+    // 明度差で「枠と名前」が分かれて見えるところに置いてある
+    private static final int BRACKET_COLOR = 0x3E4C70;
+
+    private static final String NAME = "GanKura";
+    // 名前のグラデーション。青から水色へ流す。
+    // 彩度は落としてあるが、チャットは暗い背景に重なるので明度は下げない。
+    // 彩度と明度を一緒に落とすと、ただの灰色に見えてしまう
+    private static final int NAME_START_COLOR = 0x8290BF;
+    private static final int NAME_END_COLOR = 0xA7DAE4;
+
     public static MutableComponent getGanKuraPrefix() {
-        int netheriteColor = 0x443a3b;
-        MutableComponent prefix = Component.literal("[").withStyle(Style.EMPTY.withColor(netheriteColor));
+        MutableComponent prefix = Component.literal("[").withStyle(Style.EMPTY.withColor(BRACKET_COLOR));
 
-        String text = "GanKura";
-        int startColor = 0xAAAAAA; int endColor = 0xFFFFFF;
-        int length = text.length();
-        int r1 = (startColor >> 16) & 0xFF; int g1 = (startColor >> 8) & 0xFF; int b1 = startColor & 0xFF;
-        int r2 = (endColor >> 16) & 0xFF; int g2 = (endColor >> 8) & 0xFF; int b2 = endColor & 0xFF;
-
-        for (int i = 0; i < length; i++) {
-            float ratio = (float) i / (float) (length - 1);
-            int r = (int) (r1 + (r2 - r1) * ratio);
-            int g = (int) (g1 + (g2 - g1) * ratio);
-            int b = (int) (b1 + (b2 - b1) * ratio);
-            int color = (r << 16) | (g << 8) | b;
-            prefix.append(Component.literal(String.valueOf(text.charAt(i))).withStyle(Style.EMPTY.withColor(color)));
+        for (int i = 0; i < NAME.length(); i++) {
+            // 色を持てるのは1文字ずつなので、両端がちょうど始点と終点の色になるように割る
+            float ratio = NAME.length() == 1 ? 0f : (float) i / (NAME.length() - 1);
+            int color = lerpColor(NAME_START_COLOR, NAME_END_COLOR, ratio);
+            prefix.append(Component.literal(String.valueOf(NAME.charAt(i))).withStyle(Style.EMPTY.withColor(color)));
         }
-        prefix.append(Component.literal("] ").withStyle(Style.EMPTY.withColor(netheriteColor)));
-        return prefix;
+
+        return prefix.append(Component.literal("] ").withStyle(Style.EMPTY.withColor(BRACKET_COLOR)));
+    }
+
+    /** 2色の間。赤緑青それぞれを別々に混ぜる */
+    private static int lerpColor(int from, int to, float ratio) {
+        int r = lerp((from >> 16) & 0xFF, (to >> 16) & 0xFF, ratio);
+        int g = lerp((from >> 8) & 0xFF, (to >> 8) & 0xFF, ratio);
+        int b = lerp(from & 0xFF, to & 0xFF, ratio);
+        return (r << 16) | (g << 8) | b;
+    }
+
+    private static int lerp(int from, int to, float ratio) {
+        return Math.round(from + (to - from) * ratio);
     }
 
     // ドロップ通知でアイテム名を挟む1文字。中身は見えないので何でもよい

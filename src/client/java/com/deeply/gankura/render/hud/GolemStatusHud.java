@@ -27,8 +27,7 @@ public class GolemStatusHud extends HudElement {
             if (GameState.Golem.isScanning) {
                 displayStats = "Stage: §8Scanning...";
             } else if (ModConstants.STAGE_SUMMONED.equals(stage)) {
-                long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
-                double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
+                double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - GameState.Server.estimatedTicks());
 
                 if (remainingTicks > 0) {
                     displayStats = String.format("§cStage: 5 (%.1fs)", remainingTicks / 20.0);

@@ -32,8 +32,7 @@ public class ArachneStatusHud extends HudElement {
                     // Big(Crystal)はパーティクル観測でQuick/Normalが確定するまで秒数を出せない
                     status = "§eSpawning §f(...)";
                 } else {
-                    long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
-                    double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
+                    double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - GameState.Server.estimatedTicks());
                     if (remainingTicks > 0) {
                         status = String.format("§eSpawning §c(%.1fs)", remainingTicks / 20.0);
                     } else if (inSanctuary) {

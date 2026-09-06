@@ -15,13 +15,75 @@ public class GameState {
         public static long lastPacketArrivalMillis = 0;
 
         public static double tps = 20.0;
-        public static long tpsWindowStartMillis = 0;
-        public static long tpsWindowStartTicks = 0;
 
         public static boolean isClosing = false;
         public static String closingTime = null;
         public static long lastWorldJoinTime = 0;
         public static long dayTime = 0;
+
+        // 時刻パケットの送信周期。実測したところ、実時間ではなくサーバー Tick 基準で
+        // きっちり 20 Tick おきだった(TPS 8 なら 2.5 秒おき、TPS 20 なら 1 秒おきに届く)。
+        // 合間を埋めるのはここまでで打ち切る。これより先へ進めても、
+        // サーバーが固まっているのか単に遅れているのかを区別できない
+        private static final double PACKET_INTERVAL_TICKS = 20.0;
+
+        // TPS の均し具合。1通ごとの値をそのまま使うと表示が跳ねるが、
+        // 均しすぎると TPS が動いた直後の見積もりが古いままになる
+        private static final double TPS_SMOOTHING = 0.4;
+
+        // 見積もりの巻き戻り止め。前に返した値を覚えておく
+        private static double lastEstimate = 0;
+
+        /**
+         * 時刻パケット1通ぶんから TPS を測り直す。
+         *
+         * 20 Tick 進むのに何ミリ秒かかったかが1通ごとに分かるので、
+         * 一定時間ぶんを溜める必要はない。溜めるとその間だけ推定が古くなり、
+         * カウントダウンの補間もその古い速さで進んでしまう
+         */
+        public static void updateTps(long gameTime, long arrivalMillis) {
+            long deltaTicks = gameTime - lastTimePacket;
+            long deltaMillis = arrivalMillis - lastPacketArrivalMillis;
+
+            // 初回とワールド移動直後は、間隔が意味を成さないので測らない
+            if (lastPacketArrivalMillis > 0 && deltaTicks > 0 && deltaMillis > 0) {
+                double sample = Math.min(20.0, deltaTicks * 1000.0 / deltaMillis);
+                tps = tps + (sample - tps) * TPS_SMOOTHING;
+            }
+        }
+
+        /**
+         * いまのサーバー側 Tick の見積もり。
+         *
+         * クライアントの level.getGameTime() は TPS が落ちても 20/秒で進み続けるので、
+         * カウントダウンの目標を置くときも残りを測るときも、必ずこちらを使う。
+         * 片方だけクライアントの時計を使うと、その差がそのまま残り時間の誤差になる。
+         *
+         * パケットとパケットの間は自前で進めるが、その速さは実測の TPS に合わせる。
+         * 20 固定にすると TPS が落ちている間だけ進みすぎ、
+         * 次のパケットが届いた瞬間に残り時間が巻き戻って見える
+         */
+        public static double estimatedTicks() {
+            long sincePacket = System.currentTimeMillis() - lastPacketArrivalMillis;
+            double advanced = Math.min(sincePacket * tps / 1000.0, PACKET_INTERVAL_TICKS);
+            double estimate = lastTimePacket + Math.max(0.0, advanced);
+
+            // 進めすぎていた分はパケット到着時に必ず戻るので、そのままだと表示が増える。
+            // カウントダウンが増えるのは見ていて分かるほど不自然なので、その場で止める。
+            // ただしワールドが変わって Tick が飛んだときは、素直に新しい値へ乗り換える
+            if (estimate < lastEstimate && lastEstimate - estimate <= PACKET_INTERVAL_TICKS) {
+                return lastEstimate;
+            }
+
+            lastEstimate = estimate;
+            return estimate;
+        }
+
+        /** 目標時刻を置くときの現在 Tick。まだ一度もパケットが来ていなければ、渡した値で代用する */
+        public static long estimatedTicks(long fallbackTicks) {
+            if (lastPacketArrivalMillis == 0) return fallbackTicks;
+            return Math.round(estimatedTicks());
+        }
 
         public static void reset() {
             id = "Unknown"; gametype = "Unknown"; map = "Unknown";
@@ -81,6 +143,17 @@ public class GameState {
 
         public static boolean isDwarvenMines() {
             return ModConstants.MAP_DWARVEN_MINES.equals(map);
+        }
+
+        // Dwarven Mines の奥。座標は Dwarven Mines とひと続きだが、
+        // Hypixel が別のエリア名で載せてくることがあるので分けて見る
+        public static boolean isGlaciteTunnels() {
+            return ModConstants.MAP_GLACITE_TUNNELS.equals(map);
+        }
+
+        // 潜るたびに作り直される坑道。書かれ方が揺れるので、言葉が入っているかどうかで見る
+        public static boolean isMineshaft() {
+            return ModConstants.containsIgnoreCase(map, ModConstants.MAP_MINESHAFT);
         }
 
         public static boolean isFarmingIslands() {

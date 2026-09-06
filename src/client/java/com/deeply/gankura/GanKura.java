@@ -108,6 +108,7 @@ public class GanKura implements ClientModInitializer {
         MenuOpenKeybindHandler.register();
         FloorDropHandler.register();
         BeeNestScanner.register();
+        CorpseScanner.register();
         FishingBobberTracker.register();
         InventoryButtonHandler.register();
         EnchantTooltipHandler.register();

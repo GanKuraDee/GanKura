@@ -17,24 +17,10 @@ public class WorldTimeMixin {
         long newGameTime = packet.gameTime();
         long now = System.currentTimeMillis();
 
-        // TPS推定: サーバーは通常1Tickにつき1回このパケットを送るため、
-        // 実際の経過時間(1秒間)に対して経過したTick数からTPSを逆算する
-        if (GameState.Server.tpsWindowStartMillis == 0) {
-            GameState.Server.tpsWindowStartMillis = now;
-            GameState.Server.tpsWindowStartTicks = newGameTime;
-        } else {
-            long elapsedMillis = now - GameState.Server.tpsWindowStartMillis;
-            long elapsedTicks = newGameTime - GameState.Server.tpsWindowStartTicks;
-            if (elapsedTicks < 0) {
-                // ワールド移動直後などTickカウンターが不連続になった場合はウィンドウを取り直す
-                GameState.Server.tpsWindowStartMillis = now;
-                GameState.Server.tpsWindowStartTicks = newGameTime;
-            } else if (elapsedMillis >= 1000) {
-                GameState.Server.tps = Math.min(20.0, elapsedTicks * 1000.0 / elapsedMillis);
-                GameState.Server.tpsWindowStartMillis = now;
-                GameState.Server.tpsWindowStartTicks = newGameTime;
-            }
-        }
+        // TPS推定: このパケットは 20 Tick おきに送られてくる(実測で確認済み)。
+        // つまり1通ごとに「20 Tick 進むのに何ミリ秒かかったか」がそのまま分かるので、
+        // 一定時間ぶんを溜めて平均する必要はない。溜めるとその間だけ推定が遅れて古くなる
+        GameState.Server.updateTps(newGameTime, now);
 
         GameState.Server.lastTimePacket = newGameTime;
         GameState.Server.lastPacketArrivalMillis = now;

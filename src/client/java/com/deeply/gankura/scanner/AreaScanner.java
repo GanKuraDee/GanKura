@@ -48,8 +48,7 @@ public class AreaScanner {
     private static boolean isCountdownActive() {
         if (!GameState.Arachne.isSummoning) return false;
         if (GameState.Arachne.awaitingCrystalParticles) return true;
-        long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
-        double remainingTicks = GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0));
+        double remainingTicks = GameState.Arachne.spawnTargetTime - GameState.Server.estimatedTicks();
         return remainingTicks > 0;
     }
 }
