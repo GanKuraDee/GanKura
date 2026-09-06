@@ -34,7 +34,7 @@ public class DragonHandler {
         if (m2.find()) {
             GameState.Dragon.eyes = 8; GameState.Dragon.eggState = "Hatching";
             if (ModConstants.EYE_PLACED_SELF_PATTERN.matcher(cleanMsg).find()) GameState.Dragon.playerEyes++;
-            if (client.level != null) GameState.Dragon.spawnTargetTime = client.level.getGameTime() + 180;
+            if (client.level != null) GameState.Dragon.spawnTargetTime = GameState.Server.estimatedTicks(client.level.getGameTime()) + 180;
             GameState.Dragon.lastChatTime = System.currentTimeMillis(); return true;
         }
 

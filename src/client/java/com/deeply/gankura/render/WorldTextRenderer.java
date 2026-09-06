@@ -6,8 +6,10 @@ import com.deeply.gankura.handler.HotspotAreaHandler;
 import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.handler.CommissionWaypointHandler;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.scanner.BeeNestScanner;
+import com.deeply.gankura.scanner.CorpseScanner;
 import com.deeply.gankura.util.DevHooks;
 import com.deeply.gankura.waypoint.Waypoint;
 import com.deeply.gankura.waypoint.WaypointData;
@@ -45,6 +47,19 @@ public class WorldTextRenderer {
     private static final int HOTSPOT_CIRCLE_SEGMENTS = 64;
     private static final double HOTSPOT_CIRCLE_MAX_DISTANCE = 128.0;
 
+    // ラベルの大きさ。1ブロック離れるごとにこれだけ拡大すると、
+    // 遠近による縮小と打ち消し合って、画面上の大きさが距離によらず一定になる
+    private static final double LABEL_SCALE_PER_BLOCK = 0.05;
+    // 拡大を打ち切る距離。これより内側ではワールド上の大きさが固定になり、
+    // 近づくほど画面上では大きく見える。0 まで比例させると変換行列が潰れるので、
+    // 下限そのものは必要。ここを上げるほど、手前で文字が膨らみ始める
+    private static final double LABEL_MIN_DISTANCE = 8.0;
+    private static final double LABEL_MIN_SCALE = LABEL_MIN_DISTANCE * LABEL_SCALE_PER_BLOCK;
+
+    // Gemstone の場所と Corpse の塗り。色は種類ごとに変わるので、濃さだけ決めておく
+    private static final int MINING_FILL_ALPHA = 0x80000000;
+    private static final int RGB_MASK = 0x00FFFFFF;
+
     // Hotspot Radar の推測地点に使う色と太さ
     public static final int HOTSPOT_COLOR = 0xFFFF55FF;
     private static final int HOTSPOT_FILL_COLOR = 0x40FF55FF;
@@ -61,6 +76,8 @@ public class WorldTextRenderer {
         renderTikiWaypoints(client);
         renderFloorDrops();
         renderBeeNests();
+        renderCommissionWaypoints(client);
+        renderCorpses(client);
         renderCustomWaypoints(client);
         renderCastTimer(client);
         renderHotspotGuess(client);
@@ -201,6 +218,56 @@ public class WorldTextRenderer {
         }
     }
 
+    /**
+     * 受けている Gemstone の依頼に合わせて、そのジェムストーンが採れる場所を示す。
+     *
+     * 場所は Glacite Tunnels の中に散らばっていて、どれが近いかが分からないと選べないので、
+     * 名前だけでなく、そこまでの距離も添える
+     */
+    private static void renderCommissionWaypoints(Minecraft client) {
+        if (!ModConfig.INSTANCE.mining.showGemstoneCommissionWaypoints) return;
+        // Glacite Tunnels は Dwarven Mines の一部で、座標もひと続きになっている
+        if (!GameState.Server.isDwarvenMines() && !GameState.Server.isGlaciteTunnels()) return;
+
+        Vec3 eye = client.player.position();
+
+        for (CommissionWaypointHandler.Label label : CommissionWaypointHandler.labels()) {
+            Vec3 pos = labelPos(label.pos());
+            int distance = (int) Math.round(eye.distanceTo(pos));
+
+            renderGizmoLabelAt(label.name() + " §e" + distance + "m", pos, label.argb());
+
+            // 名前だけだと地面のどこか分かりづらいので、その場所も塗っておく
+            GizmoProperties box = Gizmos.cuboid(label.pos(),
+                    GizmoStyle.fill((label.argb() & RGB_MASK) | MINING_FILL_ALPHA));
+            box.setAlwaysOnTop();
+        }
+    }
+
+    /**
+     * Mineshaft の中で見つけた Corpse を示す。
+     *
+     * 埋まっていて姿が見えないことが多いので、どの鍵がいるかが分かるよう種類も出す。
+     * 探すのは {@link CorpseScanner} の役目で、ここは見つかったものを描くだけ
+     */
+    private static void renderCorpses(Minecraft client) {
+        // 探すのは Vanguard の知らせと兼用なので、目印を出すかどうかはここで見る
+        if (!ModConfig.INSTANCE.mining.showCorpseWaypoints) return;
+
+        Vec3 eye = client.player.position();
+
+        for (CorpseScanner.Corpse corpse : CorpseScanner.corpses()) {
+            Vec3 pos = labelPos(corpse.pos());
+            int distance = (int) Math.round(eye.distanceTo(pos));
+
+            renderGizmoLabelAt(corpse.name() + " Corpse §e" + distance + "m", pos, corpse.argb());
+
+            GizmoProperties box = Gizmos.cuboid(corpse.pos(),
+                    GizmoStyle.fill((corpse.argb() & RGB_MASK) | MINING_FILL_ALPHA));
+            box.setAlwaysOnTop();
+        }
+    }
+
     // Forest Biome のミツバチの巣。Floor Drop と同じく塗りつぶしとラベルで示す
     private static void renderBeeNests() {
         if (!BeeNestScanner.isActive()) return;
@@ -282,8 +349,7 @@ public class WorldTextRenderer {
                 textToRender += String.format(" %s(%dm %ds)", col, secs / 60, secs % 60);
             }
         } else {
-            long timeSincePacket = System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis;
-            double estimatedServerTime = GameState.Server.lastTimePacket + (Math.min(timeSincePacket, 1000) / 50.0);
+            double estimatedServerTime = GameState.Server.estimatedTicks();
             double remainingTicks = Math.max(0, GameState.Golem.stage5TargetTime - estimatedServerTime);
 
             if (remainingTicks > 0) {
@@ -315,8 +381,7 @@ public class WorldTextRenderer {
             if (GameState.Arachne.awaitingCrystalParticles) {
                 textToRender = "§c§lARACHNE §c(...)";
             } else {
-                long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
-                double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
+                double remainingTicks = Math.max(0, GameState.Arachne.spawnTargetTime - GameState.Server.estimatedTicks());
                 if (remainingTicks > 0) {
                     textToRender = String.format("§c§lARACHNE §c(%.1fs)", remainingTicks / 20.0);
                 } else if (inSanctuary) {
@@ -386,10 +451,10 @@ public class WorldTextRenderer {
         // プレイヤーのtick座標を使うと20回/秒でしかスケールが更新されずカクつくため、
         // フレームごとに補間されるカメラ座標を基準にする
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
-        float textScale = (float) Math.max(0.02, cameraPos.distanceTo(pos) * 0.0025);
+        float textScale = (float) Math.max(LABEL_MIN_SCALE, cameraPos.distanceTo(pos) * LABEL_SCALE_PER_BLOCK);
 
         TextGizmo.Style style = TextGizmo.Style.forColorAndCentered(argbColor)
-                .withScale(textScale * 20.0F);
+                .withScale(textScale);
         GizmoProperties properties = Gizmos.billboardText(text, pos, style);
         properties.setAlwaysOnTop();
     }

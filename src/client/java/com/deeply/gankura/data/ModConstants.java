@@ -30,6 +30,11 @@ public class ModConstants {
     public static final String MAP_LOTUS_ATOLL = "Lotus Atoll";
     public static final String MAP_JERRYS_WORKSHOP = "Jerry's Workshop";
     public static final String MAP_DWARVEN_MINES = "Dwarven Mines";
+    // Dwarven Mines の奥。Hypixel がここを別のエリア名で載せる場合に備えて持っておく
+    public static final String MAP_GLACITE_TUNNELS = "Glacite Tunnels";
+    // 潜るたびに作り直される坑道。"Glacite Mineshafts" と書かれることもあるので、
+    // 完全一致ではなくこの言葉を含むかどうかで見る
+    public static final String MAP_MINESHAFT = "Mineshaft";
     public static final String MAP_FARMING_ISLANDS = "The Farming Islands";
 
     // タブリスト上で現在地とサーバーIDを載せている行の接頭辞

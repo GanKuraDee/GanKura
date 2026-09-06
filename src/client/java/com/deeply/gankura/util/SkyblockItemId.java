@@ -33,6 +33,10 @@ public final class SkyblockItemId {
 
     // シャードの名前の後ろに付いている飾り。"Snoozle Shard" の形で書かれている
     private static final String SHARD_SUFFIX = " Shard";
+    // シャードの ID の頭。中身の違いを後ろに付けて寄越す場合がある
+    private static final String SHARD_ID = "ATTRIBUTE_SHARD";
+    // 注文の一覧で品名の前に付く飾り。"SELL Draconic Shard" の形で書かれている
+    private static final String[] ORDER_PREFIXES = {"BUY ", "SELL "};
 
     // 直前に読んだアイテム。ツールチップは毎フレーム組み直されるので、読み直しを省く
     private static ItemStack lastStack = null;
@@ -54,18 +58,28 @@ public final class SkyblockItemId {
     private static Info info(ItemStack stack) {
         if (stack == lastStack) return lastInfo;
 
-        lastInfo = read(stack);
+        Info info = read(stack);
+        // 何も分からなかったのは、シャードの対応表がまだ届いていないだけのことがある。
+        // Bazaar の棚の品は開いている間ずっと同じなので、控えてしまうと引き直す機会が来ない
+        if (info == NOTHING) return info;
+
+        lastInfo = info;
         lastStack = stack;
-        return lastInfo;
+        return info;
     }
 
     private static Info read(ItemStack stack) {
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-        if (data == null) return NOTHING;
+        // Bazaar の棚に並ぶ品には ID が書かれていない。名前だけが手掛かりになる
+        if (data == null) return shard(stack, true);
 
         CompoundTag extra = attributes(data.copyTag());
         String id = extra.getStringOr("id", "");
-        if (id.isEmpty()) return NOTHING;
+        if (id.isEmpty()) return shard(stack, true);
+
+        // シャードはどれも同じ ID なので、名前から引き直す。
+        // 中身の違いを "ATTRIBUTE_SHARD_FOG_ELEMENTAL;1" のように後ろに付けて寄越すこともある
+        if (id.startsWith(SHARD_ID)) return shard(stack, false);
 
         return switch (id) {
             case "PET" -> new Info(id, pet(extra));
@@ -75,24 +89,42 @@ public final class SkyblockItemId {
             // "ANTLERS_RUNE_3" のように、ルーンの名前と段が ID になる
             case "RUNE" -> new Info(only(extra, "runes", (name, level) ->
                     name.toUpperCase(Locale.ROOT) + "_RUNE_" + level), null);
-            // シャードはどれも同じ ID なので、名前から引き直す
-            case "ATTRIBUTE_SHARD" -> new Info(AttributeShards.idOf(shardName(stack)), null);
             default -> new Info(id, null);
         };
     }
 
     /**
-     * シャードの名前。
+     * 名前から引いたシャード。シャードでなければ、対応表がまだ届いていなければ NOTHING。
      *
-     * "Snoozle Shard" のように書かれていて、ダンジョンの箱などでは
-     * その後ろに個数まで付く。対応表と突き合わせる分だけを切り出す
+     * 名前は "Snoozle Shard" のように書かれていて、ダンジョンの箱などでは
+     * その後ろに個数まで付く。注文の一覧では前に "SELL" が付く。
+     * 対応表と突き合わせる分だけを切り出す。
+     *
+     * ID からシャードだと分かっていない品では、"Shard" の付かない名前は見送る。
+     * 対応表に無い名前が当たることはないが、関わりのない品まで引きに行かせない
      */
-    private static String shardName(ItemStack stack) {
+    private static Info shard(ItemStack stack, boolean suffixed) {
         String name = ChatFormatting.stripFormatting(stack.getHoverName().getString());
-        if (name == null) return "";
+        if (name == null) return NOTHING;
+
+        name = withoutOrder(name.trim());
 
         int suffix = name.indexOf(SHARD_SUFFIX);
-        return (suffix > 0 ? name.substring(0, suffix) : name).trim();
+        if (suffix <= 0 && suffixed) return NOTHING;
+
+        String id = AttributeShards.idOf((suffix > 0 ? name.substring(0, suffix) : name).trim());
+        return id == null ? NOTHING : new Info(id, null);
+    }
+
+    /**
+     * 注文の一覧に並ぶ品は "SELL Draconic Shard" のように、
+     * 品名の前にどちらの注文かが付く。付いていればそこを落とす
+     */
+    private static String withoutOrder(String name) {
+        for (String prefix : ORDER_PREFIXES) {
+            if (name.startsWith(prefix)) return name.substring(prefix.length());
+        }
+        return name;
     }
 
     /**

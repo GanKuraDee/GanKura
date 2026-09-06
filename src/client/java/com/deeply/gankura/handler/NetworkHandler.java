@@ -5,6 +5,7 @@ import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.render.EntityHighlightManager;
 import com.deeply.gankura.scanner.BeeNestScanner;
+import com.deeply.gankura.scanner.CorpseScanner;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
@@ -61,6 +62,8 @@ public class NetworkHandler {
             GoldenFishHandler.handleMessage(unformattedMsg, client);
             ArachneHandler.handleMessage(unformattedMsg, client);
             ForagingHandler.handleMessage(unformattedMsg, client);
+            CorpseScanner.handleMessage(unformattedMsg, client);
+            CorpseProfitHandler.handleMessage(unformattedMsg, client);
             // 釣り上げの文言。短縮形に差し替えたときは、元のメッセージを出さない
             if (SeaCreatureCatchHandler.handleMessage(unformattedMsg, client)) return false;
 

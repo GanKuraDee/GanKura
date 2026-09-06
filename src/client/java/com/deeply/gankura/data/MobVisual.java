@@ -49,6 +49,7 @@ public interface MobVisual {
             return GameState.Server.isTorrhusCanyon() || GameState.Server.isTorrhusHeights();
         }
         if (target instanceof LotusAtoll) return GameState.Server.isLotusAtoll();
+        if (target instanceof GlaciteMineshaft) return GameState.Server.isMineshaft();
         // Sea Creature は釣れる場所が種類ごとに決まっている。
         // どこでも釣れるものだけ ANYWHERE として素通しにする
         if (target instanceof SeaCreature seaCreature) return seaCreature.area().isHere();
@@ -569,6 +570,43 @@ public interface MobVisual {
         @Override
         public List<LotusAtoll> targets() {
             return ModConfig.INSTANCE.mobVisuals.targetsLotusAtoll;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    /**
+     * Glacite Mineshaft のモブ。
+     *
+     * Littlefoot は見た目だけプレイヤーの NPC 型で、実体名で見分ける
+     */
+    enum GlaciteMineshaft implements MobVisual {
+        LITTLEFOOT("§bLittlefoot", 0x55FFFF);
+
+        private final String label;
+        private final int glowColorRGB;
+
+        GlaciteMineshaft(String label, int glowColorRGB) {
+            this.label = label;
+            this.glowColorRGB = glowColorRGB;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+
+        @Override
+        public int glowColorRGB() {
+            return glowColorRGB;
+        }
+
+        @Override
+        public List<GlaciteMineshaft> targets() {
+            return ModConfig.INSTANCE.mobVisuals.targetsGlaciteMineshaft;
         }
 
         @Override

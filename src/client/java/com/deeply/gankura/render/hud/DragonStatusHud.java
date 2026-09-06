@@ -28,8 +28,7 @@ public class DragonStatusHud extends HudElement {
             int eyes = GameState.Dragon.eyes;
 
             if ("Hatching".equals(state)) {
-                long timeSincePacket = Math.min(System.currentTimeMillis() - GameState.Server.lastPacketArrivalMillis, 1000);
-                double remainingTicks = Math.max(0, GameState.Dragon.spawnTargetTime - (GameState.Server.lastTimePacket + (timeSincePacket / 50.0)));
+                double remainingTicks = Math.max(0, GameState.Dragon.spawnTargetTime - GameState.Server.estimatedTicks());
                 eggState = remainingTicks > 0 ? String.format("Egg: §eHatching §c(%.1fs)", remainingTicks / 20.0) : "Egg: §eHatching §e(Soon)";
             } else {
                 String colorCode = switch (state) {

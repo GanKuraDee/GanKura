@@ -8,6 +8,7 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.MobVisual.CrimsonIsle;
 import com.deeply.gankura.data.MobVisual.CrystalHollows;
+import com.deeply.gankura.data.MobVisual.GlaciteMineshaft;
 import com.deeply.gankura.handler.CorleoneHandler;
 import com.deeply.gankura.handler.GoldenFishHandler;
 import net.minecraft.world.entity.EntityType;
@@ -294,6 +295,8 @@ public class EntityHighlightManager {
     private static final String HIDEYHO_ENTITY_NAME = "Hideyho";
     // Torrhus Canyon の Grizzly Bear も同じく、実体名がそのまま呼び名になっている
     private static final String GRIZZLY_BEAR_ENTITY_NAME = "Grizzly Bear";
+    // Glacite Mineshaft の Littlefoot も同じ
+    private static final String LITTLEFOOT_ENTITY_NAME = "Littlefoot";
     // Crystal Hollows の Boss Corleone もプレイヤーエンティティ型だが、
     // 実体名(Team Treasurite)・スコアボードのチーム・装備がどれも他の Treasurite 系と共通で、
     // 個体ごとに違うのはスキンだけ。テクスチャのパス末尾(スキンのハッシュ)で見分ける。
@@ -308,7 +311,8 @@ public class EntityHighlightManager {
             CrimsonIsle.MAGE_OUTLAW, MAGE_OUTLAW_ENTITY_NAME,
             CrimsonIsle.MATCHO, MATCHO_ENTITY_NAME,
             SafariHaunted.HIDEYHO, HIDEYHO_ENTITY_NAME,
-            TorrhusCanyon.GRIZZLY_BEAR, GRIZZLY_BEAR_ENTITY_NAME);
+            TorrhusCanyon.GRIZZLY_BEAR, GRIZZLY_BEAR_ENTITY_NAME,
+            GlaciteMineshaft.LITTLEFOOT, LITTLEFOOT_ENTITY_NAME);
 
     // Crimson Isle のボスのうち、プレイヤーエンティティ型のもの。
     // こちらは CrimsonBossEntry 側から引くため、ボス名を鍵にする
@@ -461,6 +465,12 @@ public class EntityHighlightManager {
     // 判定: 2 実体名
     public static final List<MobVisual> SAFARI_NAMED_PLAYER_TARGETS = List.of(
             SafariHaunted.HIDEYHO);
+
+    // Glacite Mineshaft の、プレイヤーエンティティ型(NPC)のモブ。
+    // ネームタグ(ArmorStand)より読み込み範囲が広いので、実体名で直接探す
+    // 判定: 2 実体名
+    public static final List<MobVisual> MINESHAFT_NAMED_PLAYER_TARGETS = List.of(
+            GlaciteMineshaft.LITTLEFOOT);
 
     // Crimson Isle の、ネームタグでしか判別できないモブ。
     // Matcho はプレイヤー型(NPC)で、エンティティ型では他の NPC と区別できない
@@ -1102,6 +1112,8 @@ public class EntityHighlightManager {
                 && CRIMSON_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanMarshNamed = GameState.Server.isMoongladeMarsh()
                 && MARSH_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
+        boolean scanMineshaftNamed = GameState.Server.isMineshaft()
+                && MINESHAFT_NAMED_PLAYER_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         // Sea Creature は釣れる場所が決まっているので、対象の絞り込み(anyEnabled)が
         // そのままエリアの絞り込みになる
         boolean scanSeaCreatures = SEA_CREATURE_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
@@ -1149,7 +1161,7 @@ public class EntityHighlightManager {
 
         if (!isCrystalHollows) CorleoneHandler.reset();
 
-        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanSafariTypes && !scanSafariNamed && !scanSeaCreatures && !scanSeaCreatureTypes && !scanSeaCreaturePlayers) return;
+        if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanMineshaftNamed && !scanSafariTypes && !scanSafariNamed && !scanSeaCreatures && !scanSeaCreatureTypes && !scanSeaCreaturePlayers) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
         // Boss Corleone を見つけたか。ネームタグ経由とプレイヤー名照合のどちらで見つけても立てる
@@ -1843,6 +1855,11 @@ public class EntityHighlightManager {
         // Grizzly Bear も同じ
         if (scanCanyonNamed) {
             detectNamedPlayerMobs(client, CANYON_NAMED_PLAYER_TARGETS);
+        }
+
+        // Littlefoot も同じ
+        if (scanMineshaftNamed) {
+            detectNamedPlayerMobs(client, MINESHAFT_NAMED_PLAYER_TARGETS);
         }
 
         // Sea Creature のプレイヤー型も同じく実体名で直接探す

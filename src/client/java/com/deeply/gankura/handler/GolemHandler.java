@@ -152,7 +152,7 @@ public class GolemHandler {
 
     public static void setStageToSummoned(Minecraft client) {
         if (GameState.Golem.isScanning) GameState.Golem.isScanning = false;
-        if (client.level != null) GameState.Golem.stage5TargetTime = client.level.getGameTime() + 400;
+        if (client.level != null) GameState.Golem.stage5TargetTime = GameState.Server.estimatedTicks(client.level.getGameTime()) + 400;
         updateStage(client, ModConstants.STAGE_SUMMONED);
     }
 
@@ -186,7 +186,7 @@ public class GolemHandler {
                 }
             }
             GameState.Golem.stage4StartTime = 0;
-            if (GameState.Golem.stage5TargetTime == 0 && client.level != null) GameState.Golem.stage5TargetTime = client.level.getGameTime() + 400;
+            if (GameState.Golem.stage5TargetTime == 0 && client.level != null) GameState.Golem.stage5TargetTime = GameState.Server.estimatedTicks(client.level.getGameTime()) + 400;
 
             // ★修正: Stage 5のTitleとSoundを独立して判定
             if (ModConfig.INSTANCE.combat.theEnd.enableStage5Title) {

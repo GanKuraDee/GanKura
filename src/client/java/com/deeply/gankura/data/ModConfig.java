@@ -83,6 +83,7 @@ public class ModConfig extends Config {
         if (INSTANCE.combat.crimsonIsle == null) INSTANCE.combat.crimsonIsle = new CrimsonIsleCategory();
         if (INSTANCE.combat.crystalHollows == null) INSTANCE.combat.crystalHollows = new CrystalHollowsCategory();
         if (INSTANCE.foraging == null)    INSTANCE.foraging    = new ForagingCategory();
+        if (INSTANCE.mining == null)      INSTANCE.mining      = new MiningCategory();
         if (INSTANCE.mobVisuals == null) INSTANCE.mobVisuals = new MobVisualsCategory();
         if (INSTANCE.inventoryButtons == null) INSTANCE.inventoryButtons = new InventoryButtonsCategory();
         if (INSTANCE.interfaceSettings == null) INSTANCE.interfaceSettings = new InterfaceCategory();
@@ -143,7 +144,8 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsMoongladeMarsh = normalizeEnumList(INSTANCE.mobVisuals.targetsMoongladeMarsh, List.of());
         INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
         INSTANCE.mobVisuals.targetsLotusAtoll = normalizeEnumList(INSTANCE.mobVisuals.targetsLotusAtoll, List.of());
-        INSTANCE.fishing.sharedHotspotPerks = normalizeEnumList(INSTANCE.fishing.sharedHotspotPerks, HotspotPerk.defaults());
+        INSTANCE.mobVisuals.targetsGlaciteMineshaft = normalizeEnumList(INSTANCE.mobVisuals.targetsGlaciteMineshaft, List.of());
+        INSTANCE.fishing.sharedHotspotPerks = normalizeEnumList(INSTANCE.fishing.sharedHotspotPerks, List.of());
 
         INSTANCE.saveNow();
     }
@@ -205,6 +207,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Fishing", desc = "Fishing features.")
     public FishingCategory fishing = new FishingCategory();
+
+    @Expose
+    @Category(name = "Mining", desc = "Mining features.")
+    public MiningCategory mining = new MiningCategory();
 
     @Expose
     @Category(name = "General HUD", desc = "The HUDs that stay on screen everywhere.")
@@ -715,13 +721,13 @@ public class ModConfig extends Config {
                 desc = "Shows a title when Timber fells a whole tree, yours or another player's.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
-        public boolean enableTreeFelledTitle = true;
+        public boolean enableTreeFelledTitle = false;
 
         @Expose
         @ConfigOption(name = "Mob From Tree Title", desc = "Shows a title when a mob falls from the felled tree.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
-        public boolean enableTreeMobTitle = true;
+        public boolean enableTreeMobTitle = false;
 
         @Expose
         @ConfigOption(name = "Torrhus Canyon", desc = "Expands Torrhus Canyon settings.")
@@ -757,13 +763,13 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Floor Drops", desc = "Marks the foraging drops lying on the ground.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
-        public boolean enableFloorDrops = true;
+        public boolean enableFloorDrops = false;
 
         @Expose
         @ConfigOption(name = "Bee Nest Waypoints", desc = "Marks the bee nests in the Forest Biome.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
-        public boolean enableBeeNestWaypoints = true;
+        public boolean enableBeeNestWaypoints = false;
 
         @Expose
         @ConfigOption(name = "Fish Highlight", desc = "Highlights the fish you can feed to Scrappy.")
@@ -775,7 +781,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Rockmite Mound Highlight", desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
-        public boolean enableRockmiteMoundHighlight = true;
+        public boolean enableRockmiteMoundHighlight = false;
 
         @Expose
         @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
@@ -838,6 +844,56 @@ public class ModConfig extends Config {
         public boolean enableCorleoneSpawnTitle = true;
     }
 
+    public static class MiningCategory {
+
+        @Expose
+        @ConfigOption(name = "Commissions", desc = "Expands commission settings.")
+        @ConfigEditorAccordion(id = 105)
+        @ConfigEditorBoolean
+        public boolean commissionFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Completed", desc = "Paints the commissions that are done,\n"
+                + "so the ones waiting to be claimed stand out.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 105)
+        public boolean highlightCompletedCommissions = false;
+
+        @Expose
+        @ConfigOption(name = "Gemstone Waypoints", desc = "Labels the gemstone spots in the Glacite Tunnels\n"
+                + "while you have that gemstone's commission.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 105)
+        public boolean showGemstoneCommissionWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Mineshaft", desc = "Expands mineshaft settings.")
+        @ConfigEditorAccordion(id = 106)
+        @ConfigEditorBoolean
+        public boolean mineshaftFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Corpse Waypoints", desc = "Labels the frozen corpses in the mineshaft,\n"
+                + "with the kind of key each one needs.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 106)
+        public boolean showCorpseWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Vanguard Title", desc = "Shows a title when a Vanguard corpse\n"
+                + "turns up in the mineshaft you are in.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 106)
+        public boolean showVanguardTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Corpse Profit", desc = "Adds up what a corpse dropped and posts it in chat.\n"
+                + "The key each corpse needs is taken off the total.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 106)
+        public boolean showCorpseProfit = false;
+    }
+
     // ==========================================
     // Mob Visuals: 3機能それぞれの対象モブ
     // ==========================================
@@ -856,7 +912,7 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Bait HUD", desc = "Shows the bait on the rod and how much is left.")
         @ConfigEditorBoolean
-        public boolean showBaitHud = true;
+        public boolean showBaitHud = false;
 
         @Expose
         @ConfigOption(name = "Low Bait Alert", desc = "Expands low bait alert settings.")
@@ -956,10 +1012,12 @@ public class ModConfig extends Config {
         public boolean hotspotFoundFolder = false;
 
         @Expose
-        @ConfigOption(name = "Perks", desc = "Hotspot perks worth being told about.")
+        @ConfigOption(name = "Perks", desc = "Hotspot perks worth being told about.\n"
+                + "§eNothing is picked to start with, so the alert stays quiet\n"
+                + "§euntil you add the perks you care about.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 95)
-        public List<HotspotPerk> sharedHotspotPerks = new ArrayList<>(HotspotPerk.defaults());
+        public List<HotspotPerk> sharedHotspotPerks = new ArrayList<>();
 
         @Expose
         @ConfigOption(name = "Title", desc = "Shows a title naming the perk.")
@@ -1286,6 +1344,29 @@ public class ModConfig extends Config {
         public transient Runnable disableAllLotusAtoll = () -> targetsLotusAtoll.clear();
 
         @Expose
+        @ConfigOption(name = "Glacite Mineshaft", desc = "Expands Glacite Mineshaft targets.")
+        @ConfigEditorAccordion(id = 107)
+        @ConfigEditorBoolean
+        public boolean glaciteMineshaftFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 107)
+        public List<MobVisual.GlaciteMineshaft> targetsGlaciteMineshaft = new ArrayList<>();
+
+        @ConfigOption(name = "Enable All", desc = "Puts every Glacite Mineshaft mob into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 107)
+        public transient Runnable enableAllGlaciteMineshaft =
+                () -> setAll(targetsGlaciteMineshaft, MobVisual.GlaciteMineshaft.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 107)
+        public transient Runnable disableAllGlaciteMineshaft = () -> targetsGlaciteMineshaft.clear();
+
+        @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari areas.")
         @ConfigEditorAccordion(id = 92)
         @ConfigEditorBoolean
@@ -1503,12 +1584,18 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
         @ConfigEditorBoolean
-        public boolean enableRebootAlert = true;
+        public boolean enableRebootAlert = false;
 
         @Expose
         @ConfigOption(name = "Warp Cooldown Queue", desc = "Shows cooldown, queues /warp.")
         @ConfigEditorBoolean
-        public boolean enableWarpQueue = true;
+        public boolean enableWarpQueue = false;
+
+        @Expose
+        @ConfigOption(name = "Ability Menu Fix", desc = "Stops an item swap from closing a menu an ability just opened.\n"
+                + "The swap is sent once the menu closes.")
+        @ConfigEditorBoolean
+        public boolean keepAbilityMenuOpen = false;
     }
 
     // どの場面でも出しっぱなしにする HUD
@@ -1524,7 +1611,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows equipped armor.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 51)
-        public boolean showEquipmentHud = true;
+        public boolean showEquipmentHud = false;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
@@ -1542,7 +1629,7 @@ public class ModConfig extends Config {
         @ConfigOption(name = "Enable", desc = "Shows Necklace/Cloak/Belt/Gloves.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 52)
-        public boolean showGearHud = true;
+        public boolean showGearHud = false;
 
         @Expose
         @ConfigOption(name = "Orientation", desc = "Sets horizontal or vertical.")
@@ -1577,22 +1664,22 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Pet HUD", desc = "Shows active pet.")
         @ConfigEditorBoolean
-        public boolean showPetHud = true;
+        public boolean showPetHud = false;
 
         @Expose
         @ConfigOption(name = "TPS HUD", desc = "Shows server TPS.")
         @ConfigEditorBoolean
-        public boolean showTpsHud = true;
+        public boolean showTpsHud = false;
 
         @Expose
         @ConfigOption(name = "Day HUD", desc = "Shows lobby day.")
         @ConfigEditorBoolean
-        public boolean showDayHud = true;
+        public boolean showDayHud = false;
 
         @Expose
         @ConfigOption(name = "Armor Stack HUD", desc = "Shows armor stack counts.")
         @ConfigEditorBoolean
-        public boolean showArmorStackHud = true;
+        public boolean showArmorStackHud = false;
 
         @Expose
         @ConfigOption(name = "Ferocity HUD", desc = "Shows ferocity. Hidden while it cannot be read.\n"
@@ -1604,7 +1691,7 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Quiver HUD", desc = "Shows selected arrow and how many are left.")
         @ConfigEditorBoolean
-        public boolean showQuiverHud = true;
+        public boolean showQuiverHud = false;
     }
 
     // 手に持っているアイテムの見え方
@@ -1645,22 +1732,22 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Hide Profile Name", desc = "Hides \"You are playing on profile: ...\".")
         @ConfigEditorBoolean
-        public boolean hideProfileMessage = true;
+        public boolean hideProfileMessage = false;
 
         @Expose
         @ConfigOption(name = "Hide Profile ID", desc = "Hides \"Profile ID: ...\".")
         @ConfigEditorBoolean
-        public boolean hideProfileIdMessage = true;
+        public boolean hideProfileIdMessage = false;
 
         @Expose
         @ConfigOption(name = "Hide Stash Reminder", desc = "Hides the stash reminder sent every minute.")
         @ConfigEditorBoolean
-        public boolean hideStashMessage = true;
+        public boolean hideStashMessage = false;
 
         @Expose
         @ConfigOption(name = "Hide Blank Lines", desc = "Hides chat lines that have no text.")
         @ConfigEditorBoolean
-        public boolean hideBlankMessages = true;
+        public boolean hideBlankMessages = false;
     }
 
     // バニラの画面まわりの手入れ
@@ -2066,7 +2153,7 @@ public class ModConfig extends Config {
         @Expose
         @ConfigOption(name = "Keep Cursor Position", desc = "Prevents cursor reset on quick swap.")
         @ConfigEditorBoolean
-        public boolean enableCursorRestoreOnRapidReopen = true;
+        public boolean enableCursorRestoreOnRapidReopen = false;
     }
 
     // メニューや切り替えをキーに割り当てる

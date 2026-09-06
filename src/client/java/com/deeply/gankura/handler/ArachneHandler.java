@@ -22,7 +22,7 @@ public class ArachneHandler {
             if (GameState.Arachne.awaitingCrystalParticles
                     && System.currentTimeMillis() - GameState.Arachne.crystalMessageTime > CRYSTAL_PARTICLE_DETERMINATION_MS) {
                 long delayTicks = GameState.Arachne.particleBurstCounter <= QUICK_SPAWN_THRESHOLD ? QUICK_SPAWN_DELAY_TICKS : NORMAL_SPAWN_DELAY_TICKS;
-                if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + delayTicks;
+                if (client.level != null) GameState.Arachne.spawnTargetTime = GameState.Server.estimatedTicks(client.level.getGameTime()) + delayTicks;
                 GameState.Arachne.awaitingCrystalParticles = false;
             }
         });
@@ -39,7 +39,7 @@ public class ArachneHandler {
             GameState.Arachne.downConfirmed = false;
             GameState.Arachne.everConfirmed = true;
             GameState.Arachne.lastConfirmedWasReady = false;
-            if (client.level != null) GameState.Arachne.spawnTargetTime = client.level.getGameTime() + SPAWN_DELAY_SMALL_TICKS;
+            if (client.level != null) GameState.Arachne.spawnTargetTime = GameState.Server.estimatedTicks(client.level.getGameTime()) + SPAWN_DELAY_SMALL_TICKS;
             return;
         }
 

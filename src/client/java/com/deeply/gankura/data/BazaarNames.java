@@ -31,9 +31,20 @@ public final class BazaarNames {
 
     /** 分からなければ null。初めて聞かれたときは、裏で一覧を取りに行く */
     public static String idOf(String displayName) {
-        if (asked.compareAndSet(false, true)) JsonFetch.run(BazaarNames::fetch);
+        prefetch();
 
         return idsByName.get(displayName);
+    }
+
+    /**
+     * 一覧を先に取りに行かせる。
+     *
+     * 取りに行くのは裏なので、聞かれたその場では間に合わない。
+     * 一度に多くの品を引くときは、その前にここで頼んでおく。
+     * 取得済みなら何もしないので、何度呼んでも構わない
+     */
+    public static void prefetch() {
+        if (asked.compareAndSet(false, true)) JsonFetch.run(BazaarNames::fetch);
     }
 
     private static void fetch() {
