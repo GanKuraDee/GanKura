@@ -3,6 +3,8 @@ package com.deeply.gankura.mixin;
 import com.deeply.gankura.handler.AuctionHandler;
 import com.deeply.gankura.handler.BazaarOrderHandler;
 import com.deeply.gankura.handler.CommissionHandler;
+import com.deeply.gankura.handler.FarmingContestHandler;
+import com.deeply.gankura.handler.VisitorHandler;
 import com.deeply.gankura.util.HighlightColor;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,10 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Bazaar に出している注文と、Auction House に出している品、
- * それに終わっている依頼の枠を塗る。
+ * それに終わっている依頼と、来客に渡せるかどうか、
+ * コンテストの褒美を受け取ったかどうかの枠を塗る。
  *
  * 何色に塗るかは {@link BazaarOrderHandler} と {@link AuctionHandler}、
- * {@link CommissionHandler} が決める
+ * {@link CommissionHandler}、{@link VisitorHandler}、
+ * {@link FarmingContestHandler} が決める
  */
 @Mixin(AbstractContainerScreen.class)
 public class SlotHighlightMixin {
@@ -41,6 +45,11 @@ public class SlotHighlightMixin {
             color = AuctionHandler.colorFor(slot);
         } else if (CommissionHandler.inMenu(title)) {
             color = CommissionHandler.colorFor(slot);
+        } else if (FarmingContestHandler.inMenu(title)) {
+            color = FarmingContestHandler.colorFor(slot);
+        } else {
+            // 来客の画面は題が来客の名前なので、題では見分けられない。中身から見る
+            color = VisitorHandler.colorFor(slot);
         }
         if (color == null) return;
 

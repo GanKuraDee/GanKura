@@ -8,6 +8,8 @@ import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.CommissionWaypointHandler;
 import com.deeply.gankura.handler.FloorDropHandler;
+import com.deeply.gankura.handler.PestVacuumHandler;
+import com.deeply.gankura.handler.WishingCompassHandler;
 import com.deeply.gankura.scanner.BeeNestScanner;
 import com.deeply.gankura.scanner.CorpseScanner;
 import com.deeply.gankura.util.DevHooks;
@@ -60,12 +62,22 @@ public class WorldTextRenderer {
     private static final int MINING_FILL_ALPHA = 0x80000000;
     private static final int RGB_MASK = 0x00FFFFFF;
 
+    // Wishing Compass で割り出した場所を囲む枠の太さ
+    private static final float WISHING_LINE_WIDTH = 3.0f;
+
     // Hotspot Radar の推測地点に使う色と太さ
     public static final int HOTSPOT_COLOR = 0xFFFF55FF;
     private static final int HOTSPOT_FILL_COLOR = 0x40FF55FF;
     private static final float HOTSPOT_LINE_WIDTH = 3.0f;
     // 見つけた Hotspot の枠の塗り。色は効果ごとに変わるので、濃さだけ決めておく
     private static final int HOTSPOT_FOUND_FILL_ALPHA = 0x40000000;
+
+    // Vacuum から割り出した害虫の居場所に使う色と太さ。
+    // 区画の真ん中を指しているときは、居場所が絞れていないので色を分ける
+    public static final int PEST_GUESS_COLOR = 0xFFFF5555;
+    public static final int PEST_GUESS_PLOT_COLOR = 0xFFFFFF55;
+    private static final int PEST_GUESS_FILL_ALPHA = 0x40000000;
+    private static final float PEST_GUESS_LINE_WIDTH = 3.0f;
 
     public static void render(Minecraft client) {
         if (client.player == null) return;
@@ -83,6 +95,8 @@ public class WorldTextRenderer {
         renderHotspotGuess(client);
         renderHotspotFound(client);
         renderHotspotCircles(client);
+        renderWishingCompassTarget(client);
+        renderPestVacuumGuess(client);
         // 開発中の一時的な機能。配布ビルドでは何も登録されていない
         DevHooks.renderWorld(client);
     }
@@ -116,6 +130,55 @@ public class WorldTextRenderer {
             GizmoProperties segment = Gizmos.addGizmo(new LineGizmo(from, to, argb,
                     HOTSPOT_CIRCLE_WIDTH));
             segment.setAlwaysOnTop();
+    }
+
+    /**
+     * Wishing Compass で割り出した場所を示す。
+     *
+     * 2本の直線から求めた1点なので、構造物のどこに当たるかまでは分からない。
+     * 目安として使えるよう、名前と距離に加えてブロック1つ分の枠も出す
+     */
+    private static void renderWishingCompassTarget(Minecraft client) {
+        Vec3 pos = WishingCompassHandler.solution();
+        if (pos == null) return;
+
+        int distance = (int) Math.round(client.player.position().distanceTo(pos));
+        int argb = WishingCompassHandler.solutionArgb();
+
+        renderGizmoLabelAt(WishingCompassHandler.solutionLabel() + " §e" + distance + "m",
+                pos.add(0, 1.5, 0), argb);
+
+        GizmoProperties box = Gizmos.cuboid(BlockPos.containing(pos),
+                GizmoStyle.strokeAndFill(argb, WISHING_LINE_WIDTH, (argb & RGB_MASK) | MINING_FILL_ALPHA));
+        box.setAlwaysOnTop();
+    }
+
+    /** 割り出した害虫の居場所に使う色。Tracer も同じ色で引く */
+    public static int pestGuessArgb() {
+        return PestVacuumHandler.isPlotMiddle() ? PEST_GUESS_PLOT_COLOR : PEST_GUESS_COLOR;
+    }
+
+    /**
+     * Vacuum の粒から割り出した、次の害虫の居場所を示す。
+     *
+     * 途中までの粒から伸ばした推し当てなので、居場所が分かるよう枠も出す。
+     * 区画の真ん中を指しているときは、その区画のどこかという意味しかないので色を分ける
+     */
+    private static void renderPestVacuumGuess(Minecraft client) {
+        Vec3 guess = PestVacuumHandler.guess();
+        if (guess == null) return;
+
+        boolean middle = PestVacuumHandler.isPlotMiddle();
+        int argb = pestGuessArgb();
+        int distance = (int) Math.round(client.player.position().distanceTo(guess));
+
+        String label = (middle ? "§e§lPEST §7(plot middle)" : "§a§lPEST") + " §e" + distance + "m";
+        renderGizmoLabelAt(label, guess.add(0, 1.5, 0), argb);
+
+        GizmoProperties box = Gizmos.cuboid(BlockPos.containing(guess),
+                GizmoStyle.strokeAndFill(argb, PEST_GUESS_LINE_WIDTH,
+                        (argb & RGB_MASK) | PEST_GUESS_FILL_ALPHA));
+        box.setAlwaysOnTop();
     }
 
     // Hotspot Radar から推測した場所に印を出す

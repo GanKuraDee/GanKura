@@ -66,6 +66,10 @@ public class HudConfig {
                 new QuiverHud(),
                 new FerocityHud());
 
+        register(HudCategory.GARDEN,
+                new VisitorStatusHud(),
+                new PestStatusHud());
+
         register(HudCategory.FISHING,
                 new BiteCountdownHud(),
                 new BaitHud(),
@@ -133,7 +137,14 @@ public class HudConfig {
     }
 
     public static void resetToDefault() {
+        resetToDefault(null);
+    }
+
+    /** 既定位置に戻す。category を渡すとその分類のものだけ、null なら全部 */
+    public static void resetToDefault(HudCategory category) {
         for (HudElement element : ELEMENTS) {
+            if (category != null && element.category != category) continue;
+
             element.reset();
         }
     }

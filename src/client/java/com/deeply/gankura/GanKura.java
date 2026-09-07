@@ -17,6 +17,10 @@ import com.deeply.gankura.handler.BestiaryTooltipHandler;
 import com.deeply.gankura.handler.EnchantTooltipHandler;
 import com.deeply.gankura.handler.ItemPriceTooltipHandler;
 import com.deeply.gankura.handler.ScrollableTooltipHandler;
+import com.deeply.gankura.handler.MousematHandler;
+import com.deeply.gankura.handler.PestVacuumHandler;
+import com.deeply.gankura.handler.VisitorPanel;
+import com.deeply.gankura.handler.WishingCompassHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PetHandler;
@@ -116,7 +120,11 @@ public class GanKura implements ClientModInitializer {
         AttributeTooltipHandler.register();
         ItemPriceTooltipHandler.register();
         AttributeCostPanel.register();
+        VisitorPanel.register();
+        MousematHandler.register();
+        PestVacuumHandler.register();
         ScrollableTooltipHandler.register();
+        WishingCompassHandler.register();
         LavaTextureHandler.register();
         // 開発中の一時的な機能。配布ビルドには入っていないので、あるときだけ読み込む
         DevHooks.load();

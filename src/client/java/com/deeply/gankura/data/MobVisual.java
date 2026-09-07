@@ -50,6 +50,7 @@ public interface MobVisual {
         }
         if (target instanceof LotusAtoll) return GameState.Server.isLotusAtoll();
         if (target instanceof GlaciteMineshaft) return GameState.Server.isMineshaft();
+        if (target instanceof Garden) return GameState.Server.isGarden();
         // Sea Creature は釣れる場所が種類ごとに決まっている。
         // どこでも釣れるものだけ ANYWHERE として素通しにする
         if (target instanceof SeaCreature seaCreature) return seaCreature.area().isHere();
@@ -67,7 +68,7 @@ public interface MobVisual {
         if (target instanceof TheEnd || target instanceof SpidersDen
                 || target instanceof CrimsonIsle || target instanceof CrystalHollows
                 || target instanceof MoongladeMarsh || target instanceof TorrhusCanyon
-                || target instanceof SeaCreature) {
+                || target instanceof SeaCreature || target instanceof Garden) {
             return false;
         }
         return GameState.CritterSafari.isCaptured(target.plainLabel());
@@ -607,6 +608,59 @@ public interface MobVisual {
         @Override
         public List<GlaciteMineshaft> targets() {
             return ModConfig.INSTANCE.mobVisuals.targetsGlaciteMineshaft;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
+    /**
+     * Garden に湧く Pest。
+     *
+     * どれも skull を被せたアーマースタンドで作られていて、
+     * 被っているスキンだけで種まで決まる。
+     * Earthworm だけは頭と胴体でスキンが違い、頭1つと胴体2つで一体を成す
+     */
+    enum Garden implements MobVisual {
+        FLY("§8Fly", 0x555555),
+        FIELD_MOUSE("§7Field Mouse", 0xAAAAAA),
+        RAT("§4Rat", 0xAA0000),
+        MITE("§cMite", 0xFF5555),
+        MOSQUITO("§9Mosquito", 0x5555FF),
+        EARTHWORM("§dEarthworm", 0xFF55FF),
+        CRICKET("§aCricket", 0x55FF55),
+        LOCUST("§eLocust", 0xFFFF55),
+        MOTH("§fMoth", 0xFFFFFF),
+        LUNAR_MOTH("§1Lunar Moth", 0x0000AA),
+        SLUG("§5Slug", 0xAA00AA),
+        BEETLE("§3Beetle", 0x00AAAA),
+        FIREFLY("§6Firefly", 0xFFAA00),
+        DRAGONFLY("§bDragonfly", 0x55FFFF),
+        PRAYING_MANTIS("§2Praying Mantis", 0x00AA00);
+
+        private final String label;
+        private final int glowColorRGB;
+
+        Garden(String label, int glowColorRGB) {
+            this.label = label;
+            this.glowColorRGB = glowColorRGB;
+        }
+
+        @Override
+        public String label() {
+            return label;
+        }
+
+        @Override
+        public int glowColorRGB() {
+            return glowColorRGB;
+        }
+
+        @Override
+        public List<Garden> targets() {
+            return ModConfig.INSTANCE.mobVisuals.targetsGarden;
         }
 
         @Override

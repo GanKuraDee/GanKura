@@ -145,6 +145,7 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
         INSTANCE.mobVisuals.targetsLotusAtoll = normalizeEnumList(INSTANCE.mobVisuals.targetsLotusAtoll, List.of());
         INSTANCE.mobVisuals.targetsGlaciteMineshaft = normalizeEnumList(INSTANCE.mobVisuals.targetsGlaciteMineshaft, List.of());
+        INSTANCE.mobVisuals.targetsGarden = normalizeEnumList(INSTANCE.mobVisuals.targetsGarden, List.of());
         INSTANCE.fishing.sharedHotspotPerks = normalizeEnumList(INSTANCE.fishing.sharedHotspotPerks, List.of());
 
         INSTANCE.saveNow();
@@ -199,6 +200,10 @@ public class ModConfig extends Config {
     @Expose
     @Category(name = "Combat", desc = "Bosses and combat features of each area.")
     public CombatCategory combat = new CombatCategory();
+
+    @Expose
+    @Category(name = "Farming", desc = "Farming features.")
+    public FarmingCategory farming = new FarmingCategory();
 
     @Expose
     @Category(name = "Foraging", desc = "Foraging features.")
@@ -709,6 +714,156 @@ public class ModConfig extends Config {
     // ==========================================
     // Foraging
     // ==========================================
+    // ==========================================
+    // Farming: The Garden
+    // ==========================================
+    public static class FarmingCategory {
+
+        @Expose
+        @ConfigOption(name = "Garden", desc = "The Garden features.")
+        @Accordion
+        public GardenCategory garden = new GardenCategory();
+    }
+
+    public static class GardenCategory {
+
+        @Expose
+        @ConfigOption(name = "Visitor", desc = "Expands visitor settings.")
+        @ConfigEditorAccordion(id = 109)
+        public boolean visitorFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Puts the tab list visitor lines on screen:\n"
+                + "how many are waiting and when the next one comes.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 109)
+        public boolean showVisitorStatusHud = false;
+
+        @Expose
+        @ConfigOption(name = "Required Items", desc = "Lists what the visitor is asking for beside the menu.\n"
+                + "Click a name to look it up on the Bazaar.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 109)
+        public boolean showVisitorItems = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Accept Offer", desc = "Colours Accept Offer green once you have\n"
+                + "everything the visitor wants, red while something is missing.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 109)
+        public boolean highlightVisitorOffer = false;
+
+        @Expose
+        @ConfigOption(name = "Arrival Title", desc = "Shows the name in the middle of the screen\n"
+                + "when a visitor turns up at your garden.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 109)
+        public boolean showVisitorArrivalTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Queue Full Title", desc = "Shows a title once the visitor queue fills up\n"
+                + "and no more will turn up until you serve some.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 109)
+        public boolean showVisitorQueueFullTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Jacob's Contest", desc = "Expands farming contest settings.")
+        @ConfigEditorAccordion(id = 112)
+        public boolean contestFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Rewards", desc = "Colours contests green once their reward\n"
+                + "has been claimed, yellow while it is still waiting.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 112)
+        public boolean highlightContestRewards = false;
+
+        @Expose
+        @ConfigOption(name = "Pest", desc = "Expands pest settings.")
+        @ConfigEditorAccordion(id = 111)
+        public boolean pestFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Status HUD", desc = "Puts the tab list pest lines on screen:\n"
+                + "when the next ones come, how many are alive and where.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 111)
+        public boolean showPestStatusHud = false;
+
+        @Expose
+        @ConfigOption(name = "Spawn Title", desc = "Shows how many pests turned up and where,\n"
+                + "in the middle of the screen.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 111)
+        public boolean showPestSpawnTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Max Pests Title", desc = "Shows a title once the garden is full of pests\n"
+                + "and no more will spawn until you clear some.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 111)
+        public boolean showMaxPestsTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Vacuum", desc = "Expands vacuum settings.")
+        @ConfigAccordionId(id = 111)
+        @ConfigEditorAccordion(id = 114)
+        public boolean vacuumFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Waypoint", desc = "Marks where the next pest is when you\n"
+                + "left-click with a vacuum, worked out from the particles it sends.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 114)
+        public boolean showPestVacuumWaypoint = false;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to the pest the vacuum points at.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 114)
+        public boolean showPestVacuumTracer = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Particles", desc = "Hides the particles the vacuum sends\n"
+                + "while the waypoint is being worked out.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 114)
+        public boolean hidePestVacuumParticles = true;
+
+        @Expose
+        @ConfigOption(name = "Duration", desc = "Seconds the waypoint and tracer stay.")
+        @ConfigEditorSlider(minValue = 5f, maxValue = 20f, minStep = 1f)
+        @ConfigAccordionId(id = 114)
+        public int pestVacuumSeconds = 15;
+
+        @Expose
+        @ConfigOption(name = "Squeaky Mousemat", desc = "Expands mousemat settings.")
+        @ConfigEditorAccordion(id = 110)
+        public boolean mousematFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Lock View", desc = "Stops the mouse from turning you once the mousemat\n"
+                + "has snapped you to its direction.\n"
+                + "Right-click the mousemat again to release it.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 110)
+        public boolean lockViewOnMousemat = false;
+
+        @Expose
+        @ConfigOption(name = "Release on Teleport", desc = "Releases the view when you are teleported\n"
+                + "to another plot, where the direction no longer fits.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 110)
+        public boolean unlockViewOnTeleport = true;
+
+        @Expose
+        @ConfigOption(name = "Release Key", desc = "Sets a key that releases the view.")
+        @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+        @ConfigAccordionId(id = 110)
+        public int releaseViewKeybind = GLFW.GLFW_KEY_UNKNOWN;
+    }
+
     public static class ForagingCategory {
         @Expose
         @ConfigOption(name = "Title Settings", desc = "Expands title notification settings.")
@@ -873,25 +1028,58 @@ public class ModConfig extends Config {
         public boolean mineshaftFolder = false;
 
         @Expose
-        @ConfigOption(name = "Corpse Waypoints", desc = "Labels the frozen corpses in the mineshaft,\n"
+        @ConfigOption(name = "Corpse", desc = "Expands frozen corpse settings.")
+        @ConfigAccordionId(id = 106)
+        @ConfigEditorAccordion(id = 115)
+        @ConfigEditorBoolean
+        public boolean corpseFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Waypoints", desc = "Labels the frozen corpses in the mineshaft,\n"
                 + "with the kind of key each one needs.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 106)
+        @ConfigAccordionId(id = 115)
         public boolean showCorpseWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Tracer", desc = "Draws a line to each frozen corpse,\n"
+                + "in the colour of the key it needs.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 115)
+        public boolean showCorpseTracer = true;
 
         @Expose
         @ConfigOption(name = "Vanguard Title", desc = "Shows a title when a Vanguard corpse\n"
                 + "turns up in the mineshaft you are in.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 106)
+        @ConfigAccordionId(id = 115)
         public boolean showVanguardTitle = false;
 
         @Expose
-        @ConfigOption(name = "Corpse Profit", desc = "Adds up what a corpse dropped and posts it in chat.\n"
+        @ConfigOption(name = "Profit", desc = "Adds up what a corpse dropped and posts it in chat.\n"
                 + "The key each corpse needs is taken off the total.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 106)
+        @ConfigAccordionId(id = 115)
         public boolean showCorpseProfit = false;
+
+        @Expose
+        @ConfigOption(name = "Wishing Compass", desc = "Expands wishing compass settings.")
+        @ConfigEditorAccordion(id = 108)
+        @ConfigEditorBoolean
+        public boolean wishingCompassFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Solver", desc = "Works out where the wishing compass points.\n"
+                + "Use it from two spots at least 8 blocks apart.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 108)
+        public boolean solveWishingCompass = false;
+
+        @Expose
+        @ConfigOption(name = "Waypoint", desc = "Marks the solved location in the world.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 108)
+        public boolean showWishingCompassWaypoint = false;
     }
 
     // ==========================================
@@ -1365,6 +1553,29 @@ public class ModConfig extends Config {
         @ConfigEditorButton(buttonText = "None")
         @ConfigAccordionId(id = 107)
         public transient Runnable disableAllGlaciteMineshaft = () -> targetsGlaciteMineshaft.clear();
+
+        @Expose
+        @ConfigOption(name = "Garden", desc = "Expands Garden pest targets.")
+        @ConfigEditorAccordion(id = 113)
+        @ConfigEditorBoolean
+        public boolean gardenFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Targets", desc = "Mobs to show. Applies to highlight, tracer and nameplate.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 113)
+        public List<MobVisual.Garden> targetsGarden = new ArrayList<>();
+
+        // ボタンは保存対象外なので @Expose を付けず transient にする
+        @ConfigOption(name = "Enable All", desc = "Puts every Garden pest into the list above.")
+        @ConfigEditorButton(buttonText = "All")
+        @ConfigAccordionId(id = 113)
+        public transient Runnable enableAllGarden = () -> setAll(targetsGarden, MobVisual.Garden.values());
+
+        @ConfigOption(name = "Disable All", desc = "Empties the list above.")
+        @ConfigEditorButton(buttonText = "None")
+        @ConfigAccordionId(id = 113)
+        public transient Runnable disableAllGarden = () -> targetsGarden.clear();
 
         @Expose
         @ConfigOption(name = "Critter Safari", desc = "Expands Critter Safari areas.")

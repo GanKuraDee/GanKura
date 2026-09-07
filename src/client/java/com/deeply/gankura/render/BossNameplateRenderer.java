@@ -102,6 +102,10 @@ public class BossNameplateRenderer {
         // MobVisual が持つ色をすべて網羅する。抜けがあると
         // ネームプレートだけ白くなり、Highlight/Tracer と色が食い違う
         return switch (argb & 0xFFFFFF) {
+            case 0x0000AA -> "§1";
+            case 0xAA0000 -> "§4";
+            case 0x00AA00 -> "§2";
+            case 0x00AAAA -> "§3";
             case 0x555555 -> "§8";
             case 0xAAAAAA -> "§7";
             case 0xFF5555 -> "§c";

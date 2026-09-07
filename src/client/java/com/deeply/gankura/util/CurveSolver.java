@@ -26,9 +26,22 @@ public class CurveSolver {
     // これより近ければ同じ場所とみなす(ブロック)
     private static final double SAME_POINT = 1.0E-4;
 
+    // 求めた終点を上下にずらす量(ブロック)。
+    // 何を指している軌跡かで、当てたい高さが違う
+    private final double yOffset;
+
     private final List<Vec3> points = new ArrayList<>();
     private Vec3 startPos;
     private Vec3 solved;
+
+    /** Hotspot Radar 向け。輪の中心の高さに合わせて、少し下げる */
+    public CurveSolver() {
+        this(-0.5);
+    }
+
+    public CurveSolver(double yOffset) {
+        this.yOffset = yOffset;
+    }
 
     /** 軌跡を取り直す。レーダーを使った瞬間に呼ぶ */
     public void start(Vec3 eyePos) {
@@ -76,7 +89,7 @@ public class CurveSolver {
      * 軌跡に式を当てはめ、終点を求める。
      *
      * 始点の傾き(1次の係数)から、終点にあたる t を逆算する。
-     * 最後に y を少し下げて、輪の中心の高さに合わせる
+     * 最後に y をずらして、その軌跡が指しているものの高さに合わせる
      */
     private Vec3 solve() {
         double[][] coefficients = new double[3][];
@@ -98,7 +111,7 @@ public class CurveSolver {
             }
             term *= end;
         }
-        return new Vec3(result[0], result[1] - 0.5, result[2]);
+        return new Vec3(result[0], result[1] + yOffset, result[2]);
     }
 
     // 始点の傾きから、終点にあたる t を求める

@@ -159,6 +159,10 @@ public class GameState {
         public static boolean isFarmingIslands() {
             return ModConstants.MAP_FARMING_ISLANDS.equals(map);
         }
+
+        public static boolean isGarden() {
+            return ModConstants.containsIgnoreCase(map, ModConstants.MAP_GARDEN);
+        }
     }
 
     public static class Player {

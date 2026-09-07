@@ -1,5 +1,6 @@
 package com.deeply.gankura.data;
 
+import com.deeply.gankura.util.EnchantedBookId;
 import com.deeply.gankura.util.JsonFetch;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
@@ -33,7 +34,9 @@ public final class BazaarNames {
     public static String idOf(String displayName) {
         prefetch();
 
-        return idsByName.get(displayName);
+        String id = idsByName.get(displayName);
+        // エンチャント本は一覧に載っていないので、名前から組み立てる
+        return id != null ? id : EnchantedBookId.of(displayName);
     }
 
     /**

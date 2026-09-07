@@ -4,7 +4,9 @@ import com.deeply.gankura.handler.BroodmotherHandler;
 import com.deeply.gankura.handler.CommissionWaypointHandler;
 import com.deeply.gankura.handler.DragonHandler;
 import com.deeply.gankura.handler.GolemHandler;
+import com.deeply.gankura.handler.PestSpawnHandler;
 import com.deeply.gankura.handler.PetHandler;
+import com.deeply.gankura.handler.VisitorHandler;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -74,6 +76,8 @@ public class TabListScanner {
         BroodmotherHandler.processTabList(unformattedLines);
         DragonHandler.processTabList(unformattedLines, client);
         PetHandler.processTabList(formattedLines, unformattedLines, client);
+        VisitorHandler.processTabList(formattedLines, unformattedLines, client);
+        PestSpawnHandler.processTabList(formattedLines, unformattedLines, client);
     }
 
     private static String toLegacyString(Component text) {
