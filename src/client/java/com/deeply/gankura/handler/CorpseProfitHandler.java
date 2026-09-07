@@ -46,10 +46,11 @@ public class CorpseProfitHandler {
      *
      * 頭に飾りの記号が付くことがあり、個数は "×20" や "x4,390" の形で後ろに付く。
      * 個数が1のときは省かれる。
+     * エンチャント本は "Enchanted Book (Ice Cold I)" のように中身が括弧で添えられるので、括弧も通す。
      * 名前に使われる字を絞ってあるので、"+5 Kill Combo" のような別の行はここで弾ける
      */
     private static final Pattern REWARD_LINE = Pattern.compile(
-            "^(?:[^\\p{L}\\p{N}\\s]+\\s+)?(?<name>\\p{L}[\\p{L}\\p{N} '-]*?)(?:\\s+[x×](?<count>[\\d,]+))?$");
+            "^(?:[^\\p{L}\\p{N}\\s]+\\s+)?(?<name>\\p{L}[\\p{L}\\p{N} '()-]*?)(?:\\s+[x×](?<count>[\\d,]+))?$");
 
     // 締めの区切り行。同じ記号が並ぶだけの行を、この長さ以上あれば区切りとみなす
     private static final int SEPARATOR_MIN_LENGTH = 8;

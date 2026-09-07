@@ -3,6 +3,8 @@ package com.deeply.gankura.render;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.HotspotAreaHandler;
 import com.deeply.gankura.handler.HotspotRadarHandler;
+import com.deeply.gankura.handler.PestVacuumHandler;
+import com.deeply.gankura.scanner.CorpseScanner;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -34,8 +36,16 @@ public class EntityTracerRenderer {
         List<HotspotAreaHandler.Found> foundSpots = ModConfig.INSTANCE.fishing.showHotspotFoundTracer
                 ? HotspotAreaHandler.found()
                 : List.of();
+        // 凍った死体への線。ウェイポイントと同じ場所を、同じ鍵の色で指す
+        List<CorpseScanner.Corpse> corpses = ModConfig.INSTANCE.mining.showCorpseTracer
+                ? CorpseScanner.corpses()
+                : List.of();
+        // Vacuum から割り出した害虫の居場所への線。ウェイポイントと同じ場所を指す
+        Vec3 pest = ModConfig.INSTANCE.farming.garden.showPestVacuumTracer
+                ? PestVacuumHandler.guess()
+                : null;
         if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null
-                && !hasHotspot && foundSpots.isEmpty()) return;
+                && !hasHotspot && foundSpots.isEmpty() && pest == null && corpses.isEmpty()) return;
 
         // 三人称ではカメラがプレイヤーの後方へ離れるため、カメラ位置を始点にすると
         // 線が背後から伸びているように見えるので、その場合だけプレイヤーの目の位置を使う。
@@ -58,6 +68,20 @@ public class EntityTracerRenderer {
                 new LineGizmo(startPos, hotspot.add(0, 1.5, 0), WorldTextRenderer.HOTSPOT_COLOR, 4.0f)
             );
             hotspotProps.setAlwaysOnTop();
+        }
+
+        for (CorpseScanner.Corpse corpse : corpses) {
+            GizmoProperties corpseProps = Gizmos.addGizmo(
+                new LineGizmo(startPos, WorldTextRenderer.labelPos(corpse.pos()), corpse.argb(), 4.0f)
+            );
+            corpseProps.setAlwaysOnTop();
+        }
+
+        if (pest != null) {
+            GizmoProperties pestProps = Gizmos.addGizmo(
+                new LineGizmo(startPos, pest.add(0, 1.5, 0), WorldTextRenderer.pestGuessArgb(), 4.0f)
+            );
+            pestProps.setAlwaysOnTop();
         }
 
         for (HotspotAreaHandler.Found spot : foundSpots) {

@@ -8,6 +8,7 @@ import com.deeply.gankura.data.ItemPrices;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.mixin.ContainerScreenAccessor;
 import com.deeply.gankura.util.CoinText;
+import com.deeply.gankura.util.PanelBox;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.ChatFormatting;
@@ -44,12 +45,6 @@ public final class AttributeCostPanel {
     // あと何枚いるか。まだ見つけていない Attribute には unlock の方が書かれる
     private static final Pattern TO_NEXT = Pattern.compile("Syphon ([\\d,]+) shards? to (?:level up|unlock)!");
     private static final Pattern TO_MAX = Pattern.compile("Syphon ([\\d,]+) shards? to max!");
-
-    // 箱の見た目。持ち物の窓と同じ配色にして、隣に並べても浮かないようにする
-    private static final int BORDER_COLOR = 0xFF000000;
-    private static final int BACKGROUND_COLOR = 0xFFC6C6C6;
-    private static final int LIGHT_EDGE_COLOR = 0xFFFFFFFF;
-    private static final int DARK_EDGE_COLOR = 0xFF555555;
 
     // 名前に乗せたときの下敷き。押せることが分かるよう、スロットと同じ明るさで敷く
     private static final int HOVER_COLOR = 0x80FFFFFF;
@@ -306,7 +301,7 @@ public final class AttributeCostPanel {
         int x = Math.max(box.gankura$getLeftPos() - panelWidth - MARGIN, SCREEN_EDGE);
         int y = box.gankura$getTopPos();
 
-        panel(graphics, x, y, panelWidth, panelHeight);
+        PanelBox.draw(graphics, x, y, panelWidth, panelHeight);
 
         // 値段は右端をそろえる。桁が違っても見比べやすい
         int orderRight = x + panelWidth - PADDING;
@@ -410,15 +405,5 @@ public final class AttributeCostPanel {
         int widest = 0;
         for (String text : texts) widest = Math.max(widest, font.width(text));
         return widest;
-    }
-
-    // 持ち物の窓と同じ、へこんで見える枠
-    private static void panel(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
-        graphics.fill(x, y, x + width, y + height, BORDER_COLOR);
-        graphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, BACKGROUND_COLOR);
-        graphics.fill(x + 1, y + 1, x + width - 2, y + 2, LIGHT_EDGE_COLOR);
-        graphics.fill(x + 1, y + 1, x + 2, y + height - 2, LIGHT_EDGE_COLOR);
-        graphics.fill(x + 2, y + height - 2, x + width - 1, y + height - 1, DARK_EDGE_COLOR);
-        graphics.fill(x + width - 2, y + 2, x + width - 1, y + height - 1, DARK_EDGE_COLOR);
     }
 }

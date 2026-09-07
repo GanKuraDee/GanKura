@@ -42,7 +42,13 @@
 		"FireOverlayMixin",
 		"SlotHighlightMixin",
 		"HeldSlotSyncMixin",
-		"AttributeCostPanelMixin"
+		"WishingCompassUseMixin",
+		"WishingCompassParticleMixin",
+		"AttributeCostPanelMixin",
+		"VisitorPanelMixin",
+		"PestVacuumAttackMixin",
+		"PestVacuumParticleMixin",
+		"MouseLockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

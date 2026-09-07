@@ -36,6 +36,9 @@ public class ModConstants {
     // 完全一致ではなくこの言葉を含むかどうかで見る
     public static final String MAP_MINESHAFT = "Mineshaft";
     public static final String MAP_FARMING_ISLANDS = "The Farming Islands";
+    // サイドバーには "The Garden" と出るが、タブリストの Area 行では "Garden" とだけ書かれる。
+    // どちらで来ても拾えるよう、この言葉を含むかどうかで見る
+    public static final String MAP_GARDEN = "Garden";
 
     // タブリスト上で現在地とサーバーIDを載せている行の接頭辞
     public static final String TAB_AREA_PREFIX = "Area:";

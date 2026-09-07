@@ -26,6 +26,7 @@ public class HudEditorScreen extends Screen {
     private final List<HudCategory> tabCategories = new ArrayList<>();
     private int categoryIndex = 0;
     private Button categoryButton;
+    private Button resetButton;
 
     private HudElement draggingElement = null;
     private int dragOffsetX = 0;
@@ -38,12 +39,13 @@ public class HudEditorScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(Button.builder(
-                Component.literal("Reset to Default"),
-                button -> HudConfig.resetToDefault()
-        ).bounds(this.width / 2 - 75, this.height - 30, 150, 20).build());
-
         addCategoryTabs();
+
+        // 絞り込み中は、そのとき触れる分だけを戻す。
+        // 見えていないHUDまで巻き添えで動くと、押した本人が気付けない
+        resetButton = Button.builder(resetLabel(), button -> HudConfig.resetToDefault(selectedCategory()))
+                .bounds(this.width / 2 - 75, this.height - 30, 150, 20).build();
+        this.addRenderableWidget(resetButton);
 
         // Minecraft 26.1.x では Screen に mouseScrolled がないため Fabric API で登録する
         ScreenMouseEvents.beforeMouseScroll(this).register((screen, mouseX, mouseY, h, v) -> {
@@ -171,6 +173,13 @@ public class HudEditorScreen extends Screen {
         int size = tabCategories.size();
         categoryIndex = ((categoryIndex + step) % size + size) % size;
         categoryButton.setMessage(tabLabel());
+        resetButton.setMessage(resetLabel());
+    }
+
+    // 何が戻るのかが押す前に分かるよう、絞り込んでいる分類の名前を出す
+    private Component resetLabel() {
+        HudCategory category = selectedCategory();
+        return Component.literal(category == null ? "Reset All" : "Reset " + category.label());
     }
 
     // 何件中の何件目か分かるよう、名前に番号を添える

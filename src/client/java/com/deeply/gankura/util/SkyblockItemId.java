@@ -71,11 +71,11 @@ public final class SkyblockItemId {
     private static Info read(ItemStack stack) {
         CustomData data = stack.get(DataComponents.CUSTOM_DATA);
         // Bazaar の棚に並ぶ品には ID が書かれていない。名前だけが手掛かりになる
-        if (data == null) return shard(stack, true);
+        if (data == null) return byName(stack);
 
         CompoundTag extra = attributes(data.copyTag());
         String id = extra.getStringOr("id", "");
-        if (id.isEmpty()) return shard(stack, true);
+        if (id.isEmpty()) return byName(stack);
 
         // シャードはどれも同じ ID なので、名前から引き直す。
         // 中身の違いを "ATTRIBUTE_SHARD_FOG_ELEMENTAL;1" のように後ろに付けて寄越すこともある
@@ -84,13 +84,34 @@ public final class SkyblockItemId {
         return switch (id) {
             case "PET" -> new Info(id, pet(extra));
             // "ENCHANTMENT_ULTIMATE_WISE_5" のように、入っているエンチャントが ID になる
-            case "ENCHANTED_BOOK" -> new Info(only(extra, "enchantments", (name, level) ->
-                    "ENCHANTMENT_" + name.toUpperCase(Locale.ROOT) + "_" + level), null);
+            case "ENCHANTED_BOOK" -> {
+                String book = only(extra, "enchantments", (name, level) ->
+                        "ENCHANTMENT_" + name.toUpperCase(Locale.ROOT) + "_" + level);
+                // 注文の一覧に並ぶ本には中身が入っていないので、名前から引き直す
+                yield book == null ? byName(stack) : new Info(book, null);
+            }
             // "ANTLERS_RUNE_3" のように、ルーンの名前と段が ID になる
             case "RUNE" -> new Info(only(extra, "runes", (name, level) ->
                     name.toUpperCase(Locale.ROOT) + "_RUNE_" + level), null);
             default -> new Info(id, null);
         };
+    }
+
+    /**
+     * 中身から ID の読めない品を、書かれている名前から引く。
+     *
+     * 名前しか無い品は Bazaar 絡みの画面に並ぶものに限られるので、
+     * そこで名前が ID の代わりになるシャードとエンチャント本だけを見る
+     */
+    private static Info byName(ItemStack stack) {
+        Info shard = shard(stack, true);
+        if (shard != NOTHING) return shard;
+
+        String name = displayName(stack);
+        if (name == null) return NOTHING;
+
+        String book = EnchantedBookId.of(name);
+        return book == null ? NOTHING : new Info(book, null);
     }
 
     /**
@@ -104,16 +125,20 @@ public final class SkyblockItemId {
      * 対応表に無い名前が当たることはないが、関わりのない品まで引きに行かせない
      */
     private static Info shard(ItemStack stack, boolean suffixed) {
-        String name = ChatFormatting.stripFormatting(stack.getHoverName().getString());
+        String name = displayName(stack);
         if (name == null) return NOTHING;
-
-        name = withoutOrder(name.trim());
 
         int suffix = name.indexOf(SHARD_SUFFIX);
         if (suffix <= 0 && suffixed) return NOTHING;
 
         String id = AttributeShards.idOf((suffix > 0 ? name.substring(0, suffix) : name).trim());
         return id == null ? NOTHING : new Info(id, null);
+    }
+
+    /** 表示されている名前。色付けと注文の飾りを落としたもの */
+    private static String displayName(ItemStack stack) {
+        String name = ChatFormatting.stripFormatting(stack.getHoverName().getString());
+        return name == null ? null : withoutOrder(name.trim());
     }
 
     /**

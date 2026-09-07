@@ -27,6 +27,12 @@ public class NetworkHandler {
             // 見つけていた Floor Drop はワールドが変わると意味を成さないので捨てる
             FloorDropHandler.reset();
             BeeNestScanner.reset();
+            // 割り出した Wishing Compass の目標はロビーごとに変わるので、ワールドが変わったら捨てる
+            WishingCompassHandler.reset();
+            // 視点の固定は庭の中だけの話なので、ワールドが変わったら解く
+            MousematHandler.reset();
+            // 割り出した害虫の居場所も、庭を出たら意味を成さない
+            PestVacuumHandler.reset();
             // 保存されていたSkyblock Equipmentを、レジストリアクセスが手に入ったこのタイミングで復元する
             EquipmentState.hydrate(handler.registryAccess());
         });
@@ -64,6 +70,10 @@ public class NetworkHandler {
             ForagingHandler.handleMessage(unformattedMsg, client);
             CorpseScanner.handleMessage(unformattedMsg, client);
             CorpseProfitHandler.handleMessage(unformattedMsg, client);
+            MousematHandler.handleMessage(unformattedMsg, client);
+            PestSpawnHandler.handleMessage(unformattedMsg, client);
+            // 来客の名前は色ごと題に出すので、色を持ったまま渡す
+            VisitorHandler.handleMessage(message, client);
             // 釣り上げの文言。短縮形に差し替えたときは、元のメッセージを出さない
             if (SeaCreatureCatchHandler.handleMessage(unformattedMsg, client)) return false;
 
