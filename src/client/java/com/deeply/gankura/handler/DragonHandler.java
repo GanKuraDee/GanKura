@@ -49,7 +49,12 @@ public class DragonHandler {
             String dragonType = m3.group(1);
             GameState.Dragon.eggState = "Hatched"; GameState.Dragon.type = dragonType; GameState.Dragon.eyes = 8; GameState.Dragon.spawnTargetTime = 0;
             if (client.level != null) {
-                GameState.Dragon.fightStartTime = client.level.getGameTime(); GameState.Dragon.fightEndTime = 0;
+                // 戦闘の長さは level.getGameTime() では測れない。
+                // この時計は TPS が落ちても 20/秒で進み続け、時刻パケットが届くたびに
+                // サーバーの値へ引き戻されるので、ラグ中は数秒ぶん飛び跳ねる。
+                // 開始と終了のどちらが跳ねた側に当たるかで DPS が跳ね上がりも落ちもするため、
+                // 時刻パケットを基点にした見積もりを使う
+                GameState.Dragon.fightStartTime = GameState.Server.estimatedTicks(client.level.getGameTime()); GameState.Dragon.fightEndTime = 0;
                 GameState.Dragon.top1Name = null; GameState.Dragon.top1Damage = 0; GameState.Dragon.top2Name = null; GameState.Dragon.top2Damage = 0; GameState.Dragon.top3Name = null; GameState.Dragon.top3Damage = 0;
             }
             // ★変更: 古い判定を削除し、新しい isAlertEnabledFor メソッドで判定
@@ -62,13 +67,14 @@ public class DragonHandler {
         Matcher m4 = ModConstants.DRAGON_DOWN_PATTERN.matcher(cleanMsg);
         if (m4.find()) {
             GameState.Dragon.eggState = "Respawning"; GameState.Dragon.spawnTargetTime = 0; GameState.Dragon.type = null; GameState.Dragon.eyes = 0;
-            if (client.level != null) GameState.Dragon.fightEndTime = client.level.getGameTime();
+            if (client.level != null) GameState.Dragon.fightEndTime = GameState.Server.estimatedTicks(client.level.getGameTime());
             GameState.Dragon.lastChatTime = System.currentTimeMillis();
             GameState.Player.isLootScanning = true; GameState.Player.hasShownDropAlert = false;
             return true;
         }
 
-        boolean isRecentKill = GameState.Dragon.fightEndTime > 0 && client.level != null && (client.level.getGameTime() - GameState.Dragon.fightEndTime < 400);
+        boolean isRecentKill = GameState.Dragon.fightEndTime > 0 && client.level != null
+                && (GameState.Server.estimatedTicks(client.level.getGameTime()) - GameState.Dragon.fightEndTime < 400);
         if (isRecentKill) {
             Matcher topMatcher = ModConstants.TOP_DAMAGER_PATTERN.matcher(cleanMsg);
             if (topMatcher.find()) {

@@ -780,6 +780,39 @@ public class ModConfig extends Config {
         public boolean highlightContestRewards = false;
 
         @Expose
+        @ConfigOption(name = "DNA Analyzer", desc = "Expands greenhouse DNA analyzer settings.")
+        @ConfigEditorAccordion(id = 116)
+        public boolean dnaFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Solver", desc = "Works out how to line the DNA up and colours\n"
+                + "the two slots to swap next.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 116)
+        public boolean solveDnaAnalyzer = false;
+
+        @Expose
+        @ConfigOption(name = "Middle Click", desc = "Sends the swaps as middle clicks, so no item\n"
+                + "is picked up and the next one can be clicked right away.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 116)
+        public boolean dnaAnalyzerMiddleClick = true;
+
+        @Expose
+        @ConfigOption(name = "Block Close Button", desc = "Ignores clicks on the close button,\n"
+                + "which sits right beside the board.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 116)
+        public boolean blockDnaAnalyzerClose = true;
+
+        @Expose
+        @ConfigOption(name = "Hide Tooltips", desc = "Hides the item tooltips over the board,\n"
+                + "so they do not cover the slots to swap.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 116)
+        public boolean hideDnaAnalyzerTooltips = true;
+
+        @Expose
         @ConfigOption(name = "Pest", desc = "Expands pest settings.")
         @ConfigEditorAccordion(id = 111)
         public boolean pestFolder = false;

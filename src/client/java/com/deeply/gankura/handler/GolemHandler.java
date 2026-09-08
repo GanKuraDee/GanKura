@@ -31,7 +31,12 @@ public class GolemHandler {
         if (ModConstants.GOLEM_RISE_PATTERN.matcher(msg).find()) {
             GameState.Golem.hasRisen = true;
             if (client.level != null) {
-                GameState.Golem.fightStartTime = client.level.getGameTime();
+                // 戦闘の長さは level.getGameTime() では測れない。
+                // この時計は TPS が落ちても 20/秒で進み続け、時刻パケットが届くたびに
+                // サーバーの値へ引き戻されるので、ラグ中は数秒ぶん飛び跳ねる。
+                // 開始と終了のどちらが跳ねた側に当たるかで DPS が跳ね上がりも落ちもするため、
+                // 時刻パケットを基点にした見積もりを使う
+                GameState.Golem.fightStartTime = GameState.Server.estimatedTicks(client.level.getGameTime());
                 GameState.Golem.fightEndTime = 0; GameState.Golem.lastFirstPlaceDamage = 0; GameState.Golem.lastZealotKills = 0;
             }
             return;
@@ -39,7 +44,7 @@ public class GolemHandler {
 
         if (ModConstants.GOLEM_DOWN_PATTERN.matcher(msg).find()) {
             if (client.level != null) {
-                GameState.Golem.fightEndTime = client.level.getGameTime();
+                GameState.Golem.fightEndTime = GameState.Server.estimatedTicks(client.level.getGameTime());
                 GameState.Player.isLootScanning = true; GameState.Player.hasShownDropAlert = false;
             }
             return;
@@ -70,7 +75,7 @@ public class GolemHandler {
     private static void processResult(Matcher matcher, Minecraft client) {
         if (client.level == null) return;
         long lastDownTime = GameState.Golem.fightEndTime;
-        long currentTime = client.level.getGameTime();
+        long currentTime = GameState.Server.estimatedTicks(client.level.getGameTime());
         if (lastDownTime == 0 || (currentTime - lastDownTime) > 400) return;
         GameState.Golem.fightEndTime = 0;
 
