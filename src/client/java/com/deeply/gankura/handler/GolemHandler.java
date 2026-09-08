@@ -130,7 +130,7 @@ public class GolemHandler {
 
                     // 落とし物の可否は行を分けるとチャットが流れるので、DPS と同じくホバーへ畳む
                     MutableComponent hoverText = Component.literal("§6§lDrops\n");
-                    hoverText.append(Component.literal(dropLine("§fTier Boost Core", lq, LQ_TIER_BOOST_CORE)));
+                    hoverText.append(Component.literal(dropLine("§6Tier Boost Core", lq, LQ_TIER_BOOST_CORE)));
                     hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §6Golem", lq, LQ_GOLEM_LEGENDARY)));
                     hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §5Golem", lq, LQ_GOLEM_EPIC)));
 

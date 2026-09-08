@@ -81,23 +81,23 @@ public final class DnaAnalyzerHandler {
     public static boolean blocksClick(int slotId) {
         return isEnabled() && refresh()
                 && slotId == CLOSE_SLOT
-                && ModConfig.INSTANCE.farming.garden.blockDnaAnalyzerClose;
+                && ModConfig.INSTANCE.farming.blockDnaAnalyzerClose;
     }
 
     /** 入れ替えを中クリック扱いにするか。持ち上げが挟まらず、続けて触れる */
     public static boolean usesMiddleClick() {
-        return isEnabled() && refresh() && ModConfig.INSTANCE.farming.garden.dnaAnalyzerMiddleClick;
+        return isEnabled() && refresh() && ModConfig.INSTANCE.farming.dnaAnalyzerMiddleClick;
     }
 
     /** その枠の説明を伏せるか。盤の上では邪魔にしかならない */
     public static boolean hidesTooltip(int slotId) {
         return isEnabled() && refresh()
                 && slotId >= FIRST_SLOT && slotId <= LAST_SLOT
-                && ModConfig.INSTANCE.farming.garden.hideDnaAnalyzerTooltips;
+                && ModConfig.INSTANCE.farming.hideDnaAnalyzerTooltips;
     }
 
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.farming.garden.solveDnaAnalyzer && GameState.Server.isSkyblock();
+        return ModConfig.INSTANCE.farming.solveDnaAnalyzer && GameState.Server.isSkyblock();
     }
 
     /**

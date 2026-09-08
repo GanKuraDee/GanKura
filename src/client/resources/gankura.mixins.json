@@ -50,6 +50,7 @@
 		"PestVacuumParticleMixin",
 		"DnaAnalyzerClickMixin",
 		"DnaAnalyzerTooltipMixin",
+		"BlockBreakParticleMixin",
 		"MouseLockMixin"
 	],
 	"injectors": {
