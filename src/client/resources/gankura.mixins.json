@@ -48,6 +48,8 @@
 		"VisitorPanelMixin",
 		"PestVacuumAttackMixin",
 		"PestVacuumParticleMixin",
+		"DnaAnalyzerClickMixin",
+		"DnaAnalyzerTooltipMixin",
 		"MouseLockMixin"
 	],
 	"injectors": {

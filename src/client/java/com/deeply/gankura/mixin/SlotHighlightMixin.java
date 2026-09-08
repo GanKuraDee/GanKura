@@ -3,6 +3,7 @@ package com.deeply.gankura.mixin;
 import com.deeply.gankura.handler.AuctionHandler;
 import com.deeply.gankura.handler.BazaarOrderHandler;
 import com.deeply.gankura.handler.CommissionHandler;
+import com.deeply.gankura.handler.DnaAnalyzerHandler;
 import com.deeply.gankura.handler.FarmingContestHandler;
 import com.deeply.gankura.handler.VisitorHandler;
 import com.deeply.gankura.util.HighlightColor;
@@ -23,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  *
  * 何色に塗るかは {@link BazaarOrderHandler} と {@link AuctionHandler}、
  * {@link CommissionHandler}、{@link VisitorHandler}、
+ * {@link DnaAnalyzerHandler}、
  * {@link FarmingContestHandler} が決める
  */
 @Mixin(AbstractContainerScreen.class)
@@ -47,6 +49,8 @@ public class SlotHighlightMixin {
             color = CommissionHandler.colorFor(slot);
         } else if (FarmingContestHandler.inMenu(title)) {
             color = FarmingContestHandler.colorFor(slot);
+        } else if (DnaAnalyzerHandler.inMenu(title)) {
+            color = DnaAnalyzerHandler.colorFor(slot);
         } else {
             // 来客の画面は題が来客の名前なので、題では見分けられない。中身から見る
             color = VisitorHandler.colorFor(slot);
