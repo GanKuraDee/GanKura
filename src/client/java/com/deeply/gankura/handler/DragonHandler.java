@@ -20,6 +20,10 @@ import java.util.regex.Matcher;
 
 public class DragonHandler {
 
+    // 落とし物ごとに要る Loot Quality
+    private static final int LQ_DRAGON_LEGENDARY = 450;
+    private static final int LQ_DRAGON_EPIC = 449;
+
     public static boolean handleMessage(String msg, Minecraft client) {
         String cleanMsg = msg.replaceAll("§[0-9a-fk-or]", "");
 
@@ -127,9 +131,10 @@ public class DragonHandler {
         int placementQuality = 10; // ダメージ1未満のデフォルト値
 
         if (myDamage >= 1) {
-            if (myPosition == 1) placementQuality = 200;
-            else if (myPosition == 2) placementQuality = 175;
-            else if (myPosition == 3) placementQuality = 150;
+            // 上位3つは Golem と値が違う(Golem は 200/175/150)
+            if (myPosition == 1) placementQuality = 300;
+            else if (myPosition == 2) placementQuality = 250;
+            else if (myPosition == 3) placementQuality = 200;
             else if (myPosition == 4) placementQuality = 125;
             else if (myPosition == 5) placementQuality = 110;
             else if (myPosition >= 6 && myPosition <= 8) placementQuality = 100;
@@ -174,15 +179,38 @@ public class DragonHandler {
                     NotificationUtils.sendSystemChat(client, msg);
                 }
                 if (ModConfig.INSTANCE.combat.theEnd.showDragonLootQualityChat) {
-                    NotificationUtils.sendSystemChat(client, Component.literal(String.format("§dYour Dragon Loot Quality: §l§o%d", lq)));
-                    String dropsMsg = String.format("§7[Lvl 1] §6Ender Dragon: %s §8| §7[Lvl 1] §5Ender Dragon: %s", (lq >= 450) ? "§a✔" : "§c✘", (lq >= 350) ? "§a✔" : "§c✘");
-                    NotificationUtils.sendSystemChat(client, Component.literal(dropsMsg));
+                    // 畳んだ中身を開かなくても済むよう、全部に届いたかどうかを値の色で示す
+                    String colour = qualityColour(lq, LQ_DRAGON_LEGENDARY, LQ_DRAGON_EPIC);
+                    MutableComponent msg = Component.literal(
+                            String.format("§dYour Dragon Loot Quality: %s§l§o%d §r", colour, lq));
+
+                    // 落とし物の可否は行を分けるとチャットが流れるので、DPS と同じくホバーへ畳む
+                    MutableComponent hoverText = Component.literal("§d§lDrops\n");
+                    hoverText.append(Component.literal(dropLine("§7[Lvl 1] §6Ender Dragon", lq, LQ_DRAGON_LEGENDARY)));
+                    hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §5Ender Dragon", lq, LQ_DRAGON_EPIC)));
+
+                    msg.append(Component.literal("§d§l§o[HOVER]")
+                            .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
+                    NotificationUtils.sendSystemChat(client, msg);
                 }
             }
         });
     }
 
     private static String formatDps(double dps) { return dps >= 1000 ? String.format("%,.1fk", dps / 1000.0) : String.format("%,.1f", dps); }
+
+    /** 落とし物すべてに届いていれば緑、1つでも欠けていれば赤 */
+    private static String qualityColour(int quality, int... required) {
+        for (int need : required) {
+            if (quality < need) return "§c";
+        }
+        return "§a";
+    }
+
+    /** 落とし物1つぶんの行。今回の Loot Quality で届いたかと、要る値を並べる */
+    private static String dropLine(String name, int quality, int required) {
+        return String.format("%s §7- %s §8(%d)", name, quality >= required ? "§a✔" : "§c✘", required);
+    }
 
     // ★追加: ドラゴンの種類に応じてアラート設定がONになっているか確認するメソッド
     private static boolean isAlertEnabledFor(String dragonType) {

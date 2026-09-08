@@ -22,6 +22,11 @@ import java.util.regex.Matcher;
 public class GolemHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("GolemHandler");
 
+    // 落とし物ごとに要る Loot Quality
+    private static final int LQ_TIER_BOOST_CORE = 250;
+    private static final int LQ_GOLEM_LEGENDARY = 235;
+    private static final int LQ_GOLEM_EPIC = 220;
+
     public static void handleMessage(String msg, Minecraft client) {
         if (ModConstants.GOLEM_SPAWN_PATTERN.matcher(msg).find()) {
             client.execute(() -> setStageToSummoned(client));
@@ -118,9 +123,20 @@ public class GolemHandler {
                     NotificationUtils.sendSystemChat(client, msg);
                 }
                 if (ModConfig.INSTANCE.combat.theEnd.showLootQualityChat) {
-                    NotificationUtils.sendSystemChat(client, Component.literal(String.format("§6Your Golem Loot Quality: §l§o%d", lq)));
-                    String dropsMsg = String.format("§6Tier Boost Core: %s §8| §7[Lvl 1] §6Golem: %s §8| §7[Lvl 1] §5Golem: %s", (lq >= 250) ? "§a✔" : "§c✘", (lq >= 235) ? "§a✔" : "§c✘", (lq >= 220) ? "§a✔" : "§c✘");
-                    NotificationUtils.sendSystemChat(client, Component.literal(dropsMsg));
+                    // 畳んだ中身を開かなくても済むよう、全部に届いたかどうかを値の色で示す
+                    String colour = qualityColour(lq, LQ_TIER_BOOST_CORE, LQ_GOLEM_LEGENDARY, LQ_GOLEM_EPIC);
+                    MutableComponent msg = Component.literal(
+                            String.format("§6Your Golem Loot Quality: %s§l§o%d §r", colour, lq));
+
+                    // 落とし物の可否は行を分けるとチャットが流れるので、DPS と同じくホバーへ畳む
+                    MutableComponent hoverText = Component.literal("§6§lDrops\n");
+                    hoverText.append(Component.literal(dropLine("§fTier Boost Core", lq, LQ_TIER_BOOST_CORE)));
+                    hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §6Golem", lq, LQ_GOLEM_LEGENDARY)));
+                    hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §5Golem", lq, LQ_GOLEM_EPIC)));
+
+                    msg.append(Component.literal("§6§l§o[HOVER]")
+                            .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
+                    NotificationUtils.sendSystemChat(client, msg);
                 }
             }
         });
@@ -138,6 +154,19 @@ public class GolemHandler {
     }
 
     private static String formatDps(double dps) { return dps >= 1000 ? String.format("%,.1fk", dps / 1000.0) : String.format("%,.1f", dps); }
+
+    /** 落とし物すべてに届いていれば緑、1つでも欠けていれば赤 */
+    private static String qualityColour(int quality, int... required) {
+        for (int need : required) {
+            if (quality < need) return "§c";
+        }
+        return "§a";
+    }
+
+    /** 落とし物1つぶんの行。今回の Loot Quality で届いたかと、要る値を並べる */
+    private static String dropLine(String name, int quality, int required) {
+        return String.format("%s §7- %s §8(%d)", name, quality >= required ? "§a✔" : "§c✘", required);
+    }
 
     public static void processTabList(List<String> lines, Minecraft client) {
         for (String line : lines) {
