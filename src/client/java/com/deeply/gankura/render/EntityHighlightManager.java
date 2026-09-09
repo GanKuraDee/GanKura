@@ -258,6 +258,8 @@ public class EntityHighlightManager {
     private static final double SKULL_DISPLAY_HALF_HEIGHT = 0.25;
     // 描かれているとみなす拡大率の下限
     private static final double DISPLAY_MIN_SCALE = 0.01;
+    // アーマースタンドの方は、バニラの拡大率が 0.0625 より下がらないので、そこより上で切る
+    private static final float STAND_MIN_SCALE = 0.1f;
     // 当たり判定のモブから、見た目を担うヘッドを探す距離(ブロック)。
     // これが見つかる当たり判定は「別のモブの一部」なので、それ自体をモブとして扱わない
     private static final double HITBOX_HEAD_RADIUS = 1.5;
@@ -2104,7 +2106,7 @@ public class EntityHighlightManager {
 
         // Scrappy に与える魚をハイライトする。Critter として使われている魚は除く。
         // Mob Visuals とは別の機能なので、線もネームプレートも出さずハイライトだけにする
-        if (isSafari && ModConfig.INSTANCE.foraging.enableSafariFishHighlight) {
+        if (isSafari && showSafariFish()) {
             for (Entity entity : client.level.entitiesForRendering()) {
                 if (!(entity instanceof AbstractFish)) continue;
                 // 透明な個体は別のモブの当たり判定。ネームタグ経由で確定しているものも同じ
@@ -2119,8 +2121,7 @@ public class EntityHighlightManager {
 
         // Rockmite Mound: Cavern Biome に隠れている Rockmite の巣。
         // Mob Visuals とは別の機能なので、ここもハイライトだけにする
-        if (isSafari && ModConfig.INSTANCE.foraging.enableRockmiteMoundHighlight
-                && inSafariCavern(client.player)) {
+        if (isSafari && showRockmiteMounds() && inSafariCavern(client.player)) {
             for (Entity entity : client.level.entitiesForRendering()) {
                 if (!(entity instanceof Display.ItemDisplay display)) continue;
                 if (!inSafariCavern(entity)) continue;
@@ -2407,6 +2408,8 @@ public class EntityHighlightManager {
         // 見た目がアーマースタンドのモブ。装備の無いものはネームタグ用の透明なスタンド
         if (entity instanceof ArmorStand stand) {
             if (stand.getCustomName() != null || !hasAnyEquipment(stand)) return null;
+            // 捕まえた後に残る抜け殻は、skull を被ったまま縮められている
+            if (!isDrawnStand(stand)) return null;
 
             // 被っている skull だけで種まで決まる。
             // Fairy Soul も名前なし・装備ありのアーマースタンドだが、skull が違うので自然に外れる
@@ -2936,7 +2939,8 @@ public class EntityHighlightManager {
     private static boolean hasHeadStandNear(Minecraft client, Entity entity) {
         AABB box = entity.getBoundingBox().inflate(HITBOX_HEAD_RADIUS);
         return !client.level.getEntitiesOfClass(ArmorStand.class, box,
-                e -> e.getCustomName() == null && !e.getItemBySlot(EquipmentSlot.HEAD).isEmpty()).isEmpty();
+                e -> e.getCustomName() == null && !e.getItemBySlot(EquipmentSlot.HEAD).isEmpty()
+                        && isDrawnStand(e)).isEmpty();
     }
 
     // プレイヤー型のモブ(Grizzly Bear や Hideyho など)の本体を探す
@@ -2950,6 +2954,43 @@ public class EntityHighlightManager {
     }
 
     // アーマースタンドが何かを装備しているか。装備が無いものはネームタグ用の透明なスタンド
+    /**
+     * 見た目を担っているアーマースタンドか。
+     *
+     * Critter Capsule で捕まえると、Hypixel は当たり判定のモブだけを消し、
+     * 見た目のアーマースタンドは縮めてその場に残す。skull は付いたままなので、
+     * これを弾かないと捕まえた場所に抜け殻が溜まっていく。
+     * Display を拡大率 0 にして残すのと同じ手口を、スタンドでやっているだけ
+     */
+    private static boolean isDrawnStand(ArmorStand stand) {
+        return stand.getScale() > STAND_MIN_SCALE;
+    }
+
+    /**
+     * Scrappy に与える魚を探すか。
+     *
+     * 魚も巣も、その Critter を捕まえるための道具でしかないので、
+     * 捕まえた後は用済みになる。設定次第でそこで打ち切る
+     */
+    private static boolean showSafariFish() {
+        ModConfig.ForagingCategory config = ModConfig.INSTANCE.foraging;
+        if (!config.enableSafariFishHighlight) return false;
+
+        return !config.hideSafariFishWhenCaptured || !captured(SafariCavern.SCRAPPY);
+    }
+
+    /** Rockmite の巣を探すか。捕まえた後は用済みになる */
+    private static boolean showRockmiteMounds() {
+        ModConfig.ForagingCategory config = ModConfig.INSTANCE.foraging;
+        if (!config.enableRockmiteMoundHighlight) return false;
+
+        return !config.hideRockmiteMoundsWhenCaptured || !captured(SafariCavern.ROCKMITE);
+    }
+
+    private static boolean captured(MobVisual critter) {
+        return GameState.CritterSafari.isCaptured(critter.plainLabel());
+    }
+
     private static boolean hasAnyEquipment(ArmorStand stand) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (!stand.getItemBySlot(slot).isEmpty()) return true;

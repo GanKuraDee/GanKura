@@ -1,6 +1,7 @@
 package com.deeply.gankura.scanner;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.render.EntityHighlightManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -87,7 +88,12 @@ public class BeeNestScanner {
 
     // 設定と現在のエリアの前提。どのバイオームにいるかは見ない
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.foraging.enableBeeNestWaypoints && GameState.Server.isSafari();
+        ModConfig.ForagingCategory config = ModConfig.INSTANCE.foraging;
+        if (!config.enableBeeNestWaypoints || !GameState.Server.isSafari()) return false;
+
+        // 巣は Honeybug を釣り出すための道具なので、捕まえた後は用済みになる
+        return !config.hideBeeNestsWhenCaptured
+                || !GameState.CritterSafari.isCaptured(MobVisual.SafariForest.HONEYBUG.plainLabel());
     }
 
     // 目印を出してよい状況か。

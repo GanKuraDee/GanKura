@@ -71,7 +71,21 @@ public interface MobVisual {
                 || target instanceof SeaCreature || target instanceof Garden) {
             return false;
         }
+        // 捕まえた後も見ていたい種は、名指しで残せるようにしてある
+        if (keptShown(target)) return false;
+
         return GameState.CritterSafari.isCaptured(target.plainLabel());
+    }
+
+    /** キャプチャ済みでも消さない種として選ばれているか */
+    private static boolean keptShown(MobVisual target) {
+        ModConfig.MobVisualsCategory config = ModConfig.INSTANCE.mobVisuals;
+
+        if (target instanceof SafariCavern cavern) return config.keepShownSafariCavern.contains(cavern);
+        if (target instanceof SafariForest forest) return config.keepShownSafariForest.contains(forest);
+        if (target instanceof SafariHaunted haunted) return config.keepShownSafariHaunted.contains(haunted);
+        if (target instanceof SafariIcy icy) return config.keepShownSafariIcy.contains(icy);
+        return false;
     }
 
     // 対象リストに載っていて、今いるエリアのモブで、かつその機能の全体トグルが入っていれば表示する

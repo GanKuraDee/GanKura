@@ -45,6 +45,9 @@ public final class AttributeCostPanel {
     // あと何枚いるか。まだ見つけていない Attribute には unlock の方が書かれる
     private static final Pattern TO_NEXT = Pattern.compile("Syphon ([\\d,]+) shards? to (?:level up|unlock)!");
     private static final Pattern TO_MAX = Pattern.compile("Syphon ([\\d,]+) shards? to max!");
+    // まだ開けていないシャードは "shards" ではなく "more" と書かれ、
+    // しかも開ける1枚を含まない数が載る。開けるぶんは別に足す
+    private static final Pattern MORE_TO_MAX = Pattern.compile("Syphon ([\\d,]+) more to max!");
 
     // 名前に乗せたときの下敷き。押せることが分かるよう、スロットと同じ明るさで敷く
     private static final int HOVER_COLOR = 0x80FFFFFF;
@@ -173,6 +176,11 @@ public final class AttributeCostPanel {
 
     public static void render(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics,
                               int mouseX, int mouseY) {
+        // 出していないうちは、控えてある場所を押されても何も起こさない。
+        // Attribute Menu を閉じた後の別の画面で、同じ場所を押しただけで
+        // Bazaar を開いてしまわないよう、描く前に必ず倒しておく
+        drawn = false;
+
         ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
         if (!config.enableAttributeMenuTweaks || !config.showAttributeCosts) return;
         if (!GameState.Server.isSkyblock()) return;
@@ -182,10 +190,7 @@ public final class AttributeCostPanel {
         ItemPrices.refreshIfStale();
 
         List<Entry> entries = entries(config.attributeCostTarget, config.attributeCostSort);
-        if (entries.isEmpty()) {
-            drawn = false;
-            return;
-        }
+        if (entries.isEmpty()) return;
 
         draw(screen, graphics, config, entries.subList(0, Math.min(entries.size(), config.attributeCostRows)),
                 mouseX, mouseY);
@@ -232,9 +237,10 @@ public final class AttributeCostPanel {
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null) return null;
 
-        Pattern needed = target == AttributeCostTarget.MAX_TIER ? TO_MAX : TO_NEXT;
         String shard = null;
-        Integer shards = null;
+        Integer toNext = null;
+        Integer toMax = null;
+        Integer moreToMax = null;
 
         for (Component line : lore.lines()) {
             String text = line.getString();
@@ -245,9 +251,25 @@ public final class AttributeCostPanel {
                 continue;
             }
 
-            Matcher count = needed.matcher(text);
-            if (count.find()) shards = number(count.group(1));
+            Matcher next = TO_NEXT.matcher(text);
+            if (next.find()) {
+                toNext = number(next.group(1));
+                continue;
+            }
+
+            Matcher max = TO_MAX.matcher(text);
+            if (max.find()) {
+                toMax = number(max.group(1));
+                continue;
+            }
+
+            Matcher more = MORE_TO_MAX.matcher(text);
+            if (more.find()) moreToMax = number(more.group(1));
         }
+
+        Integer shards = target == AttributeCostTarget.MAX_TIER
+                ? maxShards(toNext, toMax, moreToMax)
+                : toNext;
         if (shard == null || shards == null || shards <= 0) return null;
 
         String shardId = AttributeShards.idOf(shard);
@@ -257,6 +279,18 @@ public final class AttributeCostPanel {
         if (market == null) return null;
 
         return new Entry(shard, shards, market.instantBuy() * shards, market.instantSell() * shards);
+    }
+
+    /**
+     * 打ち止めまでに要る枚数。
+     *
+     * 開けてあるシャードは残り全部の枚数がそのまま載っているが、
+     * まだ開けていないものは開ける1枚を除いた数しか載らないので、そのぶんを足す
+     */
+    private static Integer maxShards(Integer toNext, Integer toMax, Integer moreToMax) {
+        if (toMax != null) return toMax;
+        if (moreToMax == null) return null;
+        return toNext == null ? moreToMax : moreToMax + toNext;
     }
 
     private static Integer number(String text) {
