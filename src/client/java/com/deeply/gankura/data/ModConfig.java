@@ -1160,7 +1160,7 @@ public class ModConfig extends Config {
         public boolean showVanguardTitle = false;
 
         @Expose
-        @ConfigOption(name = "Profit", desc = "Adds up what a corpse dropped and posts it in chat.\n"
+        @ConfigOption(name = "Profit Message", desc = "Adds up what a corpse dropped and posts it in chat.\n"
                 + "The key each corpse needs is taken off the total.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 115)
@@ -1688,41 +1688,53 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
-        @ConfigOption(name = "Hide Captured Critters", desc = "Drops critters already captured from Highlight, Tracer and Nameplate.\nThe Captured Critters HUD keeps showing them.")
-        @ConfigEditorBoolean
+        @ConfigOption(name = "Hide Captured Critters", desc = "Expands settings for dropping critters\n"
+                + "that have already been captured.")
         @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 117)
+        @ConfigEditorBoolean
+        public boolean hideCapturedFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Drops critters already captured from Highlight, Tracer and Nameplate.\nThe Captured Critters HUD keeps showing them.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 117)
         public boolean hideCapturedCritters = false;
 
         @Expose
         @ConfigOption(name = "Keep Shown", desc = "Expands the critters to leave showing\n"
                 + "even after they have been captured.")
-        @ConfigAccordionId(id = 92)
-        @ConfigEditorAccordion(id = 117)
+        @ConfigAccordionId(id = 117)
+        @ConfigEditorAccordion(id = 123)
         @ConfigEditorBoolean
         public boolean keepShownFolder = false;
 
         @Expose
-        @ConfigOption(name = "Cavern", desc = "Cavern critters Hide Captured Critters leaves alone.")
+        @ConfigOption(name = "Cavern", desc = "Cavern critters to leave showing\n"
+                + "even after they have been captured.")
         @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 117)
+        @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariCavern> keepShownSafariCavern = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Forest", desc = "Forest critters Hide Captured Critters leaves alone.")
+        @ConfigOption(name = "Forest", desc = "Forest critters to leave showing\n"
+                + "even after they have been captured.")
         @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 117)
+        @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariForest> keepShownSafariForest = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Haunted", desc = "Haunted critters Hide Captured Critters leaves alone.")
+        @ConfigOption(name = "Haunted", desc = "Haunted critters to leave showing\n"
+                + "even after they have been captured.")
         @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 117)
+        @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariHaunted> keepShownSafariHaunted = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Icy", desc = "Icy critters Hide Captured Critters leaves alone.")
+        @ConfigOption(name = "Icy", desc = "Icy critters to leave showing\n"
+                + "even after they have been captured.")
         @ConfigEditorDraggableList
-        @ConfigAccordionId(id = 117)
+        @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariIcy> keepShownSafariIcy = new ArrayList<>();
 
         @Expose
