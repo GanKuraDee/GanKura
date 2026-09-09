@@ -141,6 +141,10 @@ public class ModConfig extends Config {
         INSTANCE.mobVisuals.targetsSafariForest = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariForest, List.of());
         INSTANCE.mobVisuals.targetsSafariHaunted = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariHaunted, List.of());
         INSTANCE.mobVisuals.targetsSafariIcy = normalizeEnumList(INSTANCE.mobVisuals.targetsSafariIcy, List.of());
+        INSTANCE.mobVisuals.keepShownSafariCavern = normalizeEnumList(INSTANCE.mobVisuals.keepShownSafariCavern, List.of());
+        INSTANCE.mobVisuals.keepShownSafariForest = normalizeEnumList(INSTANCE.mobVisuals.keepShownSafariForest, List.of());
+        INSTANCE.mobVisuals.keepShownSafariHaunted = normalizeEnumList(INSTANCE.mobVisuals.keepShownSafariHaunted, List.of());
+        INSTANCE.mobVisuals.keepShownSafariIcy = normalizeEnumList(INSTANCE.mobVisuals.keepShownSafariIcy, List.of());
         INSTANCE.mobVisuals.targetsMoongladeMarsh = normalizeEnumList(INSTANCE.mobVisuals.targetsMoongladeMarsh, List.of());
         INSTANCE.mobVisuals.targetsTorrhusCanyon = normalizeEnumList(INSTANCE.mobVisuals.targetsTorrhusCanyon, List.of());
         INSTANCE.mobVisuals.targetsLotusAtoll = normalizeEnumList(INSTANCE.mobVisuals.targetsLotusAtoll, List.of());
@@ -773,7 +777,7 @@ public class ModConfig extends Config {
         public boolean showVisitorStatusHud = false;
 
         @Expose
-        @ConfigOption(name = "Required Items", desc = "Lists what the visitor is asking for beside the menu.\n"
+        @ConfigOption(name = "Required Items Panel", desc = "Lists what the visitor is asking for beside the menu.\n"
                 + "Click a name to look it up on the Bazaar.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 109)
@@ -787,17 +791,23 @@ public class ModConfig extends Config {
         public boolean highlightVisitorOffer = false;
 
         @Expose
+        @ConfigOption(name = "Title Settings", desc = "Expands title notification settings.")
+        @ConfigAccordionId(id = 109)
+        @ConfigEditorAccordion(id = 121)
+        public boolean visitorTitleFolder = false;
+
+        @Expose
         @ConfigOption(name = "Arrival Title", desc = "Shows the name in the middle of the screen\n"
                 + "when a visitor turns up at your garden.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 109)
+        @ConfigAccordionId(id = 121)
         public boolean showVisitorArrivalTitle = false;
 
         @Expose
         @ConfigOption(name = "Queue Full Title", desc = "Shows a title once the visitor queue fills up\n"
                 + "and no more will turn up until you serve some.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 109)
+        @ConfigAccordionId(id = 121)
         public boolean showVisitorQueueFullTitle = false;
 
         @Expose
@@ -825,18 +835,37 @@ public class ModConfig extends Config {
         public boolean showPestStatusHud = false;
 
         @Expose
+        @ConfigOption(name = "Title Settings", desc = "Expands title notification settings.")
+        @ConfigAccordionId(id = 111)
+        @ConfigEditorAccordion(id = 122)
+        public boolean pestTitleFolder = false;
+
+        @Expose
         @ConfigOption(name = "Spawn Title", desc = "Shows how many pests turned up and where,\n"
                 + "in the middle of the screen.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 111)
+        @ConfigAccordionId(id = 122)
         public boolean showPestSpawnTitle = false;
 
         @Expose
         @ConfigOption(name = "Max Pests Title", desc = "Shows a title once the garden is full of pests\n"
                 + "and no more will spawn until you clear some.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 111)
+        @ConfigAccordionId(id = 122)
         public boolean showMaxPestsTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Spawn Soon Title", desc = "Shows a title once the tab list says the next\n"
+                + "pests are within the seconds set below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 122)
+        public boolean showPestSoonTitle = false;
+
+        @Expose
+        @ConfigOption(name = "Warn At", desc = "Seconds left on the next pests to warn at.")
+        @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
+        @ConfigAccordionId(id = 122)
+        public int pestSoonSeconds = 5;
 
         @Expose
         @ConfigOption(name = "Vacuum", desc = "Expands vacuum settings.")
@@ -954,22 +983,64 @@ public class ModConfig extends Config {
         public boolean enableFloorDrops = false;
 
         @Expose
-        @ConfigOption(name = "Bee Nest Waypoints", desc = "Marks the bee nests in the Forest Biome.")
+        @ConfigOption(name = "Honeybug", desc = "Expands bee nest settings.")
+        @ConfigEditorAccordion(id = 118)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
+        public boolean honeybugFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Bee Nest Waypoints", desc = "Marks the bee nests in the Forest Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 118)
         public boolean enableBeeNestWaypoints = false;
+
+        @Expose
+        @ConfigOption(name = "Stop When Captured", desc = "Drops the waypoints once Honeybug has been\n"
+                + "captured, since the nests are no longer needed.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 118)
+        public boolean hideBeeNestsWhenCaptured = false;
+
+        @Expose
+        @ConfigOption(name = "Scrappy", desc = "Expands fish settings.")
+        @ConfigEditorAccordion(id = 119)
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 71)
+        public boolean scrappyFolder = false;
 
         @Expose
         @ConfigOption(name = "Fish Highlight", desc = "Highlights the fish you can feed to Scrappy.")
         @ConfigEditorBoolean
-        @ConfigAccordionId(id = 71)
+        @ConfigAccordionId(id = 119)
         public boolean enableSafariFishHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Rockmite Mound Highlight", desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
+        @ConfigOption(name = "Stop When Captured", desc = "Drops the highlight once Scrappy has been\n"
+                + "captured, since the fish are no longer needed.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 119)
+        public boolean hideSafariFishWhenCaptured = false;
+
+        @Expose
+        @ConfigOption(name = "Rockmite", desc = "Expands Rockmite Mound settings.")
+        @ConfigEditorAccordion(id = 120)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
+        public boolean rockmiteFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Mound Highlight", desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 120)
         public boolean enableRockmiteMoundHighlight = false;
+
+        @Expose
+        @ConfigOption(name = "Stop When Captured", desc = "Drops the highlight once Rockmite has been\n"
+                + "captured, since the mounds are no longer needed.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 120)
+        public boolean hideRockmiteMoundsWhenCaptured = false;
 
         @Expose
         @ConfigOption(name = "Wumpa", desc = "Expands Wumpa settings.")
@@ -1621,6 +1692,38 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 92)
         public boolean hideCapturedCritters = false;
+
+        @Expose
+        @ConfigOption(name = "Keep Shown", desc = "Expands the critters to leave showing\n"
+                + "even after they have been captured.")
+        @ConfigAccordionId(id = 92)
+        @ConfigEditorAccordion(id = 117)
+        @ConfigEditorBoolean
+        public boolean keepShownFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Cavern", desc = "Cavern critters Hide Captured Critters leaves alone.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 117)
+        public List<MobVisual.SafariCavern> keepShownSafariCavern = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Forest", desc = "Forest critters Hide Captured Critters leaves alone.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 117)
+        public List<MobVisual.SafariForest> keepShownSafariForest = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Haunted", desc = "Haunted critters Hide Captured Critters leaves alone.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 117)
+        public List<MobVisual.SafariHaunted> keepShownSafariHaunted = new ArrayList<>();
+
+        @Expose
+        @ConfigOption(name = "Icy", desc = "Icy critters Hide Captured Critters leaves alone.")
+        @ConfigEditorDraggableList
+        @ConfigAccordionId(id = 117)
+        public List<MobVisual.SafariIcy> keepShownSafariIcy = new ArrayList<>();
 
         @Expose
         @ConfigOption(name = "Cavern", desc = "Expands Cavern targets.")
