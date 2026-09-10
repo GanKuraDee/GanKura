@@ -2115,6 +2115,9 @@ public class EntityHighlightManager {
                 if (safariTarget(client, entity) != null) continue;
 
                 highlightedEntities.add(entity);
+                // 型による一括削除ができないので、毎 tick 作り直す集合へ入れる。
+                // 忘れると、対象から外した後も色の抜けたハイライトが残り続ける
+                rebuiltVisuals.add(entity);
                 customGlowColors.put(entity, SAFARI_FISH_GLOW_COLOR);
             }
         }
@@ -2130,6 +2133,7 @@ public class EntityHighlightManager {
                 if (state == null || !isRockmiteMound(state.itemStack())) continue;
 
                 highlightedEntities.add(entity);
+                rebuiltVisuals.add(entity);
                 customGlowColors.put(entity, ROCKMITE_MOUND_GLOW_COLOR);
             }
         }

@@ -33,6 +33,9 @@ public final class TierText {
 
     // ペットの名前に付いているレベル("[Lvl 91] Orchid Mantis")
     public static final Pattern PET_LEVEL = Pattern.compile("\\[Lvl (\\d+)]");
+    // Hunting Box のシャードに書かれている所持数("Owned: 72 Shards")
+    public static final Pattern SHARDS_OWNED = Pattern.compile("Owned:\\s*([\\d,]+)\\s*Shards?");
+
     // ペットのロアに出る、育ちきった印と育ち具合
     public static final String PET_MAX = "MAX LEVEL";
     public static final String PET_PROGRESS = "Progress to Level";
@@ -106,6 +109,22 @@ public final class TierText {
             if (BESTIARY_PROGRESS.matcher(text).find()) return true;
         }
         return false;
+    }
+
+    /**
+     * そのシャードを今いくつ持っているか。シャードでなければ null。
+     *
+     * Hunting Box のロアにしか書かれていないので、そのまま読む
+     */
+    public static Integer shardsOwned(ItemStack stack) {
+        ItemLore lore = lore(stack);
+        if (lore == null) return null;
+
+        for (Component line : lore.lines()) {
+            Matcher matcher = SHARDS_OWNED.matcher(line.getString());
+            if (matcher.find()) return parse(matcher.group(1));
+        }
+        return null;
     }
 
     /**
