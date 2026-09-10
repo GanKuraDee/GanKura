@@ -2486,6 +2486,48 @@ public class ModConfig extends Config {
 
         // ---- Pets (id: 104) ----
         @Expose
+        @ConfigOption(name = "Hunting Box", desc = "Expands how the Hunting Box is shown.")
+        @ConfigEditorAccordion(id = 124)
+        @ConfigEditorBoolean
+        public boolean huntingBoxFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the Hunting Box tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 124)
+        public boolean enableHuntingBoxTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Show Owned", desc = "Writes how many of each shard you hold\n"
+                + "in the corner of its slot.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 124)
+        public boolean showShardsOwned = true;
+
+        @Expose
+        @ConfigOption(name = "Value Panel", desc = "Lists what the shards on this page are worth\n"
+                + "beside the menu, with the page total.\n"
+                + "Click a name to look it up on the Bazaar.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 124)
+        public boolean showShardValues = true;
+
+        @Expose
+        @ConfigOption(name = "Value Rows", desc = "How many shards the box lists.\n"
+                + "The total still covers the whole page.")
+        @ConfigEditorSlider(minValue = 3f, maxValue = 20f, minStep = 1f)
+        @ConfigAccordionId(id = 124)
+        public int shardValueRows = 10;
+
+        @Expose
+        @ConfigOption(name = "Value Sort",
+                desc = "Which price the list is ordered by.\n"
+                        + "Clicking either heading in the box switches it too.")
+        @ConfigEditorDropdown
+        @ConfigAccordionId(id = 124)
+        public AttributeCostSort shardValueSort = AttributeCostSort.INSTANT;
+
+        @Expose
         @ConfigOption(name = "Pets", desc = "Expands how pets are shown in menus.")
         @ConfigEditorAccordion(id = 104)
         @ConfigEditorBoolean
