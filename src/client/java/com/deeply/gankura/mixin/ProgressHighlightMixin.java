@@ -2,7 +2,9 @@ package com.deeply.gankura.mixin;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.util.AttributeMenu;
 import com.deeply.gankura.util.BestiaryMenu;
+import com.deeply.gankura.util.HeartMenu;
 import com.deeply.gankura.util.HighlightColor;
 import com.deeply.gankura.util.TierText;
 import net.minecraft.client.Minecraft;
@@ -86,7 +88,7 @@ public class ProgressHighlightMixin {
         boolean hideMaxed = false;
         boolean maxed = false;
 
-        if (config.enableAttributeMenuTweaks && config.showAttributeTier) {
+        if (config.enableAttributeMenuTweaks && config.showAttributeTier && AttributeMenu.isOpen()) {
             tier = TierText.attributeTier(stack);
             hideMaxed = config.hideMaxedAttributeTier;
             maxed = TierText.isMaxed(stack);
@@ -96,6 +98,10 @@ public class ProgressHighlightMixin {
             tier = TierText.bestiaryTier(stack);
             hideMaxed = config.hideMaxedBestiaryTier;
             maxed = TierText.isMaxed(stack);
+        }
+        if (tier == null && config.enableHeartMenuTweaks && config.showHeartLevel
+                && HeartMenu.isOpen()) {
+            tier = TierText.heartLevel(stack);
         }
         if (tier == null && config.enablePetTweaks && config.showPetLevel) {
             tier = TierText.petLevel(stack);
@@ -132,14 +138,25 @@ public class ProgressHighlightMixin {
         boolean bestiary = config.enableBestiaryMenuTweaks && config.highlightBestiaryProgress
                 && BestiaryMenu.isOpen();
 
+        // "to unlock!" は Heart of the Forest など他の画面にもある文面なので、
+        // Attribute の画面を開いているときだけ見る
+        boolean attribute = config.enableAttributeMenuTweaks && config.highlightAttributeProgress
+                && AttributeMenu.isOpen();
+
         boolean activePet = config.enablePetTweaks && config.highlightActivePet;
+
+        // 入り切りは1つの行で決まるので、行を回さずにここで見る
+        if (config.enableHeartMenuTweaks && config.highlightHeartStatus && HeartMenu.isOpen()) {
+            Boolean enabled = TierText.heartEnabled(stack);
+            if (enabled != null) return enabled ? MAXED_COLOR : UNFINISHED_COLOR;
+        }
 
         for (Component line : lore.lines()) {
             String text = line.getString();
 
             if (activePet && text.contains(TierText.PET_DESPAWN)) return ACTIVE_PET_COLOR;
 
-            if (config.enableAttributeMenuTweaks && config.highlightAttributeProgress) {
+            if (attribute) {
                 if (TierText.ATTRIBUTE_LEVEL.matcher(text).find()) {
                     return text.contains(MAX_MARK) ? MAXED_COLOR : UNFINISHED_COLOR;
                 }

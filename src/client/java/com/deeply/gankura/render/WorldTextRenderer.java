@@ -7,6 +7,7 @@ import com.deeply.gankura.handler.HotspotRadarHandler;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.handler.CommissionWaypointHandler;
+import com.deeply.gankura.handler.EtherwarpHandler;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.handler.PestVacuumHandler;
 import com.deeply.gankura.handler.WishingCompassHandler;
@@ -97,6 +98,7 @@ public class WorldTextRenderer {
         renderHotspotCircles(client);
         renderWishingCompassTarget(client);
         renderPestVacuumGuess(client);
+        renderEtherwarpTarget(client);
         // 開発中の一時的な機能。配布ビルドでは何も登録されていない
         DevHooks.renderWorld(client);
     }
@@ -164,6 +166,45 @@ public class WorldTextRenderer {
      * 途中までの粒から伸ばした推し当てなので、居場所が分かるよう枠も出す。
      * 区画の真ん中を指しているときは、その区画のどこかという意味しかないので色を分ける
      */
+    // Etherwarp の行き先に使う色。飛べるかどうかで塗り分ける
+    public static final int ETHERWARP_OK_COLOR = 0xFF55FF55;
+    public static final int ETHERWARP_BLOCKED_COLOR = 0xFFFF5555;
+    public static final int ETHERWARP_TOO_FAR_COLOR = 0xFFFFFF55;
+    public static final int ETHERWARP_INTERACT_COLOR = 0xFFFFAA00;
+    private static final int ETHERWARP_FILL_ALPHA = 0x40000000;
+    private static final float ETHERWARP_LINE_WIDTH = 2.0f;
+
+    /**
+     * Etherwarp で飛べる先を囲う。
+     *
+     * 立つのは囲ったブロックの上。飛べないときも、
+     * どこを見ているのかと弾かれる理由が分かるよう、色を変えて出す
+     */
+    private static void renderEtherwarpTarget(Minecraft client) {
+        EtherwarpHandler.Target target = EtherwarpHandler.target(client);
+        if (target == null) return;
+
+        int argb = etherwarpArgb(target.result());
+        GizmoProperties box = Gizmos.cuboid(target.pos(),
+                GizmoStyle.strokeAndFill(argb, ETHERWARP_LINE_WIDTH,
+                        (argb & RGB_MASK) | ETHERWARP_FILL_ALPHA));
+        box.setAlwaysOnTop();
+
+        if (!ModConfig.INSTANCE.misc.showEtherwarpReason) return;
+        if (target.result() == EtherwarpHandler.Result.OK) return;
+
+        renderGizmoLabelAt(target.result().label(), Vec3.atCenterOf(target.pos()).add(0, 1.0, 0), argb);
+    }
+
+    private static int etherwarpArgb(EtherwarpHandler.Result result) {
+        return switch (result) {
+            case OK -> ETHERWARP_OK_COLOR;
+            case BLOCKED -> ETHERWARP_BLOCKED_COLOR;
+            case TOO_FAR -> ETHERWARP_TOO_FAR_COLOR;
+            case INTERACT -> ETHERWARP_INTERACT_COLOR;
+        };
+    }
+
     private static void renderPestVacuumGuess(Minecraft client) {
         Vec3 guess = PestVacuumHandler.guess();
         if (guess == null) return;

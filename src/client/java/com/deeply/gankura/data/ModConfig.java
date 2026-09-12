@@ -319,8 +319,8 @@ public class ModConfig extends Config {
         public boolean hideDamageSplash = false;
 
         @Expose
-        @ConfigOption(name = "Hide Fire Overlay", desc = "Hides the flames drawn at the bottom of the screen\n"
-                + "while you are burning.")
+        @ConfigOption(name = "Hide Fire Overlay",
+                desc = "Hides the flames drawn at the bottom of the screen while you are burning.")
         @ConfigEditorBoolean
         public boolean hideFireOverlay = false;
 
@@ -330,7 +330,8 @@ public class ModConfig extends Config {
         public boolean enableCocoonCatchTitle = true;
 
         @Expose
-        @ConfigOption(name = "Low Quiver Alert", desc = "Warns with a title and sound at 50 and 10 arrows left.")
+        @ConfigOption(name = "Low Quiver Alert",
+                desc = "Warns with a title and sound at 50 and 10 arrows left.")
         @ConfigEditorBoolean
         public boolean enableQuiverAlert = true;
 
@@ -376,7 +377,8 @@ public class ModConfig extends Config {
         public boolean enableDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Tracked Drops", desc = "Change which drops are scanned and shown on the loot tracker HUD.")
+        @ConfigOption(name = "Tracked Drops",
+                desc = "Change which drops are scanned and shown on the loot tracker HUD.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 7)
         public List<GolemRareDrop> trackedGolemDrops = new ArrayList<>(GolemRareDrop.defaults());
@@ -510,7 +512,8 @@ public class ModConfig extends Config {
         public boolean enableDragonDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Tracked Drops", desc = "Change which drops are scanned and shown on the loot tracker HUD.")
+        @ConfigOption(name = "Tracked Drops",
+                desc = "Change which drops are scanned and shown on the loot tracker HUD.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 15)
         public List<DragonRareDrop> trackedDragonDrops = new ArrayList<>(DragonRareDrop.defaults());
@@ -682,7 +685,8 @@ public class ModConfig extends Config {
         public boolean enableCrimsonDropAlerts = true;
 
         @Expose
-        @ConfigOption(name = "Tracked Drops", desc = "Change which drops are scanned and shown on the loot tracker HUD.")
+        @ConfigOption(name = "Tracked Drops",
+                desc = "Change which drops are scanned and shown on the loot tracker HUD.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 5)
         public List<CrimsonRareDrop> trackedCrimsonDrops = new ArrayList<>(CrimsonRareDrop.defaults());
@@ -734,29 +738,26 @@ public class ModConfig extends Config {
         public boolean dnaFolder = false;
 
         @Expose
-        @ConfigOption(name = "Solver", desc = "Works out how to line the DNA up and colours\n"
-                + "the two slots to swap next.")
+        @ConfigOption(name = "Solver",
+                desc = "Works out how to line the DNA up and colours the two slots to swap next.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 116)
         public boolean solveDnaAnalyzer = false;
 
         @Expose
-        @ConfigOption(name = "Middle Click", desc = "Sends the swaps as middle clicks, so no item\n"
-                + "is picked up and the next one can be clicked right away.")
+        @ConfigOption(name = "Middle Click", desc = "Speeds up swapping by not picking items up.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 116)
         public boolean dnaAnalyzerMiddleClick = true;
 
         @Expose
-        @ConfigOption(name = "Block Close Button", desc = "Ignores clicks on the close button,\n"
-                + "which sits right beside the board.")
+        @ConfigOption(name = "Block Close Button", desc = "Ignores clicks on the close button.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 116)
         public boolean blockDnaAnalyzerClose = true;
 
         @Expose
-        @ConfigOption(name = "Hide Tooltips", desc = "Hides the item tooltips over the board,\n"
-                + "so they do not cover the slots to swap.")
+        @ConfigOption(name = "Hide Tooltips", desc = "Hides the item tooltips over the board.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 116)
         public boolean hideDnaAnalyzerTooltips = true;
@@ -770,22 +771,24 @@ public class ModConfig extends Config {
         public boolean visitorFolder = false;
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Puts the tab list visitor lines on screen:\n"
-                + "how many are waiting and when the next one comes.")
+        @ConfigOption(name = "Status HUD",
+                desc = "Puts the tab list visitor lines on screen: how many are waiting and when the next one comes.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 109)
         public boolean showVisitorStatusHud = false;
 
         @Expose
-        @ConfigOption(name = "Required Items Panel", desc = "Lists what the visitor is asking for beside the menu.\n"
-                + "Click a name to look it up on the Bazaar.")
+        @ConfigOption(name = "Required Items Panel",
+                desc = "Lists what the visitor is asking for beside the menu. Click a name to look it up on the "
+                        + "Bazaar.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 109)
         public boolean showVisitorItems = false;
 
         @Expose
-        @ConfigOption(name = "Highlight Accept Offer", desc = "Colours Accept Offer green once you have\n"
-                + "everything the visitor wants, red while something is missing.")
+        @ConfigOption(name = "Highlight Accept Offer",
+                desc = "Colours Accept Offer green once you have everything the visitor wants, red while something "
+                        + "is missing.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 109)
         public boolean highlightVisitorOffer = false;
@@ -797,15 +800,15 @@ public class ModConfig extends Config {
         public boolean visitorTitleFolder = false;
 
         @Expose
-        @ConfigOption(name = "Arrival Title", desc = "Shows the name in the middle of the screen\n"
-                + "when a visitor turns up at your garden.")
+        @ConfigOption(name = "Arrival Title",
+                desc = "Shows the name in the middle of the screen when a visitor turns up at your garden.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 121)
         public boolean showVisitorArrivalTitle = false;
 
         @Expose
-        @ConfigOption(name = "Queue Full Title", desc = "Shows a title once the visitor queue fills up\n"
-                + "and no more will turn up until you serve some.")
+        @ConfigOption(name = "Queue Full Title",
+                desc = "Shows a title once the visitor queue fills up and no more will turn up until you serve some.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 121)
         public boolean showVisitorQueueFullTitle = false;
@@ -816,8 +819,8 @@ public class ModConfig extends Config {
         public boolean contestFolder = false;
 
         @Expose
-        @ConfigOption(name = "Highlight Rewards", desc = "Colours contests green once their reward\n"
-                + "has been claimed, yellow while it is still waiting.")
+        @ConfigOption(name = "Highlight Rewards",
+                desc = "Colours contests green once their reward has been claimed, yellow while it is still waiting.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 112)
         public boolean highlightContestRewards = false;
@@ -828,8 +831,9 @@ public class ModConfig extends Config {
         public boolean pestFolder = false;
 
         @Expose
-        @ConfigOption(name = "Status HUD", desc = "Puts the tab list pest lines on screen:\n"
-                + "when the next ones come, how many are alive and where.")
+        @ConfigOption(name = "Status HUD",
+                desc = "Puts the tab list pest lines on screen: when the next ones come, how many are alive and "
+                        + "where.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 111)
         public boolean showPestStatusHud = false;
@@ -841,22 +845,22 @@ public class ModConfig extends Config {
         public boolean pestTitleFolder = false;
 
         @Expose
-        @ConfigOption(name = "Spawn Title", desc = "Shows how many pests turned up and where,\n"
-                + "in the middle of the screen.")
+        @ConfigOption(name = "Spawn Title",
+                desc = "Shows how many pests turned up and where, in the middle of the screen.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 122)
         public boolean showPestSpawnTitle = false;
 
         @Expose
-        @ConfigOption(name = "Max Pests Title", desc = "Shows a title once the garden is full of pests\n"
-                + "and no more will spawn until you clear some.")
+        @ConfigOption(name = "Max Pests Title",
+                desc = "Shows a title once the garden is full of pests and no more will spawn until you clear some.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 122)
         public boolean showMaxPestsTitle = false;
 
         @Expose
-        @ConfigOption(name = "Spawn Soon Title", desc = "Shows a title once the tab list says the next\n"
-                + "pests are within the seconds set below.")
+        @ConfigOption(name = "Spawn Soon Title",
+                desc = "Shows a title once the tab list says the next pests are within the seconds set below.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 122)
         public boolean showPestSoonTitle = false;
@@ -874,8 +878,8 @@ public class ModConfig extends Config {
         public boolean vacuumFolder = false;
 
         @Expose
-        @ConfigOption(name = "Waypoint", desc = "Marks where the next pest is when you\n"
-                + "left-click with a vacuum, worked out from the particles it sends.")
+        @ConfigOption(name = "Waypoint",
+                desc = "Marks where the next pest is when you left-click with a vacuum.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 114)
         public boolean showPestVacuumWaypoint = false;
@@ -887,8 +891,7 @@ public class ModConfig extends Config {
         public boolean showPestVacuumTracer = true;
 
         @Expose
-        @ConfigOption(name = "Hide Particles", desc = "Hides the particles the vacuum sends\n"
-                + "while the waypoint is being worked out.")
+        @ConfigOption(name = "Hide Particles", desc = "Hides the particles the vacuum sends.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 114)
         public boolean hidePestVacuumParticles = true;
@@ -905,16 +908,17 @@ public class ModConfig extends Config {
         public boolean mousematFolder = false;
 
         @Expose
-        @ConfigOption(name = "Lock View", desc = "Stops the mouse from turning you once the mousemat\n"
-                + "has snapped you to its direction.\n"
-                + "Right-click the mousemat again to release it.")
+        @ConfigOption(name = "Lock View",
+                desc = "Stops the mouse from turning you once the mousemat has snapped you to its direction. "
+                        + "Right-click the mousemat again to release it.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 110)
         public boolean lockViewOnMousemat = false;
 
         @Expose
-        @ConfigOption(name = "Release on Teleport", desc = "Releases the view when you are teleported\n"
-                + "to another plot, where the direction no longer fits.")
+        @ConfigOption(name = "Release on Teleport",
+                desc = "Releases the view when you are teleported to another plot, where the direction no longer "
+                        + "fits.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 110)
         public boolean unlockViewOnTeleport = true;
@@ -941,7 +945,8 @@ public class ModConfig extends Config {
         public boolean enableTreeFelledTitle = false;
 
         @Expose
-        @ConfigOption(name = "Mob From Tree Title", desc = "Shows a title when a mob falls from the felled tree.")
+        @ConfigOption(name = "Mob From Tree Title",
+                desc = "Shows a title when a mob falls from the felled tree.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean enableTreeMobTitle = false;
@@ -953,13 +958,15 @@ public class ModConfig extends Config {
         public boolean torrhusCanyonFolder = false;
 
         @Expose
-        @ConfigOption(name = "Tiki Spawn Waypoints", desc = "Marks where Sneaky / Shrieky / Cheeky Tikis spawn.")
+        @ConfigOption(name = "Tiki Spawn Waypoints",
+                desc = "Marks where Sneaky / Shrieky / Cheeky Tikis spawn.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 74)
         public boolean enableTikiWaypoints = false;
 
         @Expose
-        @ConfigOption(name = "Beeheemoth Spawn Title", desc = "Shows a title with the sub-area when a Beeheemoth spawns.")
+        @ConfigOption(name = "Beeheemoth Spawn Title",
+                desc = "Shows a title with the sub-area when a Beeheemoth spawns.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 74)
         public boolean enableBeeheemothSpawnTitle = true;
@@ -971,7 +978,8 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
-        @ConfigOption(name = "Captured Critters HUD", desc = "Lists every Critter Safari critter and marks the ones already captured.")
+        @ConfigOption(name = "Captured Critters HUD",
+                desc = "Lists every Critter Safari critter and marks the ones already captured.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean showCapturedCrittersHud = true;
@@ -996,8 +1004,8 @@ public class ModConfig extends Config {
         public boolean enableBeeNestWaypoints = false;
 
         @Expose
-        @ConfigOption(name = "Stop When Captured", desc = "Drops the waypoints once Honeybug has been\n"
-                + "captured, since the nests are no longer needed.")
+        @ConfigOption(name = "Stop When Captured",
+                desc = "Drops the waypoints once Honeybug has been captured.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 118)
         public boolean hideBeeNestsWhenCaptured = false;
@@ -1016,8 +1024,7 @@ public class ModConfig extends Config {
         public boolean enableSafariFishHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Stop When Captured", desc = "Drops the highlight once Scrappy has been\n"
-                + "captured, since the fish are no longer needed.")
+        @ConfigOption(name = "Stop When Captured", desc = "Drops the highlight once Scrappy has been captured.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 119)
         public boolean hideSafariFishWhenCaptured = false;
@@ -1030,14 +1037,15 @@ public class ModConfig extends Config {
         public boolean rockmiteFolder = false;
 
         @Expose
-        @ConfigOption(name = "Mound Highlight", desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
+        @ConfigOption(name = "Mound Highlight",
+                desc = "Highlights the Rockmite Mounds hiding around the Cavern Biome.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 120)
         public boolean enableRockmiteMoundHighlight = false;
 
         @Expose
-        @ConfigOption(name = "Stop When Captured", desc = "Drops the highlight once Rockmite has been\n"
-                + "captured, since the mounds are no longer needed.")
+        @ConfigOption(name = "Stop When Captured",
+                desc = "Drops the highlight once Rockmite has been captured.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 120)
         public boolean hideRockmiteMoundsWhenCaptured = false;
@@ -1056,7 +1064,8 @@ public class ModConfig extends Config {
         public boolean enableWumpaSpawnTitle = true;
 
         @Expose
-        @ConfigOption(name = "Capsule Usage Message", desc = "Posts how many Critter Capsules the capture took.")
+        @ConfigOption(name = "Capsule Usage Message",
+                desc = "Posts how many Critter Capsules the capture took.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 72)
         public boolean enableWumpaCapsuleMessage = true;
@@ -1075,7 +1084,8 @@ public class ModConfig extends Config {
         public boolean doomspiralFolder = false;
 
         @Expose
-        @ConfigOption(name = "Capsule Usage Message", desc = "Posts how many Critter Capsules the capture took.")
+        @ConfigOption(name = "Capsule Usage Message",
+                desc = "Posts how many Critter Capsules the capture took.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 73)
         public boolean enableDoomspiralCapsuleMessage = true;
@@ -1088,7 +1098,8 @@ public class ModConfig extends Config {
         public boolean macawFolder = false;
 
         @Expose
-        @ConfigOption(name = "Spawn Title", desc = "Shows a title when two Macaws are attracted to the Birdfeeder.")
+        @ConfigOption(name = "Spawn Title",
+                desc = "Shows a title when two Macaws are attracted to the Birdfeeder.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 75)
         public boolean enableMacawSpawnTitle = true;
@@ -1098,7 +1109,8 @@ public class ModConfig extends Config {
     public static class CrystalHollowsCategory {
 
         @Expose
-        @ConfigOption(name = "Boss Corleone Spawn Title", desc = "Shows a title when Boss Corleone shows up nearby.")
+        @ConfigOption(name = "Boss Corleone Spawn Title",
+                desc = "Shows a title when Boss Corleone shows up nearby.")
         @ConfigEditorBoolean
         public boolean enableCorleoneSpawnTitle = true;
     }
@@ -1112,15 +1124,15 @@ public class ModConfig extends Config {
         public boolean commissionFolder = false;
 
         @Expose
-        @ConfigOption(name = "Highlight Completed", desc = "Paints the commissions that are done,\n"
-                + "so the ones waiting to be claimed stand out.")
+        @ConfigOption(name = "Highlight Completed",
+                desc = "Paints the commissions that are done, so the ones waiting to be claimed stand out.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 105)
         public boolean highlightCompletedCommissions = false;
 
         @Expose
-        @ConfigOption(name = "Gemstone Waypoints", desc = "Labels the gemstone spots in the Glacite Tunnels\n"
-                + "while you have that gemstone's commission.")
+        @ConfigOption(name = "Gemstone Waypoints",
+                desc = "Labels the gemstone spots in the Glacite Tunnels while you have that gemstone's commission.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 105)
         public boolean showGemstoneCommissionWaypoints = false;
@@ -1139,29 +1151,30 @@ public class ModConfig extends Config {
         public boolean corpseFolder = false;
 
         @Expose
-        @ConfigOption(name = "Waypoints", desc = "Labels the frozen corpses in the mineshaft,\n"
-                + "with the kind of key each one needs.")
+        @ConfigOption(name = "Waypoints",
+                desc = "Labels the frozen corpses in the mineshaft, with the kind of key each one needs.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 115)
         public boolean showCorpseWaypoints = false;
 
         @Expose
-        @ConfigOption(name = "Tracer", desc = "Draws a line to each frozen corpse,\n"
-                + "in the colour of the key it needs.")
+        @ConfigOption(name = "Tracer",
+                desc = "Draws a line to each frozen corpse, in the colour of the key it needs.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 115)
         public boolean showCorpseTracer = true;
 
         @Expose
-        @ConfigOption(name = "Vanguard Title", desc = "Shows a title when a Vanguard corpse\n"
-                + "turns up in the mineshaft you are in.")
+        @ConfigOption(name = "Vanguard Title",
+                desc = "Shows a title when a Vanguard corpse turns up in the mineshaft you are in.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 115)
         public boolean showVanguardTitle = false;
 
         @Expose
-        @ConfigOption(name = "Profit Message", desc = "Adds up what a corpse dropped and posts it in chat.\n"
-                + "The key each corpse needs is taken off the total.")
+        @ConfigOption(name = "Profit Message",
+                desc = "Adds up what a corpse dropped and posts it in chat. The key each corpse needs is taken off "
+                        + "the total.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 115)
         public boolean showCorpseProfit = false;
@@ -1173,8 +1186,8 @@ public class ModConfig extends Config {
         public boolean wishingCompassFolder = false;
 
         @Expose
-        @ConfigOption(name = "Solver", desc = "Works out where the wishing compass points.\n"
-                + "Use it from two spots at least 8 blocks apart.")
+        @ConfigOption(name = "Solver",
+                desc = "Works out where the wishing compass points. Use it from two spots at least 8 blocks apart.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 108)
         public boolean solveWishingCompass = false;
@@ -1191,20 +1204,35 @@ public class ModConfig extends Config {
     // ==========================================
     public static class FishingCategory {
         @Expose
-        @ConfigOption(name = "Shorten Catch Message", desc = "Replaces the long sea creature catch message\n"
-                + "with a short one.")
+        @ConfigOption(name = "HUD Settings", desc = "Expands the HUDs drawn while fishing.")
+        @ConfigEditorAccordion(id = 127)
         @ConfigEditorBoolean
-        public boolean shortenSeaCreatureMessage = false;
+        public boolean fishingHudFolder = false;
 
         @Expose
         @ConfigOption(name = "Bite Countdown HUD", desc = "Shows how long until something bites while fishing.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 127)
         public boolean showBiteCountdownHud = false;
 
         @Expose
         @ConfigOption(name = "Bait HUD", desc = "Shows the bait on the rod and how much is left.")
         @ConfigEditorBoolean
+        @ConfigAccordionId(id = 127)
         public boolean showBaitHud = false;
+
+        @Expose
+        @ConfigOption(name = "Chat Settings", desc = "Expands chat messages.")
+        @ConfigEditorAccordion(id = 128)
+        @ConfigEditorBoolean
+        public boolean fishingChatFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Shorten Catch Message",
+                desc = "Replaces the long sea creature catch message with a short one.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 128)
+        public boolean shortenSeaCreatureMessage = false;
 
         @Expose
         @ConfigOption(name = "Low Bait Alert", desc = "Expands low bait alert settings.")
@@ -1237,8 +1265,8 @@ public class ModConfig extends Config {
         public boolean showCastTimer = false;
 
         @Expose
-        @ConfigOption(name = "Start on Liquid Touch", desc = "Starts counting when the bobber lands,\n"
-                + "instead of when it is cast.")
+        @ConfigOption(name = "Start on Liquid Touch",
+                desc = "Starts counting when the bobber lands, instead of when it is cast.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 57)
         public boolean castTimerOnLiquidTouch = true;
@@ -1257,8 +1285,8 @@ public class ModConfig extends Config {
         public boolean hotspotGuessFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Reads the Hotspot Radar trail and marks where\n"
-                + "the hotspot should be.")
+        @ConfigOption(name = "Enable",
+                desc = "Reads the Hotspot Radar trail and marks where the hotspot should be.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 96)
         public boolean showHotspotGuess = false;
@@ -1270,8 +1298,8 @@ public class ModConfig extends Config {
         public boolean showHotspotTracer = false;
 
         @Expose
-        @ConfigOption(name = "Gone Title", desc = "Shows a title when the hotspot you are fishing in\n"
-                + "disappears.")
+        @ConfigOption(name = "Gone Title",
+                desc = "Shows a title when the hotspot you are fishing in disappears.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 100)
         public boolean showHotspotGoneTitle = false;
@@ -1296,17 +1324,17 @@ public class ModConfig extends Config {
         public boolean hideHotspotParticles = true;
 
         @Expose
-        @ConfigOption(name = "Found Alert", desc = "Expands what to do when a hotspot with one of\n"
-                + "the perks below shows up.")
+        @ConfigOption(name = "Found Alert",
+                desc = "Expands what to do when a hotspot with one of the perks below shows up.")
         @ConfigEditorAccordion(id = 95)
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 100)
         public boolean hotspotFoundFolder = false;
 
         @Expose
-        @ConfigOption(name = "Perks", desc = "Hotspot perks worth being told about.\n"
-                + "§eNothing is picked to start with, so the alert stays quiet\n"
-                + "§euntil you add the perks you care about.")
+        @ConfigOption(name = "Perks",
+                desc = "Hotspot perks worth being told about.\n§eNothing is picked to start with, so the alert stays "
+                        + "quiet\n§euntil you add the perks you care about.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 95)
         public List<HotspotPerk> sharedHotspotPerks = new ArrayList<>();
@@ -1342,8 +1370,8 @@ public class ModConfig extends Config {
         public int hotspotFoundSeconds = 60;
 
         @Expose
-        @ConfigOption(name = "Share", desc = "Posts the coordinates in chat with a button\n"
-                + "that sends them to the channel below.")
+        @ConfigOption(name = "Share",
+                desc = "Posts the coordinates in chat with a button that sends them to the channel below.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 95)
         public boolean shareHotspot = false;
@@ -1385,8 +1413,8 @@ public class ModConfig extends Config {
         public boolean goldenFishFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Tracks the Golden Fish on the Crimson Isle.\n"
-                + "Everything below needs this on.")
+        @ConfigOption(name = "Enable",
+                desc = "Tracks the Golden Fish on the Crimson Isle. Everything below needs this on.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 97)
         public boolean showGoldenFishTimer = false;
@@ -1404,8 +1432,8 @@ public class ModConfig extends Config {
         public boolean tracerGoldenFish = true;
 
         @Expose
-        @ConfigOption(name = "Throw Rod Warning", desc = "Warns before the spawn window is lost\n"
-                + "because the rod has not been thrown.")
+        @ConfigOption(name = "Throw Rod Warning",
+                desc = "Warns before the spawn window is lost because the rod has not been thrown.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 97)
         public boolean warnGoldenFishRod = true;
@@ -1417,8 +1445,7 @@ public class ModConfig extends Config {
         public int goldenFishRodWarningSeconds = 20;
 
         @Expose
-        @ConfigOption(name = "Goldfin Shard Level", desc = "Cuts 30 seconds off the spawn window per level.\n"
-                + "Read from the Attribute Menu when it is opened.")
+        @ConfigOption(name = "Goldfin Shard Level", desc = "Cuts 30 seconds off the spawn window per level.")
         @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 1f)
         @ConfigAccordionId(id = 97)
         public int goldfinShardLevel = 0;
@@ -1445,7 +1472,8 @@ public class ModConfig extends Config {
         public boolean enableTracer = true;
 
         @Expose
-        @ConfigOption(name = "Tracer Target", desc = "Nearest: only the closest mob of each kind.\nAll: every mob found.")
+        @ConfigOption(name = "Tracer Target",
+                desc = "Nearest: only the closest mob of each kind. All: every mob found.")
         @ConfigEditorDropdown
         public TracerMode tracerMode = TracerMode.NEAREST;
 
@@ -1470,7 +1498,9 @@ public class ModConfig extends Config {
         public boolean showNameplateHealth = true;
 
         @Expose
-        @ConfigOption(name = "Nameplate Capsule Count", desc = "Shows how many Critter Capsules have been thrown, under the mob's name.\nOnly Wumpa and Doomspiral have this.")
+        @ConfigOption(name = "Nameplate Capsule Count",
+                desc = "Shows how many Critter Capsules have been thrown, under the mob's name. Only Wumpa and "
+                        + "Doomspiral have this.")
         @ConfigEditorBoolean
         public boolean showNameplateCapsule = true;
 
@@ -1688,51 +1718,52 @@ public class ModConfig extends Config {
         public boolean critterSafariFolder = false;
 
         @Expose
-        @ConfigOption(name = "Hide Captured Critters", desc = "Expands settings for dropping critters\n"
-                + "that have already been captured.")
+        @ConfigOption(name = "Hide Captured Critters",
+                desc = "Expands settings for dropping critters that have already been captured.")
         @ConfigAccordionId(id = 92)
         @ConfigEditorAccordion(id = 117)
         @ConfigEditorBoolean
         public boolean hideCapturedFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Drops critters already captured from Highlight, Tracer and Nameplate.\nThe Captured Critters HUD keeps showing them.")
+        @ConfigOption(name = "Enable",
+                desc = "Drops critters already captured from Highlight, Tracer and Nameplate. The Captured Critters "
+                        + "HUD keeps showing them.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 117)
         public boolean hideCapturedCritters = false;
 
         @Expose
-        @ConfigOption(name = "Keep Shown", desc = "Expands the critters to leave showing\n"
-                + "even after they have been captured.")
+        @ConfigOption(name = "Keep Shown",
+                desc = "Expands the critters to leave showing even after they have been captured.")
         @ConfigAccordionId(id = 117)
         @ConfigEditorAccordion(id = 123)
         @ConfigEditorBoolean
         public boolean keepShownFolder = false;
 
         @Expose
-        @ConfigOption(name = "Cavern", desc = "Cavern critters to leave showing\n"
-                + "even after they have been captured.")
+        @ConfigOption(name = "Cavern",
+                desc = "Cavern critters to leave showing even after they have been captured.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariCavern> keepShownSafariCavern = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Forest", desc = "Forest critters to leave showing\n"
-                + "even after they have been captured.")
+        @ConfigOption(name = "Forest",
+                desc = "Forest critters to leave showing even after they have been captured.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariForest> keepShownSafariForest = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Haunted", desc = "Haunted critters to leave showing\n"
-                + "even after they have been captured.")
+        @ConfigOption(name = "Haunted",
+                desc = "Haunted critters to leave showing even after they have been captured.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariHaunted> keepShownSafariHaunted = new ArrayList<>();
 
         @Expose
-        @ConfigOption(name = "Icy", desc = "Icy critters to leave showing\n"
-                + "even after they have been captured.")
+        @ConfigOption(name = "Icy", desc = "Icy critters to leave showing even after they have been captured.")
         @ConfigEditorDraggableList
         @ConfigAccordionId(id = 123)
         public List<MobVisual.SafariIcy> keepShownSafariIcy = new ArrayList<>();
@@ -1834,14 +1865,15 @@ public class ModConfig extends Config {
         public transient Runnable disableAllSafariIcy = () -> targetsSafariIcy.clear();
 
         @Expose
-        @ConfigOption(name = "Sea Creatures", desc = "Expands Sea Creature targets.\n"
-                + "§eLegendary and Mythic tiers, plus the Special ones.")
+        @ConfigOption(name = "Sea Creatures",
+                desc = "Expands Sea Creature targets.\n§eLegendary and Mythic tiers, plus the Special ones.")
         @ConfigEditorAccordion(id = 94)
         @ConfigEditorBoolean
         public boolean seaCreatureFolder = false;
 
         @Expose
-        @ConfigOption(name = "Spawn Title", desc = "Shows a title with the name when a listed Sea Creature is found.")
+        @ConfigOption(name = "Spawn Title",
+                desc = "Shows a title with the name when a listed Sea Creature is found.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 94)
         public boolean enableSeaCreatureTitle = true;
@@ -1941,6 +1973,31 @@ public class ModConfig extends Config {
     public static class MiscCategory {
 
         @Expose
+        @ConfigOption(name = "Etherwarp", desc = "Expands Etherwarp settings.")
+        @ConfigEditorAccordion(id = 125)
+        @ConfigEditorBoolean
+        public boolean etherwarpFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Target",
+                desc = "Outlines the block Etherwarp would take you on top of.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 125)
+        public boolean showEtherwarpTarget = false;
+
+        @Expose
+        @ConfigOption(name = "Only While Sneaking", desc = "Only draws it while you are sneaking.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 125)
+        public boolean etherwarpOnlySneaking = true;
+
+        @Expose
+        @ConfigOption(name = "Show Reason", desc = "Names why a warp would be refused.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 125)
+        public boolean showEtherwarpReason = true;
+
+        @Expose
         @ConfigOption(name = "Server Reboot Alert", desc = "Warns of lobby restart.")
         @ConfigEditorBoolean
         public boolean enableRebootAlert = false;
@@ -1951,16 +2008,22 @@ public class ModConfig extends Config {
         public boolean enableWarpQueue = false;
 
         @Expose
-        @ConfigOption(name = "Ability Menu Fix", desc = "Stops an item swap from closing a menu an ability just opened.\n"
-                + "The swap is sent once the menu closes.")
+        @ConfigOption(name = "Ability Menu Fix",
+                desc = "Stops an item swap from closing a menu an ability just opened.")
         @ConfigEditorBoolean
         public boolean keepAbilityMenuOpen = false;
 
         @Expose
-        @ConfigOption(name = "Hide Block Break Particles", desc = "Hides the burst of fragments thrown out\n"
-                + "when a block is broken. The sound is left alone.")
+        @ConfigOption(name = "Hide Block Break Particles",
+                desc = "Hides the fragments thrown out when a block is broken.")
         @ConfigEditorBoolean
         public boolean hideBlockBreakParticles = false;
+
+        @Expose
+        @ConfigOption(name = "Ignore Armor Stand Clicks",
+                desc = "Lets rods and abilities fire with a hologram in the way.")
+        @ConfigEditorBoolean
+        public boolean ignoreArmorStandClicks = false;
     }
 
     // どの場面でも出しっぱなしにする HUD
@@ -2047,9 +2110,9 @@ public class ModConfig extends Config {
         public boolean showArmorStackHud = false;
 
         @Expose
-        @ConfigOption(name = "Ferocity HUD", desc = "Shows ferocity. Hidden while it cannot be read.\n"
-                + "§eNeeds the Ferocity Stats Widget.\n"
-                + "§e(/widget -> Stats Widget -> Enable Ferocity)")
+        @ConfigOption(name = "Ferocity HUD",
+                desc = "Shows ferocity. Hidden while it cannot be read.\n§eNeeds the Ferocity Stats "
+                        + "Widget.\n§e(/widget -> Stats Widget -> Enable Ferocity)")
         @ConfigEditorBoolean
         public boolean showFerocityHud = false;
 
@@ -2123,6 +2186,12 @@ public class ModConfig extends Config {
                 desc = "How solid the coloured slot highlights are drawn behind the items.")
         @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 5f)
         public int highlightOpacity = 50;
+
+        @Expose
+        @ConfigOption(name = "Search Input Screen",
+                desc = "Replaces the sign used by every search box with a text box.")
+        @ConfigEditorBoolean
+        public boolean enableSearchInputScreen = true;
 
         // ---- Better Inventory (id: 67) ----
         @Expose
@@ -2199,7 +2268,8 @@ public class ModConfig extends Config {
         public boolean fitTabColumns = true;
 
         @Expose
-        @ConfigOption(name = "Shrink To Fit", desc = "Scales the whole list down when it is wider than the screen.")
+        @ConfigOption(name = "Shrink To Fit",
+                desc = "Scales the whole list down when it is wider than the screen.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 66)
         public boolean shrinkTabList = true;
@@ -2212,7 +2282,8 @@ public class ModConfig extends Config {
         public boolean tooltipPositionFolder = false;
 
         @Expose
-        @ConfigOption(name = "Enable", desc = "Turns on the tooltip tweaks below, Enchant and Item Price included.")
+        @ConfigOption(name = "Enable",
+                desc = "Turns on the tooltip tweaks below, Enchant and Item Price included.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 65)
         public boolean enableItemTooltipTweaks = false;
@@ -2314,8 +2385,7 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Craft Cost",
-                desc = "Shows what the materials of one craft cost.\n"
-                        + "Bazaar materials are counted both ways: buying them now, and waiting on a buy order.")
+                desc = "Shows what the materials of one craft cost, buying them now and by order.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 103)
         public boolean showCraftCost = true;
@@ -2348,16 +2418,15 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Order Helper",
-                desc = "Marks your own Bazaar orders.\n"
-                        + "Yellow when someone outbid you, green when the order is filled.")
+                desc = "Marks your own Bazaar orders. Yellow when someone outbid you, green when the order is "
+                        + "filled.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean highlightBazaarOrders = true;
 
         @Expose
         @ConfigOption(name = "Manage Auctions",
-                desc = "Marks your own auctions.\n"
-                        + "Green when sold, red when expired.")
+                desc = "Marks your own auctions. Green when sold, red when expired.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean highlightOwnAuctions = true;
@@ -2368,13 +2437,6 @@ public class ModConfig extends Config {
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 71)
         public boolean highlightUndercutAuctions = true;
-
-        @Expose
-        @ConfigOption(name = "Search Input Screen",
-                desc = "Replaces the sign used by Bazaar and Auction searches with a text box.")
-        @ConfigEditorBoolean
-        @ConfigAccordionId(id = 71)
-        public boolean enableSearchInputScreen = true;
 
         // ---- Attributes (id: 70) ----
         @Expose
@@ -2397,8 +2459,7 @@ public class ModConfig extends Config {
         public boolean enableAttributeTierNumbers = true;
 
         @Expose
-        @ConfigOption(name = "Highlight Progress",
-                desc = "Tints maxed attributes green and the rest red.")
+        @ConfigOption(name = "Highlight Progress", desc = "Tints maxed attributes green and the rest red.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean highlightAttributeProgress = true;
@@ -2417,24 +2478,22 @@ public class ModConfig extends Config {
 
         @Expose
         @ConfigOption(name = "Shard Cost Panel",
-                desc = "Lists what the shards for the unfinished attributes cost on the Bazaar,\n"
-                        + "cheapest first, in a box beside the Attribute Menu.")
+                desc = "Lists what the shards for the unfinished attributes cost, cheapest first, beside the menu.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 70)
         public boolean showAttributeCosts = true;
 
         @Expose
         @ConfigOption(name = "Cost Target",
-                desc = "Whether to price the next tier or all the way to max.\n"
-                        + "Clicking Next or Max in the box switches it too.")
+                desc = "Whether to price the next tier or all the way to max. Clicking Next or Max in the box "
+                        + "switches it too.")
         @ConfigEditorDropdown
         @ConfigAccordionId(id = 70)
         public AttributeCostTarget attributeCostTarget = AttributeCostTarget.NEXT_TIER;
 
         @Expose
         @ConfigOption(name = "Cost Sort",
-                desc = "Which price the list is ordered by.\n"
-                        + "Clicking either heading in the box switches it too.")
+                desc = "Which price the list is ordered by. Clicking either heading in the box switches it too.")
         @ConfigEditorDropdown
         @ConfigAccordionId(id = 70)
         public AttributeCostSort attributeCostSort = AttributeCostSort.INSTANT;
@@ -2498,34 +2557,60 @@ public class ModConfig extends Config {
         public boolean enableHuntingBoxTweaks = false;
 
         @Expose
-        @ConfigOption(name = "Show Owned", desc = "Writes how many of each shard you hold\n"
-                + "in the corner of its slot.")
+        @ConfigOption(name = "Show Owned",
+                desc = "Writes how many of each shard you hold in the corner of its slot.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 124)
         public boolean showShardsOwned = true;
 
         @Expose
-        @ConfigOption(name = "Value Panel", desc = "Lists what the shards on this page are worth\n"
-                + "beside the menu, with the page total.\n"
-                + "Click a name to look it up on the Bazaar.")
+        @ConfigOption(name = "Value Panel",
+                desc = "Lists what the shards on this page are worth, with the page total. Click a name to look it "
+                        + "up on the Bazaar.")
         @ConfigEditorBoolean
         @ConfigAccordionId(id = 124)
         public boolean showShardValues = true;
 
         @Expose
-        @ConfigOption(name = "Value Rows", desc = "How many shards the box lists.\n"
-                + "The total still covers the whole page.")
+        @ConfigOption(name = "Value Rows",
+                desc = "How many shards the box lists. The total still covers the whole page.")
         @ConfigEditorSlider(minValue = 3f, maxValue = 20f, minStep = 1f)
         @ConfigAccordionId(id = 124)
         public int shardValueRows = 10;
 
         @Expose
         @ConfigOption(name = "Value Sort",
-                desc = "Which price the list is ordered by.\n"
-                        + "Clicking either heading in the box switches it too.")
+                desc = "Which price the list is ordered by. Clicking either heading in the box switches it too.")
         @ConfigEditorDropdown
         @ConfigAccordionId(id = 124)
         public AttributeCostSort shardValueSort = AttributeCostSort.INSTANT;
+
+        @Expose
+        @ConfigOption(name = "Heart of the Forest / Mountain",
+                desc = "Expands how the Heart of the Forest and Heart of the Mountain menus are shown.")
+        @ConfigEditorAccordion(id = 126)
+        @ConfigEditorBoolean
+        public boolean heartFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the tweaks below for both menus.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 126)
+        public boolean enableHeartMenuTweaks = false;
+
+        @Expose
+        @ConfigOption(name = "Highlight Status",
+                desc = "Tints enabled perks green and disabled ones red. Perks you have not unlocked are left alone.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 126)
+        public boolean highlightHeartStatus = true;
+
+        @Expose
+        @ConfigOption(name = "Show Level",
+                desc = "Writes the current level in the corner of every perk that has one.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 126)
+        public boolean showHeartLevel = true;
 
         @Expose
         @ConfigOption(name = "Pets", desc = "Expands how pets are shown in menus.")

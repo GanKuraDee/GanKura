@@ -53,6 +53,7 @@
 		"BlockBreakParticleMixin",
 		"HuntingBoxCountMixin",
 		"HuntingBoxPanelMixin",
+		"ArmorStandInteractMixin",
 		"MouseLockMixin"
 	],
 	"injectors": {
