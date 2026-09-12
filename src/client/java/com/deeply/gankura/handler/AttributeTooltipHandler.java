@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
+import com.deeply.gankura.util.AttributeMenu;
 import com.deeply.gankura.util.TooltipText;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.network.chat.Component;
@@ -36,6 +37,8 @@ public final class AttributeTooltipHandler {
             ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
             if (!config.enableAttributeMenuTweaks || !config.enableAttributeTierNumbers) return;
             if (!GameState.Server.isSkyblock() || lines.isEmpty()) return;
+            // "to unlock!" は他の画面にもある文面なので、Attribute の画面でだけ足す
+            if (!AttributeMenu.isOpen()) return;
 
             Component name = lines.get(0);
             String level = findLevel(lines);

@@ -55,6 +55,25 @@ public final class SkyblockItemId {
         return info(stack).pet();
     }
 
+    /** その属性が書かれているか。Etherwarp の融合のように、値でなく有無で効くものに使う */
+    public static boolean hasAttribute(ItemStack stack, String key) {
+        CompoundTag extra = extras(stack);
+        return extra != null && extra.contains(key);
+    }
+
+    /** アイテムに書かれている数の属性。書かれていなければ 0 */
+    public static int attribute(ItemStack stack, String key) {
+        CompoundTag extra = extras(stack);
+        return extra == null ? 0 : extra.getIntOr(key, 0);
+    }
+
+    private static CompoundTag extras(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return null;
+
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        return data == null ? null : attributes(data.copyTag());
+    }
+
     private static Info info(ItemStack stack) {
         if (stack == lastStack) return lastInfo;
 
