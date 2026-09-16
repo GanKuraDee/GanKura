@@ -3,6 +3,7 @@ package com.deeply.gankura.mixin;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.EntityHitResult;
@@ -23,7 +24,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * 向こうにあるチェストやブロックにも手が届かない。
  *
  * そこで右クリックを処理する間だけ、照準をブロック側へ引き直す。
- * 元に戻すので、殴る相手や十字カーソルの見え方は変わらない
+ * 元に戻すので、殴る相手や十字カーソルの見え方は変わらない。
+ *
+ * 外すのは文字を出すためだけのスタンドに限る。
+ * Century Cake のように、装備した品を見せて右クリックを受けるスタンドもある
  */
 @Mixin(Minecraft.class)
 public class ArmorStandInteractMixin {
@@ -44,13 +48,28 @@ public class ArmorStandInteractMixin {
         if (player == null) return;
         if (!(client.hitResult instanceof EntityHitResult hit)) return;
         if (!(hit.getEntity() instanceof ArmorStand stand)) return;
-        // 見えているアーマースタンドは飾りや NPC として置かれていることがある。
-        // 邪魔をしているのは目に映らないものだけなので、そちらだけ外す
-        if (!stand.isInvisible()) return;
+        if (!gankura$isHologram(stand)) return;
 
         gankura$heldHitResult = client.hitResult;
         // 液体は素通しにする。バニラがブロックを掴むときと同じ引き方
         client.hitResult = player.pick(player.blockInteractionRange(), 1.0f, false);
+    }
+
+    /**
+     * 文字を出すためだけに置かれたアーマースタンドか。
+     *
+     * ホログラムもダメージ表示も、透明で何も装備していない。
+     * Century Cake のように品を被せて見せているスタンドは、
+     * それ自体が右クリックの相手なので触らせる
+     */
+    @Unique
+    private static boolean gankura$isHologram(ArmorStand stand) {
+        if (!stand.isInvisible()) return false;
+
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (!stand.getItemBySlot(slot).isEmpty()) return false;
+        }
+        return true;
     }
 
     // startUseItem は途中でも抜けるので、どの出口でも必ず戻す
