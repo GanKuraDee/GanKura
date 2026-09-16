@@ -43,7 +43,10 @@ public class ArmorStandInteractMixin {
         LocalPlayer player = client.player;
         if (player == null) return;
         if (!(client.hitResult instanceof EntityHitResult hit)) return;
-        if (!(hit.getEntity() instanceof ArmorStand)) return;
+        if (!(hit.getEntity() instanceof ArmorStand stand)) return;
+        // 見えているアーマースタンドは飾りや NPC として置かれていることがある。
+        // 邪魔をしているのは目に映らないものだけなので、そちらだけ外す
+        if (!stand.isInvisible()) return;
 
         gankura$heldHitResult = client.hitResult;
         // 液体は素通しにする。バニラがブロックを掴むときと同じ引き方

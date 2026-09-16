@@ -2613,6 +2613,31 @@ public class ModConfig extends Config {
         public boolean showHeartLevel = true;
 
         @Expose
+        @ConfigOption(name = "Enchanted Book", desc = "Expands how enchanted books are shown in menus.")
+        @ConfigEditorAccordion(id = 129)
+        @ConfigEditorBoolean
+        public boolean enchantedBookFolder = false;
+
+        @Expose
+        @ConfigOption(name = "Enable", desc = "Turns on the enchanted book tweaks below.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 129)
+        public boolean enableEnchantedBookSlots = false;
+
+        @Expose
+        @ConfigOption(name = "Show Name",
+                desc = "Writes the enchantment's initials along the top of the slot.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 129)
+        public boolean showEnchantedBookName = true;
+
+        @Expose
+        @ConfigOption(name = "Show Tier", desc = "Writes the level in the corner of the slot.")
+        @ConfigEditorBoolean
+        @ConfigAccordionId(id = 129)
+        public boolean showEnchantedBookTier = true;
+
+        @Expose
         @ConfigOption(name = "Pets", desc = "Expands how pets are shown in menus.")
         @ConfigEditorAccordion(id = 104)
         @ConfigEditorBoolean
