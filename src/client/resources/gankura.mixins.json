@@ -51,6 +51,7 @@
 		"DnaAnalyzerClickMixin",
 		"DnaAnalyzerTooltipMixin",
 		"BlockBreakParticleMixin",
+		"EnchantedBookSlotMixin",
 		"HuntingBoxCountMixin",
 		"HuntingBoxPanelMixin",
 		"ArmorStandInteractMixin",
