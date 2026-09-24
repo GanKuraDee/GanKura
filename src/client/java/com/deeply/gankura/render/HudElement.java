@@ -102,6 +102,17 @@ public abstract class HudElement {
         return (int)((hasMeasured() ? measuredBottom - measuredTop : height) * scale);
     }
 
+    /**
+     * タブリストのウィジェットが切られていて読めないときの案内。2行ぶん描く。
+     * 何も出さずに黙っていると HUD の故障に見えるので、出し方まで書く
+     */
+    protected void missingWidget(GuiGraphicsExtractor graphics, Font font, int y, String widget, String howTo) {
+        text(graphics, font, "§cMissing " + widget + " Widget!", 0, y, 0xFFFFFFFF, true);
+        text(graphics, font, "§7(" + howTo + ")", 0, y + MISSING_LINE_HEIGHT, 0xFFFFFFFF, true);
+    }
+
+    private static final int MISSING_LINE_HEIGHT = 12;
+
     // 各HUDはこのメソッド経由で文字を描く。描画と同時に範囲を記録する
     protected void text(GuiGraphicsExtractor graphics, Font font, String str, int x, int y, int color, boolean shadow) {
         graphics.text(font, str, x, y, color, shadow);

@@ -60,6 +60,7 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - TPS HUD
   - Armor Stack HUD
   - Ferocity HUD
+  - Soulflow HUD
   - Quiver HUD
   - Hide Damage Splash
   - Hide Fire Overlay
@@ -75,6 +76,7 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
   - Arrow Poison Indicator
   - Server Reboot Alert
   - Low Quiver Alert
+  - Low Soulflow Alert
   - Warp Cooldown Queue
   - Keep Cursor Position
   - Held Item Size

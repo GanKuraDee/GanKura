@@ -10,7 +10,6 @@ import com.deeply.gankura.data.MobVisual.CrimsonIsle;
 import com.deeply.gankura.data.MobVisual.CrystalHollows;
 import com.deeply.gankura.data.MobVisual.GlaciteMineshaft;
 import com.deeply.gankura.data.MobVisual.Garden;
-import com.deeply.gankura.handler.CorleoneHandler;
 import com.deeply.gankura.handler.GoldenFishHandler;
 // 26.2: EntityType の定数は EntityTypes へ移動
 import net.minecraft.world.entity.EntityTypes;
@@ -1150,9 +1149,8 @@ public class EntityHighlightManager {
         boolean scanGardenPests = GameState.Server.isGarden()
                 && GARDEN_PEST_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean isCrystalHollows = GameState.Server.isCrystalHollows();
-        // Boss Corleone の存在判定はスポーン通知にも使うため、
-        // Mob Visuals で対象から外していても Crystal Hollows にいる間は常に走らせる
-        boolean scanCrystalNamed = isCrystalHollows;
+        boolean scanCrystalNamed = isCrystalHollows
+                && CRYSTAL_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanCrimsonNamed = isCrimsonIsle
                 && CRIMSON_NAMED_TARGETS.stream().anyMatch(MobVisual::anyEnabled);
         boolean scanMarshNamed = GameState.Server.isMoongladeMarsh()
@@ -1204,13 +1202,9 @@ public class EntityHighlightManager {
             for (CrimsonBossEntry boss : CRIMSON_BOSSES) boss.setIsDetected().accept(false);
         }
 
-        if (!isCrystalHollows) CorleoneHandler.reset();
-
         if (!scanGolem && !scanBroodmother && !scanArachne && !scanDragon && !scanCrimsonBosses && !scanMagmaGlare && !scanAshfangFollowers && !scanWumpa && !scanDoomspiral && !scanShulker && !scanAreaAnimals && !scanCanyonBees && !scanInvisibug && !scanCanyonHeads && !scanCanyonNamed && !scanMarshNamed && !scanCrimsonNamed && !scanCrystalNamed && !scanMineshaftNamed && !scanSafariTypes && !scanSafariNamed && !scanSeaCreatures && !scanSeaCreatureTypes && !scanSeaCreaturePlayers && !scanGardenPests) return;
 
         boolean[] bossFound = new boolean[CRIMSON_BOSSES.size()];
-        // Boss Corleone を見つけたか。ネームタグ経由とプレイヤー名照合のどちらで見つけても立てる
-        boolean corleoneFound = false;
         boolean[] followerFound = new boolean[ASHFANG_FOLLOWERS.size()];
 
         // Ashfang: 本体は2体のBlazeで構成される。ネームタグに頼らず、スポーン地点周辺のBlazeで判定する。
@@ -1379,8 +1373,6 @@ public class EntityHighlightManager {
                 for (MobVisual target : CRYSTAL_NAMED_TARGETS) {
                     if (!ModConstants.containsIgnoreCase(nameStr, target.plainLabel())) continue;
 
-                    // 存在の判定はスポーン通知にも使うので、表示設定より先に立てる
-                    if (target == CrystalHollows.BOSS_CORLEONE) corleoneFound = true;
                     if (!target.anyEnabled()) break;
 
                     // 実体名照合が本命で、そちらはネームタグより遠くまで届く。
@@ -1916,7 +1908,7 @@ public class EntityHighlightManager {
 
         // Boss Corleone も同じくプレイヤーの名前で直接探す
         if (scanCrystalNamed) {
-            if (detectNamedPlayerMobs(client, CRYSTAL_NAMED_TARGETS)) corleoneFound = true;
+            detectNamedPlayerMobs(client, CRYSTAL_NAMED_TARGETS);
         }
 
         // Hideyho も同じくプレイヤーの名前で直接探す。
@@ -2134,8 +2126,6 @@ public class EntityHighlightManager {
                 customGlowColors.put(entity, ROCKMITE_MOUND_GLOW_COLOR);
             }
         }
-
-        if (isCrystalHollows) CorleoneHandler.update(client, corleoneFound);
     }
 
     // DragonStatusHud と同じ配色ルール(ネームプレートの名前部分に使う)

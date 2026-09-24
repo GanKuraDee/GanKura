@@ -14,6 +14,9 @@ import java.util.List;
 
 public class HudEditorScreen extends Screen {
 
+    // ホイールで縮められる下限。ホイール1段ぶん
+    private static final float MIN_SCALE = 0.1f;
+
     // カテゴリの選択。横に並べると増えたときに画面下を埋めてしまうので、
     // 左右の矢印で送る1つのボタンにしている
     private static final int TAB_HEIGHT = 20;
@@ -52,7 +55,10 @@ public class HudEditorScreen extends Screen {
             float scroll = (float) v * 0.1f;
             for (HudElement element : HudConfig.ELEMENTS) {
                 if (isEditable(element) && element.isHovering(mouseX, mouseY, this.width, this.height)) {
-                    element.scale = Math.max(0.5f, Math.min(3.0f, element.scale + scroll));
+                    // 上限は設けない。0 以下になると消えたり裏返ったりして掴めなくなるので、下限だけ残す。
+                    // 0.1 ずつ足し引きすると端数が溜まるので、0.1 刻みに丸める
+                    float next = Math.round((element.scale + scroll) * 10) / 10f;
+                    element.scale = Math.max(MIN_SCALE, next);
                     break;
                 }
             }

@@ -17,7 +17,7 @@ public class FerocityHud extends HudElement {
 
     public FerocityHud() {
         super("ferocity", 460, 208, 1.0f, 50, 15,
-                () -> ModConfig.GeneralHud.showFerocityHud, () -> GameState.Player.ferocity >= 0);
+                () -> ModConfig.Combat.showFerocityHud, () -> GameState.Player.ferocity >= 0);
     }
 
     @Override

@@ -42,6 +42,8 @@ public class WorldTextRenderer {
     // 自分で置いたウェイポイントの線の太さと、名前の色。表示を打ち切る距離(ブロック)
     private static final float WAYPOINT_LINE_WIDTH = 2.0F;
     private static final int WAYPOINT_LABEL_COLOR = 0xFFFFFFFF;
+    // 距離の文字色。名前と見分けられるよう色を変える
+    private static final String WAYPOINT_DISTANCE_COLOR = "§e";
     private static final double WAYPOINT_MAX_DISTANCE = 384.0;
 
     // Hotspot の範囲を示す円の太さ・分割数と、描くのをやめる距離(ブロック)。
@@ -295,10 +297,23 @@ public class WorldTextRenderer {
             GizmoProperties box = Gizmos.cuboid(pos, waypointStyle(waypoint));
             box.setAlwaysOnTop();
 
-            if (data.showNames && !waypoint.getName().isBlank()) {
-                renderGizmoLabel(waypoint.getName(), pos, WAYPOINT_LABEL_COLOR);
-            }
+            String label = waypointLabel(client, waypoint, data);
+            if (!label.isEmpty()) renderGizmoLabel(label, pos, WAYPOINT_LABEL_COLOR);
         }
+    }
+
+    /**
+     * ウェイポイントの上に出す文字。名前と、そこまでの距離のうち、出すように選ばれているもの。
+     * 距離は自分の足元からブロックの真ん中までを、メートル単位の整数で出す
+     */
+    private static String waypointLabel(Minecraft client, Waypoint waypoint, WaypointData data) {
+        boolean name = data.showNames && !waypoint.getName().isBlank();
+        boolean distance = data.showDistance && client.player != null;
+        if (!distance) return name ? waypoint.getName() : "";
+
+        long meters = Math.round(client.player.position().distanceTo(Vec3.atCenterOf(waypoint.pos())));
+        String text = WAYPOINT_DISTANCE_COLOR + meters + "m";
+        return name ? waypoint.getName() + " " + text : text;
     }
 
     // 枠線だけ・塗りつぶしだけ・両方の3種類を Gizmo の指定へ移す

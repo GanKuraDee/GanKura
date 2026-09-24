@@ -12,7 +12,7 @@ public class QuiverHud extends HudElement {
 
     public QuiverHud() {
         super("quiver", 460, 184, 1.0f, 130, 15,
-                () -> ModConfig.GeneralHud.showQuiverHud, () -> GameState.Player.quiverArrow != null);
+                () -> ModConfig.Combat.showQuiverHud, () -> GameState.Player.quiverArrow != null);
     }
 
     @Override

@@ -12,6 +12,9 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
+import com.teamresourceful.resourcefulconfig.api.patching.ConfigPatchEvent;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -24,7 +27,7 @@ import net.minecraft.client.Minecraft;
  *   - カテゴリはネストした static クラスで、親の categories に並べた順に表示される
  *   - 表示名と説明は翻訳キー。文言は assets/gankura/lang/en_us.json にある
  */
-@Config(value = "gankura", categories = {
+@Config(value = "gankura", version = ModConfig.CONFIG_VERSION, categories = {
         ModConfig.Gui.class,
         ModConfig.Combat.class,
         ModConfig.Farming.class,
@@ -46,6 +49,12 @@ public final class ModConfig {
 
     /** 設定ファイル名かつ ResourcefulConfig 上の識別子 */
     public static final String CONFIG_ID = "gankura";
+
+    /**
+     * 設定ファイルの版。項目の置き場所を変えたら上げて、{@link #patch} に前の版からの移し方を足す。
+     *   0 → 1: 戦闘まわりの HUD と Low Soulflow Alert を General HUD から Combat へ移した
+     */
+    public static final int CONFIG_VERSION = 1;
 
     /** ResourcefulConfig はキー未割り当てを 0 で表す（MoulConfig の -1 に相当） */
     public static final int KEY_NONE = 0;
@@ -75,13 +84,35 @@ public final class ModConfig {
     /** 起動時に一度だけ呼ぶ。旧 MoulConfig 形式が残っていれば先に取り込む */
     public static void load() {
         LegacyConfigMigration.run();
-        CONFIGURATOR.register(ModConfig.class);
+        CONFIGURATOR.register(ModConfig.class, ModConfig::patch);
         InventoryButtonStore.load();
     }
 
     public static void save() {
         CONFIGURATOR.saveConfig(ModConfig.class);
         InventoryButtonStore.save();
+    }
+
+    /** 古い版の設定ファイルを、今の置き場所に合わせて書き換える */
+    private static void patch(ConfigPatchEvent event) {
+        event.register(0, json -> moveEntries(json, "generalHud", "combat",
+                "showArmorStackHud", "showFerocityHud", "showQuiverHud", "showSoulflowHud",
+                "showSoulflowLowAlert", "soulflowLowThreshold"));
+    }
+
+    /**
+     * カテゴリをまたいで項目を移す。
+     * ResourcefulConfig の move() は元に無い項目も null で書き込むので、元にあるものだけを移す
+     */
+    private static JsonObject moveEntries(JsonObject json, String from, String to, String... ids) {
+        if (!(json.get(from) instanceof JsonObject source)) return json;
+        JsonObject target = json.get(to) instanceof JsonObject existing ? existing : new JsonObject();
+        json.add(to, target);
+        for (String id : ids) {
+            JsonElement value = source.remove(id);
+            if (value != null) target.add(id, value);
+        }
+        return json;
     }
 
     public static Configurator configurator() {
@@ -104,7 +135,7 @@ public final class ModConfig {
         };
     }
 
-    @Category(value = "combat", categories = {Combat.TheEnd.class, Combat.SpidersDen.class, Combat.CrimsonIsle.class, Combat.CrystalHollows.class})
+    @Category(value = "combat", categories = {Combat.TheEnd.class, Combat.SpidersDen.class, Combat.CrimsonIsle.class})
     @ConfigInfo(title = "Combat", description = "Bosses and combat features of each area.")
     public static final class Combat {
 
@@ -120,13 +151,46 @@ public final class ModConfig {
         @Comment(value = "Shows a title when you cocoon a mob.", translation = "gankura.config.combat.enableCocoonCatchTitle.desc")
         public static boolean enableCocoonCatchTitle = true;
 
-        @ConfigEntry(id = "enableQuiverAlert", translation = "gankura.config.combat.enableQuiverAlert")
-        @Comment(value = "Warns with a title and sound at 50 and 10 arrows left.", translation = "gankura.config.combat.enableQuiverAlert.desc")
-        public static boolean enableQuiverAlert = true;
-
         @ConfigEntry(id = "showPoisonIndicator", translation = "gankura.config.combat.showPoisonIndicator")
         @Comment(value = "Shows arrow poison uses left.", translation = "gankura.config.combat.showPoisonIndicator.desc")
         public static boolean showPoisonIndicator = true;
+
+        @ConfigEntry(id = "showArmorStackHud", translation = "gankura.config.combat.showArmorStackHud")
+        @Comment(value = "Shows armor stack counts.", translation = "gankura.config.combat.showArmorStackHud.desc")
+        public static boolean showArmorStackHud = false;
+
+        @ConfigEntry(id = "showFerocityHud", translation = "gankura.config.combat.showFerocityHud")
+        @Comment(value = "Shows ferocity. Hidden while it cannot be read.\n§eNeeds the Ferocity Stats "
+            + "Widget.\n§e(/widget -> Stats Widget -> Enable Ferocity)", translation = "gankura.config.combat.showFerocityHud.desc")
+        public static boolean showFerocityHud = false;
+
+        @ConfigEntry(id = "showQuiverHud", translation = "gankura.config.combat.showQuiverHud")
+        @Comment(value = "Shows selected arrow and how many are left.", translation = "gankura.config.combat.showQuiverHud.desc")
+        public static boolean showQuiverHud = false;
+
+        @ConfigEntry(id = "enableQuiverAlert", translation = "gankura.config.combat.enableQuiverAlert")
+        @Comment(value = "Shows a title when the arrows in your quiver are running out.", translation = "gankura.config.combat.enableQuiverAlert.desc")
+        public static boolean enableQuiverAlert = true;
+
+        @ConfigEntry(id = "quiverLowThreshold", translation = "gankura.config.combat.quiverLowThreshold")
+        @Comment(value = "How many arrows are left when the alert shows.", translation = "gankura.config.combat.quiverLowThreshold.desc")
+        @ConfigOption.Range(min = 1, max = 2880)
+        public static int quiverLowThreshold = 50;
+
+        @ConfigEntry(id = "showSoulflowHud", translation = "gankura.config.combat.showSoulflowHud")
+        @Comment(value = "Shows soulflow.\n§eNeeds Soulflow in the Profile Widget.\n"
+            + "§e(/widget -> Profile Widget -> Show Soulflow)", translation = "gankura.config.combat.showSoulflowHud.desc")
+        public static boolean showSoulflowHud = false;
+
+        @ConfigEntry(id = "showSoulflowLowAlert", translation = "gankura.config.combat.showSoulflowLowAlert")
+        @Comment(value = "Shows a title when soulflow runs down to the threshold.\n§eNeeds Soulflow in the Profile "
+            + "Widget.", translation = "gankura.config.combat.showSoulflowLowAlert.desc")
+        public static boolean showSoulflowLowAlert = false;
+
+        @ConfigEntry(id = "soulflowLowThreshold", translation = "gankura.config.combat.soulflowLowThreshold")
+        @Comment(value = "How much soulflow is left when the alert shows.", translation = "gankura.config.combat.soulflowLowThreshold.desc")
+        @ConfigOption.Range(min = 1, max = 1000000)
+        public static int soulflowLowThreshold = 500;
 
         @Category(value = "theEnd")
         @ConfigInfo(title = "The End", description = "End Stone Protector and Dragon.")
@@ -293,15 +357,6 @@ public final class ModConfig {
             @ConfigEntry(id = "enableMagmaBossSpawnTitle", translation = "gankura.config.combat.crimsonIsle.enableMagmaBossSpawnTitle")
             @Comment(value = "Shows stage status title.", translation = "gankura.config.combat.crimsonIsle.enableMagmaBossSpawnTitle.desc")
             public static boolean enableMagmaBossSpawnTitle = true;
-        }
-
-        @Category(value = "crystalHollows")
-        @ConfigInfo(title = "Crystal Hollows", description = "Crystal Hollows features.")
-        public static final class CrystalHollows {
-
-            @ConfigEntry(id = "enableCorleoneSpawnTitle", translation = "gankura.config.combat.crystalHollows.enableCorleoneSpawnTitle")
-            @Comment(value = "Shows a title when Boss Corleone shows up nearby.", translation = "gankura.config.combat.crystalHollows.enableCorleoneSpawnTitle.desc")
-            public static boolean enableCorleoneSpawnTitle = true;
         }
     }
 
@@ -514,8 +569,7 @@ public final class ModConfig {
 
         @ConfigEntry(id = "baitLowThreshold", translation = "gankura.config.fishing.baitLowThreshold")
         @Comment(value = "How much bait is left when the alert shows.", translation = "gankura.config.fishing.baitLowThreshold.desc")
-        @ConfigOption.Slider
-        @ConfigOption.Range(min = 1, max = 64)
+        @ConfigOption.Range(min = 1, max = 100000)
         public static int baitLowThreshold = 16;
 
         @ConfigEntry(id = "showCastTimer", translation = "gankura.config.fishing.showCastTimer")
@@ -719,19 +773,6 @@ public final class ModConfig {
         @ConfigEntry(id = "showDayHud", translation = "gankura.config.generalHud.showDayHud")
         @Comment(value = "Shows lobby day.", translation = "gankura.config.generalHud.showDayHud.desc")
         public static boolean showDayHud = false;
-
-        @ConfigEntry(id = "showArmorStackHud", translation = "gankura.config.generalHud.showArmorStackHud")
-        @Comment(value = "Shows armor stack counts.", translation = "gankura.config.generalHud.showArmorStackHud.desc")
-        public static boolean showArmorStackHud = false;
-
-        @ConfigEntry(id = "showFerocityHud", translation = "gankura.config.generalHud.showFerocityHud")
-        @Comment(value = "Shows ferocity. Hidden while it cannot be read.\n§eNeeds the Ferocity Stats "
-            + "Widget.\n§e(/widget -> Stats Widget -> Enable Ferocity)", translation = "gankura.config.generalHud.showFerocityHud.desc")
-        public static boolean showFerocityHud = false;
-
-        @ConfigEntry(id = "showQuiverHud", translation = "gankura.config.generalHud.showQuiverHud")
-        @Comment(value = "Shows selected arrow and how many are left.", translation = "gankura.config.generalHud.showQuiverHud.desc")
-        public static boolean showQuiverHud = false;
     }
 
     @Category(value = "mobVisuals")
@@ -1377,6 +1418,14 @@ public final class ModConfig {
         @ConfigEntry(id = "hideMaxedPetLevel", translation = "gankura.config.interfaceSettings.hideMaxedPetLevel")
         @Comment(value = "Leaves the level off pets that are already maxed.", translation = "gankura.config.interfaceSettings.hideMaxedPetLevel.desc")
         public static boolean hideMaxedPetLevel = false;
+
+        @ConfigEntry(id = "enablePersonalCompactorPreview", translation = "gankura.config.interfaceSettings.enablePersonalCompactorPreview")
+        @Comment(value = "Shows the items a Personal Compactor or Personal Deletor is set to, under its name.", translation = "gankura.config.interfaceSettings.enablePersonalCompactorPreview.desc")
+        public static boolean enablePersonalCompactorPreview = false;
+
+        @ConfigEntry(id = "showPersonalCompactorStatus", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus")
+        @Comment(value = "Writes whether it is turned on above the items.", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus.desc")
+        public static boolean showPersonalCompactorStatus = true;
 
         @ConfigEntry(id = "enableCursorRestoreOnRapidReopen", translation = "gankura.config.interfaceSettings.enableCursorRestoreOnRapidReopen")
         @Comment(value = "Prevents cursor reset on quick swap.", translation = "gankura.config.interfaceSettings.enableCursorRestoreOnRapidReopen.desc")
