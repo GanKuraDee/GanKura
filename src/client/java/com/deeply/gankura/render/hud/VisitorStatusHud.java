@@ -48,7 +48,7 @@ public class VisitorStatusHud extends HudElement {
 
     public VisitorStatusHud() {
         super("visitor_status", 10, 140, 1.0f, 120, LINE_HEIGHT * 3,
-                () -> ModConfig.INSTANCE.farming.garden.showVisitorStatusHud,
+                () -> ModConfig.Farming.Garden.showVisitorStatusHud,
                 GameState.Server::isGarden);
     }
 

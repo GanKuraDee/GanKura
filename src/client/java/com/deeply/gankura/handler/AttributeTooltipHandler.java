@@ -34,8 +34,7 @@ public final class AttributeTooltipHandler {
 
     public static void register() {
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-            ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-            if (!config.enableAttributeMenuTweaks || !config.enableAttributeTierNumbers) return;
+            if (!ModConfig.Interface.enableAttributeMenuTweaks || !ModConfig.Interface.enableAttributeTierNumbers) return;
             if (!GameState.Server.isSkyblock() || lines.isEmpty()) return;
             // "to unlock!" は他の画面にもある文面なので、Attribute の画面でだけ足す
             if (!AttributeMenu.isOpen()) return;

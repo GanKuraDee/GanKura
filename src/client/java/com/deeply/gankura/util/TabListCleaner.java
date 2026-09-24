@@ -54,8 +54,7 @@ public final class TabListCleaner {
     }
 
     public static List<PlayerInfo> clean(List<PlayerInfo> entries, PlayerTabOverlay overlay) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableTabListTweaks || !config.compactTabList
+        if (!ModConfig.Interface.enableTabListTweaks || !ModConfig.Interface.compactTabList
                 || !GameState.Server.isSkyblock()) {
             return entries;
         }

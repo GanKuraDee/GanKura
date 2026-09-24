@@ -136,10 +136,9 @@ public final class HuntingBoxPanel {
     }
 
     private static boolean pickSort(AttributeCostSort picked) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (config.shardValueSort != picked) {
-            config.shardValueSort = picked;
-            ModConfig.INSTANCE.saveNow();
+        if (ModConfig.Interface.shardValueSort != picked) {
+            ModConfig.Interface.shardValueSort = picked;
+            ModConfig.save();
         }
         return true;
     }
@@ -149,15 +148,14 @@ public final class HuntingBoxPanel {
         // 出していないうちに押されても効かないよう、描く前に必ず倒しておく
         drawn = false;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableHuntingBoxTweaks || !config.showShardValues) return;
+        if (!ModConfig.Interface.enableHuntingBoxTweaks || !ModConfig.Interface.showShardValues) return;
         if (!GameState.Server.isSkyblock()) return;
         if (!screen.getTitle().getString().contains(MENU_TITLE)) return;
 
         // 額を並べるので、古いままにしない
         ItemPrices.refreshIfStale();
 
-        List<Entry> entries = entries(config.shardValueSort);
+        List<Entry> entries = entries(ModConfig.Interface.shardValueSort);
         if (entries.isEmpty()) return;
 
         draw(screen, graphics, entries, mouseX, mouseY);
@@ -220,7 +218,6 @@ public final class HuntingBoxPanel {
     private static void draw(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics,
                              List<Entry> entries, int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
 
         // 合計はページに並んでいるすべてのシャードぶん。一覧が途中で切れても変わらない
         int totalOwned = 0;
@@ -232,7 +229,7 @@ public final class HuntingBoxPanel {
             totalOrder += entry.order();
         }
 
-        List<Entry> shown = entries.subList(0, Math.min(entries.size(), config.shardValueRows));
+        List<Entry> shown = entries.subList(0, Math.min(entries.size(), ModConfig.Interface.shardValueRows));
 
         List<String> owneds = new ArrayList<>();
         List<String> instants = new ArrayList<>();
@@ -276,9 +273,9 @@ public final class HuntingBoxPanel {
 
         graphics.text(font, OWNED_LABEL, ownedRight - font.width(OWNED_LABEL), textY, NAME_COLOR, false);
         label(graphics, font, INSTANT_LABEL, instantRight, textY, INSTANT_COLOR,
-                config.shardValueSort == AttributeCostSort.INSTANT);
+                ModConfig.Interface.shardValueSort == AttributeCostSort.INSTANT);
         label(graphics, font, ORDER_LABEL, orderRight, textY, ORDER_COLOR,
-                config.shardValueSort == AttributeCostSort.ORDER);
+                ModConfig.Interface.shardValueSort == AttributeCostSort.ORDER);
         remember(font, instantRight, orderRight, textY);
         textY += LINE_HEIGHT + HEADER_SPACE;
 

@@ -17,7 +17,7 @@ public class BiteCountdownHud extends HudElement {
 
     public BiteCountdownHud() {
         super("bite_countdown", 220, 120, 1.0f, 40, 15,
-                () -> ModConfig.INSTANCE.fishing.showBiteCountdownHud,
+                () -> ModConfig.Fishing.showBiteCountdownHud,
                 () -> BiteCountdownHud.text() != null);
     }
 

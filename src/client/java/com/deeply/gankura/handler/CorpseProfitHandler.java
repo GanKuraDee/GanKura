@@ -84,7 +84,7 @@ public class CorpseProfitHandler {
     private static final List<Reward> rewards = new ArrayList<>();
 
     public static void handleMessage(String unformattedMessage, Minecraft client) {
-        if (!ModConfig.INSTANCE.mining.showCorpseProfit) {
+        if (!ModConfig.Mining.showCorpseProfit) {
             reset();
             return;
         }

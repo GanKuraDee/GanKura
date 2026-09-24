@@ -43,8 +43,7 @@ public class EnchantedBookSlotMixin {
     @Inject(method = "extractSlot", at = @At("TAIL"))
     private void gankura$markEnchantedBook(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY,
                                            CallbackInfo ci) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableEnchantedBookSlots) return;
+        if (!ModConfig.Interface.enableEnchantedBookSlots) return;
         if (!GameState.Server.isSkyblock()) return;
 
         EnchantedBookText.Book book = EnchantedBookText.of(slot.getItem());
@@ -52,12 +51,12 @@ public class EnchantedBookSlotMixin {
 
         Font font = Minecraft.getInstance().font;
 
-        if (config.showEnchantedBookTier) {
+        if (ModConfig.Interface.showEnchantedBookTier) {
             String level = String.valueOf(book.level());
             graphics.text(font, level, slot.x + LEVEL_RIGHT - font.width(level), slot.y + LEVEL_BOTTOM,
                     LEVEL_COLOR);
         }
-        if (config.showEnchantedBookName) {
+        if (ModConfig.Interface.showEnchantedBookName) {
             gankura$drawName(graphics, font, slot, book);
         }
     }

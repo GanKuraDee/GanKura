@@ -40,7 +40,7 @@ public class ArmorStandInteractMixin {
     private void gankura$dropArmorStand(CallbackInfo ci) {
         gankura$heldHitResult = null;
 
-        if (!ModConfig.INSTANCE.misc.ignoreArmorStandClicks) return;
+        if (!ModConfig.Misc.ignoreArmorStandClicks) return;
         if (!GameState.Server.isSkyblock()) return;
 
         Minecraft client = (Minecraft) (Object) this;

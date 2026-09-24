@@ -1,5 +1,6 @@
 package com.deeply.gankura.gui;
 
+import com.deeply.gankura.data.InventoryButtonStore;
 import com.deeply.gankura.data.InventoryButton;
 import com.deeply.gankura.data.ModConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -103,7 +104,7 @@ public class InventoryButtonEditorScreen extends Screen {
     }
 
     private static List<InventoryButton> buttons() {
-        return ModConfig.INSTANCE.inventoryButtons.buttons;
+        return InventoryButtonStore.buttons();
     }
 
     @Override
@@ -520,9 +521,8 @@ public class InventoryButtonEditorScreen extends Screen {
     }
 
     private void replaceButtons(List<InventoryButton> buttons) {
-        ModConfig.InventoryButtonsCategory config = ModConfig.INSTANCE.inventoryButtons;
-        config.buttons.clear();
-        config.buttons.addAll(buttons);
+        InventoryButtonStore.buttons().clear();
+        InventoryButtonStore.buttons().addAll(buttons);
         select(null);
     }
 
@@ -558,7 +558,7 @@ public class InventoryButtonEditorScreen extends Screen {
     @Override
     public void removed() {
         // 画面を閉じた時点で確実に残す。次に開くまでに落ちても設定が消えないようにする
-        ModConfig.INSTANCE.saveNow();
+        ModConfig.save();
     }
 
     @Override

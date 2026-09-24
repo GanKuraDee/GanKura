@@ -24,7 +24,7 @@ public class HotspotRadarParticleMixin {
 
     @Inject(method = "handleParticleEvent", at = @At("HEAD"))
     private void gankura$onRadarParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
-        if (!ModConfig.INSTANCE.fishing.showHotspotGuess) return;
+        if (!ModConfig.Fishing.showHotspotGuess) return;
 
         ParticleType<?> type = packet.getParticle().getType();
         boolean enchant = type == ParticleTypes.ENCHANT && packet.getCount() == 10 && packet.getMaxSpeed() == -2.0f;

@@ -62,8 +62,7 @@ public final class TabListRenderer {
     public static boolean render(GuiGraphicsExtractor graphics, int screenWidth, PlayerTabOverlay overlay,
                                  List<PlayerInfo> entries, Component header, Component footer,
                                  PingRenderer ping) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableTabListTweaks || !config.fitTabColumns || entries.isEmpty()) return false;
+        if (!ModConfig.Interface.enableTabListTweaks || !ModConfig.Interface.fitTabColumns || entries.isEmpty()) return false;
 
         Minecraft client = Minecraft.getInstance();
         Font font = client.font;
@@ -76,17 +75,17 @@ public final class TabListRenderer {
             rows = (count + columns - 1) / columns;
         }
 
-        boolean showPing = !config.hideTabListPing;
+        boolean showPing = !ModConfig.Interface.hideTabListPing;
 
         int[] widths = new int[columns];
         boolean[] heads = new boolean[columns];
-        measure(overlay, entries, rows, columns, font, config.hideTabListHeads, showPing, widths, heads);
+        measure(overlay, entries, rows, columns, font, ModConfig.Interface.hideTabListHeads, showPing, widths, heads);
 
         int totalWidth = -COLUMN_GAP;
         for (int width : widths) totalWidth += width + COLUMN_GAP;
 
         // 画面からはみ出すときは、収まる大きさまで全体を縮める
-        float scale = scaleFor(config, screenWidth, totalWidth);
+        float scale = scaleFor(screenWidth, totalWidth);
         Matrix3x2fStack pose = graphics.pose();
         if (scale < 1.0F) {
             pose.pushMatrix();
@@ -98,8 +97,8 @@ public final class TabListRenderer {
         int left = drawWidth / 2 - totalWidth / 2;
         int top = TOP;
 
-        Component shownHeader = config.hideTabListAds ? null : header;
-        Component shownFooter = config.hideTabListAds ? null : footer;
+        Component shownHeader = ModConfig.Interface.hideTabListAds ? null : header;
+        Component shownFooter = ModConfig.Interface.hideTabListAds ? null : footer;
 
         top = drawLines(graphics, font, shownHeader, drawWidth, totalWidth, top);
 
@@ -108,7 +107,7 @@ public final class TabListRenderer {
                 drawWidth / 2 + totalWidth / 2 + 1, top + rows * ROW_HEIGHT, BACKDROP_COLOR);
 
         drawEntries(graphics, overlay, entries, font, rows, columns, widths, heads,
-                left, top, showPing, ping, config.hideTabListHeads);
+                left, top, showPing, ping, ModConfig.Interface.hideTabListHeads);
 
         drawLines(graphics, font, shownFooter, drawWidth, totalWidth, top + rows * ROW_HEIGHT + 1);
 
@@ -117,8 +116,8 @@ public final class TabListRenderer {
     }
 
     // 画面に収めるための縮小率。収まっているなら 1
-    private static float scaleFor(ModConfig.InterfaceCategory config, int screenWidth, int totalWidth) {
-        if (!config.shrinkTabList) return 1.0F;
+    private static float scaleFor(int screenWidth, int totalWidth) {
+        if (!ModConfig.Interface.shrinkTabList) return 1.0F;
 
         int room = screenWidth - SCREEN_MARGIN * 2;
         if (totalWidth <= room) return 1.0F;

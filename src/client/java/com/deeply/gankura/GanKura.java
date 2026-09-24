@@ -42,12 +42,7 @@ import com.deeply.gankura.waypoint.WaypointManager;
 import com.deeply.gankura.data.EquipmentState;
 import com.deeply.gankura.data.ModConfig;
 
-import io.github.notenoughupdates.moulconfig.gui.GuiContext;
-import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent;
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
-import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent;
-import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver;
-import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor;
+import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -156,7 +151,7 @@ public class GanKura implements ClientModInitializer {
 
         // ★追加: ゲーム終了時に、確実に最新の設定をファイルに保存する
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
-            ModConfig.INSTANCE.saveNow();
+            ModConfig.save();
             WaypointManager.getInstance().save();
             // 最後にスキャンしたSkyblock Equipmentも保存する (レジストリ情報が必要なためワールド参加中のみ)
             if (client.level != null) {
@@ -206,36 +201,16 @@ public class GanKura implements ClientModInitializer {
         LOGGER.info("GanKura initialized (Mojang Mapping).");
     }
 
-    // ★設定画面展開メソッド
+    // 設定画面を開く。画面の組み立ては ResourcefulConfig 側が ModConfig の注釈から行う
     private static void openConfigScreen() {
         try {
-            // 1. デフォルトのUIパーツを登録した状態でプロセッサを生成
-            MoulConfigProcessor<ModConfig> processor = MoulConfigProcessor.withDefaults(ModConfig.INSTANCE);
-
-            // 2. ドライバーの生成
-            ConfigProcessorDriver driver = new ConfigProcessorDriver(processor);
-
-            // 3. 解析の実行
-            driver.processConfig(ModConfig.INSTANCE);
-
-            // 4. 解析が完了したプロセッサをエディタに渡す
-            // 開発中の一時的な機能。配布ビルドではカテゴリが増えない
-            DevHooks.extendConfig(processor);
-
-            MoulConfigEditor<ModConfig> editor = new MoulConfigEditor<>(processor);
-            GuiElementComponent editorComponent = new GuiElementComponent(editor);
-            GuiContext guiContext = new GuiContext(editorComponent);
-
-            // MinecraftClient -> Minecraft
-            MoulConfigScreenComponent configScreen = new MoulConfigScreenComponent(
-                    Component.literal("GanKura Configuration"),
-                    guiContext,
-                    Minecraft.getInstance().screen
-            );
-
-            Minecraft.getInstance().setScreen(configScreen);
+            Minecraft client = Minecraft.getInstance();
+            client.setScreen(
+                    ResourcefulConfigScreen.make(ModConfig.configurator(), ModConfig.class)
+                            .withParent(client.screen)
+                            .build());
         } catch (Exception e) {
-            LOGGER.error("Failed to open MoulConfig screen!", e);
+            LOGGER.error("Failed to open the GanKura config screen!", e);
         }
     }
 

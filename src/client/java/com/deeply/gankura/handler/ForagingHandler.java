@@ -15,7 +15,7 @@ public class ForagingHandler {
 
     public static void handleMessage(String unformattedMsg, Minecraft client) {
         // 木を一度に切り倒せた合図。チャットに埋もれると見逃すのでタイトルで知らせる
-        if (ModConfig.INSTANCE.foraging.enableTreeFelledTitle
+        if (ModConfig.Foraging.enableTreeFelledTitle
                 && ModConstants.TREE_FELLED_PATTERN.matcher(unformattedMsg).find()) {
             MutableComponent title = Component.literal("TREE FELLED!")
                     .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);
@@ -38,8 +38,8 @@ public class ForagingHandler {
             if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.WUMPA_CAPTURED_MSG)) {
                 GameState.CritterSafari.wumpaStatus = GameState.CritterSafari.STATUS_CAPTURED;
                 GameState.CritterSafari.markCaptured(ModConstants.WUMPA_NAME);
-                if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
-                    if (ModConfig.INSTANCE.foraging.enableWumpaCapsuleMessage) {
+                if (ModConfig.Foraging.enableWumpaCapsuleMessage) {
+                    if (ModConfig.Foraging.enableWumpaCapsuleMessage) {
                     announceCapsuleUsage(client, "§b§lWumpa", GameState.CritterSafari.wumpaCapsuleHits);
                 }
                 }
@@ -49,7 +49,7 @@ public class ForagingHandler {
             if (handleDoomspiral(unformattedMsg, client)) return;
         }
 
-        if (!ModConfig.INSTANCE.foraging.enableTreeMobTitle) return;
+        if (!ModConfig.Foraging.enableTreeMobTitle) return;
 
         // 切り倒した木からモブが降ってくるパターン。何が降ってきたかが重要なので、
         // モブ名をタイトル本体に、状況説明をサブタイトルに出す
@@ -70,7 +70,7 @@ public class ForagingHandler {
         Matcher matcher = ModConstants.COCOON_CAUGHT_PATTERN.matcher(unformattedMsg);
         if (!matcher.find()) return false;
 
-        if (ModConfig.INSTANCE.combat.enableCocoonCatchTitle) {
+        if (ModConfig.Combat.enableCocoonCatchTitle) {
             String mobName = matcher.group(1).trim();
             MutableComponent title = Component.literal(mobName)
                     .withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD);
@@ -91,7 +91,7 @@ public class ForagingHandler {
         GameState.CritterSafari.wumpaStatus = GameState.CritterSafari.STATUS_SPAWNED;
         GameState.CritterSafari.wumpaCapsuleHits = 0;
 
-        if (ModConfig.INSTANCE.foraging.enableWumpaSpawnTitle) {
+        if (ModConfig.Foraging.enableWumpaSpawnTitle) {
             MutableComponent title = Component.literal("WUMPA SPAWNED!")
                     .withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);
             MutableComponent subtitle = Component.literal("Icy Biome")
@@ -111,7 +111,7 @@ public class ForagingHandler {
         Matcher matcher = ModConstants.BEEHEEMOTH_SPAWN_PATTERN.matcher(unformattedMsg);
         if (!matcher.find()) return false;
 
-        if (ModConfig.INSTANCE.foraging.enableBeeheemothSpawnTitle) {
+        if (ModConfig.Foraging.enableBeeheemothSpawnTitle) {
             String subArea = matcher.group(1).trim();
             MutableComponent title = Component.literal("BEEHEEMOTH!")
                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
@@ -126,7 +126,7 @@ public class ForagingHandler {
     private static boolean handleMacawSpawn(String unformattedMsg, Minecraft client) {
         if (!ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.MACAW_ATTRACTED_MSG)) return false;
 
-        if (ModConfig.INSTANCE.foraging.enableMacawSpawnTitle) {
+        if (ModConfig.Foraging.enableMacawSpawnTitle) {
             MutableComponent title = Component.literal("MACAWS ATTRACTED!")
                     .withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
             MutableComponent subtitle = Component.literal("Forest Biome")
@@ -186,8 +186,8 @@ public class ForagingHandler {
         if (ModConstants.containsIgnoreCase(unformattedMsg, ModConstants.DOOMSPIRAL_CAPTURED_MSG)) {
             GameState.Doomspiral.status = GameState.Doomspiral.STATUS_CAPTURED;
             GameState.CritterSafari.markCaptured(ModConstants.DOOMSPIRAL_NAME);
-            if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
-                if (ModConfig.INSTANCE.foraging.enableDoomspiralCapsuleMessage) {
+            if (ModConfig.Foraging.enableDoomspiralCapsuleMessage) {
+                if (ModConfig.Foraging.enableDoomspiralCapsuleMessage) {
                 announceCapsuleUsage(client, "§5§lDoomspiral", GameState.Doomspiral.capsuleHits);
             }
             }

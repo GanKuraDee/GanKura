@@ -28,7 +28,7 @@ public class HotspotParticleMixin {
 
     @Inject(method = "handleParticleEvent", at = @At("HEAD"), cancellable = true)
     private void gankura$onHotspotParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
-        if (!com.deeply.gankura.data.ModConfig.INSTANCE.fishing.showHotspotCircle) return;
+        if (!com.deeply.gankura.data.ModConfig.Fishing.showHotspotCircle) return;
         if (!isHotspotParticle(packet)) return;
 
         HotspotAreaHandler.onParticle(packet.getX(), packet.getY(), packet.getZ());

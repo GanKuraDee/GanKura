@@ -19,8 +19,7 @@ public class ScreenBackgroundMixin {
     private void gankura$hideBackgroundDim(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (!((Object) this instanceof AbstractContainerScreen<?>)) return;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (config.enableInventoryTweaks && config.hideInventoryDim
+        if (ModConfig.Interface.enableInventoryTweaks && ModConfig.Interface.hideInventoryDim
                 && GameState.Server.isSkyblock()) {
             ci.cancel();
         }

@@ -1,5 +1,6 @@
 package com.deeply.gankura.handler;
 
+import com.deeply.gankura.data.InventoryButtonStore;
 import com.deeply.gankura.data.ButtonClickType;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.InventoryButton;
@@ -103,7 +104,7 @@ public final class InventoryButtonHandler {
             hoveredButton = hovered;
             hoveredSince = now;
         }
-        if (now - hoveredSince <= config().tooltipDelay) return;
+        if (now - hoveredSince <= ModConfig.InventoryButtons.tooltipDelay) return;
 
         // ボタンはスロットの上にも置けるので、下のスロットの説明を押しのけて自分のものを出す
         Component text = Component.literal(commandWithSlash(hovered)).withStyle(ChatFormatting.GRAY);
@@ -124,7 +125,7 @@ public final class InventoryButtonHandler {
 
         // 押した/離したの片方だけを使う。もう片方は素通りさせて、
         // スロットのドラッグなど本来の操作を邪魔しないようにする
-        if (config().clickType != when) return true;
+        if (ModConfig.InventoryButtons.clickType != when) return true;
 
         runCommand(placement.button());
         return false;
@@ -155,10 +156,10 @@ public final class InventoryButtonHandler {
     }
 
     private static void forEachPlacement(AbstractContainerScreen<?> screen, Consumer<Placement> consumer) {
-        ModConfig.InventoryButtonsCategory config = config();
-        if (!config.enableInventoryButtons) return;
+        
+        if (!ModConfig.InventoryButtons.enableInventoryButtons) return;
         if (!GameState.Server.isSkyblock()) return;
-        if (config.hideInDungeonMenus && isDungeonMenu(screen)) return;
+        if (ModConfig.InventoryButtons.hideInDungeonMenus && isDungeonMenu(screen)) return;
 
         ContainerScreenAccessor accessor = (ContainerScreenAccessor) screen;
         int left = accessor.gankura$getLeftPos();
@@ -166,7 +167,7 @@ public final class InventoryButtonHandler {
         int width = accessor.gankura$getImageWidth();
         int height = accessor.gankura$getImageHeight();
 
-        for (InventoryButton button : config.buttons) {
+        for (InventoryButton button : InventoryButtonStore.buttons()) {
             if (button == null || !button.isActive()) continue;
             if (button.playerInvOnly && !(screen instanceof InventoryScreen)) continue;
 
@@ -198,9 +199,5 @@ public final class InventoryButtonHandler {
     private static String commandWithSlash(InventoryButton button) {
         String command = button.commandOrEmpty().trim();
         return command.startsWith("/") ? command : "/" + command;
-    }
-
-    private static ModConfig.InventoryButtonsCategory config() {
-        return ModConfig.INSTANCE.inventoryButtons;
     }
 }

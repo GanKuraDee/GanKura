@@ -124,17 +124,16 @@ public final class AttributeCostPanel {
     private static boolean clicked(double mouseX, double mouseY) {
         if (!drawn) return false;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
 
         if (mouseY >= titleTop && mouseY <= titleBottom) {
-            if (between(mouseX, nextLeft, nextRight)) return pickTarget(config, AttributeCostTarget.NEXT_TIER);
-            if (between(mouseX, maxLeft, maxRight)) return pickTarget(config, AttributeCostTarget.MAX_TIER);
+            if (between(mouseX, nextLeft, nextRight)) return pickTarget(AttributeCostTarget.NEXT_TIER);
+            if (between(mouseX, maxLeft, maxRight)) return pickTarget(AttributeCostTarget.MAX_TIER);
             return false;
         }
 
         if (mouseY >= labelTop && mouseY <= labelBottom) {
-            if (between(mouseX, instantLeft, instantRight)) return pickSort(config, AttributeCostSort.INSTANT);
-            if (between(mouseX, orderLeft, orderRight)) return pickSort(config, AttributeCostSort.ORDER);
+            if (between(mouseX, instantLeft, instantRight)) return pickSort(AttributeCostSort.INSTANT);
+            if (between(mouseX, orderLeft, orderRight)) return pickSort(AttributeCostSort.ORDER);
             return false;
         }
 
@@ -157,18 +156,18 @@ public final class AttributeCostPanel {
         return value >= left && value <= right;
     }
 
-    private static boolean pickTarget(ModConfig.InterfaceCategory config, AttributeCostTarget picked) {
-        if (config.attributeCostTarget != picked) {
-            config.attributeCostTarget = picked;
-            ModConfig.INSTANCE.saveNow();
+    private static boolean pickTarget(AttributeCostTarget picked) {
+        if (ModConfig.Interface.attributeCostTarget != picked) {
+            ModConfig.Interface.attributeCostTarget = picked;
+            ModConfig.save();
         }
         return true;
     }
 
-    private static boolean pickSort(ModConfig.InterfaceCategory config, AttributeCostSort picked) {
-        if (config.attributeCostSort != picked) {
-            config.attributeCostSort = picked;
-            ModConfig.INSTANCE.saveNow();
+    private static boolean pickSort(AttributeCostSort picked) {
+        if (ModConfig.Interface.attributeCostSort != picked) {
+            ModConfig.Interface.attributeCostSort = picked;
+            ModConfig.save();
         }
         return true;
     }
@@ -180,18 +179,17 @@ public final class AttributeCostPanel {
         // Bazaar を開いてしまわないよう、描く前に必ず倒しておく
         drawn = false;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableAttributeMenuTweaks || !config.showAttributeCosts) return;
+        if (!ModConfig.Interface.enableAttributeMenuTweaks || !ModConfig.Interface.showAttributeCosts) return;
         if (!GameState.Server.isSkyblock()) return;
         if (!screen.getTitle().getString().contains(MENU_TITLE)) return;
 
         // 値段を並べるので、古いままにしない
         ItemPrices.refreshIfStale();
 
-        List<Entry> entries = entries(config.attributeCostTarget, config.attributeCostSort);
+        List<Entry> entries = entries(ModConfig.Interface.attributeCostTarget, ModConfig.Interface.attributeCostSort);
         if (entries.isEmpty()) return;
 
-        draw(screen, graphics, config, entries.subList(0, Math.min(entries.size(), config.attributeCostRows)),
+        draw(screen, graphics, entries.subList(0, Math.min(entries.size(), ModConfig.Interface.attributeCostRows)),
                 mouseX, mouseY);
     }
 
@@ -274,7 +272,7 @@ public final class AttributeCostPanel {
     // -------------------------------------------------- 描画
 
     private static void draw(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics,
-                             ModConfig.InterfaceCategory config, List<Entry> entries,
+                             List<Entry> entries,
                              int mouseX, int mouseY) {
         Font font = Minecraft.getInstance().font;
 
@@ -318,17 +316,17 @@ public final class AttributeCostPanel {
         int maxRightEdge = x + panelWidth - PADDING;
         int nextRightEdge = maxRightEdge - font.width(MAX_LABEL) - COLUMN_GAP;
         label(graphics, font, NEXT_LABEL, nextRightEdge, textY, TITLE_COLOR,
-                config.attributeCostTarget == AttributeCostTarget.NEXT_TIER);
+                ModConfig.Interface.attributeCostTarget == AttributeCostTarget.NEXT_TIER);
         label(graphics, font, MAX_LABEL, maxRightEdge, textY, TITLE_COLOR,
-                config.attributeCostTarget == AttributeCostTarget.MAX_TIER);
+                ModConfig.Interface.attributeCostTarget == AttributeCostTarget.MAX_TIER);
         rememberTitle(font, nextRightEdge, maxRightEdge, textY);
         textY += LINE_HEIGHT + HEADER_SPACE;
 
         graphics.text(font, NEED_LABEL, needRight - font.width(NEED_LABEL), textY, NAME_COLOR, false);
         label(graphics, font, INSTANT_LABEL, instantRight, textY, INSTANT_COLOR,
-                config.attributeCostSort == AttributeCostSort.INSTANT);
+                ModConfig.Interface.attributeCostSort == AttributeCostSort.INSTANT);
         label(graphics, font, ORDER_LABEL, orderRight, textY, ORDER_COLOR,
-                config.attributeCostSort == AttributeCostSort.ORDER);
+                ModConfig.Interface.attributeCostSort == AttributeCostSort.ORDER);
         remember(font, instantRight, orderRight, textY);
         textY += LINE_HEIGHT + HEADER_SPACE;
 

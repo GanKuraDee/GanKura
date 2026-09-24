@@ -16,8 +16,7 @@ public class InventoryEffectsMixin {
 
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void gankura$hideEffects(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (config.enableInventoryTweaks && config.hideInventoryEffects
+        if (ModConfig.Interface.enableInventoryTweaks && ModConfig.Interface.hideInventoryEffects
                 && GameState.Server.isSkyblock()) {
             ci.cancel();
         }

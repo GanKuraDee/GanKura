@@ -24,13 +24,12 @@ public class MenuOpenKeybindHandler {
 
         // GUI表示中(チャット入力・コンテナ画面・設定画面など)はキー入力をそちらに譲り、誤爆を防ぐ。
         // 無効時も含め、押しっぱなしの状態を持ち越さないようにリセットしておく
-        if (!ModConfig.INSTANCE.keybinds.enableOpenMenuKeybind || client.screen != null) {
+        if (!ModConfig.Keybinds.enableOpenMenuKeybind || client.screen != null) {
             Arrays.fill(WAS_DOWN, false);
             return;
         }
 
-        ModConfig.KeybindsCategory config = ModConfig.INSTANCE.keybinds;
-        int[] keys = {config.openLoadoutsKeybind, config.openWardrobeKeybind, config.openEquipmentKeybind};
+        int[] keys = {ModConfig.Keybinds.openLoadoutsKeybind, ModConfig.Keybinds.openWardrobeKeybind, ModConfig.Keybinds.openEquipmentKeybind};
 
         for (int i = 0; i < COMMANDS.length; i++) {
             boolean down = isKeyDown(client, keys[i]);
@@ -42,9 +41,9 @@ public class MenuOpenKeybindHandler {
         }
     }
 
-    // 未設定のキーバインドは-1(GLFW_KEY_UNKNOWN)で保存されるため除外する
+    // 未設定のキーバインドは 0、マウスのボタンは負の値で保存されるため除外する
     private static boolean isKeyDown(Minecraft client, int keyCode) {
-        if (keyCode < 0) return false;
+        if (keyCode <= 0) return false;
         return InputConstants.isKeyDown(client.getWindow(), keyCode);
     }
 }

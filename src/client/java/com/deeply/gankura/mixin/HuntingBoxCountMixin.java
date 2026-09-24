@@ -47,8 +47,7 @@ public class HuntingBoxCountMixin {
     @Inject(method = "extractSlot", at = @At("TAIL"))
     private void gankura$markShardsOwned(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY,
                                          CallbackInfo ci) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableHuntingBoxTweaks || !config.showShardsOwned) return;
+        if (!ModConfig.Interface.enableHuntingBoxTweaks || !ModConfig.Interface.showShardsOwned) return;
         if (!GameState.Server.isSkyblock()) return;
 
         Screen screen = (Screen) (Object) this;

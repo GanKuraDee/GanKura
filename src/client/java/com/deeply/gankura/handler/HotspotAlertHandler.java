@@ -54,7 +54,7 @@ public class HotspotAlertHandler {
             reset();
             return;
         }
-        if (!ModConfig.INSTANCE.fishing.showHotspotGoneTitle) {
+        if (!ModConfig.Fishing.showHotspotGoneTitle) {
             reset();
             return;
         }

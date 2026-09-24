@@ -51,7 +51,7 @@ public class HudRenderer {
         }
 
         // --- サーバーリブート警告（画面中央固定） ---
-        if (ModConfig.INSTANCE.misc.enableRebootAlert && GameState.Server.isClosing && GameState.Server.closingTime != null) {
+        if (ModConfig.Misc.enableRebootAlert && GameState.Server.isClosing && GameState.Server.closingTime != null) {
             renderServerClosingAlert(graphics, client, client.font);
         }
 

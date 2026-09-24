@@ -44,8 +44,8 @@ public class GoldfinShardScanner {
             int level = goldfinLevel(menu.slots.get(i).getItem());
             if (level < 0) continue;
 
-            ModConfig.INSTANCE.fishing.goldfinShardLevel = level;
-            ModConfig.INSTANCE.fishing.goldfinShardRead = true;
+            ModConfig.Fishing.goldfinShardLevel = level;
+            ModConfig.Fishing.goldfinShardRead = true;
             return;
         }
     }

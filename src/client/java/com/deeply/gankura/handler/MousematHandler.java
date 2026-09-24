@@ -54,7 +54,7 @@ public final class MousematHandler {
             return;
         }
 
-        boolean down = isKeyDown(client, ModConfig.INSTANCE.farming.garden.releaseViewKeybind);
+        boolean down = isKeyDown(client, ModConfig.Farming.Garden.releaseViewKeybind);
         if (down && !keyWasDown && isLocked()) {
             locked = false;
             say(client, RELEASED_TEXT);
@@ -62,9 +62,9 @@ public final class MousematHandler {
         keyWasDown = down;
     }
 
-    // 割り当てていないキーは -1(GLFW_KEY_UNKNOWN)で保存される
+    // 割り当てていないキーは 0、マウスのボタンは負の値で保存される。どちらもキーボードの走査対象外
     private static boolean isKeyDown(Minecraft client, int keyCode) {
-        if (keyCode < 0) return false;
+        if (keyCode <= 0) return false;
         return InputConstants.isKeyDown(client.getWindow(), keyCode);
     }
 
@@ -94,7 +94,7 @@ public final class MousematHandler {
             return;
         }
 
-        if (!locked || !ModConfig.INSTANCE.farming.garden.unlockViewOnTeleport) return;
+        if (!locked || !ModConfig.Farming.Garden.unlockViewOnTeleport) return;
 
         // 飛んだ先で視点が固まったままだと、身動きが取れないと勘違いしやすい
         if (message.startsWith(TELEPORT_PREFIX) || message.equals(WARP_MESSAGE)) {
@@ -104,13 +104,13 @@ public final class MousematHandler {
     }
 
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.farming.garden.lockViewOnMousemat && GameState.Server.isGarden();
+        return ModConfig.Farming.Garden.lockViewOnMousemat && GameState.Server.isGarden();
     }
 
     /** 固定したときの知らせ。解除キーを割り当てていれば、その名前を添える */
     private static String lockedText() {
-        int keyCode = ModConfig.INSTANCE.farming.garden.releaseViewKeybind;
-        if (keyCode < 0) return LOCKED_TEXT_NO_KEY;
+        int keyCode = ModConfig.Farming.Garden.releaseViewKeybind;
+        if (keyCode <= 0) return LOCKED_TEXT_NO_KEY;
 
         String key = InputConstants.Type.KEYSYM.getOrCreate(keyCode).getDisplayName().getString();
         return LOCKED_TEXT + key + LOCKED_TEXT_TAIL;

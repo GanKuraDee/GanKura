@@ -37,7 +37,7 @@ public class CapturedCrittersHud extends HudElement {
 
     public CapturedCrittersHud() {
         super("captured_critters", 215, 10, 1.0f, 380, 150,
-                () -> ModConfig.INSTANCE.foraging.showCapturedCrittersHud,
+                () -> ModConfig.Foraging.showCapturedCrittersHud,
                 () -> GameState.Server.isSafari());
     }
 

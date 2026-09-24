@@ -37,8 +37,7 @@ public final class BestiaryTooltipHandler {
 
     public static void register() {
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-            ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-            if (!config.enableBestiaryMenuTweaks || !config.enableBestiaryTierNumbers) return;
+            if (!ModConfig.Interface.enableBestiaryMenuTweaks || !ModConfig.Interface.enableBestiaryTierNumbers) return;
             if (!GameState.Server.isSkyblock() || !BestiaryMenu.isOpen()) return;
             if (lines.isEmpty()) return;
 

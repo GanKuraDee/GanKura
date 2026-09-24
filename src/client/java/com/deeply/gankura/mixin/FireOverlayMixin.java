@@ -23,7 +23,7 @@ public class FireOverlayMixin {
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
     private static void gankura$hideFireOverlay(PoseStack pose, MultiBufferSource second,
                                                 TextureAtlasSprite sprite, CallbackInfo ci) {
-        if (!ModConfig.INSTANCE.combat.hideFireOverlay) return;
+        if (!ModConfig.Combat.hideFireOverlay) return;
         if (!GameState.Server.isSkyblock()) return;
 
         ci.cancel();

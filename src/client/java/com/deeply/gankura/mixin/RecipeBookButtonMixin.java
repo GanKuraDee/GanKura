@@ -20,8 +20,7 @@ public class RecipeBookButtonMixin {
 
     @Inject(method = "initButton", at = @At("HEAD"), cancellable = true)
     private void gankura$hideRecipeBookButton(CallbackInfo ci) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (config.enableInventoryTweaks && config.hideRecipeBook
+        if (ModConfig.Interface.enableInventoryTweaks && ModConfig.Interface.hideRecipeBook
                 && GameState.Server.isSkyblock()) {
             ci.cancel();
         }

@@ -55,11 +55,10 @@ public final class EnchantTooltipHandler {
 
     public static void register() {
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-            ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
             // Tooltips の Enable が親。ここが切れていれば中の設定は見ない
-            if (!config.enableItemTooltipTweaks || !config.enableEnchantTooltipTweaks) return;
-            if (!config.enableMaxEnchantChroma && !config.enableBookEnchantGold
-                    && !config.enableNumericEnchantTiers) {
+            if (!ModConfig.Interface.enableItemTooltipTweaks || !ModConfig.Interface.enableEnchantTooltipTweaks) return;
+            if (!ModConfig.Interface.enableMaxEnchantChroma && !ModConfig.Interface.enableBookEnchantGold
+                    && !ModConfig.Interface.enableNumericEnchantTiers) {
                 return;
             }
             if (!GameState.Server.isSkyblock()) return;
@@ -79,7 +78,7 @@ public final class EnchantTooltipHandler {
      */
     private static Component rewrite(Component component) {
         Line line = flatten(component);
-        boolean numbers = ModConfig.INSTANCE.interfaceSettings.enableNumericEnchantTiers;
+        boolean numbers = ModConfig.Interface.enableNumericEnchantTiers;
 
         byte[] marks = null;
         Map<Integer, Replacement> replacements = null;
@@ -121,16 +120,15 @@ public final class EnchantTooltipHandler {
         EnchantData.Levels levels = EnchantData.levels(name);
         if (levels == null || level <= 0) return PLAIN;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
 
         // Ultimate Enchantment はもともと目立つので、外せるようにしてある
-        if (levels.ultimate() && config.ignoreUltimateEnchants) return PLAIN;
+        if (levels.ultimate() && ModConfig.Interface.ignoreUltimateEnchants) return PLAIN;
 
         // 表より高いレベルの品も最大として扱う
-        if (level >= levels.max()) return config.enableMaxEnchantChroma ? CHROMA : PLAIN;
+        if (level >= levels.max()) return ModConfig.Interface.enableMaxEnchantChroma ? CHROMA : PLAIN;
 
         // エンチャントテーブルでは届かないレベル。本を重ねないと手に入らない
-        if (level > levels.table()) return config.enableBookEnchantGold ? GOLD : PLAIN;
+        if (level > levels.table()) return ModConfig.Interface.enableBookEnchantGold ? GOLD : PLAIN;
 
         return PLAIN;
     }

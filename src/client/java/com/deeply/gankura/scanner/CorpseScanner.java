@@ -105,8 +105,8 @@ public class CorpseScanner {
     // 目印を切っているだけで Vanguard の知らせまで止まるのは分かりにくい
     private static boolean isEnabled() {
         if (!GameState.Server.isMineshaft()) return false;
-        return ModConfig.INSTANCE.mining.showCorpseWaypoints
-                || ModConfig.INSTANCE.mining.showVanguardTitle;
+        return ModConfig.Mining.showCorpseWaypoints
+                || ModConfig.Mining.showVanguardTitle;
     }
 
     private static void scan(Minecraft client) {
@@ -141,7 +141,7 @@ public class CorpseScanner {
      * 入り口に立った瞬間ではなく、そこそこ近くまで進んだところで出る
      */
     private static void announceVanguard(Minecraft client, List<Corpse> found) {
-        if (!ModConfig.INSTANCE.mining.showVanguardTitle || vanguardAnnounced) return;
+        if (!ModConfig.Mining.showVanguardTitle || vanguardAnnounced) return;
 
         boolean hasVanguard = found.stream().anyMatch(corpse -> Kind.VANGUARD.label.equals(corpse.name()));
         if (!hasVanguard) return;

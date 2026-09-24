@@ -12,7 +12,7 @@ public class BaitHud extends HudElement {
 
     public BaitHud() {
         super("bait", 460, 199, 1.0f, 130, 15,
-                () -> ModConfig.INSTANCE.fishing.showBaitHud, () -> GameState.Player.fishingBait != null);
+                () -> ModConfig.Fishing.showBaitHud, () -> GameState.Player.fishingBait != null);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class GoldenFishHud extends HudElement {
 
     public GoldenFishHud() {
         super("golden_fish", 10, 110, 1.0f, 260, 64,
-                () -> ModConfig.INSTANCE.fishing.showGoldenFishTimer,
+                () -> ModConfig.Fishing.showGoldenFishTimer,
                 () -> !lines(false).isEmpty());
     }
 
@@ -71,7 +71,7 @@ public class GoldenFishHud extends HudElement {
         long rod = GoldenFishHandler.rodRemaining();
         if (rod >= 0) lines.add("§7Throw rod in: §b" + time(rod));
 
-        lines.add(goldfinLine(ModConfig.INSTANCE.fishing.goldfinShardLevel));
+        lines.add(goldfinLine(ModConfig.Fishing.goldfinShardLevel));
         return lines;
     }
 
@@ -82,7 +82,7 @@ public class GoldenFishHud extends HudElement {
      */
     private static String goldfinLine(int level) {
         // レベル0と見分けられないと、短縮を見落としていることに気づけない
-        if (!ModConfig.INSTANCE.fishing.goldfinShardRead) {
+        if (!ModConfig.Fishing.goldfinShardRead) {
             return "§7Goldfin Shard Level: §cUnknown §8(open the Attribute Menu)";
         }
 

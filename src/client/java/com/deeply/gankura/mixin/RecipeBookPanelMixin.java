@@ -15,8 +15,7 @@ public class RecipeBookPanelMixin {
 
     @Inject(method = "isVisible", at = @At("HEAD"), cancellable = true)
     private void gankura$hideRecipeBook(CallbackInfoReturnable<Boolean> cir) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (config.enableInventoryTweaks && config.hideRecipeBook
+        if (ModConfig.Interface.enableInventoryTweaks && ModConfig.Interface.hideRecipeBook
                 && GameState.Server.isSkyblock()) {
             cir.setReturnValue(false);
         }

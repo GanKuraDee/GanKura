@@ -79,7 +79,7 @@ public class FishingBobberTracker {
 
     private static void tick(Minecraft client) {
         // どちらの表示も切っているなら、浮きを探す必要が無い
-        if (!ModConfig.INSTANCE.fishing.showCastTimer && !ModConfig.INSTANCE.fishing.showBiteCountdownHud) {
+        if (!ModConfig.Fishing.showCastTimer && !ModConfig.Fishing.showBiteCountdownHud) {
             startMillis = 0;
             hypixelCountdown = null;
             fishArrived = false;
@@ -100,7 +100,7 @@ public class FishingBobberTracker {
 
         // 着水を待つ設定のときは、水面(溶岩面)に触れてから数え始める。
         // 待たない設定なら、投げた瞬間 = 浮きが出た瞬間から数える
-        if (!ModConfig.INSTANCE.fishing.castTimerOnLiquidTouch || hook.isInWater() || hook.isInLava()) {
+        if (!ModConfig.Fishing.castTimerOnLiquidTouch || hook.isInWater() || hook.isInLava()) {
             startMillis = System.currentTimeMillis();
         }
     }

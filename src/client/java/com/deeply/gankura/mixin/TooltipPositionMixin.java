@@ -33,8 +33,7 @@ public class TooltipPositionMixin {
         // 画面に収まっている説明はカーソルの脇に出したままにする。
         // 一番上に揃えるのは、頭が切れてしまうものだけでよい
         boolean overflows = tooltipHeight + MARGIN * 2 > screenHeight;
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        boolean fromTop = overflows && config.enableItemTooltipTweaks && config.tooltipFromTop;
+        boolean fromTop = overflows && ModConfig.Interface.enableItemTooltipTweaks && ModConfig.Interface.tooltipFromTop;
 
         int offset = ScrollableTooltipHandler.offset();
         if (!fromTop && offset == 0) return;

@@ -109,13 +109,12 @@ public final class EtherwarpHandler {
 
     /** いま示す行き先。示さないときは null */
     public static Target target(Minecraft client) {
-        ModConfig.MiscCategory config = ModConfig.INSTANCE.misc;
-        if (!config.showEtherwarpTarget) return null;
+        if (!ModConfig.Misc.showEtherwarpTarget) return null;
         if (!GameState.Server.isSkyblock()) return null;
 
         Player player = client.player;
         if (player == null || client.level == null) return null;
-        if (config.etherwarpOnlySneaking && !player.isShiftKeyDown()) return null;
+        if (ModConfig.Misc.etherwarpOnlySneaking && !player.isShiftKeyDown()) return null;
 
         ItemStack held = player.getMainHandItem();
         if (!SkyblockItemId.hasAttribute(held, MERGE_KEY)) return null;

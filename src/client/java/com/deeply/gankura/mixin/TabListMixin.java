@@ -66,7 +66,7 @@ public class TabListMixin {
     private void gankura$renderTabList(GuiGraphicsExtractor graphics, int width, Scoreboard scoreboard,
                                        Objective objective, CallbackInfo ci) {
         // 点数や体力を出す一覧は作りが変わるので、そのときはバニラに任せる
-        if (!ModConfig.INSTANCE.interfaceSettings.enableTabListTweaks) return;
+        if (!ModConfig.Interface.enableTabListTweaks) return;
         if (!GameState.Server.isSkyblock() || objective != null) return;
 
         PlayerTabOverlay overlay = (PlayerTabOverlay) (Object) this;
@@ -82,7 +82,7 @@ public class TabListMixin {
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void gankura$hideAds(GuiGraphicsExtractor graphics, int width, Scoreboard scoreboard,
                                  Objective objective, CallbackInfo ci) {
-        if (!gankura$enabled(ModConfig.INSTANCE.interfaceSettings.hideTabListAds)) return;
+        if (!gankura$enabled(ModConfig.Interface.hideTabListAds)) return;
 
         gankura$savedHeader = header;
         gankura$savedFooter = footer;
@@ -121,7 +121,7 @@ public class TabListMixin {
     @Inject(method = "extractPingIcon", at = @At("HEAD"), cancellable = true)
     private void gankura$hidePingIcon(GuiGraphicsExtractor graphics, int width, int x, int y,
                                       PlayerInfo entry, CallbackInfo ci) {
-        if (gankura$enabled(ModConfig.INSTANCE.interfaceSettings.hideTabListPing)) ci.cancel();
+        if (gankura$enabled(ModConfig.Interface.hideTabListPing)) ci.cancel();
     }
 
     // -------------------------------------------------- 顔
@@ -145,7 +145,7 @@ public class TabListMixin {
                     target = "Lnet/minecraft/client/gui/components/PlayerFaceExtractor;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/resources/Identifier;IIIZZI)V"))
     private void gankura$hideExtraHead(GuiGraphicsExtractor graphics, Identifier texture, int x, int y,
                                        int size, boolean hat, boolean upsideDown, int color) {
-        if (gankura$enabled(ModConfig.INSTANCE.interfaceSettings.hideTabListHeads)
+        if (gankura$enabled(ModConfig.Interface.hideTabListHeads)
                 && !TabListCleaner.hasHead((PlayerTabOverlay) (Object) this, gankura$currentEntry)) {
             return;
         }
@@ -154,7 +154,7 @@ public class TabListMixin {
 
     @Unique
     private boolean gankura$enabled(boolean option) {
-        return ModConfig.INSTANCE.interfaceSettings.enableTabListTweaks
+        return ModConfig.Interface.enableTabListTweaks
                 && option && GameState.Server.isSkyblock();
     }
 }

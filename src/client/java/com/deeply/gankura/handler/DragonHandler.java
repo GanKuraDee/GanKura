@@ -165,7 +165,7 @@ public class DragonHandler {
     private static void printDragonResult(Minecraft client, String dps, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
-                if (ModConfig.INSTANCE.combat.theEnd.showDragonDpsChat && dps != null && duration != null) {
+                if (ModConfig.Combat.TheEnd.showDragonDpsChat && dps != null && duration != null) {
                     MutableComponent msg = Component.literal(String.format("§dYour Dragon DPS: §l§o%s §r§7(%s) ", dps, duration));
                     if (durationSeconds > 0 && GameState.Dragon.top1Damage > 0) {
                         MutableComponent hoverText = Component.literal("§d§lTop 3 DPS\n");
@@ -178,7 +178,7 @@ public class DragonHandler {
                     }
                     NotificationUtils.sendSystemChat(client, msg);
                 }
-                if (ModConfig.INSTANCE.combat.theEnd.showDragonLootQualityChat) {
+                if (ModConfig.Combat.TheEnd.showDragonLootQualityChat) {
                     // 畳んだ中身を開かなくても済むよう、全部に届いたかどうかを値の色で示す
                     String colour = qualityColour(lq, LQ_DRAGON_LEGENDARY, LQ_DRAGON_EPIC);
                     MutableComponent msg = Component.literal(
@@ -214,10 +214,10 @@ public class DragonHandler {
 
     // ★追加: ドラゴンの種類に応じてアラート設定がONになっているか確認するメソッド
     private static boolean isAlertEnabledFor(String dragonType) {
-        if (!ModConfig.INSTANCE.combat.theEnd.enableDragonSpawnAlert) return false;
+        if (!ModConfig.Combat.TheEnd.enableDragonSpawnAlert) return false;
         // 未知のドラゴンは fromTypeName が null を返し、リストにも含まれないため表示しない
         DragonAlertType type = DragonAlertType.fromTypeName(dragonType);
-        return type != null && ModConfig.INSTANCE.combat.theEnd.dragonSpawnAlerts.contains(type);
+        return type != null && java.util.Arrays.asList(ModConfig.Combat.TheEnd.dragonSpawnAlerts).contains(type);
     }
 
     // ★Utilsから引き継いだドラゴンスポーンの表示処理

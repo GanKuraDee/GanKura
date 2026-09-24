@@ -1,5 +1,6 @@
 package com.deeply.gankura.gui;
 
+import com.deeply.gankura.data.InventoryButtonStore;
 import com.deeply.gankura.data.InventoryButton;
 import com.deeply.gankura.data.ModConfig;
 import com.google.gson.Gson;
@@ -49,7 +50,7 @@ public final class InventoryButtonPresets {
     }
 
     public static LinkedHashMap<String, List<InventoryButton>> saved() {
-        return ModConfig.INSTANCE.inventoryButtons.savedPresets;
+        return InventoryButtonStore.savedPresets();
     }
 
     public static boolean isBuiltIn(String name) {
@@ -72,14 +73,14 @@ public final class InventoryButtonPresets {
         }
 
         saved.put(trimmed, copyOf(buttons));
-        ModConfig.INSTANCE.saveNow();
+        ModConfig.save();
         return null;
     }
 
     public static boolean delete(String name) {
         if (isBuiltIn(name) || saved().remove(name) == null) return false;
 
-        ModConfig.INSTANCE.saveNow();
+        ModConfig.save();
         return true;
     }
 

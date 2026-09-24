@@ -62,7 +62,7 @@ public final class AbilityMenuHandler {
     }
 
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.misc.keepAbilityMenuOpen && GameState.Server.isSkyblock();
+        return ModConfig.Misc.keepAbilityMenuOpen && GameState.Server.isSkyblock();
     }
 
     private static boolean opensMenu(ItemStack stack) {

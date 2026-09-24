@@ -71,16 +71,15 @@ public abstract class MenuSetKeybindMixin {
     }
 
     private static int resolveTargetSlot(String title, int keyCode) {
-        ModConfig.KeybindsCategory keybinds = ModConfig.INSTANCE.keybinds;
 
         Matcher loadoutsMatcher = LOADOUTS_TITLE_PATTERN.matcher(title);
         if (loadoutsMatcher.find()) {
-            if (!keybinds.enableLoadoutsKeybind) return -1;
+            if (!ModConfig.Keybinds.enableLoadoutsKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    keybinds.loadoutsKeybindSlot1, keybinds.loadoutsKeybindSlot2, keybinds.loadoutsKeybindSlot3,
-                    keybinds.loadoutsKeybindSlot4, keybinds.loadoutsKeybindSlot5, keybinds.loadoutsKeybindSlot6,
-                    keybinds.loadoutsKeybindSlot7, keybinds.loadoutsKeybindSlot8, keybinds.loadoutsKeybindSlot9,
-                    keybinds.loadoutsKeybindSlot10, keybinds.loadoutsKeybindSlot11, keybinds.loadoutsKeybindSlot12);
+                    ModConfig.Keybinds.loadoutsKeybindSlot1, ModConfig.Keybinds.loadoutsKeybindSlot2, ModConfig.Keybinds.loadoutsKeybindSlot3,
+                    ModConfig.Keybinds.loadoutsKeybindSlot4, ModConfig.Keybinds.loadoutsKeybindSlot5, ModConfig.Keybinds.loadoutsKeybindSlot6,
+                    ModConfig.Keybinds.loadoutsKeybindSlot7, ModConfig.Keybinds.loadoutsKeybindSlot8, ModConfig.Keybinds.loadoutsKeybindSlot9,
+                    ModConfig.Keybinds.loadoutsKeybindSlot10, ModConfig.Keybinds.loadoutsKeybindSlot11, ModConfig.Keybinds.loadoutsKeybindSlot12);
             if (index < 0) return -1;
 
             int page = Integer.parseInt(loadoutsMatcher.group("page"));
@@ -90,21 +89,21 @@ public abstract class MenuSetKeybindMixin {
         }
 
         if (ARMOR_SET_TITLE_PATTERN.matcher(title).find()) {
-            if (!keybinds.enableArmorSetKeybind) return -1;
+            if (!ModConfig.Keybinds.enableArmorSetKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    keybinds.armorSetKeybindSlot1, keybinds.armorSetKeybindSlot2, keybinds.armorSetKeybindSlot3,
-                    keybinds.armorSetKeybindSlot4, keybinds.armorSetKeybindSlot5, keybinds.armorSetKeybindSlot6,
-                    keybinds.armorSetKeybindSlot7, keybinds.armorSetKeybindSlot8, keybinds.armorSetKeybindSlot9);
+                    ModConfig.Keybinds.armorSetKeybindSlot1, ModConfig.Keybinds.armorSetKeybindSlot2, ModConfig.Keybinds.armorSetKeybindSlot3,
+                    ModConfig.Keybinds.armorSetKeybindSlot4, ModConfig.Keybinds.armorSetKeybindSlot5, ModConfig.Keybinds.armorSetKeybindSlot6,
+                    ModConfig.Keybinds.armorSetKeybindSlot7, ModConfig.Keybinds.armorSetKeybindSlot8, ModConfig.Keybinds.armorSetKeybindSlot9);
             if (index < 0 || index >= SET_COLUMNS) return -1;
             return SET_BUTTON_ROW * MENU_WIDTH + index;
         }
 
         if (EQUIPMENT_SET_TITLE_PATTERN.matcher(title).find()) {
-            if (!keybinds.enableEquipmentSetKeybind) return -1;
+            if (!ModConfig.Keybinds.enableEquipmentSetKeybind) return -1;
             int index = indexOfKey(keyCode,
-                    keybinds.equipmentSetKeybindSlot1, keybinds.equipmentSetKeybindSlot2, keybinds.equipmentSetKeybindSlot3,
-                    keybinds.equipmentSetKeybindSlot4, keybinds.equipmentSetKeybindSlot5, keybinds.equipmentSetKeybindSlot6,
-                    keybinds.equipmentSetKeybindSlot7, keybinds.equipmentSetKeybindSlot8, keybinds.equipmentSetKeybindSlot9);
+                    ModConfig.Keybinds.equipmentSetKeybindSlot1, ModConfig.Keybinds.equipmentSetKeybindSlot2, ModConfig.Keybinds.equipmentSetKeybindSlot3,
+                    ModConfig.Keybinds.equipmentSetKeybindSlot4, ModConfig.Keybinds.equipmentSetKeybindSlot5, ModConfig.Keybinds.equipmentSetKeybindSlot6,
+                    ModConfig.Keybinds.equipmentSetKeybindSlot7, ModConfig.Keybinds.equipmentSetKeybindSlot8, ModConfig.Keybinds.equipmentSetKeybindSlot9);
             if (index < 0 || index >= SET_COLUMNS) return -1;
             return SET_BUTTON_ROW * MENU_WIDTH + index;
         }
@@ -112,10 +111,10 @@ public abstract class MenuSetKeybindMixin {
         return -1;
     }
 
-    // 未設定のキーバインドは-1(KeyboardConstants.none)で保存されるため、
-    // event.key()が負の値になることは実際にはないが念のため除外する
+    // 未設定のキーバインドは 0、マウスのボタンは負の値で保存されるため、
+    // キーボードの入力と取り違えないようどちらも除外する
     private static int indexOfKey(int keyCode, int... keybinds) {
-        if (keyCode < 0) return -1;
+        if (keyCode <= 0) return -1;
         for (int i = 0; i < keybinds.length; i++) {
             if (keybinds[i] == keyCode) return i;
         }

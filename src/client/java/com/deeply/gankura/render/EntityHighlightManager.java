@@ -1059,16 +1059,16 @@ public class EntityHighlightManager {
 
         // Golden Fish: Mob Visuals とは別の機能なので、ここもハイライトだけにする。
         // 下の早期戻りより前に置き、Mob Visuals を全て切っていても動くようにする
-        boolean goldenFishVisuals = ModConfig.INSTANCE.fishing.highlightGoldenFish
-                || ModConfig.INSTANCE.fishing.tracerGoldenFish;
+        boolean goldenFishVisuals = ModConfig.Fishing.highlightGoldenFish
+                || ModConfig.Fishing.tracerGoldenFish;
         if (goldenFishVisuals && GoldenFishHandler.isActive()) {
             for (Entity entity : client.level.entitiesForRendering()) {
                 if (!matchesHeadSkin(entity, GOLDEN_FISH_SKIN)) continue;
 
-                if (ModConfig.INSTANCE.fishing.tracerGoldenFish) {
+                if (ModConfig.Fishing.tracerGoldenFish) {
                     tracerEntities.put(entity, 0xFF000000 | GOLDEN_FISH_GLOW_COLOR);
                 }
-                if (!ModConfig.INSTANCE.fishing.highlightGoldenFish) continue;
+                if (!ModConfig.Fishing.highlightGoldenFish) continue;
 
                 // marker でないアーマースタンドは、そのままだと腕・胴・脚の輪郭まで出てしまう
                 if (entity instanceof ArmorStand stand && !stand.isMarker()) headOnlyGlowEntities.add(entity);
@@ -1080,8 +1080,6 @@ public class EntityHighlightManager {
             }
         }
 
-        ModConfig.TheEndCategory theEnd = ModConfig.INSTANCE.combat.theEnd;
-        ModConfig.SpidersDenCategory spidersDen = ModConfig.INSTANCE.combat.spidersDen;
 
         // 各ボスについて「その場に居るか(Present)」「Glowing対象か(glow)」「探索が必要か(scan)」を分けて持つ。
         // ネームプレートのみ有効な場合も探索は必要だが、Glowing対象には加えない
@@ -1114,7 +1112,6 @@ public class EntityHighlightManager {
                 && ASHFANG_FOLLOWERS.stream().anyMatch(f -> f.enableHighlight().get() || f.enableTracer().get() || f.enableNameplate().get());
 
         // Wumpa: Safari に出現するラヴェジャーは Wumpa しかいないため、型だけで本体と判定できる
-        ModConfig.ForagingCategory foraging = ModConfig.INSTANCE.foraging;
         boolean isSafari = GameState.Server.isSafari();
         boolean glowWumpa = isSafari && SafariIcy.WUMPA.highlight();
         boolean scanWumpa = isSafari && SafariIcy.WUMPA.anyEnabled();
@@ -2977,18 +2974,16 @@ public class EntityHighlightManager {
      * 捕まえた後は用済みになる。設定次第でそこで打ち切る
      */
     private static boolean showSafariFish() {
-        ModConfig.ForagingCategory config = ModConfig.INSTANCE.foraging;
-        if (!config.enableSafariFishHighlight) return false;
+        if (!ModConfig.Foraging.enableSafariFishHighlight) return false;
 
-        return !config.hideSafariFishWhenCaptured || !captured(SafariCavern.SCRAPPY);
+        return !ModConfig.Foraging.hideSafariFishWhenCaptured || !captured(SafariCavern.SCRAPPY);
     }
 
     /** Rockmite の巣を探すか。捕まえた後は用済みになる */
     private static boolean showRockmiteMounds() {
-        ModConfig.ForagingCategory config = ModConfig.INSTANCE.foraging;
-        if (!config.enableRockmiteMoundHighlight) return false;
+        if (!ModConfig.Foraging.enableRockmiteMoundHighlight) return false;
 
-        return !config.hideRockmiteMoundsWhenCaptured || !captured(SafariCavern.ROCKMITE);
+        return !ModConfig.Foraging.hideRockmiteMoundsWhenCaptured || !captured(SafariCavern.ROCKMITE);
     }
 
     private static boolean captured(MobVisual critter) {
@@ -3120,8 +3115,7 @@ public class EntityHighlightManager {
     }
 
     private static void showSeaCreatureTitle(Minecraft client, MobVisual target, boolean fromCatch, String suffix) {
-        ModConfig.MobVisualsCategory config = ModConfig.INSTANCE.mobVisuals;
-        if (!config.enableSeaCreatureTitle && !config.enableSeaCreatureSound) return;
+        if (!ModConfig.MobVisuals.enableSeaCreatureTitle && !ModConfig.MobVisuals.enableSeaCreatureSound) return;
 
         // 自分で釣った分は、チャットの文言で既に知らせている。
         // 引換券のように釣れた匹数ぶんだけ使うので、
@@ -3137,11 +3131,11 @@ public class EntityHighlightManager {
         String text = color + "§l" + target.plainLabel() + suffix + color + "§l!";
         // このタイトルだけはフェードを挟まず、出た瞬間に読めるようにする
         client.execute(() -> {
-            if (config.enableSeaCreatureTitle) {
+            if (ModConfig.MobVisuals.enableSeaCreatureTitle) {
                 NotificationUtils.showTitle(client, Component.literal(text), null,
                         SEA_CREATURE_TITLE_FADE, SEA_CREATURE_TITLE_STAY, SEA_CREATURE_TITLE_FADE);
             }
-            if (config.enableSeaCreatureSound) {
+            if (ModConfig.MobVisuals.enableSeaCreatureSound) {
                 NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP,
                         SEA_CREATURE_SOUND_VOLUME, SEA_CREATURE_SOUND_PITCH);
             }
@@ -3677,7 +3671,7 @@ public class EntityHighlightManager {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
 
-        if (ModConfig.INSTANCE.mobVisuals.tracerMode == ModConfig.MobVisualsCategory.TracerMode.ALL) {
+        if (ModConfig.MobVisuals.tracerMode == ModConfig.MobVisuals.TracerMode.ALL) {
             tracerEntities.put(entity, colorARGB);
             return;
         }

@@ -32,7 +32,7 @@ public class MouseCursorRestoreMixin {
 
     @Inject(method = "setScreen", at = @At("HEAD"))
     private void gankura$beforeSetScreen(Screen screen, CallbackInfo ci) {
-        if (!ModConfig.INSTANCE.interfaceSettings.enableCursorRestoreOnRapidReopen) {
+        if (!ModConfig.Interface.enableCursorRestoreOnRapidReopen) {
             this.gankura$shouldRestore = false;
             return;
         }
