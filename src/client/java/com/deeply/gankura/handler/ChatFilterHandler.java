@@ -40,15 +40,14 @@ public final class ChatFilterHandler {
     public static boolean shouldHide(String unformattedMsg) {
         if (!GameState.Server.isSkyblock()) return false;
 
-        ModConfig.ChatFilterCategory config = ModConfig.INSTANCE.chatFilter;
         String message = unformattedMsg.trim();
 
         // 見出しの前後に挟まる空行。何も書かれていないので、消しても読み落としはない
-        if (config.hideBlankMessages && message.isEmpty()) return true;
+        if (ModConfig.ChatFilter.hideBlankMessages && message.isEmpty()) return true;
 
-        if (config.hideProfileMessage && message.startsWith(PROFILE_NAME_PREFIX)) return true;
-        if (config.hideProfileIdMessage && message.startsWith(PROFILE_ID_PREFIX)) return true;
-        if (!config.hideStashMessage) return false;
+        if (ModConfig.ChatFilter.hideProfileMessage && message.startsWith(PROFILE_NAME_PREFIX)) return true;
+        if (ModConfig.ChatFilter.hideProfileIdMessage && message.startsWith(PROFILE_ID_PREFIX)) return true;
+        if (!ModConfig.ChatFilter.hideStashMessage) return false;
 
         for (Pattern pattern : STASH_PATTERNS) {
             if (pattern.matcher(message).find()) return true;

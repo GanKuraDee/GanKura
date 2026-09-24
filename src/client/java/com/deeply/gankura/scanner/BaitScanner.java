@@ -101,7 +101,7 @@ public class BaitScanner {
      * 餌を付け直すか、余裕のある数に戻るとまた出せるようにする
      */
     private static void checkLow(Minecraft client, String bait, int count) {
-        if (!ModConfig.INSTANCE.fishing.showBaitLowAlert) {
+        if (!ModConfig.Fishing.showBaitLowAlert) {
             alerted = false;
             return;
         }
@@ -110,7 +110,7 @@ public class BaitScanner {
         if (!bait.equals(GameState.Player.fishingBait)) alerted = false;
 
         // まだ余裕があるうちも戻しておく
-        if (count > ModConfig.INSTANCE.fishing.baitLowThreshold) {
+        if (count > ModConfig.Fishing.baitLowThreshold) {
             alerted = false;
             return;
         }

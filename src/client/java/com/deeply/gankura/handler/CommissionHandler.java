@@ -43,7 +43,7 @@ public final class CommissionHandler {
     }
 
     private static Integer compute(ItemStack stack) {
-        if (!ModConfig.INSTANCE.mining.highlightCompletedCommissions) return null;
+        if (!ModConfig.Mining.highlightCompletedCommissions) return null;
         if (!GameState.Server.isSkyblock() || stack.isEmpty()) return null;
 
         ItemLore lore = stack.get(DataComponents.LORE);

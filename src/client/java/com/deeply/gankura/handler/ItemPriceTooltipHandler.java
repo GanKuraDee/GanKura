@@ -34,10 +34,9 @@ public final class ItemPriceTooltipHandler {
 
     public static void register() {
         ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-            ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
             // Tooltips の Enable が親。ここが切れていれば中の設定は見ない
-            if (!config.enableItemTooltipTweaks || !config.enableItemPrice) return;
-            if (!config.showLowestBin && !config.showBazaarPrice && !config.showCraftCost) return;
+            if (!ModConfig.Interface.enableItemTooltipTweaks || !ModConfig.Interface.enableItemPrice) return;
+            if (!ModConfig.Interface.showLowestBin && !ModConfig.Interface.showBazaarPrice && !ModConfig.Interface.showCraftCost) return;
             if (!GameState.Server.isSkyblock()) return;
 
             // 何か持ち上げた時点で取りに行く。次に見たときには間に合っている
@@ -48,8 +47,8 @@ public final class ItemPriceTooltipHandler {
 
             SkyblockItemId.Pet pet = SkyblockItemId.pet(stack);
             List<Component> priceLines = pet == null
-                    ? build(config, itemId, stack.getCount())
-                    : buildPet(config, pet, lines);
+                    ? build(itemId, stack.getCount())
+                    : buildPet(pet, lines);
             if (priceLines.isEmpty()) return;
 
             // 元の説明と地続きに見えないよう、1行空けてから足す
@@ -58,28 +57,28 @@ public final class ItemPriceTooltipHandler {
         });
     }
 
-    private static List<Component> build(ModConfig.InterfaceCategory config, String itemId, int count) {
+    private static List<Component> build(String itemId, int count) {
         List<Component> lines = new ArrayList<>();
 
-        if (config.showLowestBin) {
+        if (ModConfig.Interface.showLowestBin) {
             Double lowestBin = ItemPrices.lowestBin(itemId);
-            if (lowestBin != null) lines.add(line(config, "Lowest BIN", lowestBin, count));
+            if (lowestBin != null) lines.add(line("Lowest BIN", lowestBin, count));
         }
 
-        if (config.showBazaarPrice) {
+        if (ModConfig.Interface.showBazaarPrice) {
             ItemPrices.Bazaar bazaar = ItemPrices.bazaar(itemId);
             if (bazaar != null) {
-                BazaarPriceType shown = config.bazaarPriceType;
+                BazaarPriceType shown = ModConfig.Interface.bazaarPriceType;
                 if (shown != BazaarPriceType.INSTANT_SELL) {
-                    lines.add(line(config, "Bazaar Buy", bazaar.instantBuy(), count));
+                    lines.add(line("Bazaar Buy", bazaar.instantBuy(), count));
                 }
                 if (shown != BazaarPriceType.INSTANT_BUY) {
-                    lines.add(line(config, "Bazaar Sell", bazaar.instantSell(), count));
+                    lines.add(line("Bazaar Sell", bazaar.instantSell(), count));
                 }
             }
         }
 
-        if (config.showCraftCost) addCraftCost(config, lines, itemId, count);
+        if (ModConfig.Interface.showCraftCost) addCraftCost(lines, itemId, count);
 
         return lines;
     }
@@ -89,9 +88,9 @@ public final class ItemPriceTooltipHandler {
      *
      * ペットは Bazaar には無く、作ることもできないので最安 BIN だけを出す
      */
-    private static List<Component> buildPet(ModConfig.InterfaceCategory config, SkyblockItemId.Pet pet,
+    private static List<Component> buildPet(SkyblockItemId.Pet pet,
                                             List<Component> lore) {
-        if (!config.showLowestBin) return List.of();
+        if (!ModConfig.Interface.showLowestBin) return List.of();
 
         PetBin.Result found = PetBin.of(pet, lore);
         if (found == null) return List.of();
@@ -100,7 +99,7 @@ public final class ItemPriceTooltipHandler {
         String label = found.listed() == found.level()
                 ? "Lowest BIN"
                 : "Lowest BIN (Lvl " + found.listed() + ")";
-        return List.of(line(config, label, found.price(), 1));
+        return List.of(line(label, found.price(), 1));
     }
 
     /**
@@ -109,7 +108,7 @@ public final class ItemPriceTooltipHandler {
      * Bazaar の材料は買い方で値段が変わるので、
      * 今すぐ買う場合と、買い注文を出して待つ場合の両方を出す
      */
-    private static void addCraftCost(ModConfig.InterfaceCategory config, List<Component> lines,
+    private static void addCraftCost(List<Component> lines,
                                      String itemId, int count) {
         ItemRecipes.Recipe recipe = ItemRecipes.of(itemId);
         if (recipe == null) return;
@@ -120,12 +119,12 @@ public final class ItemPriceTooltipHandler {
 
         // Auction House だけで揃う品は、待っても値段が変わらない
         if (instant.equals(order)) {
-            lines.add(line(config, "Craft", instant, count));
+            lines.add(line("Craft", instant, count));
             return;
         }
 
-        lines.add(line(config, "Craft (Instant Buy)", instant, count));
-        lines.add(line(config, "Craft (Buy Order)", order, count));
+        lines.add(line("Craft (Instant Buy)", instant, count));
+        lines.add(line("Craft (Buy Order)", order, count));
     }
 
     /** 材料のどれか1つでも値段が分からなければ null。当てにならない合計は出さない */
@@ -155,21 +154,21 @@ public final class ItemPriceTooltipHandler {
         return ItemPrices.lowestBin(itemId);
     }
 
-    private static Component line(ModConfig.InterfaceCategory config, String label, double price, int count) {
+    private static Component line(String label, double price, int count) {
         StringBuilder text = new StringBuilder(LABEL_STYLE).append(label)
-                .append(": ").append(COIN_STYLE).append(format(config, price));
+                .append(": ").append(COIN_STYLE).append(format(price));
 
         // まとめて持っているときは、その分の合計も添える
-        if (count > 1 && config.showStackPrice) {
+        if (count > 1 && ModConfig.Interface.showStackPrice) {
             text.append(' ').append(LABEL_STYLE).append('(')
-                    .append(COIN_STYLE).append(format(config, price * count))
+                    .append(COIN_STYLE).append(format(price * count))
                     .append(LABEL_STYLE).append(" for ").append(count).append(')');
         }
 
         return Component.literal(text.toString());
     }
 
-    private static String format(ModConfig.InterfaceCategory config, double price) {
-        return CoinText.format(price, config.shortPriceNumbers);
+    private static String format(double price) {
+        return CoinText.format(price, ModConfig.Interface.shortPriceNumbers);
     }
 }

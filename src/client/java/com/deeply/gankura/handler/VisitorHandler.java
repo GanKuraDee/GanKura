@@ -136,7 +136,7 @@ public final class VisitorHandler {
         }
         statusLines = List.copyOf(status);
 
-        if (full && !queueFull && ModConfig.INSTANCE.farming.garden.showVisitorQueueFullTitle) {
+        if (full && !queueFull && ModConfig.Farming.Garden.showVisitorQueueFullTitle) {
             NotificationUtils.showTitle(client,
                     Component.literal(QUEUE_FULL_TITLE), Component.literal(QUEUE_FULL_SUBTITLE),
                     TITLE_FADE, TITLE_STAY, TITLE_FADE);
@@ -152,7 +152,7 @@ public final class VisitorHandler {
      * 畑を耕している間はチャットが流れていくので、1行では気付けない
      */
     public static void handleMessage(Component message, Minecraft client) {
-        if (!ModConfig.INSTANCE.farming.garden.showVisitorArrivalTitle) return;
+        if (!ModConfig.Farming.Garden.showVisitorArrivalTitle) return;
         if (!GameState.Server.isGarden()) return;
 
         String plain = ChatFormatting.stripFormatting(message.getString());
@@ -218,7 +218,7 @@ public final class VisitorHandler {
 
     /** その枠に塗る色。塗らないときは null */
     public static Integer colorFor(Slot slot) {
-        if (!ModConfig.INSTANCE.farming.garden.highlightVisitorOffer) return null;
+        if (!ModConfig.Farming.Garden.highlightVisitorOffer) return null;
         if (!GameState.Server.isGarden()) return null;
 
         return COLORS.get(slot, VisitorHandler::color);

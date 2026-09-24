@@ -170,7 +170,7 @@ public final class WishingCompassHandler {
 
     /** 割り出した場所。まだ出ていなければ null */
     public static Vec3 solution() {
-        return ModConfig.INSTANCE.mining.showWishingCompassWaypoint ? solution : null;
+        return ModConfig.Mining.showWishingCompassWaypoint ? solution : null;
     }
 
     /** 目印に出す名前。絞り切れなかったときは、どれとも決めない名前になる */
@@ -411,7 +411,7 @@ public final class WishingCompassHandler {
     }
 
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.mining.solveWishingCompass && GameState.Server.isCrystalHollows();
+        return ModConfig.Mining.solveWishingCompass && GameState.Server.isCrystalHollows();
     }
 
     private static String coords(Vec3 pos) {

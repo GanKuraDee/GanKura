@@ -60,8 +60,7 @@ public final class AuctionHandler {
     }
 
     private static Integer compute(ItemStack stack) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableAuctionTweaks || !config.highlightOwnAuctions) return null;
+        if (!ModConfig.Interface.enableAuctionTweaks || !ModConfig.Interface.highlightOwnAuctions) return null;
         if (!GameState.Server.isSkyblock() || stack.isEmpty()) return null;
 
         ItemLore lore = stack.get(DataComponents.LORE);
@@ -78,7 +77,7 @@ public final class AuctionHandler {
             if (buyItNow.find()) price = parse(buyItNow.group(1));
         }
         // まだ売れていない品だけがここに来る。競りのものは比べる相手が違うので見送る
-        if (price == null || !config.highlightUndercutAuctions) return null;
+        if (price == null || !ModConfig.Interface.highlightUndercutAuctions) return null;
 
         // 値段を照らし合わせるので、古いままにしない
         ItemPrices.refreshIfStale();

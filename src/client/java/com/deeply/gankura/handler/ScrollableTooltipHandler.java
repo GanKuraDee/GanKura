@@ -33,8 +33,7 @@ public final class ScrollableTooltipHandler {
     }
 
     public static int offset() {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        return config.enableItemTooltipTweaks && config.enableScrollableTooltips ? offset : 0;
+        return ModConfig.Interface.enableItemTooltipTweaks && ModConfig.Interface.enableScrollableTooltips ? offset : 0;
     }
 
     public static void register() {
@@ -59,8 +58,7 @@ public final class ScrollableTooltipHandler {
      * @return ホイールの動きを画面へ渡すなら true。ツールチップを動かしたときだけ止める
      */
     private static boolean onScroll(AbstractContainerScreen<?> screen, double vertical) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableItemTooltipTweaks || !config.enableScrollableTooltips) return true;
+        if (!ModConfig.Interface.enableItemTooltipTweaks || !ModConfig.Interface.enableScrollableTooltips) return true;
         if (!GameState.Server.isSkyblock() || vertical == 0) return true;
 
         // 説明が出ていないときは、いつも通りの操作に任せる
@@ -73,7 +71,7 @@ public final class ScrollableTooltipHandler {
         }
         // ホイールを下に回すと、説明の下の方が見えるように上へ動かす。
         // 感覚は人によるので、逆向きにもできるようにしてある
-        int direction = ModConfig.INSTANCE.interfaceSettings.invertTooltipScroll ? 1 : -1;
+        int direction = ModConfig.Interface.invertTooltipScroll ? 1 : -1;
         offset += direction * (int) Math.signum(vertical) * SCROLL_STEP;
         return false;
     }

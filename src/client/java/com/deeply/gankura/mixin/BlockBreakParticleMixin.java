@@ -21,7 +21,7 @@ public class BlockBreakParticleMixin {
 
     @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
     private void gankura$hideBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci) {
-        if (!ModConfig.INSTANCE.misc.hideBlockBreakParticles) return;
+        if (!ModConfig.Misc.hideBlockBreakParticles) return;
         if (!GameState.Server.isSkyblock()) return;
 
         ci.cancel();

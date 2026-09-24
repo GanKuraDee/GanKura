@@ -55,7 +55,11 @@
 		"HuntingBoxCountMixin",
 		"HuntingBoxPanelMixin",
 		"ArmorStandInteractMixin",
-		"MouseLockMixin"
+		"MouseLockMixin",
+		"ResourcefulConfigOptionsMixin",
+		"ResourcefulConfigScreenAccessor",
+		"ResourcefulListWidgetAccessor",
+		"ResourcefulListWidgetIndentMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

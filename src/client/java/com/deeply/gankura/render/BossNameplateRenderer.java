@@ -40,7 +40,7 @@ public class BossNameplateRenderer {
         float screenHeight = client.getWindow().getGuiScaledHeight();
         // GUIスケールの影響を打ち消し、設定を変えても常に同じ大きさで表示する
         float textScale = (float) (REFERENCE_GUI_SCALE / client.getWindow().getGuiScale())
-                * ModConfig.INSTANCE.mobVisuals.nameplateScale;
+                * ModConfig.MobVisuals.nameplateScale;
 
         for (Map.Entry<Entity, String> entry : EntityHighlightManager.nameplateEntities.entrySet()) {
             Entity entity = entry.getKey();
@@ -81,14 +81,14 @@ public class BossNameplateRenderer {
     // 1行目に名前、2行目にHPを置いた表示文字列を組み立てる。
     // HPが未取得(スキャン直後など)の場合は名前のみを返す
     public static String buildLabel(String coloredName, String rawHealth) {
-        if (!ModConfig.INSTANCE.mobVisuals.showNameplateHealth) return coloredName;
+        if (!ModConfig.MobVisuals.showNameplateHealth) return coloredName;
         return withSecondLine(coloredName, rawHealth);
     }
 
     // Critter Capsule を当てた回数を2行目に置く。HPと同じ位置に出すが、
     // 出し分けの設定は別なので入口を分けている
     public static String buildCapsuleLabel(String coloredName, String rawCapsule) {
-        if (!ModConfig.INSTANCE.mobVisuals.showNameplateCapsule) return coloredName;
+        if (!ModConfig.MobVisuals.showNameplateCapsule) return coloredName;
         return withSecondLine(coloredName, rawCapsule);
     }
 

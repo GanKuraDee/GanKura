@@ -90,7 +90,7 @@ public class FloorDropHandler {
 
     // 目印を出してよい状況か
     public static boolean isActive() {
-        return ModConfig.INSTANCE.foraging.enableFloorDrops && GameState.Server.isSafari();
+        return ModConfig.Foraging.enableFloorDrops && GameState.Server.isSafari();
     }
 
     // 描画側から参照する、目印を出す位置

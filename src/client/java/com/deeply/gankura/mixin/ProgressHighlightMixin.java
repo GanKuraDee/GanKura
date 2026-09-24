@@ -81,31 +81,30 @@ public class ProgressHighlightMixin {
     // 今のティアを、アイテムの個数と同じ右下の隅に出す
     @Unique
     private void gankura$drawTier(GuiGraphicsExtractor graphics, Slot slot) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
         ItemStack stack = slot.getItem();
 
         Integer tier = null;
         boolean hideMaxed = false;
         boolean maxed = false;
 
-        if (config.enableAttributeMenuTweaks && config.showAttributeTier && AttributeMenu.isOpen()) {
+        if (ModConfig.Interface.enableAttributeMenuTweaks && ModConfig.Interface.showAttributeTier && AttributeMenu.isOpen()) {
             tier = TierText.attributeTier(stack);
-            hideMaxed = config.hideMaxedAttributeTier;
+            hideMaxed = ModConfig.Interface.hideMaxedAttributeTier;
             maxed = TierText.isMaxed(stack);
         }
-        if (tier == null && config.enableBestiaryMenuTweaks && config.showBestiaryTier
+        if (tier == null && ModConfig.Interface.enableBestiaryMenuTweaks && ModConfig.Interface.showBestiaryTier
                 && BestiaryMenu.isOpen()) {
             tier = TierText.bestiaryTier(stack);
-            hideMaxed = config.hideMaxedBestiaryTier;
+            hideMaxed = ModConfig.Interface.hideMaxedBestiaryTier;
             maxed = TierText.isMaxed(stack);
         }
-        if (tier == null && config.enableHeartMenuTweaks && config.showHeartLevel
+        if (tier == null && ModConfig.Interface.enableHeartMenuTweaks && ModConfig.Interface.showHeartLevel
                 && HeartMenu.isOpen()) {
             tier = TierText.heartLevel(stack);
         }
-        if (tier == null && config.enablePetTweaks && config.showPetLevel) {
+        if (tier == null && ModConfig.Interface.enablePetTweaks && ModConfig.Interface.showPetLevel) {
             tier = TierText.petLevel(stack);
-            hideMaxed = config.hideMaxedPetLevel;
+            hideMaxed = ModConfig.Interface.hideMaxedPetLevel;
             maxed = TierText.isPetMaxed(stack);
         }
         if (tier == null) return;
@@ -134,19 +133,18 @@ public class ProgressHighlightMixin {
         ItemLore lore = stack.get(DataComponents.LORE);
         if (lore == null) return null;
 
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        boolean bestiary = config.enableBestiaryMenuTweaks && config.highlightBestiaryProgress
+        boolean bestiary = ModConfig.Interface.enableBestiaryMenuTweaks && ModConfig.Interface.highlightBestiaryProgress
                 && BestiaryMenu.isOpen();
 
         // "to unlock!" は Heart of the Forest など他の画面にもある文面なので、
         // Attribute の画面を開いているときだけ見る
-        boolean attribute = config.enableAttributeMenuTweaks && config.highlightAttributeProgress
+        boolean attribute = ModConfig.Interface.enableAttributeMenuTweaks && ModConfig.Interface.highlightAttributeProgress
                 && AttributeMenu.isOpen();
 
-        boolean activePet = config.enablePetTweaks && config.highlightActivePet;
+        boolean activePet = ModConfig.Interface.enablePetTweaks && ModConfig.Interface.highlightActivePet;
 
         // 入り切りは1つの行で決まるので、行を回さずにここで見る
-        if (config.enableHeartMenuTweaks && config.highlightHeartStatus && HeartMenu.isOpen()) {
+        if (ModConfig.Interface.enableHeartMenuTweaks && ModConfig.Interface.highlightHeartStatus && HeartMenu.isOpen()) {
             Boolean enabled = TierText.heartEnabled(stack);
             if (enabled != null) return enabled ? MAXED_COLOR : UNFINISHED_COLOR;
         }

@@ -104,7 +104,7 @@ public final class PestVacuumHandler {
 
     /** 読んでいる間の粒を隠すか */
     public static boolean hidesParticles() {
-        return ModConfig.INSTANCE.farming.garden.hidePestVacuumParticles;
+        return ModConfig.Farming.Garden.hidePestVacuumParticles;
     }
 
     /**
@@ -215,7 +215,7 @@ public final class PestVacuumHandler {
     }
 
     private static long showMillis() {
-        return ModConfig.INSTANCE.farming.garden.pestVacuumSeconds * 1000L;
+        return ModConfig.Farming.Garden.pestVacuumSeconds * 1000L;
     }
 
     private static boolean isHoldingVacuum(Minecraft client) {
@@ -227,6 +227,6 @@ public final class PestVacuumHandler {
     }
 
     private static boolean isEnabled() {
-        return ModConfig.INSTANCE.farming.garden.showPestVacuumWaypoint && GameState.Server.isGarden();
+        return ModConfig.Farming.Garden.showPestVacuumWaypoint && GameState.Server.isGarden();
     }
 }

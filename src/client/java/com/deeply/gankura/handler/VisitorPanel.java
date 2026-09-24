@@ -81,7 +81,7 @@ public final class VisitorPanel {
                               int mouseX, int mouseY) {
         drawn = false;
 
-        if (!ModConfig.INSTANCE.farming.garden.showVisitorItems) return;
+        if (!ModConfig.Farming.Garden.showVisitorItems) return;
         if (!GameState.Server.isGarden()) return;
 
         Minecraft client = Minecraft.getInstance();

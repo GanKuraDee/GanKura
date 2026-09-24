@@ -75,7 +75,7 @@ public class GoldenFishHandler {
 
     /** NetworkHandler のチャット振り分けから呼ばれる */
     public static void handleMessage(String unformattedMsg, Minecraft client) {
-        if (!ModConfig.INSTANCE.fishing.showGoldenFishTimer) return;
+        if (!ModConfig.Fishing.showGoldenFishTimer) return;
 
         String message = unformattedMsg.trim();
         if (message.equals(SPAWN)) {
@@ -111,7 +111,7 @@ public class GoldenFishHandler {
      * それ以外ではタイマーを出さない
      */
     public static boolean isActive() {
-        return ModConfig.INSTANCE.fishing.showGoldenFishTimer
+        return ModConfig.Fishing.showGoldenFishTimer
                 && GameState.Server.isCrimsonIsle() && hasLavaRod;
     }
 
@@ -127,11 +127,11 @@ public class GoldenFishHandler {
 
     // Goldfin Shard のレベル分を引いた、湧き得るようになるまでの時間
     private static long minSpawnMillis() {
-        return BASE_MIN_SPAWN_MS - SHARD_BONUS_MS * ModConfig.INSTANCE.fishing.goldfinShardLevel;
+        return BASE_MIN_SPAWN_MS - SHARD_BONUS_MS * ModConfig.Fishing.goldfinShardLevel;
     }
 
     private static long maxSpawnMillis() {
-        return BASE_MAX_SPAWN_MS - SHARD_BONUS_MS * ModConfig.INSTANCE.fishing.goldfinShardLevel;
+        return BASE_MAX_SPAWN_MS - SHARD_BONUS_MS * ModConfig.Fishing.goldfinShardLevel;
     }
 
     /** 湧き得るようになるまでの残り(ミリ秒)。数えていなければ -1 */
@@ -207,10 +207,10 @@ public class GoldenFishHandler {
 
     // 数えが消える前に、投げ直すよう知らせる
     private static void warnRod(Minecraft client) {
-        if (!ModConfig.INSTANCE.fishing.warnGoldenFishRod || warnedRod) return;
+        if (!ModConfig.Fishing.warnGoldenFishRod || warnedRod) return;
 
         long remaining = rodRemaining();
-        if (remaining < 0 || remaining > ModConfig.INSTANCE.fishing.goldenFishRodWarningSeconds * 1000L) return;
+        if (remaining < 0 || remaining > ModConfig.Fishing.goldenFishRodWarningSeconds * 1000L) return;
 
         warnedRod = true;
         title(client, "§c§lThrow your rod!");

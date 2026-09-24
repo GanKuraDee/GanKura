@@ -49,7 +49,7 @@ public class PestStatusHud extends HudElement {
 
     public PestStatusHud() {
         super("pest_status", 10, 188, 1.0f, 120, LINE_HEIGHT * 4,
-                () -> ModConfig.INSTANCE.farming.garden.showPestStatusHud,
+                () -> ModConfig.Farming.Garden.showPestStatusHud,
                 GameState.Server::isGarden);
     }
 

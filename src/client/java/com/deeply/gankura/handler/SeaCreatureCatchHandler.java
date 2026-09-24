@@ -54,7 +54,7 @@ public class SeaCreatureCatchHandler {
         if (DOUBLE_HOOK_PATTERN.matcher(unformattedMsg.trim()).matches()) {
             doubleHookMillis = System.currentTimeMillis();
             // 短縮するときは、この行を釣り上げの文言の頭にまとめるので出さない
-            return ModConfig.INSTANCE.fishing.shortenSeaCreatureMessage;
+            return ModConfig.Fishing.shortenSeaCreatureMessage;
         }
 
         SeaCreatureCatches.Catch caught = SeaCreatureCatches.byMessage(unformattedMsg);
@@ -87,7 +87,7 @@ public class SeaCreatureCatchHandler {
      * 元のメッセージは呼び出し側で差し止めるので、ここでは短い側を出すだけでよい
      */
     private static boolean shorten(Minecraft client, SeaCreatureCatches.Catch caught, boolean doubleHook) {
-        if (!ModConfig.INSTANCE.fishing.shortenSeaCreatureMessage || client.player == null) return false;
+        if (!ModConfig.Fishing.shortenSeaCreatureMessage || client.player == null) return false;
 
         // 周りの文はレア度の6色のどれとも重ならない色にする。
         // 青のままだと RARE の種を釣ったときに1行が同じ色で埋まってしまう

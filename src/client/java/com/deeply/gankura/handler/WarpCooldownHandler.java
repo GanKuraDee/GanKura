@@ -22,7 +22,7 @@ public class WarpCooldownHandler {
     }
 
     private static boolean onCommand(String command) {
-        if (!ModConfig.INSTANCE.misc.enableWarpQueue || !isWarpCommand(command)) return true;
+        if (!ModConfig.Misc.enableWarpQueue || !isWarpCommand(command)) return true;
 
         long now = System.currentTimeMillis();
         if (GameState.Warp.awaitingConfirmation || now < GameState.Warp.cooldownEndAt) {

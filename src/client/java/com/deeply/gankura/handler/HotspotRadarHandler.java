@@ -47,7 +47,7 @@ public class HotspotRadarHandler {
 
     /** 推測した Hotspot の場所。分かっていなければ null */
     public static Vec3 guess() {
-        if (!ModConfig.INSTANCE.fishing.showHotspotGuess) return null;
+        if (!ModConfig.Fishing.showHotspotGuess) return null;
         return solver.solved();
     }
 

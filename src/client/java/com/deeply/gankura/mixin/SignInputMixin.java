@@ -34,8 +34,7 @@ public class SignInputMixin {
 
     @Inject(method = "openTextEdit", at = @At("HEAD"), cancellable = true)
     private void gankura$openSearchInput(SignBlockEntity sign, boolean frontText, CallbackInfo ci) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableSearchInputScreen || !GameState.Server.isSkyblock()) return;
+        if (!ModConfig.Interface.enableSearchInputScreen || !GameState.Server.isSkyblock()) return;
 
         Component prompt = gankura$searchPrompt(sign, frontText);
         if (prompt == null) return;

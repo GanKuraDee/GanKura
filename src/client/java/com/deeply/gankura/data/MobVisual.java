@@ -64,7 +64,7 @@ public interface MobVisual {
      * 対象は Critter Safari の4バイオームのモブだけで、他エリアのモブには効かない
      */
     private static boolean hiddenAsCaptured(MobVisual target) {
-        if (!ModConfig.INSTANCE.mobVisuals.hideCapturedCritters) return false;
+        if (!ModConfig.MobVisuals.hideCapturedCritters) return false;
         if (target instanceof TheEnd || target instanceof SpidersDen
                 || target instanceof CrimsonIsle || target instanceof CrystalHollows
                 || target instanceof MoongladeMarsh || target instanceof TorrhusCanyon
@@ -79,26 +79,25 @@ public interface MobVisual {
 
     /** キャプチャ済みでも消さない種として選ばれているか */
     private static boolean keptShown(MobVisual target) {
-        ModConfig.MobVisualsCategory config = ModConfig.INSTANCE.mobVisuals;
 
-        if (target instanceof SafariCavern cavern) return config.keepShownSafariCavern.contains(cavern);
-        if (target instanceof SafariForest forest) return config.keepShownSafariForest.contains(forest);
-        if (target instanceof SafariHaunted haunted) return config.keepShownSafariHaunted.contains(haunted);
-        if (target instanceof SafariIcy icy) return config.keepShownSafariIcy.contains(icy);
+        if (target instanceof SafariCavern cavern) return java.util.Arrays.asList(ModConfig.MobVisuals.keepShownSafariCavern).contains(cavern);
+        if (target instanceof SafariForest forest) return java.util.Arrays.asList(ModConfig.MobVisuals.keepShownSafariForest).contains(forest);
+        if (target instanceof SafariHaunted haunted) return java.util.Arrays.asList(ModConfig.MobVisuals.keepShownSafariHaunted).contains(haunted);
+        if (target instanceof SafariIcy icy) return java.util.Arrays.asList(ModConfig.MobVisuals.keepShownSafariIcy).contains(icy);
         return false;
     }
 
     // 対象リストに載っていて、今いるエリアのモブで、かつその機能の全体トグルが入っていれば表示する
     default boolean highlight() {
-        return ModConfig.INSTANCE.mobVisuals.enableHighlight && shown(this);
+        return ModConfig.MobVisuals.enableHighlight && shown(this);
     }
 
     default boolean tracer() {
-        return ModConfig.INSTANCE.mobVisuals.enableTracer && shown(this);
+        return ModConfig.MobVisuals.enableTracer && shown(this);
     }
 
     default boolean nameplate() {
-        return ModConfig.INSTANCE.mobVisuals.enableNameplate && shown(this);
+        return ModConfig.MobVisuals.enableNameplate && shown(this);
     }
 
     // 機能の全体トグル以外の、3機能に共通する表示条件
@@ -136,7 +135,7 @@ public interface MobVisual {
 
         @Override
         public List<TheEnd> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsTheEnd;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsTheEnd);
         }
 
         @Override
@@ -171,7 +170,7 @@ public interface MobVisual {
 
         @Override
         public List<SpidersDen> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSpidersDen;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSpidersDen);
         }
 
         @Override
@@ -213,7 +212,7 @@ public interface MobVisual {
 
         @Override
         public List<CrimsonIsle> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsCrimsonIsle;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsCrimsonIsle);
         }
 
         @Override
@@ -246,7 +245,7 @@ public interface MobVisual {
 
         @Override
         public List<CrystalHollows> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsCrystalHollows;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsCrystalHollows);
         }
 
         @Override
@@ -287,7 +286,7 @@ public interface MobVisual {
 
         @Override
         public List<SafariCavern> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSafariCavern;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSafariCavern);
         }
 
         @Override
@@ -328,7 +327,7 @@ public interface MobVisual {
 
         @Override
         public List<SafariForest> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSafariForest;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSafariForest);
         }
 
         @Override
@@ -370,7 +369,7 @@ public interface MobVisual {
 
         @Override
         public List<SafariHaunted> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSafariHaunted;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSafariHaunted);
         }
 
         @Override
@@ -411,7 +410,7 @@ public interface MobVisual {
 
         @Override
         public List<SafariIcy> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSafariIcy;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSafariIcy);
         }
 
         @Override
@@ -469,7 +468,7 @@ public interface MobVisual {
 
         @Override
         public List<MoongladeMarsh> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsMoongladeMarsh;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsMoongladeMarsh);
         }
 
         @Override
@@ -528,7 +527,7 @@ public interface MobVisual {
 
         @Override
         public List<TorrhusCanyon> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsTorrhusCanyon;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsTorrhusCanyon);
         }
 
         @Override
@@ -584,7 +583,7 @@ public interface MobVisual {
 
         @Override
         public List<LotusAtoll> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsLotusAtoll;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsLotusAtoll);
         }
 
         @Override
@@ -621,7 +620,7 @@ public interface MobVisual {
 
         @Override
         public List<GlaciteMineshaft> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsGlaciteMineshaft;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsGlaciteMineshaft);
         }
 
         @Override
@@ -674,7 +673,7 @@ public interface MobVisual {
 
         @Override
         public List<Garden> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsGarden;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsGarden);
         }
 
         @Override
@@ -776,7 +775,7 @@ public interface MobVisual {
 
         @Override
         public List<SeaCreature> targets() {
-            return ModConfig.INSTANCE.mobVisuals.targetsSeaCreature;
+            return java.util.Arrays.asList(ModConfig.MobVisuals.targetsSeaCreature);
         }
 
         @Override

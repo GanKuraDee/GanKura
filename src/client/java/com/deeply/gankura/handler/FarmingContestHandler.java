@@ -42,7 +42,7 @@ public final class FarmingContestHandler {
 
     /** その枠に塗る色。塗らないときは null */
     public static Integer colorFor(Slot slot) {
-        if (!ModConfig.INSTANCE.farming.garden.highlightContestRewards) return null;
+        if (!ModConfig.Farming.Garden.highlightContestRewards) return null;
         if (!GameState.Server.isSkyblock()) return null;
 
         return COLORS.get(slot, FarmingContestHandler::compute);

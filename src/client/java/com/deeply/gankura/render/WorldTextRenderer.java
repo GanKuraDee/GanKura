@@ -190,7 +190,7 @@ public class WorldTextRenderer {
                         (argb & RGB_MASK) | ETHERWARP_FILL_ALPHA));
         box.setAlwaysOnTop();
 
-        if (!ModConfig.INSTANCE.misc.showEtherwarpReason) return;
+        if (!ModConfig.Misc.showEtherwarpReason) return;
         if (target.result() == EtherwarpHandler.Result.OK) return;
 
         renderGizmoLabelAt(target.result().label(), Vec3.atCenterOf(target.pos()).add(0, 1.0, 0), argb);
@@ -239,7 +239,7 @@ public class WorldTextRenderer {
 
     // 狙っている効果の Hotspot を見つけたとき、しばらくの間その場所に印を出す
     private static void renderHotspotFound(Minecraft client) {
-        if (!ModConfig.INSTANCE.fishing.showHotspotFoundWaypoint) return;
+        if (!ModConfig.Fishing.showHotspotFoundWaypoint) return;
 
         for (HotspotAreaHandler.Found spot : HotspotAreaHandler.found()) {
             int distance = (int) Math.round(client.player.position().distanceTo(spot.center()));
@@ -257,7 +257,7 @@ public class WorldTextRenderer {
 
     // 投げている浮きの上に、投げてからの経過秒を出す
     private static void renderCastTimer(Minecraft client) {
-        if (!ModConfig.INSTANCE.fishing.showCastTimer) return;
+        if (!ModConfig.Fishing.showCastTimer) return;
 
         FishingHook hook = FishingBobberTracker.bobber(client);
         if (hook == null) return;
@@ -329,7 +329,7 @@ public class WorldTextRenderer {
      * 名前だけでなく、そこまでの距離も添える
      */
     private static void renderCommissionWaypoints(Minecraft client) {
-        if (!ModConfig.INSTANCE.mining.showGemstoneCommissionWaypoints) return;
+        if (!ModConfig.Mining.showGemstoneCommissionWaypoints) return;
         // Glacite Tunnels は Dwarven Mines の一部で、座標もひと続きになっている
         if (!GameState.Server.isDwarvenMines() && !GameState.Server.isGlaciteTunnels()) return;
 
@@ -356,7 +356,7 @@ public class WorldTextRenderer {
      */
     private static void renderCorpses(Minecraft client) {
         // 探すのは Vanguard の知らせと兼用なので、目印を出すかどうかはここで見る
-        if (!ModConfig.INSTANCE.mining.showCorpseWaypoints) return;
+        if (!ModConfig.Mining.showCorpseWaypoints) return;
 
         Vec3 eye = client.player.position();
 
@@ -387,7 +387,7 @@ public class WorldTextRenderer {
     // Wumpaに敗れた後、戦闘エリアへ戻る小さな穴の目印。
     // Wumpaが湧いている間しか使い道がないので、その間だけ表示する
     private static void renderWumpaWaypoint() {
-        if (!ModConfig.INSTANCE.foraging.enableWumpaWaypoint) return;
+        if (!ModConfig.Foraging.enableWumpaWaypoint) return;
         if (!GameState.Server.isSafari()) return;
         if (!GameState.CritterSafari.isWumpaSpawned()) return;
 
@@ -401,7 +401,7 @@ public class WorldTextRenderer {
     // Tiki 系のスポーン地点。Tiki はここにあるオブジェを完成させないと出現しないため、
     // 湧いているかどうかに関わらず常に目印を出す
     private static void renderTikiWaypoints(Minecraft client) {
-        if (!ModConfig.INSTANCE.foraging.enableTikiWaypoints) return;
+        if (!ModConfig.Foraging.enableTikiWaypoints) return;
         // Tiki 系は Torrhus Canyon と Torrhus Heights のどちらにも湧く
         if (!GameState.Server.isTorrhusCanyon() && !GameState.Server.isTorrhusHeights()) return;
         if (client.player == null) return;
@@ -439,7 +439,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderGolemLocationText() {
-        if (!ModConfig.INSTANCE.combat.theEnd.showGolemWorldLocation_Text) return;
+        if (!ModConfig.Combat.TheEnd.showGolemWorldLocation_Text) return;
 
         GolemAnchor anchor = golemAnchor();
         if (anchor == null) return;
@@ -468,7 +468,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderArachneLocationText() {
-        if (!ModConfig.INSTANCE.combat.spidersDen.showArachneWorldText) return;
+        if (!ModConfig.Combat.SpidersDen.showArachneWorldText) return;
         if (!GameState.Server.isSpidersDen()) return;
 
         BlockPos renderPos = ModConstants.ARACHNE_ALTAR_POS;
@@ -529,7 +529,7 @@ public class WorldTextRenderer {
     }
 
     private static void renderCrimsonBossLocationTexts() {
-        if (!ModConfig.INSTANCE.combat.crimsonIsle.showCrimsonIsleWorldText) return;
+        if (!ModConfig.Combat.CrimsonIsle.showCrimsonIsleWorldText) return;
         boolean isCrimsonIsle = GameState.Server.isCrimsonIsle();
         if (!isCrimsonIsle) return;
 

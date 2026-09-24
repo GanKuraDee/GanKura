@@ -19,7 +19,7 @@ public final class HighlightColor {
 
     /** 設定の濃さを載せた色。渡すのは 0xRRGGBB の並び */
     public static int tint(int rgb) {
-        int percent = Math.min(Math.max(ModConfig.INSTANCE.interfaceSettings.highlightOpacity, 0), FULL_PERCENT);
+        int percent = Math.min(Math.max(ModConfig.Interface.highlightOpacity, 0), FULL_PERCENT);
         int alpha = percent * FULL_ALPHA / FULL_PERCENT;
 
         return (alpha << 24) | (rgb & RGB_MASK);

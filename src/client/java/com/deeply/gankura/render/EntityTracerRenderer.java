@@ -27,21 +27,21 @@ public class EntityTracerRenderer {
 
         // Stage 4/5 の End Stone Protector は、まだ湧いていないので指す相手のエンティティが無い。
         // 代わりにワールド上へ出しているテキストと同じ位置・同じ色で線を引く
-        WorldTextRenderer.GolemAnchor golem = ModConfig.INSTANCE.combat.theEnd.showGolemWorldLocation_Tracer
+        WorldTextRenderer.GolemAnchor golem = ModConfig.Combat.TheEnd.showGolemWorldLocation_Tracer
                 ? WorldTextRenderer.golemAnchor()
                 : null;
-        boolean hasHotspot = ModConfig.INSTANCE.fishing.showHotspotTracer
+        boolean hasHotspot = ModConfig.Fishing.showHotspotTracer
                 && HotspotRadarHandler.guess() != null;
         // 見つけた Hotspot への線。ウェイポイントと同じ場所を指す
-        List<HotspotAreaHandler.Found> foundSpots = ModConfig.INSTANCE.fishing.showHotspotFoundTracer
+        List<HotspotAreaHandler.Found> foundSpots = ModConfig.Fishing.showHotspotFoundTracer
                 ? HotspotAreaHandler.found()
                 : List.of();
         // 凍った死体への線。ウェイポイントと同じ場所を、同じ鍵の色で指す
-        List<CorpseScanner.Corpse> corpses = ModConfig.INSTANCE.mining.showCorpseTracer
+        List<CorpseScanner.Corpse> corpses = ModConfig.Mining.showCorpseTracer
                 ? CorpseScanner.corpses()
                 : List.of();
         // Vacuum から割り出した害虫の居場所への線。ウェイポイントと同じ場所を指す
-        Vec3 pest = ModConfig.INSTANCE.farming.garden.showPestVacuumTracer
+        Vec3 pest = ModConfig.Farming.Garden.showPestVacuumTracer
                 ? PestVacuumHandler.guess()
                 : null;
         if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null
@@ -60,7 +60,7 @@ public class EntityTracerRenderer {
         Vec3 startPos = basePos.add(client.player.getViewVector(partialTicks).scale(0.2));
 
         // Hotspot Radar の推測地点も、指す相手のエンティティが無いので位置で線を引く
-        Vec3 hotspot = ModConfig.INSTANCE.fishing.showHotspotTracer
+        Vec3 hotspot = ModConfig.Fishing.showHotspotTracer
                 ? HotspotRadarHandler.guess()
                 : null;
         if (hotspot != null) {

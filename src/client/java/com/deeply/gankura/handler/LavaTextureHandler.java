@@ -30,7 +30,7 @@ public class LavaTextureHandler {
 
     /** 溶岩に入ったときのフォグを消すか */
     public static boolean hidingFog() {
-        return active && ModConfig.INSTANCE.fishing.hideLavaFog;
+        return active && ModConfig.Fishing.hideLavaFog;
     }
 
     private static void tick(Minecraft client) {
@@ -42,10 +42,9 @@ public class LavaTextureHandler {
     }
 
     private static boolean enabled() {
-        ModConfig.FishingCategory config = ModConfig.INSTANCE.fishing;
-        if (!config.replaceLavaTexture || !GameState.Server.isSkyblock()) return false;
+        if (!ModConfig.Fishing.replaceLavaTexture || !GameState.Server.isSkyblock()) return false;
 
-        return config.lavaTextureArea == LavaTextureArea.EVERYWHERE
+        return ModConfig.Fishing.lavaTextureArea == LavaTextureArea.EVERYWHERE
                 || GameState.Server.isCrimsonIsle();
     }
 

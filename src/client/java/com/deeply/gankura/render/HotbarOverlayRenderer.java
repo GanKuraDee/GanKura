@@ -15,7 +15,7 @@ public class HotbarOverlayRenderer {
     public static void render(GuiGraphicsExtractor graphics, int x, int y, ItemStack stack) {
         if (stack.isEmpty()) return;
 
-        if (!ModConfig.INSTANCE.combat.showPoisonIndicator) return;
+        if (!ModConfig.Combat.showPoisonIndicator) return;
 
         // Mojang: is(Item)
         if (stack.is(Items.BOW)) {

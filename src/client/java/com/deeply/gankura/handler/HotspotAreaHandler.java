@@ -115,21 +115,20 @@ public class HotspotAreaHandler {
 
     /** パーティクルを消して、代わりに円を出す設定か */
     public static boolean shouldHideParticles() {
-        return ModConfig.INSTANCE.fishing.showHotspotCircle
-                && ModConfig.INSTANCE.fishing.hideHotspotParticles;
+        return ModConfig.Fishing.showHotspotCircle
+                && ModConfig.Fishing.hideHotspotParticles;
     }
 
     // 円を出すか、見つけたことを知らせるか。どちらも使わないなら探す必要がない
     private static boolean tracking() {
-        return ModConfig.INSTANCE.fishing.showHotspotCircle
-                || ModConfig.INSTANCE.fishing.shareHotspot || alerting();
+        return ModConfig.Fishing.showHotspotCircle
+                || ModConfig.Fishing.shareHotspot || alerting();
     }
 
     // 見つけたときに何か出す設定になっているか
     private static boolean alerting() {
-        ModConfig.FishingCategory config = ModConfig.INSTANCE.fishing;
-        return config.showHotspotFoundTitle || config.playHotspotFoundSound
-                || config.showHotspotFoundWaypoint || config.showHotspotFoundTracer;
+        return ModConfig.Fishing.showHotspotFoundTitle || ModConfig.Fishing.playHotspotFoundSound
+                || ModConfig.Fishing.showHotspotFoundWaypoint || ModConfig.Fishing.showHotspotFoundTracer;
     }
 
     /** 印を出している Hotspot。時間切れのものは含まない */
@@ -139,7 +138,7 @@ public class HotspotAreaHandler {
 
     /** 描ける状態の Hotspot を返す */
     public static List<Circle> circles() {
-        if (!ModConfig.INSTANCE.fishing.showHotspotCircle) return List.of();
+        if (!ModConfig.Fishing.showHotspotCircle) return List.of();
 
         List<Circle> circles = new ArrayList<>();
         for (Hotspot hotspot : hotspots.values()) {
@@ -243,11 +242,11 @@ public class HotspotAreaHandler {
      * 実際に送るのはボタンを押したときだけで、自動では送らない
      */
     private static void offerFound(Minecraft client) {
-        if (!ModConfig.INSTANCE.fishing.shareHotspot && !alerting()) return;
+        if (!ModConfig.Fishing.shareHotspot && !alerting()) return;
 
         for (Hotspot hotspot : hotspots.values()) {
             if (hotspot.center == null || alreadyOffered(hotspot.center)) continue;
-            if (!ModConfig.INSTANCE.fishing.sharedHotspotPerks.contains(hotspot.perk)) continue;
+            if (!java.util.Arrays.asList(ModConfig.Fishing.sharedHotspotPerks).contains(hotspot.perk)) continue;
 
             announce(client, hotspot);
             return;
@@ -263,24 +262,23 @@ public class HotspotAreaHandler {
         offeredSpots.addLast(new Told(hotspot.center, System.currentTimeMillis()));
         if (offeredSpots.size() > MAX_OFFERED_SPOTS) offeredSpots.removeFirst();
 
-        ModConfig.FishingCategory config = ModConfig.INSTANCE.fishing;
-        if (config.shareHotspot) offer(client, hotspot);
+        if (ModConfig.Fishing.shareHotspot) offer(client, hotspot);
 
-        if (config.showHotspotFoundTitle) {
+        if (ModConfig.Fishing.showHotspotFoundTitle) {
             NotificationUtils.showTitle(client,
                     Component.literal("§d§lHOTSPOT"),
                     Component.literal(hotspot.perk.toString()),
                     TITLE_FADE, TITLE_STAY, TITLE_FADE);
         }
 
-        if (config.playHotspotFoundSound) {
+        if (ModConfig.Fishing.playHotspotFoundSound) {
             NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP,
                     SOUND_VOLUME, SOUND_PITCH);
         }
 
-        if (config.showHotspotFoundWaypoint || config.showHotspotFoundTracer) {
+        if (ModConfig.Fishing.showHotspotFoundWaypoint || ModConfig.Fishing.showHotspotFoundTracer) {
             found.add(new Found(hotspot.center, hotspot.perk,
-                    System.currentTimeMillis() + config.hotspotFoundSeconds * 1000L));
+                    System.currentTimeMillis() + ModConfig.Fishing.hotspotFoundSeconds * 1000L));
         }
     }
 
@@ -329,7 +327,7 @@ public class HotspotAreaHandler {
                 .withBold(true)
                 .withClickEvent(new ClickEvent.RunCommand("/gankura sharehotspot " + id))
                 .withHoverEvent(new HoverEvent.ShowText(Component.literal(
-                        "Click to send the coordinates to " + ModConfig.INSTANCE.fishing.hotspotShareChannel))));
+                        "Click to send the coordinates to " + ModConfig.Fishing.hotspotShareChannel))));
 
         NotificationUtils.sendSystemChat(client, Component.empty()
                 .append(Component.literal("HOTSPOT ")
@@ -357,7 +355,7 @@ public class HotspotAreaHandler {
     }
 
     private static String shareMessage(Offer offer) {
-        return ModConfig.INSTANCE.fishing.hotspotShareChannel.command()
+        return ModConfig.Fishing.hotspotShareChannel.command()
                 + " " + coords(offer.center()) + " | " + offer.perk().plainLabel() + " | " + antiSpam();
     }
 

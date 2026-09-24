@@ -93,7 +93,7 @@ public final class PestSpawnHandler {
     }
 
     public static void handleMessage(String unformattedMessage, Minecraft client) {
-        if (!ModConfig.INSTANCE.farming.garden.showPestSpawnTitle) return;
+        if (!ModConfig.Farming.Garden.showPestSpawnTitle) return;
         if (!GameState.Server.isGarden()) return;
 
         String message = unformattedMessage.trim();
@@ -153,7 +153,7 @@ public final class PestSpawnHandler {
             break;
         }
 
-        if (full && !maxPests && ModConfig.INSTANCE.farming.garden.showMaxPestsTitle) {
+        if (full && !maxPests && ModConfig.Farming.Garden.showMaxPestsTitle) {
             NotificationUtils.showTitle(client,
                     Component.literal(MAX_TITLE), Component.literal(MAX_SUBTITLE),
                     TITLE_FADE, TITLE_STAY, TITLE_FADE);
@@ -181,7 +181,7 @@ public final class PestSpawnHandler {
         soonDeadlineMillis = System.currentTimeMillis() + (long) (seconds * MILLIS);
 
         // まだ設定した秒より先なら、次に近づいたときにまた知らせる
-        if (seconds > ModConfig.INSTANCE.farming.garden.pestSoonSeconds) soonShown = false;
+        if (seconds > ModConfig.Farming.Garden.pestSoonSeconds) soonShown = false;
     }
 
     private static void resetSoon() {
@@ -197,8 +197,7 @@ public final class PestSpawnHandler {
      * 一度出したら READY になるか、待ち時間が伸び直すまで黙る
      */
     private static void tick(Minecraft client) {
-        ModConfig.GardenCategory config = ModConfig.INSTANCE.farming.garden;
-        if (!config.showPestSoonTitle || !GameState.Server.isGarden()) {
+        if (!ModConfig.Farming.Garden.showPestSoonTitle || !GameState.Server.isGarden()) {
             resetSoon();
             return;
         }
@@ -206,7 +205,7 @@ public final class PestSpawnHandler {
 
         // 残りは切り上げる。タブリストに出ている数と同じ数え方にしておく
         int seconds = (int) Math.ceil((soonDeadlineMillis - System.currentTimeMillis()) / MILLIS);
-        if (seconds > config.pestSoonSeconds) return;
+        if (seconds > ModConfig.Farming.Garden.pestSoonSeconds) return;
 
         soonShown = true;
         NotificationUtils.showTitle(client,

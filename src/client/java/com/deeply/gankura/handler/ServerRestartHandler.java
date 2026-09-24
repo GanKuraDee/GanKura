@@ -31,7 +31,7 @@ public class ServerRestartHandler {
                 long currentDay = GameState.Server.dayTime / 24000L;
 
                 // 設定がON、且つ条件を満たしている場合のみ実行
-                if (ModConfig.INSTANCE.combat.theEnd.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
+                if (ModConfig.Combat.TheEnd.enableDay30Alert && currentDay >= 30 && ModConstants.STAGE_AWAKENING.equals(GameState.Golem.stage) && !GameState.Golem.hasAnnouncedDay30) {
                     GameState.Golem.hasAnnouncedDay30 = true;
 
                     client.execute(() -> {
@@ -76,7 +76,7 @@ public class ServerRestartHandler {
 
     public static void handleChat(String unformattedMsg, Minecraft client) {
         // 設定がOFFなら何もしない
-        if (!ModConfig.INSTANCE.misc.enableRebootAlert) return;
+        if (!ModConfig.Misc.enableRebootAlert) return;
 
         if (unformattedMsg.regionMatches(true, 0, "[Important] This server will restart soon:", 0, "[Important] This server will restart soon:".length())) {
             GameState.Server.isClosing = true;

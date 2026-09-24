@@ -58,8 +58,7 @@ public final class BazaarOrderHandler {
     }
 
     private static Integer compute(ItemStack stack) {
-        ModConfig.InterfaceCategory config = ModConfig.INSTANCE.interfaceSettings;
-        if (!config.enableAuctionTweaks || !config.highlightBazaarOrders) return null;
+        if (!ModConfig.Interface.enableAuctionTweaks || !ModConfig.Interface.highlightBazaarOrders) return null;
         if (!GameState.Server.isSkyblock() || stack.isEmpty()) return null;
 
         Matcher name = ORDER_NAME.matcher(stack.getHoverName().getString().trim());
