@@ -26,11 +26,11 @@ public class HotspotRadarParticleMixin {
     private void gankura$onRadarParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (!ModConfig.Fishing.showHotspotGuess) return;
 
-        ParticleType<?> type = packet.getParticle().getType();
-        boolean enchant = type == ParticleTypes.ENCHANT && packet.getCount() == 10 && packet.getMaxSpeed() == -2.0f;
-        boolean flame = type == ParticleTypes.FLAME && packet.getCount() == 1 && packet.getMaxSpeed() == 0.0f;
+        ParticleType<?> type = packet.particle().getType();
+        boolean enchant = type == ParticleTypes.ENCHANT && packet.count() == 10 && packet.xMaxSpeed() == -2.0f;
+        boolean flame = type == ParticleTypes.FLAME && packet.count() == 1 && packet.xMaxSpeed() == 0.0f;
         if (!enchant && !flame) return;
 
-        HotspotRadarHandler.onParticle(packet.getX(), packet.getY(), packet.getZ());
+        HotspotRadarHandler.onParticle(packet.x(), packet.y(), packet.z());
     }
 }

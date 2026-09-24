@@ -24,7 +24,7 @@ public class EquipmentSetsClickMixin {
     private static final int SET_BUTTON_ROW = 4; // 5行目(0-index)
     private static final int MENU_WIDTH = 9;
 
-    @Inject(method = "slotClicked", at = @At("HEAD"))
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"))
     private void onSlotClicked(Slot slot, int slotId, int buttonNum, ContainerInput containerInput, CallbackInfo ci) {
         if (buttonNum != 0) return;
         if (slot == null || !slot.hasItem()) return;

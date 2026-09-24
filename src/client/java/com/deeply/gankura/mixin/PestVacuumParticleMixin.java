@@ -26,19 +26,19 @@ public class PestVacuumParticleMixin {
     private void gankura$onPestVacuumParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (!PestVacuumHandler.isReading()) return;
 
-        ParticleType<?> type = packet.getParticle().getType();
+        ParticleType<?> type = packet.particle().getType();
         boolean trail = type == ParticleTypes.ANGRY_VILLAGER
-                && packet.getCount() == 1 && packet.getMaxSpeed() == 0.0f && isSpotOn(packet);
+                && packet.count() == 1 && packet.xMaxSpeed() == 0.0f && isSpotOn(packet);
         boolean sparkle = type == ParticleTypes.ENCHANT
-                && packet.getCount() == 10 && packet.getMaxSpeed() == -2.0f && isSpotOn(packet);
+                && packet.count() == 10 && packet.xMaxSpeed() == -2.0f && isSpotOn(packet);
         if (!trail && !sparkle) return;
 
-        if (trail) PestVacuumHandler.onParticle(packet.getX(), packet.getY(), packet.getZ());
+        if (trail) PestVacuumHandler.onParticle(packet.x(), packet.y(), packet.z());
         if (PestVacuumHandler.hidesParticles()) ci.cancel();
     }
 
     // ばらけずに1点から出ているか。同じ種類でも、散らして出す粒とは別物になる
     private static boolean isSpotOn(ClientboundLevelParticlesPacket packet) {
-        return packet.getXDist() == 0.0f && packet.getYDist() == 0.0f && packet.getZDist() == 0.0f;
+        return packet.xDist() == 0.0f && packet.yDist() == 0.0f && packet.zDist() == 0.0f;
     }
 }

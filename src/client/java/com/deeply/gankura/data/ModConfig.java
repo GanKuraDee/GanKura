@@ -3,6 +3,7 @@ package com.deeply.gankura.data;
 import com.deeply.gankura.gui.InventoryButtonEditorScreen;
 import com.deeply.gankura.gui.WaypointScreen;
 import com.deeply.gankura.render.HudEditorScreen;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.teamresourceful.resourcefulconfig.api.annotations.Category;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
@@ -12,7 +13,6 @@ import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * 設定の定義そのもの。ResourcefulConfig がこのクラスを読んで、
@@ -1434,62 +1434,62 @@ public final class ModConfig {
         @ConfigEntry(id = "loadoutsKeybindSlot1", translation = "gankura.config.keybinds.loadoutsKeybindSlot1")
         @Comment(value = "Sets key for slot 1.", translation = "gankura.config.keybinds.loadoutsKeybindSlot1.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot1 = GLFW.GLFW_KEY_1;
+        public static int loadoutsKeybindSlot1 = InputConstants.KEY_1;
 
         @ConfigEntry(id = "loadoutsKeybindSlot2", translation = "gankura.config.keybinds.loadoutsKeybindSlot2")
         @Comment(value = "Sets key for slot 2.", translation = "gankura.config.keybinds.loadoutsKeybindSlot2.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot2 = GLFW.GLFW_KEY_2;
+        public static int loadoutsKeybindSlot2 = InputConstants.KEY_2;
 
         @ConfigEntry(id = "loadoutsKeybindSlot3", translation = "gankura.config.keybinds.loadoutsKeybindSlot3")
         @Comment(value = "Sets key for slot 3.", translation = "gankura.config.keybinds.loadoutsKeybindSlot3.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot3 = GLFW.GLFW_KEY_3;
+        public static int loadoutsKeybindSlot3 = InputConstants.KEY_3;
 
         @ConfigEntry(id = "loadoutsKeybindSlot4", translation = "gankura.config.keybinds.loadoutsKeybindSlot4")
         @Comment(value = "Sets key for slot 4.", translation = "gankura.config.keybinds.loadoutsKeybindSlot4.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot4 = GLFW.GLFW_KEY_4;
+        public static int loadoutsKeybindSlot4 = InputConstants.KEY_4;
 
         @ConfigEntry(id = "loadoutsKeybindSlot5", translation = "gankura.config.keybinds.loadoutsKeybindSlot5")
         @Comment(value = "Sets key for slot 5.", translation = "gankura.config.keybinds.loadoutsKeybindSlot5.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot5 = GLFW.GLFW_KEY_5;
+        public static int loadoutsKeybindSlot5 = InputConstants.KEY_5;
 
         @ConfigEntry(id = "loadoutsKeybindSlot6", translation = "gankura.config.keybinds.loadoutsKeybindSlot6")
         @Comment(value = "Sets key for slot 6.", translation = "gankura.config.keybinds.loadoutsKeybindSlot6.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot6 = GLFW.GLFW_KEY_6;
+        public static int loadoutsKeybindSlot6 = InputConstants.KEY_6;
 
         @ConfigEntry(id = "loadoutsKeybindSlot7", translation = "gankura.config.keybinds.loadoutsKeybindSlot7")
         @Comment(value = "Sets key for slot 7.", translation = "gankura.config.keybinds.loadoutsKeybindSlot7.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot7 = GLFW.GLFW_KEY_7;
+        public static int loadoutsKeybindSlot7 = InputConstants.KEY_7;
 
         @ConfigEntry(id = "loadoutsKeybindSlot8", translation = "gankura.config.keybinds.loadoutsKeybindSlot8")
         @Comment(value = "Sets key for slot 8.", translation = "gankura.config.keybinds.loadoutsKeybindSlot8.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot8 = GLFW.GLFW_KEY_8;
+        public static int loadoutsKeybindSlot8 = InputConstants.KEY_8;
 
         @ConfigEntry(id = "loadoutsKeybindSlot9", translation = "gankura.config.keybinds.loadoutsKeybindSlot9")
         @Comment(value = "Sets key for slot 9.", translation = "gankura.config.keybinds.loadoutsKeybindSlot9.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot9 = GLFW.GLFW_KEY_9;
+        public static int loadoutsKeybindSlot9 = InputConstants.KEY_9;
 
         @ConfigEntry(id = "loadoutsKeybindSlot10", translation = "gankura.config.keybinds.loadoutsKeybindSlot10")
         @Comment(value = "Sets key for slot 10.", translation = "gankura.config.keybinds.loadoutsKeybindSlot10.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot10 = GLFW.GLFW_KEY_0;
+        public static int loadoutsKeybindSlot10 = InputConstants.KEY_0;
 
         @ConfigEntry(id = "loadoutsKeybindSlot11", translation = "gankura.config.keybinds.loadoutsKeybindSlot11")
         @Comment(value = "Sets key for slot 11.", translation = "gankura.config.keybinds.loadoutsKeybindSlot11.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot11 = GLFW.GLFW_KEY_MINUS;
+        public static int loadoutsKeybindSlot11 = InputConstants.KEY_MINUS;
 
         @ConfigEntry(id = "loadoutsKeybindSlot12", translation = "gankura.config.keybinds.loadoutsKeybindSlot12")
         @Comment(value = "Sets key for slot 12.", translation = "gankura.config.keybinds.loadoutsKeybindSlot12.desc")
         @ConfigOption.Keybind
-        public static int loadoutsKeybindSlot12 = GLFW.GLFW_KEY_EQUAL;
+        public static int loadoutsKeybindSlot12 = InputConstants.KEY_EQUALS;
 
         @ConfigEntry(id = "enableArmorSetKeybind", translation = "gankura.config.keybinds.enableArmorSetKeybind")
         @Comment(value = "Switches Armor Sets via configured keys.", translation = "gankura.config.keybinds.enableArmorSetKeybind.desc")
@@ -1498,47 +1498,47 @@ public final class ModConfig {
         @ConfigEntry(id = "armorSetKeybindSlot1", translation = "gankura.config.keybinds.armorSetKeybindSlot1")
         @Comment(value = "Sets key for slot 1.", translation = "gankura.config.keybinds.armorSetKeybindSlot1.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot1 = GLFW.GLFW_KEY_1;
+        public static int armorSetKeybindSlot1 = InputConstants.KEY_1;
 
         @ConfigEntry(id = "armorSetKeybindSlot2", translation = "gankura.config.keybinds.armorSetKeybindSlot2")
         @Comment(value = "Sets key for slot 2.", translation = "gankura.config.keybinds.armorSetKeybindSlot2.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot2 = GLFW.GLFW_KEY_2;
+        public static int armorSetKeybindSlot2 = InputConstants.KEY_2;
 
         @ConfigEntry(id = "armorSetKeybindSlot3", translation = "gankura.config.keybinds.armorSetKeybindSlot3")
         @Comment(value = "Sets key for slot 3.", translation = "gankura.config.keybinds.armorSetKeybindSlot3.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot3 = GLFW.GLFW_KEY_3;
+        public static int armorSetKeybindSlot3 = InputConstants.KEY_3;
 
         @ConfigEntry(id = "armorSetKeybindSlot4", translation = "gankura.config.keybinds.armorSetKeybindSlot4")
         @Comment(value = "Sets key for slot 4.", translation = "gankura.config.keybinds.armorSetKeybindSlot4.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot4 = GLFW.GLFW_KEY_4;
+        public static int armorSetKeybindSlot4 = InputConstants.KEY_4;
 
         @ConfigEntry(id = "armorSetKeybindSlot5", translation = "gankura.config.keybinds.armorSetKeybindSlot5")
         @Comment(value = "Sets key for slot 5.", translation = "gankura.config.keybinds.armorSetKeybindSlot5.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot5 = GLFW.GLFW_KEY_5;
+        public static int armorSetKeybindSlot5 = InputConstants.KEY_5;
 
         @ConfigEntry(id = "armorSetKeybindSlot6", translation = "gankura.config.keybinds.armorSetKeybindSlot6")
         @Comment(value = "Sets key for slot 6.", translation = "gankura.config.keybinds.armorSetKeybindSlot6.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot6 = GLFW.GLFW_KEY_6;
+        public static int armorSetKeybindSlot6 = InputConstants.KEY_6;
 
         @ConfigEntry(id = "armorSetKeybindSlot7", translation = "gankura.config.keybinds.armorSetKeybindSlot7")
         @Comment(value = "Sets key for slot 7.", translation = "gankura.config.keybinds.armorSetKeybindSlot7.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot7 = GLFW.GLFW_KEY_7;
+        public static int armorSetKeybindSlot7 = InputConstants.KEY_7;
 
         @ConfigEntry(id = "armorSetKeybindSlot8", translation = "gankura.config.keybinds.armorSetKeybindSlot8")
         @Comment(value = "Sets key for slot 8.", translation = "gankura.config.keybinds.armorSetKeybindSlot8.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot8 = GLFW.GLFW_KEY_8;
+        public static int armorSetKeybindSlot8 = InputConstants.KEY_8;
 
         @ConfigEntry(id = "armorSetKeybindSlot9", translation = "gankura.config.keybinds.armorSetKeybindSlot9")
         @Comment(value = "Sets key for slot 9.", translation = "gankura.config.keybinds.armorSetKeybindSlot9.desc")
         @ConfigOption.Keybind
-        public static int armorSetKeybindSlot9 = GLFW.GLFW_KEY_9;
+        public static int armorSetKeybindSlot9 = InputConstants.KEY_9;
 
         @ConfigEntry(id = "enableEquipmentSetKeybind", translation = "gankura.config.keybinds.enableEquipmentSetKeybind")
         @Comment(value = "Switches Equipment Sets via configured keys.", translation = "gankura.config.keybinds.enableEquipmentSetKeybind.desc")
@@ -1547,47 +1547,47 @@ public final class ModConfig {
         @ConfigEntry(id = "equipmentSetKeybindSlot1", translation = "gankura.config.keybinds.equipmentSetKeybindSlot1")
         @Comment(value = "Sets key for slot 1.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot1.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot1 = GLFW.GLFW_KEY_1;
+        public static int equipmentSetKeybindSlot1 = InputConstants.KEY_1;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot2", translation = "gankura.config.keybinds.equipmentSetKeybindSlot2")
         @Comment(value = "Sets key for slot 2.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot2.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot2 = GLFW.GLFW_KEY_2;
+        public static int equipmentSetKeybindSlot2 = InputConstants.KEY_2;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot3", translation = "gankura.config.keybinds.equipmentSetKeybindSlot3")
         @Comment(value = "Sets key for slot 3.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot3.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot3 = GLFW.GLFW_KEY_3;
+        public static int equipmentSetKeybindSlot3 = InputConstants.KEY_3;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot4", translation = "gankura.config.keybinds.equipmentSetKeybindSlot4")
         @Comment(value = "Sets key for slot 4.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot4.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot4 = GLFW.GLFW_KEY_4;
+        public static int equipmentSetKeybindSlot4 = InputConstants.KEY_4;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot5", translation = "gankura.config.keybinds.equipmentSetKeybindSlot5")
         @Comment(value = "Sets key for slot 5.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot5.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot5 = GLFW.GLFW_KEY_5;
+        public static int equipmentSetKeybindSlot5 = InputConstants.KEY_5;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot6", translation = "gankura.config.keybinds.equipmentSetKeybindSlot6")
         @Comment(value = "Sets key for slot 6.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot6.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot6 = GLFW.GLFW_KEY_6;
+        public static int equipmentSetKeybindSlot6 = InputConstants.KEY_6;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot7", translation = "gankura.config.keybinds.equipmentSetKeybindSlot7")
         @Comment(value = "Sets key for slot 7.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot7.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot7 = GLFW.GLFW_KEY_7;
+        public static int equipmentSetKeybindSlot7 = InputConstants.KEY_7;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot8", translation = "gankura.config.keybinds.equipmentSetKeybindSlot8")
         @Comment(value = "Sets key for slot 8.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot8.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot8 = GLFW.GLFW_KEY_8;
+        public static int equipmentSetKeybindSlot8 = InputConstants.KEY_8;
 
         @ConfigEntry(id = "equipmentSetKeybindSlot9", translation = "gankura.config.keybinds.equipmentSetKeybindSlot9")
         @Comment(value = "Sets key for slot 9.", translation = "gankura.config.keybinds.equipmentSetKeybindSlot9.desc")
         @ConfigOption.Keybind
-        public static int equipmentSetKeybindSlot9 = GLFW.GLFW_KEY_9;
+        public static int equipmentSetKeybindSlot9 = InputConstants.KEY_9;
     }
 
     @Category(value = "misc")

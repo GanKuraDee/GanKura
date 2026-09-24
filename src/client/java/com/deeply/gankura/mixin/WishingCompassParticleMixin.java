@@ -20,8 +20,8 @@ public class WishingCompassParticleMixin {
 
     @Inject(method = "handleParticleEvent", at = @At("HEAD"))
     private void gankura$onCompassParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
-        if (packet.getParticle().getType() != ParticleTypes.HAPPY_VILLAGER) return;
+        if (packet.particle().getType() != ParticleTypes.HAPPY_VILLAGER) return;
 
-        WishingCompassHandler.onParticle(packet.getX(), packet.getY(), packet.getZ());
+        WishingCompassHandler.onParticle(packet.x(), packet.y(), packet.z());
     }
 }

@@ -14,6 +14,17 @@ repositories {
 loom {
 	splitEnvironmentSourceSets()
 
+	// Loom は Gradle 同期のたびに .idea/runConfigurations を Gradle タスク型で作り直してしまう。
+	// DevAuth の指定を入れた Application 型の実行構成を手で置いているので、生成を止めておく
+	runs {
+		client {
+			ideConfigGenerated = false
+		}
+		server {
+			ideConfigGenerated = false
+		}
+	}
+
 	mods {
 		"gankura" {
 			sourceSet sourceSets.main
@@ -46,13 +57,13 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	// 設定画面と設定ファイルの読み書き
-	implementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.2:5.0.0")
-	include("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.2:5.0.0")
+	// 設定画面と設定ファイルの読み書き。26.3 対応版が出ている
+	implementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.3:6.0.1")
+	include("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.3:6.0.1")
 
 	// ModMenu の設定画面は ResourcefulConfig 側が用意する。
 	// こちらから参照はしないが、開発中に動かして確かめられるよう実行時には入れておく
-	implementation("com.terraformersmc:modmenu:20.0.0-beta.4")
+	implementation("com.terraformersmc:modmenu:21.0.0-beta.1")
 }
 
 processResources {

@@ -25,8 +25,8 @@ public class FloorDropParticleMixin {
     private void gankura$onHappyVillagerParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (!ModConfig.Foraging.enableFloorDrops) return;
         if (!GameState.Server.isSafari()) return;
-        if (packet.getParticle().getType() != ParticleTypes.HAPPY_VILLAGER) return;
+        if (packet.particle().getType() != ParticleTypes.HAPPY_VILLAGER) return;
 
-        FloorDropHandler.onFloorDropParticle(packet.getX(), packet.getY(), packet.getZ());
+        FloorDropHandler.onFloorDropParticle(packet.x(), packet.y(), packet.z());
     }
 }

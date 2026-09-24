@@ -65,7 +65,7 @@ public final class MousematHandler {
     // 割り当てていないキーは 0、マウスのボタンは負の値で保存される。どちらもキーボードの走査対象外
     private static boolean isKeyDown(Minecraft client, int keyCode) {
         if (keyCode <= 0) return false;
-        return InputConstants.isKeyDown(client.getWindow(), keyCode);
+        return InputConstants.isKeyDown(keyCode);
     }
 
     /** 今、マウスでの視点移動を止めているか */
@@ -112,7 +112,7 @@ public final class MousematHandler {
         int keyCode = ModConfig.Farming.Garden.releaseViewKeybind;
         if (keyCode <= 0) return LOCKED_TEXT_NO_KEY;
 
-        String key = InputConstants.Type.KEYSYM.getOrCreate(keyCode).getDisplayName().getString();
+        String key = InputConstants.Type.KEYBOARD.getOrCreate(keyCode).getDisplayName().getString();
         return LOCKED_TEXT + key + LOCKED_TEXT_TAIL;
     }
 

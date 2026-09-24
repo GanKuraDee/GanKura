@@ -26,16 +26,16 @@ public class ArachneCrystalParticleMixin {
     private void onParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (!GameState.Arachne.awaitingCrystalParticles) return;
 
-        if (packet.getMaxSpeed() != 1f) return;
-        if (packet.getParticle().getType() != ParticleTypes.DUST) return;
+        if (packet.xMaxSpeed() != 1f) return;
+        if (packet.particle().getType() != ParticleTypes.DUST) return;
 
-        Vector3f color = ((DustParticleOptions) packet.getParticle()).getColor();
+        Vector3f color = ((DustParticleOptions) packet.particle()).getColor();
         if (color.x > BLACK_COLOR_EPSILON || color.y > BLACK_COLOR_EPSILON || color.z > BLACK_COLOR_EPSILON) return;
 
         BlockPos altar = ModConstants.ARACHNE_ALTAR_POS;
-        double dx = packet.getX() - altar.getX();
-        double dy = packet.getY() - altar.getY();
-        double dz = packet.getZ() - altar.getZ();
+        double dx = packet.x() - altar.getX();
+        double dy = packet.y() - altar.getY();
+        double dz = packet.z() - altar.getZ();
         if (Math.sqrt(dx * dx + dy * dy + dz * dz) > ALTAR_RADIUS) return;
 
         GameState.Arachne.particleBurstCounter++;

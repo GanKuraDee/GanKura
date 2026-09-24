@@ -6,7 +6,6 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.screens.Screen;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -52,7 +51,7 @@ public class MouseCursorRestoreMixin {
     private void gankura$afterSetScreen(Screen screen, CallbackInfo ci) {
         if (this.gankura$shouldRestore && screen != null) {
             Window window = this.minecraft.getWindow();
-            InputConstants.grabOrReleaseMouse(window, GLFW.GLFW_CURSOR_NORMAL, this.gankura$savedX, this.gankura$savedY);
+            InputConstants.releaseMouse(window, this.gankura$savedX, this.gankura$savedY);
             MouseHandlerAccessor accessor = (MouseHandlerAccessor) this.minecraft.mouseHandler;
             accessor.gankura$setXpos(this.gankura$savedX);
             accessor.gankura$setYpos(this.gankura$savedY);

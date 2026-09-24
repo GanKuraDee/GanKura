@@ -23,8 +23,8 @@ public class InvisibugParticleMixin {
     @Inject(method = "handleParticleEvent", at = @At("HEAD"))
     private void gankura$onCritParticle(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (!GameState.Server.isMoongladeMarsh()) return;
-        if (packet.getParticle().getType() != ParticleTypes.CRIT) return;
+        if (packet.particle().getType() != ParticleTypes.CRIT) return;
 
-        EntityHighlightManager.onCritParticle(packet.getX(), packet.getY(), packet.getZ());
+        EntityHighlightManager.onCritParticle(packet.x(), packet.y(), packet.z());
     }
 }

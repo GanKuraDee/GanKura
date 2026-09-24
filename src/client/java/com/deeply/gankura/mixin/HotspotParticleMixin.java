@@ -31,21 +31,21 @@ public class HotspotParticleMixin {
         if (!com.deeply.gankura.data.ModConfig.Fishing.showHotspotCircle) return;
         if (!isHotspotParticle(packet)) return;
 
-        HotspotAreaHandler.onParticle(packet.getX(), packet.getY(), packet.getZ());
+        HotspotAreaHandler.onParticle(packet.x(), packet.y(), packet.z());
         if (HotspotAreaHandler.shouldHideParticles()) ci.cancel();
     }
 
     private static boolean isHotspotParticle(ClientboundLevelParticlesPacket packet) {
         // 溶岩の Hotspot。色の無いパーティクルなので個数で見分ける
         if (com.deeply.gankura.data.GameState.Server.isCrimsonIsle()) {
-            return packet.getParticle().getType() == ParticleTypes.SMOKE
-                    && (packet.getCount() == 5 || packet.getCount() == 2);
+            return packet.particle().getType() == ParticleTypes.SMOKE
+                    && (packet.count() == 5 || packet.count() == 2);
         }
 
-        if (packet.getParticle().getType() != ParticleTypes.DUST) return false;
-        if (packet.getCount() != 0 || packet.getMaxSpeed() != 1f || packet.getXDist() != 1f) return false;
+        if (packet.particle().getType() != ParticleTypes.DUST) return false;
+        if (packet.count() != 0 || packet.xMaxSpeed() != 1f || packet.xDist() != 1f) return false;
 
-        Vector3f color = ((DustParticleOptions) packet.getParticle()).getColor();
+        Vector3f color = ((DustParticleOptions) packet.particle()).getColor();
         return Math.abs(color.x - WATER_COLOR.x) < COLOR_EPSILON
                 && Math.abs(color.y - WATER_COLOR.y) < COLOR_EPSILON
                 && Math.abs(color.z - WATER_COLOR.z) < COLOR_EPSILON;

@@ -28,7 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BossSectionVisibilityMixin {
 
     @Inject(method = "isSectionCompiledAndVisible", at = @At("HEAD"), cancellable = true)
-    private void gankura$allowTrackedBossSection(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private void gankura$allowTrackedBossSection(BlockPos pos, long chunkFadeDuration,
+                                                 CallbackInfoReturnable<Boolean> cir) {
         if (EntityHighlightManager.highlightedEntities.isEmpty()) return;
 
         // 呼び出し元は entity.blockPosition() をそのまま渡すため、完全一致で判定すれば

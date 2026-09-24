@@ -8,6 +8,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,29 +29,25 @@ public class SignInputMixin {
     @Unique
     private static final String SEARCH_PROMPT = "Enter query";
 
-    // 看板の行数
-    @Unique
-    private static final int SIGN_LINES = 4;
-
     @Inject(method = "openTextEdit", at = @At("HEAD"), cancellable = true)
-    private void gankura$openSearchInput(SignBlockEntity sign, boolean frontText, CallbackInfo ci) {
+    private void gankura$openSearchInput(SignBlockEntity sign, SignTextSlot slot, CallbackInfo ci) {
         if (!ModConfig.Interface.enableSearchInputScreen || !GameState.Server.isSkyblock()) return;
 
-        Component prompt = gankura$searchPrompt(sign, frontText);
+        Component prompt = gankura$searchPrompt(sign, slot);
         if (prompt == null) return;
 
         ci.cancel();
         Minecraft.getInstance().gui.setScreen(
-                new SignInputScreen(sign.getBlockPos(), frontText, prompt));
+                new SignInputScreen(sign.getBlockPos(), slot, prompt));
     }
 
     // 検索の看板なら、その案内の行。違う看板なら null
     @Unique
-    private Component gankura$searchPrompt(SignBlockEntity sign, boolean frontText) {
-        SignText text = sign.getText(frontText);
+    private Component gankura$searchPrompt(SignBlockEntity sign, SignTextSlot slot) {
+        SignText text = sign.getText(slot);
 
-        for (int line = 0; line < SIGN_LINES; line++) {
-            Component message = text.getMessage(line, false);
+        // 26.3: SignText#getMessage(int, boolean) が廃止され、行のリストを返す getMessages に変わった
+        for (Component message : text.getMessages(false)) {
             if (message.getString().contains(SEARCH_PROMPT)) return message;
         }
         return null;

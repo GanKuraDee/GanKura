@@ -24,7 +24,7 @@ public class TooltipPositionMixin {
     // 画面の縁に残す余白。バニラが位置を丸めるときと同じ値
     private static final int MARGIN = 4;
 
-    @Inject(method = "positionTooltip", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "positionTooltip(IIIIII)Lorg/joml/Vector2ic;", at = @At("RETURN"), cancellable = true)
     private void gankura$moveTooltip(int screenWidth, int screenHeight, int mouseX, int mouseY,
                                      int tooltipWidth, int tooltipHeight,
                                      CallbackInfoReturnable<Vector2ic> cir) {

@@ -38,10 +38,6 @@ final class LegacyConfigMigration {
     private static final String GROUP_PREFIX = "gankura.config.";
     private static final String GROUP_SEPARATOR = ".sep.";
 
-    // MoulConfig はマウスのボタンを 0〜9 で、ResourcefulConfig は「ボタン番号 - 100」で持つ
-    private static final int LEGACY_LAST_MOUSE_BUTTON = 9;
-    private static final int RC_MOUSE_OFFSET = -100;
-
     private LegacyConfigMigration() {
     }
 
@@ -91,18 +87,12 @@ final class LegacyConfigMigration {
                     || Modifier.isFinal(field.getModifiers())) {
                 continue;
             }
+            // キーバインドは引き継がない。26.3 で入力が GLFW から SDL に変わり、
+            // 旧ファイルに入っている GLFW のキーコードは別のキーを指してしまうため
+            if (field.isAnnotationPresent(ConfigOption.Keybind.class)) continue;
+
             JsonElement value = json.get(entry.id());
             if (value == null || value.isJsonNull()) continue;
-
-            if (field.isAnnotationPresent(ConfigOption.Keybind.class)) {
-                try {
-                    field.setInt(null, convertKeybind(value.getAsInt()));
-                } catch (Exception e) {
-                    LOGGER.warn("Could not carry over keybind {}.{} from the old config",
-                            category.getSimpleName(), field.getName(), e);
-                }
-                continue;
-            }
             try {
                 // 旧 List<列挙> は配列になっているが、Gson は JSON 配列から素直に読み替えてくれる
                 field.set(null, GSON.fromJson(value, field.getGenericType()));
@@ -111,21 +101,6 @@ final class LegacyConfigMigration {
                         category.getSimpleName(), field.getName(), e);
             }
         }
-    }
-
-    /**
-     * キーバインドの値を ResourcefulConfig の表し方に直す。キーボードのキーコードはどちらも GLFW なのでそのまま。
-     *
-     * <pre>
-     *              未割り当て   マウスのボタン n
-     * MoulConfig   -1           n（0〜9）
-     * RC           0            n - 100
-     * </pre>
-     */
-    private static int convertKeybind(int legacy) {
-        if (legacy < 0) return ModConfig.KEY_NONE;
-        if (legacy <= LEGACY_LAST_MOUSE_BUTTON) return legacy + RC_MOUSE_OFFSET;
-        return legacy;
     }
 
     /**

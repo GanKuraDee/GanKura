@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class PetsMenuClickMixin {
     private static final Pattern PETS_TITLE_PATTERN = Pattern.compile("\\(\\d+/\\d+\\)\\s*Pets");
 
-    @Inject(method = "slotClicked", at = @At("HEAD"))
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"))
     private void onSlotClicked(Slot slot, int slotId, int buttonNum, ContainerInput containerInput, CallbackInfo ci) {
         if (buttonNum != 0) return;
         if (slot == null || !slot.hasItem()) return;

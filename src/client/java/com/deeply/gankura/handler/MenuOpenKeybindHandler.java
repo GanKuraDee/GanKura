@@ -44,6 +44,6 @@ public class MenuOpenKeybindHandler {
     // 未設定のキーバインドは 0、マウスのボタンは負の値で保存されるため除外する
     private static boolean isKeyDown(Minecraft client, int keyCode) {
         if (keyCode <= 0) return false;
-        return InputConstants.isKeyDown(client.getWindow(), keyCode);
+        return InputConstants.isKeyDown(keyCode);
     }
 }
