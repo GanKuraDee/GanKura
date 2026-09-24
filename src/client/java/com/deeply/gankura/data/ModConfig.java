@@ -170,7 +170,7 @@ public final class ModConfig {
 
         @ConfigEntry(id = "enableQuiverAlert", translation = "gankura.config.combat.enableQuiverAlert")
         @Comment(value = "Shows a title when the arrows in your quiver are running out.", translation = "gankura.config.combat.enableQuiverAlert.desc")
-        public static boolean enableQuiverAlert = true;
+        public static boolean enableQuiverAlert = false;
 
         @ConfigEntry(id = "quiverLowThreshold", translation = "gankura.config.combat.quiverLowThreshold")
         @Comment(value = "How many arrows are left when the alert shows.", translation = "gankura.config.combat.quiverLowThreshold.desc")
