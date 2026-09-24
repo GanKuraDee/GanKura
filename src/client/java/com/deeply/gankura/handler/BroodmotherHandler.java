@@ -16,16 +16,22 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 public class BroodmotherHandler {
+    // タブリストが揃うまでの行数の目安。読み込み途中で「ウィジェットが無い」と誤判定しないための待ち
+    private static final int MIN_LOADED_LINES = 20;
+
 
     public static void processTabList(List<String> lines) {
         for (String line : lines) {
             Matcher bmMatcher = ModConstants.BROODMOTHER_PATTERN.matcher(line);
             if (bmMatcher.find()) {
+                GameState.Broodmother.widgetMissing = false;
                 String bmStageName = bmMatcher.group(1).trim();
                 updateBroodmotherStage(bmStageName);
                 return;
             }
         }
+        // タブリストが揃っているのに行が無い。HUD で出し方を案内する
+        if (lines.size() >= MIN_LOADED_LINES) GameState.Broodmother.widgetMissing = true;
     }
 
     private static void updateBroodmotherStage(String newStage) {

@@ -20,6 +20,9 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 public class GolemHandler {
+    // タブリストが揃うまでの行数の目安。読み込み途中で「ウィジェットが無い」と誤判定しないための待ち
+    private static final int MIN_LOADED_LINES = 20;
+
     private static final Logger LOGGER = LoggerFactory.getLogger("GolemHandler");
 
     // 落とし物ごとに要る Loot Quality
@@ -172,6 +175,7 @@ public class GolemHandler {
         for (String line : lines) {
             Matcher matcher = ModConstants.PROTECTOR_PATTERN.matcher(line);
             if (matcher.find()) {
+                GameState.Golem.widgetMissing = false;
                 boolean wasScanning = GameState.Golem.isScanning;
                 if (GameState.Golem.isScanning) GameState.Golem.isScanning = false;
                 String rawState = matcher.group(1).trim().split("\\s+")[0];
@@ -182,6 +186,8 @@ public class GolemHandler {
                 return;
             }
         }
+        // タブリストが揃っているのに行が無い。HUD で出し方を案内する
+        if (lines.size() >= MIN_LOADED_LINES) GameState.Golem.widgetMissing = true;
     }
 
     public static void setStageToSummoned(Minecraft client) {

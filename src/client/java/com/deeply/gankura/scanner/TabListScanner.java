@@ -71,6 +71,7 @@ public class TabListScanner {
         // エリア/サーバーIDは他のハンドラーの判定条件になるため、必ず先に更新する
         LocationScanner.processTabList(unformattedLines);
         FerocityScanner.processTabList(unformattedLines);
+        SoulflowScanner.processTabList(unformattedLines);
         CommissionWaypointHandler.processTabList(unformattedLines);
         GolemHandler.processTabList(unformattedLines, client);
         BroodmotherHandler.processTabList(unformattedLines);

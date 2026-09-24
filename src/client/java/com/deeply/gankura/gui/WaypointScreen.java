@@ -285,6 +285,11 @@ public class WaypointScreen extends Screen {
             button.setMessage(toggleLabel("Render", data.enabled));
         }).bounds(left, height - 52, 88, WIDGET_HEIGHT).build());
 
+        addRenderableWidget(Button.builder(toggleLabel("Distance", data.showDistance), button -> {
+            data.showDistance = !data.showDistance;
+            button.setMessage(toggleLabel("Distance", data.showDistance));
+        }).bounds(centerX - 44, height - 52, 88, WIDGET_HEIGHT).build());
+
         addRenderableWidget(Button.builder(toggleLabel("Names", data.showNames), button -> {
             data.showNames = !data.showNames;
             button.setMessage(toggleLabel("Names", data.showNames));

@@ -20,6 +20,12 @@ public class BroodmotherStatusHud extends HudElement {
         Font font = Minecraft.getInstance().font;
         String displayStats;
 
+        if (!isPreview && GameState.Broodmother.widgetMissing) {
+            text(graphics, font, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF, true);
+            missingWidget(graphics, font, 12, "Broodmother", "/widget -> General Info Widget -> Show Broodmother");
+            return;
+        }
+
         if (isPreview) {
             displayStats = "Stage: §e4 §f(0m 45s)";
         } else {

@@ -66,6 +66,9 @@ final class LegacyConfigMigration {
         // ModConfig.load() の中で register より前に呼ばれるため、
         // ここで入れた値がそのまま ResourcefulConfig の初期値として保存される
         applyCategories(root, ModConfig.class.getAnnotation(Config.class).categories());
+        // 戦闘まわりの HUD は、MoulConfig の頃は General HUD に置いていた
+        JsonObject formerGeneralHud = objectOrNull(root, "generalHud");
+        if (formerGeneralHud != null) applyFields(formerGeneralHud, ModConfig.Combat.class);
         ModConfig.expandedAccordions = openAccordions(root);
         InventoryButtonStore.importLegacy(objectOrNull(root, "inventoryButtons"));
 

@@ -67,6 +67,12 @@ public final class SkyblockItemId {
         return extra == null ? 0 : extra.getIntOr(key, 0);
     }
 
+    /** アイテムに書かれている文字の属性。書かれていなければ null */
+    public static String stringAttribute(ItemStack stack, String key) {
+        CompoundTag extra = extras(stack);
+        return extra == null ? null : extra.getString(key).orElse(null);
+    }
+
     private static CompoundTag extras(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 

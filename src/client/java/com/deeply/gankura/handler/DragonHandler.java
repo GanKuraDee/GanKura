@@ -19,6 +19,9 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 
 public class DragonHandler {
+    // タブリストが揃うまでの行数の目安。読み込み途中で「ウィジェットが無い」と誤判定しないための待ち
+    private static final int MIN_LOADED_LINES = 20;
+
 
     // 落とし物ごとに要る Loot Quality
     private static final int LQ_DRAGON_LEGENDARY = 450;
@@ -248,6 +251,13 @@ public class DragonHandler {
             if (eyeMatcher.find()) { foundEyePlaced = true; try { scannedEyes = Integer.parseInt(eyeMatcher.group(1)); } catch (Exception ignored) {} }
             Matcher typeMatcher = ModConstants.DRAGON_TYPE_TAB_PATTERN.matcher(line);
             if (typeMatcher.find()) scannedType = typeMatcher.group(1);
+        }
+
+        // 卵の状態は、目の数・孵化・再生成のどれか1行で出る。どれも無ければウィジェットで出していない
+        if (foundEyePlaced || foundDragonSpawned || foundEggRespawning) {
+            GameState.Dragon.widgetMissing = false;
+        } else if (lines.size() >= MIN_LOADED_LINES) {
+            GameState.Dragon.widgetMissing = true;
         }
 
         if ("Scanning...".equals(GameState.Dragon.eggState)) {

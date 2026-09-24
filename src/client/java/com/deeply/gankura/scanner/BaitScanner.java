@@ -37,6 +37,8 @@ public class BaitScanner {
 
     // すでに知らせたか。減り続ける間に何度も出さないために持つ
     private static boolean alerted;
+    // 最後に見た餌。読めない間も覚えておき、付け替えたかどうかの判定に使う
+    private static String lastBait = null;
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(BaitScanner::scan);
@@ -88,29 +90,28 @@ public class BaitScanner {
         GameState.Player.fishingBaitCount = count;
     }
 
+    // 竿を持ち替えるなどで読めなくなっても、知らせた印は残す。
+    // 同じ餌のまま戻ってきたときに知らせ直さないため（Low Quiver Alert と同じ扱い）
     private static void clear() {
         GameState.Player.fishingBait = null;
         GameState.Player.fishingBaitCount = 0;
-        alerted = false;
     }
 
     /**
      * 残数が閾値を下回ったときに知らせる。
      *
      * 減るたびに出すとうるさいので、1度出したらそれで終わり。
-     * 餌を付け直すか、余裕のある数に戻るとまた出せるようにする
+     * 別の餌に付け直すか、余裕のある数に戻るとまた出せるようにする。
+     * 竿を持ち替えるなどで一時的に読めなくなっても、同じ餌なら知らせ直さない
      */
     private static void checkLow(Minecraft client, String bait, int count) {
-        if (!ModConfig.Fishing.showBaitLowAlert) {
-            alerted = false;
-            return;
-        }
+        // 別の餌に付け直したなら、また知らせられるように戻す。
+        // 読めなくなると今の餌は消えるので、最後に見た餌と比べる
+        if (!bait.equals(lastBait)) alerted = false;
+        lastBait = bait;
 
-        // 別の餌に付け直したなら、また知らせられるように戻す
-        if (!bait.equals(GameState.Player.fishingBait)) alerted = false;
-
-        // まだ余裕があるうちも戻しておく
-        if (count > ModConfig.Fishing.baitLowThreshold) {
+        // 切ってある間と、まだ余裕があるうちも戻しておく
+        if (!ModConfig.Fishing.showBaitLowAlert || count > ModConfig.Fishing.baitLowThreshold) {
             alerted = false;
             return;
         }
@@ -118,7 +119,7 @@ public class BaitScanner {
 
         alerted = true;
         NotificationUtils.showTitle(client,
-                Component.literal("§c§lBait Low §e§l" + count), null,
+                Component.literal("§c§lBait Low §e§l" + count), Component.literal(bait),
                 ALERT_TITLE_FADE, ALERT_TITLE_STAY, ALERT_TITLE_FADE);
         NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP, ALERT_SOUND_VOLUME, ALERT_SOUND_PITCH);
     }
