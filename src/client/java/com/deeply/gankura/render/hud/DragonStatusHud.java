@@ -19,6 +19,12 @@ public class DragonStatusHud extends HudElement {
         Font font = Minecraft.getInstance().font;
         String eggState; String eyePlaced = null; String dragonType = null;
 
+        if (!isPreview && GameState.Dragon.widgetMissing) {
+            text(graphics, font, "§d§lDragon Status", 0, 0, 0xFFFF55FF, true);
+            missingWidget(graphics, font, 12, "Dragon", "/widget -> General Info Widget -> Show Eyes Placed");
+            return;
+        }
+
         if (isPreview) {
             eggState = "§cEgg: Hatched (Spawned)";
             eyePlaced = "§cEyes placed: 8/8 §b(2)";

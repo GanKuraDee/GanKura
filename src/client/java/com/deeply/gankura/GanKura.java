@@ -25,6 +25,7 @@ import com.deeply.gankura.handler.VisitorPanel;
 import com.deeply.gankura.handler.WishingCompassHandler;
 import com.deeply.gankura.handler.MenuOpenKeybindHandler;
 import com.deeply.gankura.handler.NetworkHandler;
+import com.deeply.gankura.handler.PersonalCompactorPreview;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.handler.QuiverAlertHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
@@ -116,6 +117,7 @@ public class GanKura implements ClientModInitializer {
         BestiaryTooltipHandler.register();
         AttributeTooltipHandler.register();
         ItemPriceTooltipHandler.register();
+        PersonalCompactorPreview.register();
         AttributeCostPanel.register();
         VisitorPanel.register();
         MousematHandler.register();

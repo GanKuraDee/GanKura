@@ -15,6 +15,8 @@ public class WaypointData {
     public boolean enabled = true;
     // ブロックの上に名前を出すかどうか
     public boolean showNames = true;
+    // 名前の横に、そこまでの距離を出すかどうか
+    public boolean showDistance = false;
     // エリア名 -> そのエリアのウェイポイント
     public Map<String, List<Waypoint>> areas = new LinkedHashMap<>();
     // エリア名 -> 非表示にしたグループ

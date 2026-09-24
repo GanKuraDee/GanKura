@@ -4,72 +4,56 @@ import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.util.NotificationUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 
-// 矢の残りが少なくなったことを、タイトルと音で知らせる。
-// しきい値を下から跨いだ瞬間だけ出すので、残りが少ないまま撃ち続けても鳴り続けない
+// 矢筒の矢が設定した本数まで減ったことを、タイトルと音で知らせる。
+// 知らせ方は Low Bait Alert / Low Soulflow Alert に合わせている。
+// どの矢が減っているのかは、サブタイトルにレアリティの色のまま出す
 public class QuiverAlertHandler {
 
-    private static final int LOW_THRESHOLD = 50;
-    private static final int CRITICAL_THRESHOLD = 10;
+    private static final int ALERT_TITLE_FADE = 0;
+    private static final int ALERT_TITLE_STAY = 40;
+    private static final float ALERT_SOUND_VOLUME = 1.0f;
+    private static final float ALERT_SOUND_PITCH = 0.7f;
 
-    // 直前の残数と矢の種類。跨いだ瞬間を見るために覚えておく
-    private static int lastCount = -1;
+    // 一度知らせたか。しきい値より上に戻るか、別の矢に持ち替えるまでは知らせ直さない
+    private static boolean alerted;
+    // 直前に見た矢の種類。持ち替えを見分けるために覚えておく
     private static String lastArrow = null;
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(QuiverAlertHandler::tick);
     }
 
+    /**
+     * 残りがしきい値以下になったときに知らせる。
+     *
+     * 減るたびに出すとうるさいので、1度出したらそれで終わり。
+     * 補充してしきい値より上に戻るか、別の矢に持ち替えると、また出せるようにする。
+     * ロビーを移る間などに一時的に読めなくなっても、戻ってきたときに知らせ直さない
+     */
     private static void tick(Minecraft client) {
         if (client.player == null) return;
 
         String arrow = GameState.Player.quiverArrow;
-        if (!GameState.Server.isSkyblock() || arrow == null) {
-            reset();
-            return;
-        }
+        if (!GameState.Server.isSkyblock() || arrow == null) return;
 
-        int count = GameState.Player.quiverArrowCount;
-        int previous = lastCount;
-        boolean sameArrow = arrow.equals(lastArrow);
-        lastCount = count;
+        if (!arrow.equals(lastArrow)) alerted = false;
         lastArrow = arrow;
 
-        if (!ModConfig.Combat.enableQuiverAlert) return;
-        // 読み始めた直後と、矢を持ち替えた直後は比べる相手がいない。
-        // 種類を変えると残数が別の矢のものへ飛ぶので、それを「減った」と数えないようにする
-        if (previous < 0 || !sameArrow) return;
-        // 補充したときは何も出さない
-        if (count >= previous) return;
-
-        if (crossed(previous, count, CRITICAL_THRESHOLD)) {
-            alert(client, "ARROWS ALMOST OUT", ChatFormatting.RED, count, SoundEvents.ANVIL_LAND, 1.4f);
-        } else if (crossed(previous, count, LOW_THRESHOLD)) {
-            alert(client, "LOW ON ARROWS", ChatFormatting.YELLOW, count, SoundEvents.ARROW_HIT_PLAYER, 1.0f);
+        int count = GameState.Player.quiverArrowCount;
+        if (!ModConfig.Combat.enableQuiverAlert || count > ModConfig.Combat.quiverLowThreshold) {
+            alerted = false;
+            return;
         }
-    }
+        if (alerted) return;
 
-    public static void reset() {
-        lastCount = -1;
-        lastArrow = null;
-    }
-
-    // このtickでしきい値を上から下へ跨いだか
-    private static boolean crossed(int previous, int count, int threshold) {
-        return previous > threshold && count <= threshold;
-    }
-
-    private static void alert(Minecraft client, String title, ChatFormatting color, int count, SoundEvent sound, float pitch) {
-        MutableComponent titleText = Component.literal(title).withStyle(color, ChatFormatting.BOLD);
-        Component subtitle = Component.literal(String.format("%,d left", count));
-
-        NotificationUtils.showTitle(client, titleText, subtitle);
-        NotificationUtils.playSound(client, sound, 1.0f, pitch);
+        alerted = true;
+        NotificationUtils.showTitle(client,
+                Component.literal("§c§lArrows Low §e§l" + String.format("%,d", count)), Component.literal(arrow),
+                ALERT_TITLE_FADE, ALERT_TITLE_STAY, ALERT_TITLE_FADE);
+        NotificationUtils.playSound(client, SoundEvents.EXPERIENCE_ORB_PICKUP, ALERT_SOUND_VOLUME, ALERT_SOUND_PITCH);
     }
 }

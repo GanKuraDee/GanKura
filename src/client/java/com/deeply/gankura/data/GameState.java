@@ -192,6 +192,11 @@ public class GameState {
         // Ferocity。タブリストから読めていないときは -1
         public static int ferocity = -1;
 
+        // Soulflow。タブリストから読めていないときは -1。
+        // 読み込み途中と「ウィジェットに行が無い」とを見分けるため、無いと分かったときだけ missing を立てる
+        public static int soulflow = -1;
+        public static boolean soulflowWidgetMissing = false;
+
         public static boolean hasShownDropAlert = false;
         public static boolean isLootScanning = false;
 
@@ -211,6 +216,8 @@ public class GameState {
     public static class Golem {
         public static String stage = ModConstants.STAGE_RESTING;
         public static boolean isScanning = true;
+        // タブリストは揃っているのに End Stone Protector の行が無い。ウィジェットで出していない
+        public static boolean widgetMissing = false;
         public static boolean hasRisen = false;
         public static long stage4StartTime = 0;
         public static long stage5TargetTime = 0;
@@ -225,7 +232,7 @@ public class GameState {
         public static String top3Name = null; public static long top3Damage = 0;
 
         public static void reset() {
-            stage = ModConstants.STAGE_RESTING; isScanning = true; hasRisen = false;
+            stage = ModConstants.STAGE_RESTING; isScanning = true; hasRisen = false; widgetMissing = false;
             stage4StartTime = 0; stage5TargetTime = 0; health = null; hasAnnouncedDay30 = false;
             fightStartTime = 0; fightEndTime = 0; lastFirstPlaceDamage = 0; lastZealotKills = 0;
             top1Name = null; top1Damage = 0; top2Name = null; top2Damage = 0; top3Name = null; top3Damage = 0;
@@ -234,6 +241,8 @@ public class GameState {
 
     public static class Dragon {
         public static String eggState = "Scanning...";
+        // タブリストは揃っているのに卵・目の行が無い。ウィジェットで出していない
+        public static boolean widgetMissing = false;
         public static int eyes = 0;
         public static int playerEyes = 0;
         public static String type = null;
@@ -249,7 +258,7 @@ public class GameState {
         public static String top3Name = null; public static long top3Damage = 0;
 
         public static void reset() {
-            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null; health = null;
+            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null; health = null; widgetMissing = false;
             spawnTargetTime = 0; lastChatTime = 0; fightStartTime = 0; fightEndTime = 0;
             top1Name = null; top1Damage = 0; top2Name = null; top2Damage = 0; top3Name = null; top3Damage = 0;
         }
@@ -257,6 +266,8 @@ public class GameState {
 
     public static class Broodmother {
         public static String stage = "Scanning...";
+        // タブリストは揃っているのに Broodmother の行が無い。ウィジェットで出していない
+        public static boolean widgetMissing = false;
         public static long stage4StartTime = 0;
         public static String health = null;
 
@@ -264,6 +275,7 @@ public class GameState {
             stage = "Scanning...";
             stage4StartTime = 0;
             health = null;
+            widgetMissing = false;
         }
     }
 
@@ -335,12 +347,6 @@ public class GameState {
         public static boolean isDetected = false;
         public static String health = null;
         public static void reset() { isDetected = false; health = null; }
-    }
-
-    public static class Corleone {
-        // Boss Corleone を今見つけているか。スポーン通知の出し分けに使う
-        public static boolean isDetected = false;
-        public static void reset() { isDetected = false; }
     }
 
     public static class MagmaBoss {
@@ -460,7 +466,6 @@ public class GameState {
         AshfangAcolyte.reset();
         AshfangUnderling.reset();
         MagmaBoss.reset();
-        Corleone.reset();
         CrimsonDrop.reset();
         CritterSafari.reset();
         Doomspiral.reset();

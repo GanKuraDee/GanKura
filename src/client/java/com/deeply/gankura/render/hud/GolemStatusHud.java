@@ -20,6 +20,13 @@ public class GolemStatusHud extends HudElement {
         Font font = Minecraft.getInstance().font;
         String displayStats;
 
+        if (!isPreview && GameState.Golem.widgetMissing) {
+            text(graphics, font, "§lGolem Status", 0, 0, 0xFFFFAA00, true);
+            missingWidget(graphics, font, 12, "End Stone Protector",
+                    "/widget -> General Info Widget -> Show End Stone Protector Status");
+            return;
+        }
+
         if (isPreview) {
             displayStats = "Stage: §e4 §f(2m 30s)";
         } else {

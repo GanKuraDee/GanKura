@@ -36,6 +36,8 @@ public final class ConfigGroups {
     }
 
     private static void items() {
+        GROUP_OF.put("gankura.config.combat.enableQuiverAlert", "gankura.config.combat.sep.quiverLowAlertFolder");
+        GROUP_OF.put("gankura.config.combat.quiverLowThreshold", "gankura.config.combat.sep.quiverLowAlertFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.showGolemStatusHud", "gankura.config.combat.theEnd.sep.golemSection");
         GROUP_OF.put("gankura.config.combat.theEnd.showLootTrackerHud", "gankura.config.combat.theEnd.sep.golemRareDropFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.enableDropAlerts", "gankura.config.combat.theEnd.sep.golemRareDropFolder");
@@ -153,6 +155,8 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.generalHud.showGearHud", "gankura.config.generalHud.sep.equipmentHudFolder");
         GROUP_OF.put("gankura.config.generalHud.gearHudOrientation", "gankura.config.generalHud.sep.equipmentHudFolder");
         GROUP_OF.put("gankura.config.generalHud.showYawPitchHud", "gankura.config.generalHud.sep.yawPitchHudFolder");
+        GROUP_OF.put("gankura.config.combat.showSoulflowLowAlert", "gankura.config.combat.sep.soulflowLowAlertFolder");
+        GROUP_OF.put("gankura.config.combat.soulflowLowThreshold", "gankura.config.combat.sep.soulflowLowAlertFolder");
         GROUP_OF.put("gankura.config.generalHud.yawPrecision", "gankura.config.generalHud.sep.yawPitchHudFolder");
         GROUP_OF.put("gankura.config.generalHud.pitchPrecision", "gankura.config.generalHud.sep.yawPitchHudFolder");
         GROUP_OF.put("gankura.config.mobVisuals.targetsTheEnd", "gankura.config.mobVisuals.sep.theEndFolder");
@@ -264,6 +268,8 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.interfaceSettings.highlightActivePet", "gankura.config.interfaceSettings.sep.petFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.showPetLevel", "gankura.config.interfaceSettings.sep.petFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.hideMaxedPetLevel", "gankura.config.interfaceSettings.sep.petFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.enablePersonalCompactorPreview", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.showPersonalCompactorStatus", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
         GROUP_OF.put("gankura.config.keybinds.enableOpenMenuKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
         GROUP_OF.put("gankura.config.keybinds.openLoadoutsKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
         GROUP_OF.put("gankura.config.keybinds.openWardrobeKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
@@ -307,6 +313,7 @@ public final class ConfigGroups {
     }
 
     private static void groups() {
+        ALL.add("gankura.config.combat.sep.quiverLowAlertFolder");
         ALL.add("gankura.config.combat.theEnd.sep.golemSection");
         ALL.add("gankura.config.combat.theEnd.sep.golemRareDropFolder");
         PARENT.put("gankura.config.combat.theEnd.sep.golemRareDropFolder", "gankura.config.combat.theEnd.sep.golemSection");
@@ -385,6 +392,7 @@ public final class ConfigGroups {
         ALL.add("gankura.config.generalHud.sep.armorHudFolder");
         ALL.add("gankura.config.generalHud.sep.equipmentHudFolder");
         ALL.add("gankura.config.generalHud.sep.yawPitchHudFolder");
+        ALL.add("gankura.config.combat.sep.soulflowLowAlertFolder");
         ALL.add("gankura.config.mobVisuals.sep.theEndFolder");
         ALL.add("gankura.config.mobVisuals.sep.spidersDenFolder");
         ALL.add("gankura.config.mobVisuals.sep.crimsonIsleFolder");
@@ -422,6 +430,7 @@ public final class ConfigGroups {
         ALL.add("gankura.config.interfaceSettings.sep.heartFolder");
         ALL.add("gankura.config.interfaceSettings.sep.enchantedBookFolder");
         ALL.add("gankura.config.interfaceSettings.sep.petFolder");
+        ALL.add("gankura.config.interfaceSettings.sep.personalCompactorFolder");
         ALL.add("gankura.config.keybinds.sep.openMenuKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.loadoutsKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.armorSetKeybindFolder");

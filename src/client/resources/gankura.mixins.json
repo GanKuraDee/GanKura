@@ -59,7 +59,8 @@
 		"ResourcefulConfigOptionsMixin",
 		"ResourcefulConfigScreenAccessor",
 		"ResourcefulListWidgetAccessor",
-		"ResourcefulListWidgetIndentMixin"
+		"ResourcefulListWidgetIndentMixin",
+		"PersonalCompactorTooltipMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
