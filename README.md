@@ -11,27 +11,6 @@ GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses.
     - `add <name>` - Add a named Waypoint to your current location.
     - `list` - Display a list of Waypoints in the current area.
 
-# Supported
-- **The End**
-  - End Stone Protector
-  - Dragon
-- **Spider's Den**
-  - Broodmother
-  - Arachne
-- **Crimson Isle**
-  - Bladesoul
-  - Barbarian Duke X
-  - Mage Outlaw
-  - Magma Boss
-  - Ashfang
-- **Foraging**
-  - All Moonglade Marsh Mobs (Excluding Sea Creatures)
-  - All Torrhus Canyon Mobs (Excluding Sea Creatures)
-  - All Critter Safari Mobs
-- **Fishing**
-  - All Rare Sea Creatures
-  - All Lotus Atoll Critters
-
 # Features
 The sections below follow the order and the names of the settings screen (`/gankura`).
 
@@ -157,10 +136,37 @@ The sections below follow the order and the names of the settings screen (`/gank
   - Highlight, Tracer and Nameplate on the mobs picked for each area.
 ![Mob Visuals 1](https://cdn.modrinth.com/data/cached_images/cedfcc59352699485521d31dd54cea2fdc8c0bf5.png)
 ![Mob Visuals 2](https://cdn.modrinth.com/data/cached_images/492e5e063322ab0882b7efb41fc43e0836a90fdc.png)
-  - The End, Spider's Den, Crimson Isle, Crystal Hollows, Moonglade Marsh, Torrhus Canyon,
-    Lotus Atoll, Glacite Mineshaft, Garden, Critter Safari, Sea Creatures
-  - Critter Safari - Hide Captured Critters
-  - Sea Creatures - Spawn Title, Spawn Sound
+  - **The End**
+    - End Stone Protector
+    - Dragon
+  - **Spider's Den**
+    - Broodmother
+    - Arachne
+    - Arachne's Brood
+  - **Crimson Isle**
+    - Bladesoul
+    - Barbarian Duke X
+    - Mage Outlaw
+    - Magma Boss
+    - Magma Glare
+    - Matcho
+    - Ashfang
+    - Ashfang Follower
+    - Ashfang Acolyte
+    - Ashfang Underling
+  - **Crystal Hollows**
+    - Boss Corleone
+  - **Glacite Mineshaft**
+    - Littlefoot
+  - **Garden**
+    - All Pests
+  - **Foraging**
+    - All Moonglade Marsh Mobs (Excluding Sea Creatures)
+    - All Torrhus Canyon Mobs (Excluding Sea Creatures)
+    - All Critter Safari Mobs
+  - **Fishing**
+    - All Rare Sea Creatures
+    - All Lotus Atoll Critters
 </details>
 
 <details>
