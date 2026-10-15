@@ -843,11 +843,6 @@ public final class ModConfig {
         @ConfigOption.Range(min = 0.25, max = 3.0)
         public static float nameplateScale = DEFAULT_NAMEPLATE_SCALE;
 
-        // ボタンは保存対象外なので @Expose を付けず transient にする
-        @ConfigButton(title = "gankura.config.mobVisuals.resetNameplateScale", text = "gankura.config.mobVisuals.resetNameplateScale.button")
-        @Comment(value = "Reset to default.")
-        public static final Runnable resetNameplateScale = () -> nameplateScale = DEFAULT_NAMEPLATE_SCALE;
-
         @ConfigEntry(id = "showNameplateHealth", translation = "gankura.config.mobVisuals.showNameplateHealth")
         @Comment(value = "Shows the mob's health under its name.", translation = "gankura.config.mobVisuals.showNameplateHealth.desc")
         public static boolean showNameplateHealth = true;
@@ -1144,30 +1139,17 @@ public final class ModConfig {
         @ConfigOption.Range(min = 0.01, max = 1.0)
         public static float heldItemScale = 1.0f;
 
-        // ボタンには @Expose は付けず、代わりに transient を付けます！
-        @ConfigButton(title = "gankura.config.heldItem.resetHeldItemScale", text = "gankura.config.heldItem.resetHeldItemScale.button")
-        @Comment(value = "Reset to default.")
-        public static final Runnable resetHeldItemScale = () -> heldItemScale = 1.0f;
-
         @ConfigEntry(id = "heldItemOffsetX", translation = "gankura.config.heldItem.heldItemOffsetX")
         @Comment(value = "Shifts item horizontally.", translation = "gankura.config.heldItem.heldItemOffsetX.desc")
         @ConfigOption.Slider
         @ConfigOption.Range(min = -1.0, max = 1.0)
         public static float heldItemOffsetX = 0.0f;
 
-        @ConfigButton(title = "gankura.config.heldItem.resetHeldItemOffsetX", text = "gankura.config.heldItem.resetHeldItemOffsetX.button")
-        @Comment(value = "Reset to default.")
-        public static final Runnable resetHeldItemOffsetX = () -> heldItemOffsetX = 0.0f;
-
         @ConfigEntry(id = "heldItemOffsetY", translation = "gankura.config.heldItem.heldItemOffsetY")
         @Comment(value = "Shifts item vertically.", translation = "gankura.config.heldItem.heldItemOffsetY.desc")
         @ConfigOption.Slider
         @ConfigOption.Range(min = -1.0, max = 1.0)
         public static float heldItemOffsetY = 0.0f;
-
-        @ConfigButton(title = "gankura.config.heldItem.resetHeldItemOffsetY", text = "gankura.config.heldItem.resetHeldItemOffsetY.button")
-        @Comment(value = "Reset to default.")
-        public static final Runnable resetHeldItemOffsetY = () -> heldItemOffsetY = 0.0f;
     }
 
     @Category(value = "interfaceSettings")
