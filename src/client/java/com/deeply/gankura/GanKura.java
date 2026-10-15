@@ -28,6 +28,7 @@ import com.deeply.gankura.handler.NetworkHandler;
 import com.deeply.gankura.handler.PersonalCompactorPreview;
 import com.deeply.gankura.handler.PetHandler;
 import com.deeply.gankura.handler.QuiverAlertHandler;
+import com.deeply.gankura.handler.RagnarockHandler;
 import com.deeply.gankura.handler.ServerRestartHandler;
 import com.deeply.gankura.handler.WarpCooldownHandler;
 import com.deeply.gankura.render.EntityHighlightManager;
@@ -98,6 +99,7 @@ public class GanKura implements ClientModInitializer {
         GoldfinShardScanner.register();
         BaitScanner.register();
         QuiverAlertHandler.register();
+        RagnarockHandler.register();
         EntityHighlightManager.register();
         CrimsonDropHandler.register();
         WarpCooldownHandler.register();
