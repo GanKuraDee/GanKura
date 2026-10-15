@@ -60,7 +60,10 @@
 		"ResourcefulConfigScreenAccessor",
 		"ResourcefulListWidgetAccessor",
 		"ResourcefulListWidgetIndentMixin",
-		"PersonalCompactorTooltipMixin"
+		"PersonalCompactorTooltipMixin",
+		"SellProtectionMixin",
+		"RagnarockSoundMixin",
+		"RagnarockUseItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

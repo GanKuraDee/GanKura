@@ -157,6 +157,10 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.generalHud.showYawPitchHud", "gankura.config.generalHud.sep.yawPitchHudFolder");
         GROUP_OF.put("gankura.config.combat.showSoulflowLowAlert", "gankura.config.combat.sep.soulflowLowAlertFolder");
         GROUP_OF.put("gankura.config.combat.soulflowLowThreshold", "gankura.config.combat.sep.soulflowLowAlertFolder");
+        GROUP_OF.put("gankura.config.combat.enableRagnarockCastTitle", "gankura.config.combat.sep.ragnarockFolder");
+        GROUP_OF.put("gankura.config.combat.showRagnarockStrengthChat", "gankura.config.combat.sep.ragnarockFolder");
+        GROUP_OF.put("gankura.config.combat.enableRagnarockCancelTitle", "gankura.config.combat.sep.ragnarockFolder");
+        GROUP_OF.put("gankura.config.combat.showRagnarockCountdownHud", "gankura.config.combat.sep.ragnarockFolder");
         GROUP_OF.put("gankura.config.generalHud.yawPrecision", "gankura.config.generalHud.sep.yawPitchHudFolder");
         GROUP_OF.put("gankura.config.generalHud.pitchPrecision", "gankura.config.generalHud.sep.yawPitchHudFolder");
         GROUP_OF.put("gankura.config.mobVisuals.targetsTheEnd", "gankura.config.mobVisuals.sep.theEndFolder");
@@ -270,6 +274,10 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.interfaceSettings.hideMaxedPetLevel", "gankura.config.interfaceSettings.sep.petFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.enablePersonalCompactorPreview", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.showPersonalCompactorStatus", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.enableSellProtection", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.sellProtectionMinRarity", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.sellProtectRecombobulated", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
+        GROUP_OF.put("gankura.config.interfaceSettings.sellProtectionAllowTripleClick", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
         GROUP_OF.put("gankura.config.keybinds.enableOpenMenuKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
         GROUP_OF.put("gankura.config.keybinds.openLoadoutsKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
         GROUP_OF.put("gankura.config.keybinds.openWardrobeKeybind", "gankura.config.keybinds.sep.openMenuKeybindFolder");
@@ -393,6 +401,7 @@ public final class ConfigGroups {
         ALL.add("gankura.config.generalHud.sep.equipmentHudFolder");
         ALL.add("gankura.config.generalHud.sep.yawPitchHudFolder");
         ALL.add("gankura.config.combat.sep.soulflowLowAlertFolder");
+        ALL.add("gankura.config.combat.sep.ragnarockFolder");
         ALL.add("gankura.config.mobVisuals.sep.theEndFolder");
         ALL.add("gankura.config.mobVisuals.sep.spidersDenFolder");
         ALL.add("gankura.config.mobVisuals.sep.crimsonIsleFolder");
@@ -431,6 +440,7 @@ public final class ConfigGroups {
         ALL.add("gankura.config.interfaceSettings.sep.enchantedBookFolder");
         ALL.add("gankura.config.interfaceSettings.sep.petFolder");
         ALL.add("gankura.config.interfaceSettings.sep.personalCompactorFolder");
+        ALL.add("gankura.config.interfaceSettings.sep.sellProtectionFolder");
         ALL.add("gankura.config.keybinds.sep.openMenuKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.loadoutsKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.armorSetKeybindFolder");
