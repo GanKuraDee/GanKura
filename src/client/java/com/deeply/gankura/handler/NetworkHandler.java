@@ -42,6 +42,7 @@ public class NetworkHandler {
             // 1. アクションバーのメッセージは専用ハンドラーへ
             if (overlay) {
                 ArmorStackHandler.handleActionBar(message);
+                RagnarockHandler.handleActionBar(message);
                 return true;
             }
 
@@ -68,6 +69,7 @@ public class NetworkHandler {
             GoldenFishHandler.handleMessage(unformattedMsg, client);
             ArachneHandler.handleMessage(unformattedMsg, client);
             ForagingHandler.handleMessage(unformattedMsg, client);
+            RagnarockHandler.handleMessage(unformattedMsg, client);
             CorpseScanner.handleMessage(unformattedMsg, client);
             CorpseProfitHandler.handleMessage(unformattedMsg, client);
             MousematHandler.handleMessage(unformattedMsg, client);

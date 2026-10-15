@@ -1,5 +1,6 @@
 package com.deeply.gankura.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.deeply.gankura.data.InventoryButtonStore;
 import com.deeply.gankura.data.InventoryButton;
 import com.deeply.gankura.data.ModConfig;
@@ -482,8 +483,9 @@ public class InventoryButtonEditorScreen extends Screen {
             int top = guiTop + PRESET_FIRST_Y - 1 + PRESET_STEP * index++;
             if (mouseY < top || mouseY > top + PRESET_STEP) continue;
 
-            // 右クリックは削除。Mod が持っている分は消せない
-            if (mouseButton == 1) {
+            // 右クリックは削除。Mod が持っている分は消せない。
+            // ボタンの番号は数字で比べない。26.3 で入力が SDL に変わり、右ボタンが 1 から 3 になった
+            if (mouseButton == InputConstants.MOUSE_BUTTON_RIGHT) {
                 if (InventoryButtonPresets.delete(preset.getKey())) {
                     setStatus(Component.literal("Deleted " + preset.getKey() + "."));
                 } else {

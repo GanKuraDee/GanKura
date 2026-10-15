@@ -151,6 +151,22 @@ public final class ModConfig {
         @Comment(value = "Shows a title when you cocoon a mob.", translation = "gankura.config.combat.enableCocoonCatchTitle.desc")
         public static boolean enableCocoonCatchTitle = true;
 
+        @ConfigEntry(id = "enableRagnarockCastTitle", translation = "gankura.config.combat.enableRagnarockCastTitle")
+        @Comment(value = "Shows a title when the Ragnarock Axe finishes casting, with the Strength it gives.", translation = "gankura.config.combat.enableRagnarockCastTitle.desc")
+        public static boolean enableRagnarockCastTitle = false;
+
+        @ConfigEntry(id = "showRagnarockStrengthChat", translation = "gankura.config.combat.showRagnarockStrengthChat")
+        @Comment(value = "Sends the Strength the Ragnarock Axe gives to chat when it finishes casting.", translation = "gankura.config.combat.showRagnarockStrengthChat.desc")
+        public static boolean showRagnarockStrengthChat = false;
+
+        @ConfigEntry(id = "enableRagnarockCancelTitle", translation = "gankura.config.combat.enableRagnarockCancelTitle")
+        @Comment(value = "Shows a title when taking damage cancels the Ragnarock Axe cast.", translation = "gankura.config.combat.enableRagnarockCancelTitle.desc")
+        public static boolean enableRagnarockCancelTitle = false;
+
+        @ConfigEntry(id = "showRagnarockCountdownHud", translation = "gankura.config.combat.showRagnarockCountdownHud")
+        @Comment(value = "Shows the time left until the Ragnarock Axe finishes casting, while it is casting.", translation = "gankura.config.combat.showRagnarockCountdownHud.desc")
+        public static boolean showRagnarockCountdownHud = false;
+
         @ConfigEntry(id = "showPoisonIndicator", translation = "gankura.config.combat.showPoisonIndicator")
         @Comment(value = "Shows arrow poison uses left.", translation = "gankura.config.combat.showPoisonIndicator.desc")
         public static boolean showPoisonIndicator = true;
@@ -1426,6 +1442,22 @@ public final class ModConfig {
         @ConfigEntry(id = "showPersonalCompactorStatus", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus")
         @Comment(value = "Writes whether it is turned on above the items.", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus.desc")
         public static boolean showPersonalCompactorStatus = true;
+
+        @ConfigEntry(id = "enableSellProtection", translation = "gankura.config.interfaceSettings.enableSellProtection")
+        @Comment(value = "Stops you from selling items of the rarity below or higher to an NPC shop.", translation = "gankura.config.interfaceSettings.enableSellProtection.desc")
+        public static boolean enableSellProtection = false;
+
+        @ConfigEntry(id = "sellProtectionMinRarity", translation = "gankura.config.interfaceSettings.sellProtectionMinRarity")
+        @Comment(value = "The lowest rarity that is protected.", translation = "gankura.config.interfaceSettings.sellProtectionMinRarity.desc")
+        public static ItemRarity sellProtectionMinRarity = ItemRarity.LEGENDARY;
+
+        @ConfigEntry(id = "sellProtectRecombobulated", translation = "gankura.config.interfaceSettings.sellProtectRecombobulated")
+        @Comment(value = "Also stops recombobulated items, whatever their rarity.", translation = "gankura.config.interfaceSettings.sellProtectRecombobulated.desc")
+        public static boolean sellProtectRecombobulated = true;
+
+        @ConfigEntry(id = "sellProtectionAllowTripleClick", translation = "gankura.config.interfaceSettings.sellProtectionAllowTripleClick")
+        @Comment(value = "Lets a triple-click on a protected item sell it anyway. Turn off to block every click.", translation = "gankura.config.interfaceSettings.sellProtectionAllowTripleClick.desc")
+        public static boolean sellProtectionAllowTripleClick = true;
 
         @ConfigEntry(id = "enableCursorRestoreOnRapidReopen", translation = "gankura.config.interfaceSettings.enableCursorRestoreOnRapidReopen")
         @Comment(value = "Prevents cursor reset on quick swap.", translation = "gankura.config.interfaceSettings.enableCursorRestoreOnRapidReopen.desc")

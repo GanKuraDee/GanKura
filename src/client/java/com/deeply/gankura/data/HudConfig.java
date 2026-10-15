@@ -65,7 +65,8 @@ public class HudConfig {
                 new YawPitchHud(),
                 new QuiverHud(),
                 new FerocityHud(),
-                new SoulflowHud());
+                new SoulflowHud(),
+                new RagnarockHud());
 
         register(HudCategory.GARDEN,
                 new VisitorStatusHud(),

@@ -1,5 +1,6 @@
 package com.deeply.gankura.render;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.deeply.gankura.data.HudCategory;
 import com.deeply.gankura.data.HudConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
@@ -111,10 +112,8 @@ public class HudEditorScreen extends Screen {
         // MouseButtonEvent.class L10: フィールド名は x() と y() です
         double mouseX = event.x();
         double mouseY = event.y();
-        // button() メソッドを使用して int 値を取得
-        int button = event.button();
-
-        if (button == 0) {
+        // ボタンの番号は数字で比べない。26.3 で入力が SDL に変わり、左ボタンが 0 から 1 になった
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             for (HudElement element : HudConfig.ELEMENTS) {
                 if (isEditable(element) && element.isHovering(mouseX, mouseY, this.width, this.height)) {
                     draggingElement = element;
