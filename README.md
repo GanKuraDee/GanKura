@@ -1,23 +1,13 @@
 # GanKura
 GanKura is a Hypixel Skyblock Mod focused on Area Mini-bosses. 
 
-- **Commands**
-  - `/gankura` - Open the main settings screen.
-  - `/gankura hud` - Open the HUD movement and scaling settings screen.
-  - `/gankura buttons` - Open the Inventory Buttons editor screen.
-  - `/gankura waypoint <arg> (/gkw)` - Open the Custom Waypoints settings screen.
-    - `toggle` - Toggle the rendering of Waypoints.
-    - `add` - Add a Waypoint to your current location.
-    - `add <name>` - Add a named Waypoint to your current location.
-    - `list` - Display a list of Waypoints in the current area.
-
 # Features
-The sections below follow the order and the names of the settings screen (`/gankura`).
+Open the settings screen with `/gankura`. The sections below follow its order and names.
 
 <details>
 <summary>Edit HUD Locations</summary>
 
-  - Move and scale every HUD this mod draws (also `/gankura hud`).
+  - Move and scale every HUD this mod draws. Also opens with `/gankura hud`.
 </details>
 
 <details>
@@ -174,6 +164,12 @@ The sections below follow the order and the names of the settings screen (`/gank
 <details>
 <summary>Custom Waypoints</summary>
   
+- **Commands:** `/gankura waypoint`, or `/gkw` for short
+  - `/gkw` -> Open the Custom Waypoints screen.
+  - `/gkw add` -> Add a Waypoint at your current location.
+  - `/gkw add <name>` -> Add a named Waypoint at your current location.
+  - `/gkw list` -> List the Waypoints in the current area.
+  - `/gkw toggle` -> Show or hide the Waypoints.
 - **Add at my position / Add empty:**
   - Add Waypoint to your current location / coordinates x:0,y:0,z:0
 - **Area:**
