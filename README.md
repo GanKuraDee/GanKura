@@ -136,6 +136,8 @@ The sections below follow the order and the names of the settings screen (`/gank
   - Highlight, Tracer and Nameplate on the mobs picked for each area.
 ![Mob Visuals 1](https://cdn.modrinth.com/data/cached_images/cedfcc59352699485521d31dd54cea2fdc8c0bf5.png)
 ![Mob Visuals 2](https://cdn.modrinth.com/data/cached_images/492e5e063322ab0882b7efb41fc43e0836a90fdc.png)
+
+### Supported Mobs
   - **The End**
     - End Stone Protector
     - Dragon
