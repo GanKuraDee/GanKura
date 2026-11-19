@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -18,6 +19,10 @@ import java.util.regex.Matcher;
 public class BroodmotherHandler {
     // タブリストが揃うまでの行数の目安。読み込み途中で「ウィジェットが無い」と誤判定しないための待ち
     private static final int MIN_LOADED_LINES = 20;
+    // Stage 4 から湧くまでの時間 (サーバー Tick)。ほかのカウントダウンと同じく TPS を考慮して数える
+    public static final int STAGE_4_TICKS = 600;
+    // Stage 4 より前の段階。ここから Stage 4 に変わるのを見ていれば、湧くまでを数えられる
+    private static final Set<String> BEFORE_STAGE_4 = Set.of("Slain", "Dormant", "Soon", "Awakening");
 
 
     public static void processTabList(List<String> lines) {
@@ -46,6 +51,13 @@ public class BroodmotherHandler {
         // =======================================================
         if ("Imminent".equals(newStage)) {
             GameState.Broodmother.stage4StartTime = System.currentTimeMillis();
+
+            // Stage 3 以下から変わる瞬間を見ていれば、湧くまでの30秒を数えられる。
+            // ロビーに入った時点ですでに Stage 4 だったなら、いつ始まったか分からないので数えない
+            boolean witnessed = BEFORE_STAGE_4.contains(oldStage) && client.level != null;
+            GameState.Broodmother.spawnTargetTick = witnessed
+                    ? GameState.Server.estimatedTicks(client.level.getGameTime()) + STAGE_4_TICKS
+                    : 0;
 
             // ★変更: TitleとSoundを独立して判定
             client.execute(() -> {
@@ -78,6 +90,7 @@ public class BroodmotherHandler {
                 }
             }
             GameState.Broodmother.stage4StartTime = 0;
+            GameState.Broodmother.spawnTargetTick = 0;
 
             // ★変更: TitleとSoundを独立して判定
             client.execute(() -> {
@@ -93,6 +106,7 @@ public class BroodmotherHandler {
         else {
             if (!"Imminent".equals(newStage)) {
                 GameState.Broodmother.stage4StartTime = 0;
+                GameState.Broodmother.spawnTargetTick = 0;
             }
         }
     }

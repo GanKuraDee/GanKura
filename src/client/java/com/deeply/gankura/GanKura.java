@@ -7,7 +7,6 @@ import com.deeply.gankura.handler.CrimsonDropHandler;
 import com.deeply.gankura.handler.FishingBobberTracker;
 import com.deeply.gankura.handler.FloorDropHandler;
 import com.deeply.gankura.handler.GoldenFishHandler;
-import com.deeply.gankura.handler.HotspotAlertHandler;
 import com.deeply.gankura.handler.LavaTextureHandler;
 import com.deeply.gankura.handler.HotspotAreaHandler;
 import com.deeply.gankura.handler.HotspotRadarHandler;
@@ -103,7 +102,6 @@ public class GanKura implements ClientModInitializer {
         EntityHighlightManager.register();
         CrimsonDropHandler.register();
         WarpCooldownHandler.register();
-        HotspotAlertHandler.register();
         HotspotAreaHandler.register();
         GoldenFishHandler.register();
         HotspotRadarHandler.register();

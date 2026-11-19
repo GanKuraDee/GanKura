@@ -15,6 +15,7 @@ Open the settings screen with `/gankura`. The sections below follow its order an
 
   - Hide Damage Splash
   - Hide Fire Overlay
+  - Hide Death Animation
   - Cocoon Catch Title
   - Ragnarock - Cast Title, Strength in Chat, Cancel Title, Countdown HUD
   - Arrow Poison Indicator
@@ -107,6 +108,8 @@ Open the settings screen with `/gankura`. The sections below follow its order an
   - Mineshaft
     - Corpse - Waypoints, Tracer, Vanguard Title, Profit Message
   - Wishing Compass - Solver, Waypoint
+  - Hide Block Break Particles
+  - Hide Mining Particles
 </details>
 
 <details>
@@ -266,7 +269,6 @@ Buttons placed around inventory menus that run a command when clicked. Ported fr
   - Server Reboot Alert
   - Warp Cooldown Queue
   - Ability Menu Fix
-  - Hide Block Break Particles
   - Ignore Armor Stand Clicks
 </details>
 

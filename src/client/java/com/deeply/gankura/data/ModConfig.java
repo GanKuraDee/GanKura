@@ -53,8 +53,9 @@ public final class ModConfig {
     /**
      * 設定ファイルの版。項目の置き場所を変えたら上げて、{@link #patch} に前の版からの移し方を足す。
      *   0 → 1: 戦闘まわりの HUD と Low Soulflow Alert を General HUD から Combat へ移した
+     *   1 → 2: ブロックのパーティクルを消す2項目を Misc から Mining へ移した
      */
-    public static final int CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
 
     /** ResourcefulConfig はキー未割り当てを 0 で表す（MoulConfig の -1 に相当） */
     public static final int KEY_NONE = 0;
@@ -98,6 +99,8 @@ public final class ModConfig {
         event.register(0, json -> moveEntries(json, "generalHud", "combat",
                 "showArmorStackHud", "showFerocityHud", "showQuiverHud", "showSoulflowHud",
                 "showSoulflowLowAlert", "soulflowLowThreshold"));
+        event.register(1, json -> moveEntries(json, "misc", "mining",
+                "hideBlockBreakParticles", "hideMiningParticles"));
     }
 
     /**
@@ -146,6 +149,10 @@ public final class ModConfig {
         @ConfigEntry(id = "hideFireOverlay", translation = "gankura.config.combat.hideFireOverlay")
         @Comment(value = "Hides the flames drawn at the bottom of the screen while you are burning.", translation = "gankura.config.combat.hideFireOverlay.desc")
         public static boolean hideFireOverlay = false;
+
+        @ConfigEntry(id = "hideDeathAnimation", translation = "gankura.config.combat.hideDeathAnimation")
+        @Comment(value = "Removes mobs as soon as they die, without the red fall-over animation or the puff of smoke.", translation = "gankura.config.combat.hideDeathAnimation.desc")
+        public static boolean hideDeathAnimation = false;
 
         @ConfigEntry(id = "enableCocoonCatchTitle", translation = "gankura.config.combat.enableCocoonCatchTitle")
         @Comment(value = "Shows a title when you cocoon a mob.", translation = "gankura.config.combat.enableCocoonCatchTitle.desc")
@@ -740,6 +747,14 @@ public final class ModConfig {
         @ConfigEntry(id = "showWishingCompassWaypoint", translation = "gankura.config.mining.showWishingCompassWaypoint")
         @Comment(value = "Marks the solved location in the world.", translation = "gankura.config.mining.showWishingCompassWaypoint.desc")
         public static boolean showWishingCompassWaypoint = false;
+
+        @ConfigEntry(id = "hideBlockBreakParticles", translation = "gankura.config.mining.hideBlockBreakParticles")
+        @Comment(value = "Hides the fragments thrown out when a block is broken.", translation = "gankura.config.mining.hideBlockBreakParticles.desc")
+        public static boolean hideBlockBreakParticles = false;
+
+        @ConfigEntry(id = "hideMiningParticles", translation = "gankura.config.mining.hideMiningParticles")
+        @Comment(value = "Hides the particles that fly off a block while you mine it.", translation = "gankura.config.mining.hideMiningParticles.desc")
+        public static boolean hideMiningParticles = false;
     }
 
     @Category(value = "generalHud")
@@ -1680,10 +1695,6 @@ public final class ModConfig {
         @ConfigEntry(id = "keepAbilityMenuOpen", translation = "gankura.config.misc.keepAbilityMenuOpen")
         @Comment(value = "Stops an item swap from closing a menu an ability just opened.", translation = "gankura.config.misc.keepAbilityMenuOpen.desc")
         public static boolean keepAbilityMenuOpen = false;
-
-        @ConfigEntry(id = "hideBlockBreakParticles", translation = "gankura.config.misc.hideBlockBreakParticles")
-        @Comment(value = "Hides the fragments thrown out when a block is broken.", translation = "gankura.config.misc.hideBlockBreakParticles.desc")
-        public static boolean hideBlockBreakParticles = false;
 
         @ConfigEntry(id = "ignoreArmorStandClicks", translation = "gankura.config.misc.ignoreArmorStandClicks")
         @Comment(value = "Lets rods and abilities fire with a hologram in the way.", translation = "gankura.config.misc.ignoreArmorStandClicks.desc")
