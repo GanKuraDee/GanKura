@@ -269,11 +269,15 @@ public class GameState {
         // タブリストは揃っているのに Broodmother の行が無い。ウィジェットで出していない
         public static boolean widgetMissing = false;
         public static long stage4StartTime = 0;
+        // Stage 4 になる瞬間をこのロビーで見ていたときの、湧く見込みのサーバー Tick。
+        // ロビーに入った時点ですでに Stage 4 だったなら、いつ湧くか分からないので 0 のまま
+        public static long spawnTargetTick = 0;
         public static String health = null;
 
         public static void reset() {
             stage = "Scanning...";
             stage4StartTime = 0;
+            spawnTargetTick = 0;
             health = null;
             widgetMissing = false;
         }
