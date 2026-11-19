@@ -27,7 +27,7 @@ public class BroodmotherStatusHud extends HudElement {
         }
 
         if (isPreview) {
-            displayStats = "Stage: §e4 §f(0m 45s)";
+            displayStats = "Stage: §e4 §e(25s)";
         } else {
             String stage = GameState.Broodmother.stage;
 
@@ -46,15 +46,27 @@ public class BroodmotherStatusHud extends HudElement {
                 };
                 displayStats = "Stage: " + num;
 
-                if ("Imminent".equals(stage) && GameState.Broodmother.stage4StartTime > 0) {
-                    long seconds = (System.currentTimeMillis() - GameState.Broodmother.stage4StartTime) / 1000;
-                    String col = seconds >= 45 ? "§c" : (seconds >= 30 ? "§e" : "§f");
-                    displayStats += String.format(" %s(%dm %ds)", col, seconds / 60, seconds % 60);
-                }
+                if ("Imminent".equals(stage)) displayStats += " " + stage4Suffix();
             }
         }
 
         text(graphics, font, "§4§lBroodmother Status", 0, 0, 0xFFFFFFFF, true);
         text(graphics, font, displayStats, 0, 12, 0xFFFFFFFF, true);
+    }
+
+    /**
+     * Stage 4 の後ろに付ける表示。
+     *
+     * Stage 4 に変わる瞬間をこのロビーで見ていれば、湧くまでの残り秒数を出す。
+     * ロビーに入った時点ですでに Stage 4 だったときや、数え終わってもまだ湧かないときは "(Soon)"
+     */
+    private static String stage4Suffix() {
+        long target = GameState.Broodmother.spawnTargetTick;
+        Minecraft client = Minecraft.getInstance();
+        if (target > 0 && client.level != null) {
+            long ticksLeft = target - GameState.Server.estimatedTicks(client.level.getGameTime());
+            if (ticksLeft > 0) return String.format("§e(%ds)", (ticksLeft + 19) / 20);
+        }
+        return "§e(Soon)";
     }
 }

@@ -74,6 +74,7 @@ public class NetworkHandler {
             CorpseProfitHandler.handleMessage(unformattedMsg, client);
             MousematHandler.handleMessage(unformattedMsg, client);
             PestSpawnHandler.handleMessage(unformattedMsg, client);
+            HotspotAlertHandler.handleMessage(unformattedMsg, client);
             // 来客の名前は色ごと題に出すので、色を持ったまま渡す
             VisitorHandler.handleMessage(message, client);
             // 釣り上げの文言。短縮形に差し替えたときは、元のメッセージを出さない
