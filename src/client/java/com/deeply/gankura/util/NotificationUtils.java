@@ -116,17 +116,23 @@ public class NotificationUtils {
     }
 
     public static void sendSystemChat(Minecraft client, Component message) {
-        if (client.player == null) return;
-        MutableComponent fullMessage = getGanKuraPrefix().append(message);
+        if (client == null || client.player == null || client.gui == null || client.gui.hud == null) return;
+        if (!client.isSameThread()) {
+            client.execute(() -> sendSystemChat(client, message));
+            return;
+        }
 
-        /*
-         * 26.1.2 における修正ポイント:
-         * displayClientMessage -> sendSystemMessage
-         * もしくは client.player.chat.addMessage(...)
-         *
-         * 多くの最新バージョンでは sendSystemMessage(Component) が標準です。
-         */
-        client.player.sendSystemMessage(fullMessage);
+        // 接頭辞の括弧の色が本文へ引き継がれないよう、空の親の下に並べる
+        MutableComponent fullMessage = Component.empty()
+                .append(getGanKuraPrefix())
+                .append(message);
+
+        // LocalPlayer#sendSystemMessage は ChatListener#handleSystemMessage(..., true) を経由するため、
+        // サーバー由来のチャット扱いになり Fabric の ClientReceiveMessageEvents (ALLOW_GAME / MODIFY_GAME 等) が発火する。
+        // そのため他 Mod が GanKura の通知をサーバーチャットと誤認して文字列から作り直し、
+        // 接頭辞の RGB 色が "<#3E4C70>[" のようなタグ文字列として露出することがある。
+        // クライアント自身の通知は ChatComponent#addClientSystemMessage で直接チャット欄に追加し、受信イベントを通さない
+        client.gui.hud.getChat().addClientSystemMessage(fullMessage);
     }
 
     public static void playSound(Minecraft client, SoundEvent sound, float volume, float pitch) {

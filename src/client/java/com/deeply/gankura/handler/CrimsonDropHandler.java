@@ -164,11 +164,10 @@ public class CrimsonDropHandler {
         NotificationUtils.showTitle(client, title,
                 NotificationUtils.dropSubtitle(itemName, count), 5, 100, 20);
 
-        // 自分の名前は入れず、ほかの GanKura の知らせと同じく自分視点の文にする。
-        // Hypixel のプレイヤー名 ("[550] 名前 ⚡") が入った行は、ほかの mod が作り直すことがあり、
-        // そのとき GanKura の接頭辞の RGB の色が "<#3E4C70>[" のような文字になって出てしまう
-        MutableComponent chatMsg = Component.literal("")
-                .append(Component.literal("You obtained ").withStyle(ChatFormatting.YELLOW))
+        Component playerName = client.player.getDisplayName();
+        MutableComponent chatMsg = Component.empty()
+                .append(playerName)
+                .append(Component.literal(" has obtained ").withStyle(ChatFormatting.YELLOW))
                 .append(itemName)
                 .append(Component.literal("!").withStyle(ChatFormatting.YELLOW))
                 // Loot Tracker で数えて何個目か。タイトルの "#2" と同じ数

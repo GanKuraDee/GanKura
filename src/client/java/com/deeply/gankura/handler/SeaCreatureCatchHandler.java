@@ -4,8 +4,11 @@ import com.deeply.gankura.data.MobVisual;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.SeaCreatureCatches;
 import com.deeply.gankura.render.EntityHighlightManager;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +31,18 @@ public class SeaCreatureCatchHandler {
             Pattern.compile("It's a Double Hook!(?: Woot woot!)?");
     // その合図を、直後の釣り上げの文言と同じ1回とみなす時間(ミリ秒)
     private static final long DOUBLE_HOOK_WINDOW_MS = 500;
-    private static final String DOUBLE_HOOK_LABEL = "§e§lDOUBLE HOOK! ";
+
+    // Hypixel 公式サーバーリソースパックの Mob Types アイコン (assets/hypixel_skyblock/textures/gui/mobs.png)
+    private static final Identifier HYPIXEL_MOBS_FONT_TEXTURE =
+            Identifier.fromNamespaceAndPath("hypixel_skyblock", "textures/gui/mobs.png");
+    private static final String AQUATIC_ICON = "\uE072";
+    private static final String MAGMATIC_ICON = "\uE07D";
+    // サーバーリソースパックが無効な環境でも豆腐(□)にならないようにする代替記号
+    private static final String AQUATIC_FALLBACK_ICON = "\u2693"; // ⚓
+    private static final String MAGMATIC_FALLBACK_ICON = "\u2646"; // ♆
 
     // Mithril Grubber は Small / Medium / Large / Bloated の4サイズで湧くが、扱いは1種
     private static final String MITHRIL_GRUBBER_NAME = "Mithril Grubber";
-    private static final String VOWELS = "AEIOU";
 
     // Mob Visuals に登録できる Sea Creature を、釣り上げ文言に出てくる名前から引く
     private static final Map<String, MobVisual> MOB_VISUALS = new HashMap<>();
@@ -53,7 +63,7 @@ public class SeaCreatureCatchHandler {
         // プレイヤーの発言は NetworkHandler で弾かれているので、ここには来ない
         if (DOUBLE_HOOK_PATTERN.matcher(unformattedMsg.trim()).matches()) {
             doubleHookMillis = System.currentTimeMillis();
-            // 短縮するときは、この行を釣り上げの文言の頭にまとめるので出さない
+            // 短縮するときは、釣り上げの文言に "x2" を付けてまとめるのでこの行は出さない
             return ModConfig.Fishing.shortenSeaCreatureMessage;
         }
 
@@ -82,19 +92,42 @@ public class SeaCreatureCatchHandler {
     }
 
     /**
-     * 長い文言を "You caught a Lord Jawbus!" の形に差し替える。差し替えたら true。
-     *
-     * 元のメッセージは呼び出し側で差し止めるので、ここでは短い側を出すだけでよい
+     * 長い文言を Hypixel の Trophy Frog 通知に似た
+     * "{Aquatic/Magmatic記号} SEA CREATURE! You caught {名前}[ x2]!" の形に差し替える。
+     * 差し替えたら true。元のメッセージは呼び出し側で差し止める。
      */
     private static boolean shorten(Minecraft client, SeaCreatureCatches.Catch caught, boolean doubleHook) {
-        if (!ModConfig.Fishing.shortenSeaCreatureMessage || client.player == null) return false;
+        if (!ModConfig.Fishing.shortenSeaCreatureMessage
+                || client.player == null || client.gui == null || client.gui.hud == null) {
+            return false;
+        }
 
-        // 周りの文はレア度の6色のどれとも重ならない色にする。
-        // 青のままだと RARE の種を釣ったときに1行が同じ色で埋まってしまう
-        String text = "§bYou caught " + article(caught.name()) + " " + caught.displayName() + "§b!";
-        if (doubleHook) text = DOUBLE_HOOK_LABEL + text;
-        client.player.sendSystemMessage(Component.literal(text));
+        boolean lava = caught.lava();
+        ChatFormatting headerColor = lava ? ChatFormatting.RED : ChatFormatting.BLUE;
+        String icon = mobTypeIcon(client, lava);
+
+        // ビットマップ記号は太字にすると横に潰れるため通常体、続く "SEA CREATURE!" を太字にする
+        MutableComponent msg = Component.empty()
+                .append(Component.literal(icon + " ").withStyle(headerColor))
+                .append(Component.literal("SEA CREATURE!").withStyle(headerColor, ChatFormatting.BOLD))
+                .append(Component.literal(" You caught ").withStyle(ChatFormatting.WHITE))
+                .append(caught.formattedName());
+
+        if (doubleHook) {
+            msg.append(Component.literal(" x2").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+        }
+        msg.append(Component.literal("!").withStyle(ChatFormatting.WHITE));
+
+        client.gui.hud.getChat().addClientSystemMessage(msg);
         return true;
+    }
+
+    private static String mobTypeIcon(Minecraft client, boolean lava) {
+        boolean hasHypixelPack = client.getResourceManager().getResource(HYPIXEL_MOBS_FONT_TEXTURE).isPresent();
+        if (hasHypixelPack) {
+            return lava ? MAGMATIC_ICON : AQUATIC_ICON;
+        }
+        return lava ? MAGMATIC_FALLBACK_ICON : AQUATIC_FALLBACK_ICON;
     }
 
     // 直前に Double Hook の合図が来ていたか。1度使ったら忘れる
@@ -102,11 +135,5 @@ public class SeaCreatureCatchHandler {
         boolean recent = System.currentTimeMillis() - doubleHookMillis < DOUBLE_HOOK_WINDOW_MS;
         doubleHookMillis = 0;
         return recent;
-    }
-
-    // 名前が母音で始まるなら "an"。SkyHanni の短縮形に合わせている
-    private static String article(String name) {
-        if (name.isEmpty()) return "a";
-        return VOWELS.indexOf(Character.toUpperCase(name.charAt(0))) >= 0 ? "an" : "a";
     }
 }
