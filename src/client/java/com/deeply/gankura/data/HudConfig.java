@@ -76,6 +76,9 @@ public class HudConfig {
                 new BiteCountdownHud(),
                 new BaitHud(),
                 new GoldenFishHud());
+
+        register(HudCategory.MINING,
+                new MineshaftCooldownHud());
     }
 
     private static void register(HudCategory category, HudElement... elements) {

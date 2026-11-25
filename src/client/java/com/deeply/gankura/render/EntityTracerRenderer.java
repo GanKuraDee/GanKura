@@ -3,6 +3,7 @@ package com.deeply.gankura.render;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.handler.HotspotAreaHandler;
 import com.deeply.gankura.handler.HotspotRadarHandler;
+import com.deeply.gankura.handler.MineshaftHandler;
 import com.deeply.gankura.handler.PestVacuumHandler;
 import com.deeply.gankura.scanner.CorpseScanner;
 import com.deeply.gankura.data.ModConfig;
@@ -40,12 +41,17 @@ public class EntityTracerRenderer {
         List<CorpseScanner.Corpse> corpses = ModConfig.Mining.showCorpseTracer
                 ? CorpseScanner.corpses()
                 : List.of();
+        // 湧いた Glacite Mineshaft のポータル文字列への線
+        Vec3 mineshaftPortal = ModConfig.Mining.showMineshaftPortalTracer
+                ? MineshaftHandler.portalTarget()
+                : null;
         // Vacuum から割り出した害虫の居場所への線。ウェイポイントと同じ場所を指す
         Vec3 pest = ModConfig.Farming.Garden.showPestVacuumTracer
                 ? PestVacuumHandler.guess()
                 : null;
         if (EntityHighlightManager.tracerEntities.isEmpty() && golem == null
-                && !hasHotspot && foundSpots.isEmpty() && pest == null && corpses.isEmpty()) return;
+                && !hasHotspot && foundSpots.isEmpty() && pest == null
+                && corpses.isEmpty() && mineshaftPortal == null) return;
 
         // 三人称ではカメラがプレイヤーの後方へ離れるため、カメラ位置を始点にすると
         // 線が背後から伸びているように見えるので、その場合だけプレイヤーの目の位置を使う。
@@ -75,6 +81,13 @@ public class EntityTracerRenderer {
                 new LineGizmo(startPos, WorldTextRenderer.labelPos(corpse.pos()), corpse.argb(), 4.0f)
             );
             corpseProps.setAlwaysOnTop();
+        }
+
+        if (mineshaftPortal != null) {
+            GizmoProperties portalProps = Gizmos.addGizmo(
+                new LineGizmo(startPos, mineshaftPortal, MineshaftHandler.PORTAL_TRACER_COLOR, 4.0f)
+            );
+            portalProps.setAlwaysOnTop();
         }
 
         if (pest != null) {
