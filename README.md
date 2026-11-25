@@ -105,7 +105,7 @@ Open the settings screen with `/gankura`. The sections below follow its order an
 <summary>Mining</summary>
 
   - Commissions - Highlight Completed, Gemstone Waypoints
-  - Mineshaft
+  - Mineshaft - Portal Tracer, Cooldown HUD, Cooldown Ready Title
     - Corpse - Waypoints, Tracer, Vanguard Title, Profit Message
   - Wishing Compass - Solver, Waypoint
   - Hide Block Break Particles
@@ -239,7 +239,6 @@ Buttons placed around inventory menus that run a command when clicked. Ported fr
   - Heart of the Forest / Mountain - Highlight Status, Show Level
   - Enchanted Book - Show Name, Show Tier
   - Pets - Highlight Active Pet, Show Level, Hide Maxed Level
-  - Personal Compactor - Show Status
   - NPC Sell Protection - Minimum Rarity, Protect Recombobulated, Triple-Click to Sell
   - Keep Cursor Position
 </details>

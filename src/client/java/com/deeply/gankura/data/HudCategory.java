@@ -14,7 +14,8 @@ public enum HudCategory {
     CRIMSON_ISLE("Crimson Isle"),
     CRITTER_SAFARI("Critter Safari"),
     FISHING("Fishing"),
-    GARDEN("Garden");
+    GARDEN("Garden"),
+    MINING("Mining");
 
     private final String label;
 

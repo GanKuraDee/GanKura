@@ -33,6 +33,8 @@ public class NetworkHandler {
             MousematHandler.reset();
             // 割り出した害虫の居場所も、庭を出たら意味を成さない
             PestVacuumHandler.reset();
+            // ポータル誘導はロビー移動で消すが、30秒クールダウンはワープをまたいで残す
+            MineshaftHandler.onWorldJoin();
             // 保存されていたSkyblock Equipmentを、レジストリアクセスが手に入ったこのタイミングで復元する
             EquipmentState.hydrate(handler.registryAccess());
         });
@@ -72,6 +74,7 @@ public class NetworkHandler {
             RagnarockHandler.handleMessage(unformattedMsg, client);
             CorpseScanner.handleMessage(unformattedMsg, client);
             CorpseProfitHandler.handleMessage(unformattedMsg, client);
+            MineshaftHandler.handleMessage(unformattedMsg, client);
             MousematHandler.handleMessage(unformattedMsg, client);
             PestSpawnHandler.handleMessage(unformattedMsg, client);
             HotspotAlertHandler.handleMessage(unformattedMsg, client);

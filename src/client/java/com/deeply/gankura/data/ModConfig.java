@@ -722,6 +722,18 @@ public final class ModConfig {
             + "commission.", translation = "gankura.config.mining.showGemstoneCommissionWaypoints.desc")
         public static boolean showGemstoneCommissionWaypoints = false;
 
+        @ConfigEntry(id = "showMineshaftPortalTracer", translation = "gankura.config.mining.showMineshaftPortalTracer")
+        @Comment(value = "Draws a line to a spawned Glacite Mineshaft portal.", translation = "gankura.config.mining.showMineshaftPortalTracer.desc")
+        public static boolean showMineshaftPortalTracer = false;
+
+        @ConfigEntry(id = "showMineshaftCooldownHud", translation = "gankura.config.mining.showMineshaftCooldownHud")
+        @Comment(value = "Shows the 30-second cooldown after entering a Glacite Mineshaft.", translation = "gankura.config.mining.showMineshaftCooldownHud.desc")
+        public static boolean showMineshaftCooldownHud = false;
+
+        @ConfigEntry(id = "showMineshaftCooldownTitle", translation = "gankura.config.mining.showMineshaftCooldownTitle")
+        @Comment(value = "Shows a title when the 30-second Glacite Mineshaft cooldown ends.", translation = "gankura.config.mining.showMineshaftCooldownTitle.desc")
+        public static boolean showMineshaftCooldownTitle = false;
+
         @ConfigEntry(id = "showCorpseWaypoints", translation = "gankura.config.mining.showCorpseWaypoints")
         @Comment(value = "Labels the frozen corpses in the mineshaft, with the kind of key each one needs.", translation = "gankura.config.mining.showCorpseWaypoints.desc")
         public static boolean showCorpseWaypoints = false;
@@ -1431,14 +1443,6 @@ public final class ModConfig {
         @ConfigEntry(id = "hideMaxedPetLevel", translation = "gankura.config.interfaceSettings.hideMaxedPetLevel")
         @Comment(value = "Leaves the level off pets that are already maxed.", translation = "gankura.config.interfaceSettings.hideMaxedPetLevel.desc")
         public static boolean hideMaxedPetLevel = false;
-
-        @ConfigEntry(id = "enablePersonalCompactorPreview", translation = "gankura.config.interfaceSettings.enablePersonalCompactorPreview")
-        @Comment(value = "Shows the items a Personal Compactor or Personal Deletor is set to, under its name.", translation = "gankura.config.interfaceSettings.enablePersonalCompactorPreview.desc")
-        public static boolean enablePersonalCompactorPreview = false;
-
-        @ConfigEntry(id = "showPersonalCompactorStatus", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus")
-        @Comment(value = "Writes whether it is turned on above the items.", translation = "gankura.config.interfaceSettings.showPersonalCompactorStatus.desc")
-        public static boolean showPersonalCompactorStatus = true;
 
         @ConfigEntry(id = "enableSellProtection", translation = "gankura.config.interfaceSettings.enableSellProtection")
         @Comment(value = "Stops you from selling items of the rarity below or higher to an NPC shop.", translation = "gankura.config.interfaceSettings.enableSellProtection.desc")
