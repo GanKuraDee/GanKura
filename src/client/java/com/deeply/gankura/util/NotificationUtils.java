@@ -121,10 +121,15 @@ public class NotificationUtils {
             return;
         }
 
-        // 接頭辞の括弧の色が本文へ引き継がれないよう、空の親の下に並べる
+        // 接頭辞の括弧の色が本文へ引き継がれないよう、空の親の下に並べる。
+        // また、message を再帰的に複製してから渡す。
+        // ItemStack#getHoverName() 等の生 Component をそのままチャットへ渡すと、
+        // チャットの Component を破壊的に書き換える他 Mod (Click to Translate Chat 等) に
+        // 元の ItemStack 側の DataComponents.CUSTOM_NAME まで書き換えられてしまい、
+        // クリックパケット生成時の HashedStack ハッシュ化で例外が起きるため
         MutableComponent fullMessage = Component.empty()
                 .append(getGanKuraPrefix())
-                .append(message);
+                .append(deepCopy(message));
 
         // LocalPlayer#sendSystemMessage は ChatListener#handleSystemMessage(..., true) を経由するため、
         // サーバー由来のチャット扱いになり Fabric の ClientReceiveMessageEvents (ALLOW_GAME / MODIFY_GAME 等) が発火する。
@@ -132,6 +137,18 @@ public class NotificationUtils {
         // 接頭辞の RGB 色が "<#3E4C70>[" のようなタグ文字列として露出することがある。
         // クライアント自身の通知は ChatComponent#addClientSystemMessage で直接チャット欄に追加し、受信イベントを通さない
         client.gui.getChat().addClientSystemMessage(fullMessage);
+    }
+
+    /**
+     * Component と子要素を再帰的に複製する。
+     * {@link Component#copy()} は子リスト(siblings)の浅いコピーしかしないため、自前で深く複製する
+     */
+    public static MutableComponent deepCopy(Component component) {
+        MutableComponent copy = component.plainCopy().withStyle(component.getStyle());
+        for (Component sibling : component.getSiblings()) {
+            copy.append(deepCopy(sibling));
+        }
+        return copy;
     }
 
     public static void playSound(Minecraft client, SoundEvent sound, float volume, float pitch) {

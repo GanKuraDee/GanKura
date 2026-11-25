@@ -144,6 +144,9 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.fishing.goldfinShardLevel", "gankura.config.fishing.sep.goldenFishFolder");
         GROUP_OF.put("gankura.config.mining.highlightCompletedCommissions", "gankura.config.mining.sep.commissionFolder");
         GROUP_OF.put("gankura.config.mining.showGemstoneCommissionWaypoints", "gankura.config.mining.sep.commissionFolder");
+        GROUP_OF.put("gankura.config.mining.showMineshaftPortalTracer", "gankura.config.mining.sep.mineshaftFolder");
+        GROUP_OF.put("gankura.config.mining.showMineshaftCooldownHud", "gankura.config.mining.sep.mineshaftFolder");
+        GROUP_OF.put("gankura.config.mining.showMineshaftCooldownTitle", "gankura.config.mining.sep.mineshaftFolder");
         GROUP_OF.put("gankura.config.mining.showCorpseWaypoints", "gankura.config.mining.sep.corpseFolder");
         GROUP_OF.put("gankura.config.mining.showCorpseTracer", "gankura.config.mining.sep.corpseFolder");
         GROUP_OF.put("gankura.config.mining.showVanguardTitle", "gankura.config.mining.sep.corpseFolder");
@@ -272,8 +275,6 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.interfaceSettings.highlightActivePet", "gankura.config.interfaceSettings.sep.petFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.showPetLevel", "gankura.config.interfaceSettings.sep.petFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.hideMaxedPetLevel", "gankura.config.interfaceSettings.sep.petFolder");
-        GROUP_OF.put("gankura.config.interfaceSettings.enablePersonalCompactorPreview", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
-        GROUP_OF.put("gankura.config.interfaceSettings.showPersonalCompactorStatus", "gankura.config.interfaceSettings.sep.personalCompactorFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.enableSellProtection", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.sellProtectionMinRarity", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
         GROUP_OF.put("gankura.config.interfaceSettings.sellProtectRecombobulated", "gankura.config.interfaceSettings.sep.sellProtectionFolder");
@@ -439,7 +440,6 @@ public final class ConfigGroups {
         ALL.add("gankura.config.interfaceSettings.sep.heartFolder");
         ALL.add("gankura.config.interfaceSettings.sep.enchantedBookFolder");
         ALL.add("gankura.config.interfaceSettings.sep.petFolder");
-        ALL.add("gankura.config.interfaceSettings.sep.personalCompactorFolder");
         ALL.add("gankura.config.interfaceSettings.sep.sellProtectionFolder");
         ALL.add("gankura.config.keybinds.sep.openMenuKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.loadoutsKeybindFolder");
