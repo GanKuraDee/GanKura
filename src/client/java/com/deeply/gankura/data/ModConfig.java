@@ -224,8 +224,12 @@ public final class ModConfig {
             public static boolean showGolemStatusHud = true;
 
             @ConfigEntry(id = "showLootTrackerHud", translation = "gankura.config.combat.theEnd.showLootTrackerHud")
-            @Comment(value = "Shows loot tracker HUD.", translation = "gankura.config.combat.theEnd.showLootTrackerHud.desc")
+            @Comment(value = "Shows rare drop counts on the tracker HUD.", translation = "gankura.config.combat.theEnd.showLootTrackerHud.desc")
             public static boolean showLootTrackerHud = true;
+
+            @ConfigEntry(id = "showGolemDpsTracker", translation = "gankura.config.combat.theEnd.showGolemDpsTracker")
+            @Comment(value = "Shows fight count, max DPS and average DPS on the tracker HUD.", translation = "gankura.config.combat.theEnd.showGolemDpsTracker.desc")
+            public static boolean showGolemDpsTracker = true;
 
             @ConfigEntry(id = "enableDropAlerts", translation = "gankura.config.combat.theEnd.enableDropAlerts")
             @Comment(value = "Shows rare drop alert.", translation = "gankura.config.combat.theEnd.enableDropAlerts.desc")
@@ -285,8 +289,16 @@ public final class ModConfig {
             public static boolean showDragonStatusHud = true;
 
             @ConfigEntry(id = "showDragonTrackerHud", translation = "gankura.config.combat.theEnd.showDragonTrackerHud")
-            @Comment(value = "Shows loot tracker HUD.", translation = "gankura.config.combat.theEnd.showDragonTrackerHud.desc")
+            @Comment(value = "Shows rare drop counts on the tracker HUD.", translation = "gankura.config.combat.theEnd.showDragonTrackerHud.desc")
             public static boolean showDragonTrackerHud = true;
+
+            @ConfigEntry(id = "showDragonDpsTracker", translation = "gankura.config.combat.theEnd.showDragonDpsTracker")
+            @Comment(value = "Shows fight count, max DPS and average DPS on the tracker HUD.", translation = "gankura.config.combat.theEnd.showDragonDpsTracker.desc")
+            public static boolean showDragonDpsTracker = true;
+
+            @ConfigEntry(id = "showDragonPerTypeDps", translation = "gankura.config.combat.theEnd.showDragonPerTypeDps")
+            @Comment(value = "Shows fight count, max DPS and average DPS for each dragon type below the overall DPS.", translation = "gankura.config.combat.theEnd.showDragonPerTypeDps.desc")
+            public static boolean showDragonPerTypeDps = true;
 
             @ConfigEntry(id = "enableDragonDropAlerts", translation = "gankura.config.combat.theEnd.enableDragonDropAlerts")
             @Comment(value = "Shows rare drop alert.", translation = "gankura.config.combat.theEnd.enableDragonDropAlerts.desc")
@@ -1695,6 +1707,11 @@ public final class ModConfig {
         @ConfigEntry(id = "enableWarpQueue", translation = "gankura.config.misc.enableWarpQueue")
         @Comment(value = "Shows cooldown, queues /warp.", translation = "gankura.config.misc.enableWarpQueue.desc")
         public static boolean enableWarpQueue = false;
+
+        @ConfigEntry(id = "cancelWarpQueueKeybind", translation = "gankura.config.misc.cancelWarpQueueKeybind")
+        @Comment(value = "Sets a key that cancels the queued /warp.", translation = "gankura.config.misc.cancelWarpQueueKeybind.desc")
+        @ConfigOption.Keybind
+        public static int cancelWarpQueueKeybind = KEY_NONE;
 
         @ConfigEntry(id = "keepAbilityMenuOpen", translation = "gankura.config.misc.keepAbilityMenuOpen")
         @Comment(value = "Stops an item swap from closing a menu an ability just opened.", translation = "gankura.config.misc.keepAbilityMenuOpen.desc")

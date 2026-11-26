@@ -246,6 +246,8 @@ public class GameState {
         public static int eyes = 0;
         public static int playerEyes = 0;
         public static String type = null;
+        // 撃破直後に type を null に戻すため、直後のダメージ結果で種別別 DPS を記録するための控え
+        public static String lastKilledType = null;
         // スコアボードの「Dragon HP: 4,824,217❤」から取得する現在HP(カンマ区切りの生文字列)
         public static String health = null;
         public static long spawnTargetTime = 0;
@@ -258,7 +260,7 @@ public class GameState {
         public static String top3Name = null; public static long top3Damage = 0;
 
         public static void reset() {
-            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null; health = null; widgetMissing = false;
+            eggState = "Scanning..."; eyes = 0; playerEyes = 0; type = null; lastKilledType = null; health = null; widgetMissing = false;
             spawnTargetTime = 0; lastChatTime = 0; fightStartTime = 0; fightEndTime = 0;
             top1Name = null; top1Damage = 0; top2Name = null; top2Damage = 0; top3Name = null; top3Damage = 0;
         }

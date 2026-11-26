@@ -3,9 +3,12 @@ package com.deeply.gankura.handler;
 import com.deeply.gankura.data.GameState;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
+import com.deeply.gankura.util.NotificationUtils;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
 public class WarpCooldownHandler {
     private static final long COOLDOWN_MS = 3000L;
@@ -15,6 +18,9 @@ public class WarpCooldownHandler {
     // 無効なWarp名などサーバーが「Warping...」以外(エラーメッセージ等)を返した場合に、
     // 確認待ち状態のまま固まってしまわないようにするためのタイムアウト
     private static final long CONFIRMATION_TIMEOUT_MS = 3000L;
+
+    // 押しっぱなしで連続反応しないよう、押した瞬間だけを拾う
+    private static boolean cancelKeyWasDown = false;
 
     public static void register() {
         ClientSendMessageEvents.ALLOW_COMMAND.register(WarpCooldownHandler::onCommand);
@@ -55,6 +61,8 @@ public class WarpCooldownHandler {
     }
 
     private static void onTick(Minecraft client) {
+        checkCancelKey(client);
+
         // 確認待ちが一定時間続いた場合(無効な引数などで「Warping...」が返ってこなかった場合)は
         // 待機状態を解除し、キューされたコマンドがあれば送信する
         if (GameState.Warp.awaitingConfirmation
@@ -68,6 +76,29 @@ public class WarpCooldownHandler {
 
         GameState.Warp.cooldownEndAt = 0;
         dispatchQueuedCommand(client);
+    }
+
+    private static void checkCancelKey(Minecraft client) {
+        // 画面表示中(チャット入力・設定画面など)は入力をそちらに譲り、誤解除を防ぐ
+        if (!ModConfig.Misc.enableWarpQueue || client.player == null || client.gui.screen() != null) {
+            cancelKeyWasDown = false;
+            return;
+        }
+
+        boolean down = isKeyDown(client, ModConfig.Misc.cancelWarpQueueKeybind);
+        if (down && !cancelKeyWasDown && GameState.Warp.queuedCommand != null) {
+            String cancelled = GameState.Warp.queuedCommand;
+            GameState.Warp.queuedCommand = null;
+            NotificationUtils.sendSystemChat(client,
+                    Component.literal("§eWarp queue cancelled. §7(/" + cancelled + ")"));
+        }
+        cancelKeyWasDown = down;
+    }
+
+    // 未設定のキーバインドは 0、マウスのボタンは負の値で保存されるため除外する
+    private static boolean isKeyDown(Minecraft client, int keyCode) {
+        if (keyCode <= 0) return false;
+        return InputConstants.isKeyDown(client.getWindow(), keyCode);
     }
 
     // 再送信は onCommand() を再度通過するため、そちら側で awaitingConfirmation が再度立てられる

@@ -2,6 +2,7 @@ package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.DragonAlertType;
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.LootStats;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
@@ -73,6 +74,9 @@ public class DragonHandler {
 
         Matcher m4 = ModConstants.DRAGON_DOWN_PATTERN.matcher(cleanMsg);
         if (m4.find()) {
+            // 撃破メッセージ側の種類名を優先し、取れなければスポーン時の記憶を残す
+            String killedType = m4.group(1);
+            GameState.Dragon.lastKilledType = (killedType != null && !killedType.isEmpty()) ? killedType : GameState.Dragon.type;
             GameState.Dragon.eggState = "Respawning"; GameState.Dragon.spawnTargetTime = 0; GameState.Dragon.type = null; GameState.Dragon.eyes = 0;
             if (client.level != null) GameState.Dragon.fightEndTime = GameState.Server.estimatedTicks(client.level.getGameTime());
             GameState.Dragon.lastChatTime = System.currentTimeMillis();
@@ -116,14 +120,35 @@ public class DragonHandler {
             if (GameState.Dragon.fightStartTime > 0 && lastDownTime > GameState.Dragon.fightStartTime) durationSeconds = (lastDownTime - GameState.Dragon.fightStartTime) / 20.0;
 
             final double finalDurationSec = durationSeconds;
-            final String finalDps = (durationSeconds > 0) ? formatDps(myDamage / durationSeconds) : null;
+            final double finalDpsValue;
+            final String finalDps;
+            final String finalBestBadge;
+            final DragonAlertType finalDragonType = DragonAlertType.fromTypeName(GameState.Dragon.lastKilledType);
+            if (durationSeconds > 0) {
+                double dps = myDamage / durationSeconds;
+                finalDpsValue = dps;
+                LootStats.DragonDpsResult dpsResult = LootStats.recordDragonDps(finalDragonType, dps);
+                finalDps = LootStats.formatDps(dps);
+                if (dpsResult.newOverallBest()) {
+                    finalBestBadge = "§e§l(NEW BEST!) ";
+                } else if (dpsResult.newTypeBest()) {
+                    finalBestBadge = "§e§l(NEW TYPE BEST!) ";
+                } else {
+                    finalBestBadge = "";
+                }
+            } else {
+                finalDpsValue = 0;
+                finalDps = null;
+                finalBestBadge = "";
+            }
+            GameState.Dragon.lastKilledType = null;
             final String finalDurationStr = (durationSeconds > 0) ? String.format("%.1fs", durationSeconds) : null;
 
             new Timer().schedule(new TimerTask() {
                 @Override public void run() {
                     // ★修正: myDamage(自分のダメージ)も引数として渡す
                     int lootQuality = calculateDragonLootQuality(myPosition, myDamage);
-                    printDragonResult(client, finalDps, finalDurationStr, finalDurationSec, lootQuality);
+                    printDragonResult(client, finalDragonType, finalDps, finalDpsValue, finalBestBadge, finalDurationStr, finalDurationSec, lootQuality);
                 }
             }, 500);
         } catch (Exception ignored) {}
@@ -165,18 +190,29 @@ public class DragonHandler {
         return (int) (placementQuality + (100 * placedEyes) + damageRatio);
     }
 
-    private static void printDragonResult(Minecraft client, String dps, String duration, double durationSeconds, int lq) {
+    private static void printDragonResult(Minecraft client, DragonAlertType dragonType, String dps, double dpsValue, String bestBadge, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
+                String dragonColor = dragonType != null ? dragonType.colorCode() : "§d";
+                String dragonLabel = dragonType != null ? dragonType.typeName() + " Dragon" : "Dragon";
                 if (ModConfig.Combat.TheEnd.showDragonDpsChat && dps != null && duration != null) {
-                    MutableComponent msg = Component.literal(String.format("§dYour Dragon DPS: §l§o%s §r§7(%s) ", dps, duration));
+                    String badgeSegment = bestBadge != null && !bestBadge.isEmpty() ? bestBadge + "§r" : "";
+                    String dpsColor = LootStats.dpsColor(dpsValue);
+                    MutableComponent msg = Component.literal(String.format("§fYour %s§l%s §bDPS: %s§l§o%s §r%s§7(%s) ", dragonColor, dragonLabel, dpsColor, dps, badgeSegment, duration));
                     if (durationSeconds > 0 && GameState.Dragon.top1Damage > 0) {
-                        MutableComponent hoverText = Component.literal("§d§lTop 3 DPS\n");
-                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- §d§l§o%s", GameState.Dragon.top1Name, formatDps(GameState.Dragon.top1Damage / durationSeconds))));
-                        if (GameState.Dragon.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §d§l§o%s", GameState.Dragon.top2Name, formatDps(GameState.Dragon.top2Damage / durationSeconds))));
-                        if (GameState.Dragon.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §d§l§o%s", GameState.Dragon.top3Name, formatDps(GameState.Dragon.top3Damage / durationSeconds))));
+                        double top1Dps = GameState.Dragon.top1Damage / durationSeconds;
+                        MutableComponent hoverText = Component.literal("§b§lTop 3 DPS\n");
+                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- %s§l§o%s", GameState.Dragon.top1Name, LootStats.dpsColor(top1Dps), formatDps(top1Dps))));
+                        if (GameState.Dragon.top2Damage > 0) {
+                            double top2Dps = GameState.Dragon.top2Damage / durationSeconds;
+                            hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- %s§l§o%s", GameState.Dragon.top2Name, LootStats.dpsColor(top2Dps), formatDps(top2Dps))));
+                        }
+                        if (GameState.Dragon.top3Damage > 0) {
+                            double top3Dps = GameState.Dragon.top3Damage / durationSeconds;
+                            hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- %s§l§o%s", GameState.Dragon.top3Name, LootStats.dpsColor(top3Dps), formatDps(top3Dps))));
+                        }
                         // Yarnの HoverEvent.ShowText は HoverEvent.Action.SHOW_TEXT になります。また、.setStyle は .withStyle になります。
-                        msg.append(Component.literal("§d§l§o[HOVER]")
+                        msg.append(Component.literal("§b§l§o[HOVER]")
                                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
@@ -185,14 +221,14 @@ public class DragonHandler {
                     // 畳んだ中身を開かなくても済むよう、全部に届いたかどうかを値の色で示す
                     String colour = qualityColour(lq, LQ_DRAGON_LEGENDARY, LQ_DRAGON_EPIC);
                     MutableComponent msg = Component.literal(
-                            String.format("§dYour Dragon Loot Quality: %s§l§o%d §r", colour, lq));
+                            String.format("§fYour %s§l%s §eLoot Quality: %s§l§o%d §r", dragonColor, dragonLabel, colour, lq));
 
                     // 落とし物の可否は行を分けるとチャットが流れるので、DPS と同じくホバーへ畳む
-                    MutableComponent hoverText = Component.literal("§d§lDrops\n");
+                    MutableComponent hoverText = Component.literal("§e§lDrops\n");
                     hoverText.append(Component.literal(dropLine("§7[Lvl 1] §6Ender Dragon", lq, LQ_DRAGON_LEGENDARY)));
                     hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §5Ender Dragon", lq, LQ_DRAGON_EPIC)));
 
-                    msg.append(Component.literal("§d§l§o[HOVER]")
+                    msg.append(Component.literal("§e§l§o[HOVER]")
                             .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     NotificationUtils.sendSystemChat(client, msg);
                 }
@@ -200,7 +236,7 @@ public class DragonHandler {
         });
     }
 
-    private static String formatDps(double dps) { return dps >= 1000 ? String.format("%,.1fk", dps / 1000.0) : String.format("%,.1f", dps); }
+    private static String formatDps(double dps) { return LootStats.formatDps(dps); }
 
     /** 落とし物すべてに届いていれば緑、1つでも欠けていれば赤 */
     private static String qualityColour(int quality, int... required) {

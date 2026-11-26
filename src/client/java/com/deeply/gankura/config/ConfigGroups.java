@@ -39,7 +39,8 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.combat.enableQuiverAlert", "gankura.config.combat.sep.quiverLowAlertFolder");
         GROUP_OF.put("gankura.config.combat.quiverLowThreshold", "gankura.config.combat.sep.quiverLowAlertFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.showGolemStatusHud", "gankura.config.combat.theEnd.sep.golemSection");
-        GROUP_OF.put("gankura.config.combat.theEnd.showLootTrackerHud", "gankura.config.combat.theEnd.sep.golemRareDropFolder");
+        GROUP_OF.put("gankura.config.combat.theEnd.showLootTrackerHud", "gankura.config.combat.theEnd.sep.golemTrackerFolder");
+        GROUP_OF.put("gankura.config.combat.theEnd.showGolemDpsTracker", "gankura.config.combat.theEnd.sep.golemTrackerFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.enableDropAlerts", "gankura.config.combat.theEnd.sep.golemRareDropFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.trackedGolemDrops", "gankura.config.combat.theEnd.sep.golemRareDropFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.showGolemWorldLocation_Text", "gankura.config.combat.theEnd.sep.worldLocationFolder");
@@ -54,7 +55,9 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.combat.theEnd.showLootQualityChat", "gankura.config.combat.theEnd.sep.golemChatFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.enableDay30Alert", "gankura.config.combat.theEnd.sep.golemChatFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.showDragonStatusHud", "gankura.config.combat.theEnd.sep.dragonSection");
-        GROUP_OF.put("gankura.config.combat.theEnd.showDragonTrackerHud", "gankura.config.combat.theEnd.sep.dragonRareDropFolder");
+        GROUP_OF.put("gankura.config.combat.theEnd.showDragonTrackerHud", "gankura.config.combat.theEnd.sep.dragonTrackerFolder");
+        GROUP_OF.put("gankura.config.combat.theEnd.showDragonDpsTracker", "gankura.config.combat.theEnd.sep.dragonTrackerFolder");
+        GROUP_OF.put("gankura.config.combat.theEnd.showDragonPerTypeDps", "gankura.config.combat.theEnd.sep.dragonTrackerFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.enableDragonDropAlerts", "gankura.config.combat.theEnd.sep.dragonRareDropFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.trackedDragonDrops", "gankura.config.combat.theEnd.sep.dragonRareDropFolder");
         GROUP_OF.put("gankura.config.combat.theEnd.enableDragonSpawnAlert", "gankura.config.combat.theEnd.sep.spawnTitleFolder");
@@ -319,11 +322,15 @@ public final class ConfigGroups {
         GROUP_OF.put("gankura.config.misc.showEtherwarpTarget", "gankura.config.misc.sep.etherwarpFolder");
         GROUP_OF.put("gankura.config.misc.etherwarpOnlySneaking", "gankura.config.misc.sep.etherwarpFolder");
         GROUP_OF.put("gankura.config.misc.showEtherwarpReason", "gankura.config.misc.sep.etherwarpFolder");
+        GROUP_OF.put("gankura.config.misc.enableWarpQueue", "gankura.config.misc.sep.warpQueueFolder");
+        GROUP_OF.put("gankura.config.misc.cancelWarpQueueKeybind", "gankura.config.misc.sep.warpQueueFolder");
     }
 
     private static void groups() {
         ALL.add("gankura.config.combat.sep.quiverLowAlertFolder");
         ALL.add("gankura.config.combat.theEnd.sep.golemSection");
+        ALL.add("gankura.config.combat.theEnd.sep.golemTrackerFolder");
+        PARENT.put("gankura.config.combat.theEnd.sep.golemTrackerFolder", "gankura.config.combat.theEnd.sep.golemSection");
         ALL.add("gankura.config.combat.theEnd.sep.golemRareDropFolder");
         PARENT.put("gankura.config.combat.theEnd.sep.golemRareDropFolder", "gankura.config.combat.theEnd.sep.golemSection");
         ALL.add("gankura.config.combat.theEnd.sep.worldLocationFolder");
@@ -335,6 +342,8 @@ public final class ConfigGroups {
         ALL.add("gankura.config.combat.theEnd.sep.golemChatFolder");
         PARENT.put("gankura.config.combat.theEnd.sep.golemChatFolder", "gankura.config.combat.theEnd.sep.golemSection");
         ALL.add("gankura.config.combat.theEnd.sep.dragonSection");
+        ALL.add("gankura.config.combat.theEnd.sep.dragonTrackerFolder");
+        PARENT.put("gankura.config.combat.theEnd.sep.dragonTrackerFolder", "gankura.config.combat.theEnd.sep.dragonSection");
         ALL.add("gankura.config.combat.theEnd.sep.dragonRareDropFolder");
         PARENT.put("gankura.config.combat.theEnd.sep.dragonRareDropFolder", "gankura.config.combat.theEnd.sep.dragonSection");
         ALL.add("gankura.config.combat.theEnd.sep.spawnTitleFolder");
@@ -446,5 +455,6 @@ public final class ConfigGroups {
         ALL.add("gankura.config.keybinds.sep.armorSetKeybindFolder");
         ALL.add("gankura.config.keybinds.sep.equipmentSetKeybindFolder");
         ALL.add("gankura.config.misc.sep.etherwarpFolder");
+        ALL.add("gankura.config.misc.sep.warpQueueFolder");
     }
 }
