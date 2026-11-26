@@ -8,10 +8,34 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Properties;
 
 public class LootStats {
     private static final Logger LOGGER = LoggerFactory.getLogger("GankuraLootStats");
+
+    /** 種類ごとの DPS 集計 */
+    public static final class DpsStats {
+        public int fights = 0;
+        public double totalDps = 0.0;
+        public double maxDps = 0.0;
+
+        public double averageDps() {
+            return fights > 0 ? totalDps / fights : 0.0;
+        }
+
+        boolean record(double dps) {
+            boolean newBest = dps > maxDps;
+            fights++;
+            totalDps += dps;
+            if (newBest) maxDps = dps;
+            return newBest;
+        }
+    }
+
+    /** Dragon の DPS 記録結果。全体または種類別の最大 DPS を更新したかを返す */
+    public record DragonDpsResult(boolean newOverallBest, boolean newTypeBest) {}
 
     private static final File CONFIG_FILE = FabricLoader.getInstance()
             .getConfigDir()
@@ -25,9 +49,26 @@ public class LootStats {
     public static int legendaryGolemPets = 0;
     public static int tierBoostCores = 0;
 
+    // End Stone Protector の DPS 記録 (戦闘数・合計DPS・最大DPS)
+    public static int golemFights = 0;
+    public static double golemTotalDps = 0.0;
+    public static double golemMaxDps = 0.0;
+
     // ★追加: ドラゴンペットの取得数
     public static int epicDragonPets = 0;
     public static int legendaryDragonPets = 0;
+
+    // Dragon の DPS 記録 (全体 + 種類別)
+    public static int dragonFights = 0;
+    public static double dragonTotalDps = 0.0;
+    public static double dragonMaxDps = 0.0;
+    private static final EnumMap<DragonAlertType, DpsStats> DRAGON_TYPE_DPS = new EnumMap<>(DragonAlertType.class);
+
+    static {
+        for (DragonAlertType type : DragonAlertType.values()) {
+            DRAGON_TYPE_DPS.put(type, new DpsStats());
+        }
+    }
 
     // Crimson Isle ドロップ
     public static int kuudraKeys = 0;
@@ -58,9 +99,24 @@ public class LootStats {
             try { legendaryGolemPets = Integer.parseInt(properties.getProperty("legendaryGolemPets", "0")); } catch (NumberFormatException e) { legendaryGolemPets = 0; }
             try { tierBoostCores = Integer.parseInt(properties.getProperty("tierBoostCores", "0")); } catch (NumberFormatException e) { tierBoostCores = 0; }
 
+            golemFights = parseNonNegativeInt(properties.getProperty("golemFights"));
+            golemTotalDps = parseNonNegativeDouble(properties.getProperty("golemTotalDps"));
+            golemMaxDps = parseNonNegativeDouble(properties.getProperty("golemMaxDps"));
+
             // ★追加: ドラゴンペットの読み込み
             try { epicDragonPets = Integer.parseInt(properties.getProperty("epicDragonPets", "0")); } catch (NumberFormatException e) { epicDragonPets = 0; }
             try { legendaryDragonPets = Integer.parseInt(properties.getProperty("legendaryDragonPets", "0")); } catch (NumberFormatException e) { legendaryDragonPets = 0; }
+
+            dragonFights = parseNonNegativeInt(properties.getProperty("dragonFights"));
+            dragonTotalDps = parseNonNegativeDouble(properties.getProperty("dragonTotalDps"));
+            dragonMaxDps = parseNonNegativeDouble(properties.getProperty("dragonMaxDps"));
+            for (DragonAlertType type : DragonAlertType.values()) {
+                String prefix = dragonTypeKeyPrefix(type);
+                DpsStats stats = DRAGON_TYPE_DPS.get(type);
+                stats.fights = parseNonNegativeInt(properties.getProperty(prefix + "fights"));
+                stats.totalDps = parseNonNegativeDouble(properties.getProperty(prefix + "totalDps"));
+                stats.maxDps = parseNonNegativeDouble(properties.getProperty(prefix + "maxDps"));
+            }
             // Crimson Isle
             try { kuudraKeys = Integer.parseInt(properties.getProperty("kuudraKeys", "0")); } catch (NumberFormatException e) { kuudraKeys = 0; }
             try { hotKuudraKeys = Integer.parseInt(properties.getProperty("hotKuudraKeys", "0")); } catch (NumberFormatException e) { hotKuudraKeys = 0; }
@@ -91,10 +147,23 @@ public class LootStats {
         properties.setProperty("epicGolemPets", String.valueOf(epicGolemPets));
         properties.setProperty("legendaryGolemPets", String.valueOf(legendaryGolemPets));
         properties.setProperty("tierBoostCores", String.valueOf(tierBoostCores));
+        properties.setProperty("golemFights", String.valueOf(golemFights));
+        properties.setProperty("golemTotalDps", String.valueOf(golemTotalDps));
+        properties.setProperty("golemMaxDps", String.valueOf(golemMaxDps));
 
         // ★追加: ドラゴンペットの保存
         properties.setProperty("epicDragonPets", String.valueOf(epicDragonPets));
         properties.setProperty("legendaryDragonPets", String.valueOf(legendaryDragonPets));
+        properties.setProperty("dragonFights", String.valueOf(dragonFights));
+        properties.setProperty("dragonTotalDps", String.valueOf(dragonTotalDps));
+        properties.setProperty("dragonMaxDps", String.valueOf(dragonMaxDps));
+        for (DragonAlertType type : DragonAlertType.values()) {
+            String prefix = dragonTypeKeyPrefix(type);
+            DpsStats stats = DRAGON_TYPE_DPS.get(type);
+            properties.setProperty(prefix + "fights", String.valueOf(stats.fights));
+            properties.setProperty(prefix + "totalDps", String.valueOf(stats.totalDps));
+            properties.setProperty(prefix + "maxDps", String.valueOf(stats.maxDps));
+        }
         // Crimson Isle
         properties.setProperty("kuudraKeys", String.valueOf(kuudraKeys));
         properties.setProperty("hotKuudraKeys", String.valueOf(hotKuudraKeys));
@@ -139,6 +208,90 @@ public class LootStats {
     public static void addLegendaryDragonPet() {
         legendaryDragonPets++;
         save();
+    }
+
+    public static synchronized boolean recordGolemDps(double dps) {
+        if (!Double.isFinite(dps) || dps <= 0.0) return false;
+        boolean newBest = dps > golemMaxDps;
+        golemFights++;
+        golemTotalDps += dps;
+        if (newBest) golemMaxDps = dps;
+        save();
+        return newBest;
+    }
+
+    public static synchronized DragonDpsResult recordDragonDps(DragonAlertType type, double dps) {
+        if (!Double.isFinite(dps) || dps <= 0.0) return new DragonDpsResult(false, false);
+        boolean newOverallBest = dps > dragonMaxDps;
+        dragonFights++;
+        dragonTotalDps += dps;
+        if (newOverallBest) dragonMaxDps = dps;
+        boolean newTypeBest = false;
+        if (type != null) {
+            DpsStats stats = DRAGON_TYPE_DPS.get(type);
+            if (stats != null) newTypeBest = stats.record(dps);
+        }
+        save();
+        return new DragonDpsResult(newOverallBest, newTypeBest);
+    }
+
+    public static DpsStats dragonTypeDps(DragonAlertType type) {
+        return DRAGON_TYPE_DPS.get(type);
+    }
+
+    private static String dragonTypeKeyPrefix(DragonAlertType type) {
+        return "dragonType." + type.typeName().toLowerCase(Locale.ROOT) + ".";
+    }
+
+    public static double golemAverageDps() {
+        return golemFights > 0 ? golemTotalDps / golemFights : 0.0;
+    }
+
+    public static double dragonAverageDps() {
+        return dragonFights > 0 ? dragonTotalDps / dragonFights : 0.0;
+    }
+
+    /** チャットと Tracker HUD で揃えた DPS 表記 */
+    public static String formatDps(double dps) {
+        return dps >= 1000.0
+                ? String.format(Locale.ROOT, "%,.1fk", dps / 1000.0)
+                : String.format(Locale.ROOT, "%,.1f", dps);
+    }
+
+    /** DPS 値に応じた色コード (Hypixel SkyBlock のレベル色階調に準拠) */
+    public static String dpsColor(double dps) {
+        if (!Double.isFinite(dps) || dps <= 0.0) return "§7";
+        if (dps < 10_000.0) return "§f";
+        if (dps < 25_000.0) return "§e";
+        if (dps < 50_000.0) return "§a";
+        if (dps < 100_000.0) return "§2";
+        if (dps < 250_000.0) return "§b";
+        if (dps < 500_000.0) return "§3";
+        if (dps < 1_000_000.0) return "§9";
+        if (dps < 2_500_000.0) return "§d";
+        if (dps < 4_000_000.0) return "§5";
+        if (dps < 6_000_000.0) return "§6";
+        if (dps < 8_000_000.0) return "§c";
+        return "§4";
+    }
+
+    private static int parseNonNegativeInt(String value) {
+        if (value == null) return 0;
+        try {
+            return Math.max(0, Integer.parseInt(value));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static double parseNonNegativeDouble(String value) {
+        if (value == null) return 0.0;
+        try {
+            double parsed = Double.parseDouble(value);
+            return Double.isFinite(parsed) && parsed > 0.0 ? parsed : 0.0;
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
     // Crimson Isle 追加用メソッド

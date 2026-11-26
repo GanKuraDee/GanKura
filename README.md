@@ -28,7 +28,8 @@ Open the settings screen with `/gankura`. The sections below follow its order an
   - **The End**
     - End Stone Protector
       - Status HUD
-      - Rare Drop Settings - Loot Tracker HUD, Notification, Tracked Drops
+      - Tracker HUD - Show Loot, Show DPS
+      - Rare Drop Settings - Notification, Tracked Drops
 ![Rare Drop Notification](https://cdn.modrinth.com/data/cached_images/083fb73c0c606473ca634b7548aca070825fc15f.png)
       - World Location Display - Show Text, Show Beacon Beam, Show Tracer
 ![End Stone Protector World Location Display](https://cdn.modrinth.com/data/cached_images/f0cd9155cc45df09483a68779fc5cbeaa1ef9054.png)
@@ -37,7 +38,8 @@ Open the settings screen with `/gankura`. The sections below follow its order an
       - Chat Settings - Stage 4 Duration Message, DPS Message, Loot Quality Message, Day 30+ Alert Message
     - Dragon
       - Status HUD
-      - Rare Drop Settings - Loot Tracker HUD, Notification, Tracked Drops
+      - Tracker HUD - Show Loot, Show DPS, By Dragon Type
+      - Rare Drop Settings - Notification, Tracked Drops
       - Spawn Alert Title - Enable, Alert Dragons
       - Chat Settings - DPS Message, Loot Quality Message
   - **Spider's Den**
@@ -266,7 +268,7 @@ Buttons placed around inventory menus that run a command when clicked. Ported fr
 
   - Etherwarp - Highlight Target, Only While Sneaking, Show Reason
   - Server Reboot Alert
-  - Warp Cooldown Queue
+  - Warp Cooldown Queue - Enable, Cancel Key
   - Ability Menu Fix
   - Ignore Armor Stand Clicks
 </details>

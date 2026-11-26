@@ -9,31 +9,37 @@ import java.util.List;
  * 色は showDragonSpawnAlert のタイトル色に合わせている。
  */
 public enum DragonAlertType {
-    PROTECTOR("§8Protector", "Protector"),
-    OLD("§7Old", "Old"),
-    UNSTABLE("§5Unstable", "Unstable"),
-    YOUNG("§fYoung", "Young"),
-    STRONG("§cStrong", "Strong"),
-    WISE("§bWise", "Wise"),
-    SUPERIOR("§eSuperior", "Superior");
+    PROTECTOR("§8", "Protector"),
+    OLD("§7", "Old"),
+    UNSTABLE("§5", "Unstable"),
+    YOUNG("§f", "Young"),
+    STRONG("§c", "Strong"),
+    WISE("§b", "Wise"),
+    SUPERIOR("§e", "Superior");
 
+    private final String colorCode;
     private final String label;
     private final String typeName;
 
-    DragonAlertType(String label, String typeName) {
-        this.label = label;
+    DragonAlertType(String colorCode, String typeName) {
+        this.colorCode = colorCode;
+        this.label = colorCode + typeName;
         this.typeName = typeName;
+    }
+
+    public String colorCode() {
+        return colorCode;
     }
 
     public String typeName() {
         return typeName;
     }
 
-    /** GameState.Dragon.type の文字列に対応する種類を返す。未知の種類は null */
+    /** GameState.Dragon.type や DRAGON DOWN! の文字列に対応する種類を返す。未知の種類は null */
     public static DragonAlertType fromTypeName(String typeName) {
         if (typeName == null) return null;
         for (DragonAlertType type : values()) {
-            if (type.typeName.equals(typeName)) return type;
+            if (type.typeName.equalsIgnoreCase(typeName)) return type;
         }
         return null;
     }
