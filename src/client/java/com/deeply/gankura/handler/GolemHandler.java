@@ -1,6 +1,7 @@
 package com.deeply.gankura.handler;
 
 import com.deeply.gankura.data.GameState;
+import com.deeply.gankura.data.LootStats;
 import com.deeply.gankura.data.ModConfig;
 import com.deeply.gankura.data.ModConstants;
 import com.deeply.gankura.util.NotificationUtils;
@@ -90,37 +91,48 @@ public class GolemHandler {
         try {
             long myDamage = Long.parseLong(matcher.group(1).replace(",", ""));
             int myPosition = Integer.parseInt(matcher.group(2).replace(",", ""));
-            String formattedDps = null; String durationStr = null; double durationSeconds = 0;
+            String formattedDps = null; String durationStr = null; double durationSeconds = 0; double dpsValue = 0; boolean newBest = false;
             if (GameState.Golem.fightStartTime > 0 && lastDownTime > GameState.Golem.fightStartTime) {
                 durationSeconds = (lastDownTime - GameState.Golem.fightStartTime) / 20.0;
                 if (durationSeconds > 0) {
-                    formattedDps = formatDps(myDamage / durationSeconds);
+                    dpsValue = myDamage / durationSeconds;
+                    newBest = LootStats.recordGolemDps(dpsValue);
+                    formattedDps = LootStats.formatDps(dpsValue);
                     durationStr = String.format("%.1fs", durationSeconds);
                 }
             }
 
-            String finalDps = formattedDps; String finalDuration = durationStr; double finalDurationSec = durationSeconds;
+            String finalDps = formattedDps; double finalDpsValue = dpsValue; String finalDuration = durationStr; double finalDurationSec = durationSeconds; boolean finalNewBest = newBest;
             new Timer().schedule(new TimerTask() {
                 @Override public void run() {
                     int lootQuality = calculateLootQuality(myDamage, myPosition);
-                    printResult(client, finalDps, finalDuration, finalDurationSec, lootQuality);
+                    printResult(client, finalDps, finalDpsValue, finalNewBest, finalDuration, finalDurationSec, lootQuality);
                 }
             }, 500);
         } catch (Exception e) {}
     }
 
-    private static void printResult(Minecraft client, String dps, String duration, double durationSeconds, int lq) {
+    private static void printResult(Minecraft client, String dps, double dpsValue, boolean newBest, String duration, double durationSeconds, int lq) {
         client.execute(() -> {
             if (client.player != null) {
                 if (ModConfig.Combat.TheEnd.showDpsChat && dps != null && duration != null) {
-                    MutableComponent msg = Component.literal(String.format("§6Your Golem DPS: §l§o%s §r§7(%s) ", dps, duration));
+                    String badge = newBest ? "§e§l(NEW BEST!) §r" : "";
+                    String dpsColor = LootStats.dpsColor(dpsValue);
+                    MutableComponent msg = Component.literal(String.format("§fYour §6§lGolem §bDPS: %s§l§o%s §r%s§7(%s) ", dpsColor, dps, badge, duration));
                     if (durationSeconds > 0 && GameState.Golem.top1Damage > 0) {
-                        MutableComponent hoverText = Component.literal("§6§lTop 3 DPS\n");
-                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- §6§l§o%s", GameState.Golem.top1Name, formatDps(GameState.Golem.top1Damage / durationSeconds))));
-                        if (GameState.Golem.top2Damage > 0) hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- §6§l§o%s", GameState.Golem.top2Name, formatDps(GameState.Golem.top2Damage / durationSeconds))));
-                        if (GameState.Golem.top3Damage > 0) hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- §6§l§o%s", GameState.Golem.top3Name, formatDps(GameState.Golem.top3Damage / durationSeconds))));
+                        double top1Dps = GameState.Golem.top1Damage / durationSeconds;
+                        MutableComponent hoverText = Component.literal("§b§lTop 3 DPS\n");
+                        hoverText.append(Component.literal(String.format("§e#1 §f%s §7- %s§l§o%s", GameState.Golem.top1Name, LootStats.dpsColor(top1Dps), formatDps(top1Dps))));
+                        if (GameState.Golem.top2Damage > 0) {
+                            double top2Dps = GameState.Golem.top2Damage / durationSeconds;
+                            hoverText.append(Component.literal(String.format("\n§6#2 §f%s §7- %s§l§o%s", GameState.Golem.top2Name, LootStats.dpsColor(top2Dps), formatDps(top2Dps))));
+                        }
+                        if (GameState.Golem.top3Damage > 0) {
+                            double top3Dps = GameState.Golem.top3Damage / durationSeconds;
+                            hoverText.append(Component.literal(String.format("\n§c#3 §f%s §7- %s§l§o%s", GameState.Golem.top3Name, LootStats.dpsColor(top3Dps), formatDps(top3Dps))));
+                        }
                         // Yarnの HoverEvent.ShowText は HoverEvent.Action.SHOW_TEXT に、setStyleはwithStyleに変更
-                        msg.append(Component.literal("§6§l§o[HOVER]")
+                        msg.append(Component.literal("§b§l§o[HOVER]")
                                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     }
                     NotificationUtils.sendSystemChat(client, msg);
@@ -129,15 +141,15 @@ public class GolemHandler {
                     // 畳んだ中身を開かなくても済むよう、全部に届いたかどうかを値の色で示す
                     String colour = qualityColour(lq, LQ_TIER_BOOST_CORE, LQ_GOLEM_LEGENDARY, LQ_GOLEM_EPIC);
                     MutableComponent msg = Component.literal(
-                            String.format("§6Your Golem Loot Quality: %s§l§o%d §r", colour, lq));
+                            String.format("§fYour §6§lGolem §eLoot Quality: %s§l§o%d §r", colour, lq));
 
                     // 落とし物の可否は行を分けるとチャットが流れるので、DPS と同じくホバーへ畳む
-                    MutableComponent hoverText = Component.literal("§6§lDrops\n");
+                    MutableComponent hoverText = Component.literal("§e§lDrops\n");
                     hoverText.append(Component.literal(dropLine("§6Tier Boost Core", lq, LQ_TIER_BOOST_CORE)));
                     hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §6Golem", lq, LQ_GOLEM_LEGENDARY)));
                     hoverText.append(Component.literal("\n" + dropLine("§7[Lvl 1] §5Golem", lq, LQ_GOLEM_EPIC)));
 
-                    msg.append(Component.literal("§6§l§o[HOVER]")
+                    msg.append(Component.literal("§e§l§o[HOVER]")
                             .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(hoverText))));
                     NotificationUtils.sendSystemChat(client, msg);
                 }
@@ -156,7 +168,7 @@ public class GolemHandler {
         return (int) (placementQuality + damageScore + zealotScore);
     }
 
-    private static String formatDps(double dps) { return dps >= 1000 ? String.format("%,.1fk", dps / 1000.0) : String.format("%,.1f", dps); }
+    private static String formatDps(double dps) { return LootStats.formatDps(dps); }
 
     /** 落とし物すべてに届いていれば緑、1つでも欠けていれば赤 */
     private static String qualityColour(int quality, int... required) {
